@@ -1,6 +1,7 @@
 require 'coffee-script/register'
 browserify = require 'browserify'
 bower = require 'bower'
+childProcess = require 'child_process'
 del = require 'del'
 concat = require 'gulp-concat'
 glob = require 'glob'
@@ -16,12 +17,7 @@ sh = require 'shelljs'
 source = require 'vinyl-source-stream'
 uglify = require 'gulp-uglify'
 watchify = require 'watchify'
-webdriverUpdate = require('gulp-protractor').webdriver_update
 protractor = require('gulp-protractor').protractor
-
-# TODO: Make sure that the order of tasks doesn't matter. If
-# it does, use a callback:
-# https://github.com/gulpjs/gulp/blob/master/docs/API.md#return-a-promise
 
 buildDir = './www'
 appDir = './app'
@@ -149,12 +145,15 @@ gulp.task 'unit', ->
   return
 
 
-gulp.task 'webdriver-update', webdriverUpdate
+gulp.task 'webdriver-update', (done) ->
+  childProcess.spawn 'webdriver-manager', ['update'], stdio: 'inherit'
+    .once 'close', done
+  return
 
 
 gulp.task 'e2e', ['webdriver-update'], ->
   gulp.src "#{appDir}/**/*.scenario.coffee"
-    .pipe protractor(configFile: './client/config/protractor.conf.coffee')
+    .pipe protractor(configFile: './config/protractor.conf.coffee')
     .on 'error', (error) ->
       throw error
   return
