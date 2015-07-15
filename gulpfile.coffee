@@ -73,7 +73,7 @@ gulp.task 'scripts', ['clean-scripts'], ->
 
 
 gulp.task 'styles', ->
-  gulp.src "#{appDir}/index.scss"
+  gulp.src "#{appDir}/main.scss"
     .pipe sass(errLogToConsole: true)
     .pipe rename(extname: '.css')
     .pipe gulp.dest("#{buildDir}/app")
