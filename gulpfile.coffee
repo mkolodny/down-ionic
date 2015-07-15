@@ -198,6 +198,7 @@ gulp.task 'watch', [
   scripts true
   gulp.watch "#{appDir}/**/*.scss", ['styles']
   gulp.watch "#{dataDir}/**/*", ['data']
+  gulp.watch "#{appDir}/**/*.html", ['templates']
   return
 
 
