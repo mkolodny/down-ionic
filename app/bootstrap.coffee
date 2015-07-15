@@ -1,6 +1,6 @@
 # tells AngularJS to go ahead and bootstrap when the DOM is loaded
 require './ionic/ionic.js'
-angular = require 'angular'
+require 'angular'
 require 'angular-animate'
 require 'angular-sanitize'
 require 'angular-ui-router'
