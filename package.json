@@ -25,7 +25,6 @@
   },
   "devDependencies": {
     "bower": "1.4.1",
-    "gulp-livereload": "3.8.0",
     "gulp-protractor": "1.0.0",
     "gulp-util": "2.2.20",
     "jasmine-core": "2.3.4",

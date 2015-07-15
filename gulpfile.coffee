@@ -7,7 +7,6 @@ glob = require 'glob'
 gulp = require 'gulp'
 gutil = require 'gulp-util'
 imagemin = require 'gulp-imagemin'
-livereload = require 'gulp-livereload'
 karma = require('karma').server
 karmaConf = require './config/karma.conf'
 minifyCss = require 'gulp-minify-css'
@@ -51,8 +50,6 @@ scripts = (watch) ->
       # wrap plugins to support streams
       # i.e. .pipe streamify(plugin())
       .pipe gulp.dest("#{buildDir}/app")
-    if watch
-      return bundleStream.pipe livereload()
     return bundleStream
 
   if watch
