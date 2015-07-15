@@ -7,3 +7,6 @@ plugins/
 
 # vim
 *.sw[op]
+
+# build directory
+www/
