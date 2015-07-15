@@ -4,6 +4,14 @@ APNSDevice = ($resource, apiRoot) ->
   $resource "#{listUrl}/:id", null,
     save:
       method: 'post'
+      transformRequest: (data, headersGetter) ->
+        request =
+          id: data.id
+          user_id: data.userId
+          registration_id: data.registrationId
+          device_id: data.deviceId
+          name: data.name
+        angular.toJson request
       transformResponse: (data, headersGetter) ->
         data = angular.fromJson data
         response =
