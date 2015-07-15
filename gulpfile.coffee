@@ -3,12 +3,13 @@ browserify = require 'browserify'
 bower = require 'bower'
 del = require 'del'
 concat = require 'gulp-concat'
+glob = require 'glob'
 gulp = require 'gulp'
 gutil = require 'gulp-util'
 imagemin = require 'gulp-imagemin'
 livereload = require 'gulp-livereload'
 karma = require('karma').server
-#karmaConf = require './client/config/karma.conf'
+karmaConf = require './config/karma.conf'
 minifyCss = require 'gulp-minify-css'
 rename = require 'gulp-rename'
 sass = require 'gulp-sass'
@@ -26,7 +27,7 @@ protractor = require('gulp-protractor').protractor
 buildDir = './www'
 appDir = './app'
 dataDir = './data'
-testDir = './test'
+testDir = './tests'
 
 gulp.task 'install', ->
   bower.commands.install().on 'log', (data) ->
@@ -128,22 +129,26 @@ gulp.task 'minify', [
 
 
 gulp.task 'unit', ->
-  ## watch all test files for changes, and re-browserify
-  bundler = watchify
-    entries: "#{appDir}/**/*.spec.coffee"
-    extensions: ['.coffee']
+  # Watch all test files for changes, and re-browserify.
+  glob "#{appDir}/**/*.spec.coffee", null, (err, files) ->
+    bundler = browserify
+      cache: {}
+      packageCache: {}
+      entries: files
+      extensions: ['.coffee']
+    bundler = watchify bundler
 
-  bundle = ->
-    bundler.bundle {debug: true}
-      .pipe source('test-bundle.js')
-      .pipe gulp.dest(testDir)
+    bundle = ->
+      bundler.bundle()
+        .pipe source('test-bundle.js')
+        .pipe gulp.dest(testDir)
 
-  bundler.on 'update', bundle
+    bundler.on 'update', bundle
 
-  bundle()
+    bundle()
 
-  # run the unit tests using karma
-  karma.start karmaConf
+    # run the unit tests using karma
+    karma.start karmaConf
   return
 
 

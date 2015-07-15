@@ -10,3 +10,6 @@ plugins/
 
 # build directory
 www/
+
+# test directory
+tests/
