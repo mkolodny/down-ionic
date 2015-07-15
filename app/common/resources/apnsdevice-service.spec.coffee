@@ -47,7 +47,7 @@ describe 'apnsdevice service', ->
 
       expectedDevice = new APNSDevice
         id: responseData.id
-        userId: responseData.user_id
+        userId: responseData.user
         registrationId: responseData.registration_id
         deviceId: responseData.device_id
         name: responseData.name

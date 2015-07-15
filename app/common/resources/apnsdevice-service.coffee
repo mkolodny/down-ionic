@@ -16,7 +16,7 @@ APNSDevice = ($resource, apiRoot) ->
         data = angular.fromJson data
         response =
           id: data.id
-          userId: data.user_id
+          userId: data.user
           registrationId: data.registration_id
           deviceId: data.device_id
           name: data.name
