@@ -7,3 +7,7 @@ angular.module 'down', ['ionic']
       # above the keyboard for form inputs)
       $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
       $window.StatusBar?.styleDefault()
+
+    # Allow sending a request body with DELETE request.
+    #$httpProvider.defaults.headers.delete =
+    #  'Content-Type': 'application/json;charset=utf-8'
