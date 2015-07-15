@@ -94,7 +94,7 @@ gulp.task 'clean-data', ->
 
 
 gulp.task 'data', ['clean-data'], ->
-  gulp.src "#{dataDir}/**/*.*", {base: "#{dataDir}"}
+  gulp.src "#{dataDir}/**/*", {base: "#{dataDir}"}
     .pipe gulp.dest(buildDir)
   return
 
@@ -197,7 +197,7 @@ gulp.task 'watch', [
 ], ->
   scripts true
   gulp.watch "#{appDir}/**/*.scss", ['styles']
-  gulp.watch "#{dataDir}/**", ['data']
+  gulp.watch "#{dataDir}/**/*", ['data']
   return
 
 
