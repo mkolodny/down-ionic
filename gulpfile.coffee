@@ -58,15 +58,18 @@ scripts = (watch) ->
     bundler.on 'update', bundle
 
   bundle()
+  return
 
 
 gulp.task 'clean-scripts', ->
   gulp.src "#{buildDir}/app/bundle.*", {read: false}
     .pipe rimraf()
+  return
 
 
 gulp.task 'scripts', ['clean-scripts'], ->
   scripts false
+  return
 
 
 gulp.task 'styles', ->
@@ -77,6 +80,7 @@ gulp.task 'styles', ->
     #.pipe minifyCss(keepSpecialComments: 0)
     #.pipe rename(extname: '.min.css')
     #.pipe gulp.dest("#{buildDir}/app")
+  return
 
 
 gulp.task 'clean-data', ->
@@ -86,16 +90,19 @@ gulp.task 'clean-data', ->
     "#{buildDir}/videos"
   ], {read: false}
     .pipe rimraf()
+  return
 
 
 gulp.task 'data', ['clean-data'], ->
   gulp.src "#{dataDir}/**/*.*", {base: "#{dataDir}"}
     .pipe gulp.dest(buildDir)
+  return
 
 
 gulp.task 'clean-templates', ->
   gulp.src "#{buildDir}/**/*.html", {read: false}
     .pipe rimraf()
+  return
 
 
 gulp.task 'templates', ['clean-templates'], ->
@@ -118,18 +125,21 @@ gulp.task 'minify-js', ['scripts'], ->
   gulp.src "#{buildDir}/app/bundle.js"
     .pipe uglify({mangle: false})
     .pipe gulp.dest("#{buildDir}/app")
+  return
 
 
 gulp.task 'minify-css', ['styles'], ->
   gulp.src "#{buildDir}/app/main.css"
     .pipe minifyCSS()
     .pipe gulp.dest("#{buildDir}/app")
+  return
 
 
 gulp.task 'minify-images', ['data'], ->
   gulp.src "#{buildDir}/images/**"
     .pipe imagemin()
     .pipe gulp.dest("#{buildDir}/images")
+  return
 
 
 gulp.task 'minify', [
@@ -156,6 +166,7 @@ gulp.task 'unit', ->
 
   # run the unit tests using karma
   karma.start karmaConf
+  return
 
 
 gulp.task 'webdriver-update', webdriverUpdate
@@ -166,6 +177,7 @@ gulp.task 'e2e', ['webdriver-update'], ->
     .pipe protractor(configFile: './client/config/protractor.conf.coffee')
     .on 'error', (error) ->
       throw error
+  return
 
 
 gulp.task 'build', [
@@ -186,6 +198,7 @@ gulp.task 'watch', [
   scripts true
   gulp.watch "#{appDir}/**/*.scss", ['styles']
   gulp.watch "#{dataDir}/**", ['data']
+  return
 
 
 gulp.task 'default', ['watch']
