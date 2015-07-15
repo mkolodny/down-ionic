@@ -11,6 +11,7 @@ imagemin = require 'gulp-imagemin'
 karma = require('karma').server
 karmaConf = require './config/karma.conf'
 minifyCss = require 'gulp-minify-css'
+ngAnnotate = require 'gulp-ng-annotate'
 rename = require 'gulp-rename'
 sass = require 'gulp-sass'
 sh = require 'shelljs'
@@ -45,6 +46,7 @@ scripts = (watch) ->
       .pipe source('bundle.js')
       # wrap plugins to support streams
       # i.e. .pipe streamify(plugin())
+      .pipe ngAnnotate()
       .pipe gulp.dest("#{buildDir}/app")
     return bundleStream
 
@@ -134,6 +136,7 @@ gulp.task 'unit', ->
     bundle = ->
       bundler.bundle()
         .pipe source('test-bundle.js')
+        .pipe ngAnnotate()
         .pipe gulp.dest(testDir)
 
     bundler.on 'update', bundle
