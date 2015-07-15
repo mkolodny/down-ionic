@@ -23,7 +23,7 @@ describe 'apnsdevice service', ->
 
   describe 'creating', ->
 
-    it 'should POST the user', ->
+    it 'should POST the device', ->
       device =
         userId: 1
         registrationId: '1670dc75c6fa765ae1f5d16e34bccdd5fe24b9fa90dd5af81634ea' \
@@ -31,7 +31,7 @@ describe 'apnsdevice service', ->
         deviceId: '97b2517566a8479bb69e6b5d8cf6ebc8'
         name: 'iPhone, 8.3'
       postData =
-        user_id: device.userId
+        user: device.userId
         registration_id: device.registrationId
         device_id: device.deviceId
         name: device.name
@@ -45,7 +45,6 @@ describe 'apnsdevice service', ->
         response = _response_
       $httpBackend.flush 1
 
-      # TODO: encapsulate this
       expectedDevice = new APNSDevice
         id: responseData.id
         userId: responseData.user_id

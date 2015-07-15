@@ -7,7 +7,7 @@ APNSDevice = ($resource, apiRoot) ->
       transformRequest: (data, headersGetter) ->
         request =
           id: data.id
-          user_id: data.userId
+          user: data.userId
           registration_id: data.registrationId
           device_id: data.deviceId
           name: data.name
