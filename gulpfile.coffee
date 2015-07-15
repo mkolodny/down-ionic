@@ -57,12 +57,17 @@ scripts = (watch) ->
   return
 
 
-gulp.task 'scripts', ->
+gulp.task 'scripts', ['clean-scripts'], ->
   scripts false
   return
 
 
-gulp.task 'styles', ->
+gulp.task 'clean-scripts', ->
+  del 'www/**/*.js'
+  return
+
+
+gulp.task 'styles', ['clean-styles'], ->
   gulp.src "#{appDir}/main.scss"
     .pipe sass(errLogToConsole: true)
     .pipe rename(extname: '.css')
@@ -73,13 +78,23 @@ gulp.task 'styles', ->
   return
 
 
-gulp.task 'data', ->
+gulp.task 'clean-styles', ->
+  del 'www/**/*.css'
+  return
+
+
+gulp.task 'data', ['clean-data'], ->
   gulp.src "#{dataDir}/**/*", {base: "#{dataDir}"}
     .pipe gulp.dest(buildDir)
   return
 
 
-gulp.task 'templates', ->
+gulp.task 'clean-data', ->
+  del 'www/images'
+  return
+
+
+gulp.task 'templates', ['clean-templates'], ->
   # NOTE: When we build the webview, we can give the ionic templates/partials an
   # .app.html extension, and the web partials a .web.html extension, then rename them
   # to .html. If we decide to use gulp-template-cache, we can us the transformUrl
@@ -92,6 +107,11 @@ gulp.task 'templates', ->
 
   gulp.src "#{appDir}/index.html"
     .pipe gulp.dest(buildDir)
+  return
+
+
+gulp.task 'clean-templates', ->
+  del 'www/**/*.html'
   return
 
 
@@ -168,7 +188,6 @@ gulp.task 'clean', ->
 
 
 gulp.task 'build', [
-  'clean'
   'scripts'
   'styles'
   'templates'
@@ -178,11 +197,9 @@ gulp.task 'build', [
 
 
 gulp.task 'watch', [
-  'clean'
-  'scripts'
+  'clean-scripts'
   'styles'
   'templates'
-  'data'
 ], ->
   scripts true
   gulp.watch "#{appDir}/**/*.scss", ['styles']
