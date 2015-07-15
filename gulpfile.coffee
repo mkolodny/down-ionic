@@ -1,6 +1,7 @@
 require 'coffee-script/register'
 browserify = require 'browserify'
 bower = require 'bower'
+del = require 'del'
 concat = require 'gulp-concat'
 gulp = require 'gulp'
 gutil = require 'gulp-util'
@@ -10,7 +11,6 @@ karma = require('karma').server
 #karmaConf = require './client/config/karma.conf'
 minifyCss = require 'gulp-minify-css'
 rename = require 'gulp-rename'
-rimraf = require 'gulp-rimraf'
 sass = require 'gulp-sass'
 sh = require 'shelljs'
 source = require 'vinyl-source-stream'
@@ -61,13 +61,7 @@ scripts = (watch) ->
   return
 
 
-gulp.task 'clean-scripts', ->
-  gulp.src "#{buildDir}/app/bundle.*", {read: false}
-    .pipe rimraf()
-  return
-
-
-gulp.task 'scripts', ['clean-scripts'], ->
+gulp.task 'scripts', ->
   scripts false
   return
 
@@ -83,29 +77,13 @@ gulp.task 'styles', ->
   return
 
 
-gulp.task 'clean-data', ->
-  gulp.src [
-    "#{buildDir}/images"
-    "#{buildDir}/fonts"
-    "#{buildDir}/videos"
-  ], {read: false}
-    .pipe rimraf()
-  return
-
-
-gulp.task 'data', ['clean-data'], ->
+gulp.task 'data', ->
   gulp.src "#{dataDir}/**/*", {base: "#{dataDir}"}
     .pipe gulp.dest(buildDir)
   return
 
 
-gulp.task 'clean-templates', ->
-  gulp.src "#{buildDir}/**/*.html", {read: false}
-    .pipe rimraf()
-  return
-
-
-gulp.task 'templates', ['clean-templates'], ->
+gulp.task 'templates', ->
   # NOTE: When we build the webview, we can give the ionic templates/partials an
   # .app.html extension, and the web partials a .web.html extension, then rename them
   # to .html. If we decide to use gulp-template-cache, we can us the transformUrl
@@ -121,22 +99,22 @@ gulp.task 'templates', ['clean-templates'], ->
   return
 
 
-gulp.task 'minify-js', ['scripts'], ->
+gulp.task 'minify-js', ->
   gulp.src "#{buildDir}/app/bundle.js"
     .pipe uglify({mangle: false})
     .pipe gulp.dest("#{buildDir}/app")
   return
 
 
-gulp.task 'minify-css', ['styles'], ->
+gulp.task 'minify-css', ->
   gulp.src "#{buildDir}/app/main.css"
     .pipe minifyCSS()
     .pipe gulp.dest("#{buildDir}/app")
   return
 
 
-gulp.task 'minify-images', ['data'], ->
-  gulp.src "#{buildDir}/images/**"
+gulp.task 'minify-images', ->
+  gulp.src "#{buildDir}/images/**/*"
     .pipe imagemin()
     .pipe gulp.dest("#{buildDir}/images")
   return
@@ -145,7 +123,7 @@ gulp.task 'minify-images', ['data'], ->
 gulp.task 'minify', [
   'minify-js'
   'minify-css'
-  #'minify-images'
+  'minify-images'
 ]
 
 
@@ -180,7 +158,13 @@ gulp.task 'e2e', ['webdriver-update'], ->
   return
 
 
+gulp.task 'clean', ->
+  del 'www'
+  return
+
+
 gulp.task 'build', [
+  'clean'
   'scripts'
   'styles'
   'templates'
@@ -190,6 +174,7 @@ gulp.task 'build', [
 
 
 gulp.task 'watch', [
+  'clean'
   'scripts'
   'styles'
   'templates'
