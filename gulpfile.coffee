@@ -110,7 +110,8 @@ gulp.task 'templates', ['clean-templates'], ->
     .pipe gulp.dest("#{buildDir}/app")
 
   gulp.src "#{appDir}/index.html"
-    .pipe gulp.dest("#{buildDir}/app")
+    .pipe gulp.dest(buildDir)
+  return
 
 
 gulp.task 'minify-js', ['scripts'], ->
