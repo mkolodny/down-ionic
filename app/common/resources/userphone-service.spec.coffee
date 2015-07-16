@@ -4,14 +4,16 @@ require './resources-module'
 
 describe 'userphone service', ->
   $httpBackend = null
-  UserPhone = null
   listUrl = null
+  User = null
+  UserPhone = null
 
   beforeEach angular.mock.module('down.resources')
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
     apiRoot = $injector.get 'apiRoot'
+    User = $injector.get 'User'
     UserPhone = $injector.get 'UserPhone'
 
     listUrl = "#{apiRoot}/userphones"
@@ -37,15 +39,7 @@ describe 'userphone service', ->
         user: user
         phone: '+1234567890'
       postData =
-        user:
-          id: user.id
-          email: user.email
-          name: user.name
-          username: user.username
-          image_url: user.imageUrl
-          location:
-            type: 'Point'
-            coordinates: [user.location.lat, user.location.long]
+        user: User.serialize user
         phone: userPhone.phone
       responseData = angular.extend {id: 1}, postData
 
