@@ -23,7 +23,7 @@ describe 'allfriendsinvitation service', ->
 
   describe 'creating', ->
 
-    fit 'should POST the allFriendsInvitation', ->
+    it 'should POST the allFriendsInvitation', ->
       allFriendsInvitation =
         eventId: 1
         fromUserId: 2

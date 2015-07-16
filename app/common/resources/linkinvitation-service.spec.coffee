@@ -23,7 +23,7 @@ describe 'linkinvitation service', ->
 
   describe 'creating', ->
 
-    fit 'should POST the linkInvitation', ->
+    it 'should POST the linkInvitation', ->
       linkInvitation =
         eventId: 1
         fromUserId: 2
