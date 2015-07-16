@@ -40,12 +40,9 @@ describe 'friendship service', ->
         response = _response_
       $httpBackend.flush 1
 
-      expectedFriendship = new Friendship
-        id: responseData.id
-        userId: responseData.user
-        friendId: responseData.friend
-      actualFriendship = new Friendship(response)
-      expect(actualFriendship).toAngularEqual expectedFriendship
+      expectedFriendshipData = angular.extend {id: responseData.id}, friendship
+      expectedFriendship = new Friendship(expectedFriendshipData)
+      expect(response).toAngularEqual expectedFriendship
 
 
   xdescribe 'deleting with a friend', ->

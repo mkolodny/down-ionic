@@ -6,7 +6,6 @@ Friendship = ($resource, apiRoot) ->
       method: 'post'
       transformRequest: (data, headersGetter) ->
         request =
-          id: data.id
           user: data.userId
           friend: data.friendId
         angular.toJson request
@@ -22,6 +21,7 @@ Friendship = ($resource, apiRoot) ->
     TODO: The request data is being sent as query parameters.
     See: http://stackoverflow.com/questions/22186671/angular-resource-delete-wont-send-body-to-express-js-server
     and http://stackoverflow.com/questions/18924217/how-to-set-custom-headers-with-a-resource-action
+    A backup option is to make a PUT request.
 
     deleteWithFriend:
       method: 'delete'

@@ -68,20 +68,9 @@ describe 'event service', ->
         response = _response_
       $httpBackend.flush 1
 
-      expectedEvent = new Event
-        id: responseData.id
-        title: responseData.title
-        creatorId: responseData.creator
-        canceled: responseData.canceled
-        datetime: new Date(responseData.datetime)
-        createdAt: new Date(responseData.createdAt)
-        updatedAt: new Date(responseData.updatedAt)
-        place:
-          name: responseData.place.name
-          lat: event.place.lat
-          long: event.place.long
-      actualEvent = new Event(response)
-      expect(actualEvent).toAngularEqual expectedEvent
+      expectedEventData = angular.extend {id: responseData.id}, event
+      expectedEvent = new Event expectedEventData
+      expect(response).toAngularEqual expectedEvent
 
 
   describe 'sending a message', ->

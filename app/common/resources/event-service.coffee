@@ -7,7 +7,6 @@ Event = ($resource, apiRoot) ->
       method: 'post'
       transformRequest: (data, headersGetter) ->
         request =
-          id: data.id
           title: data.title
           creator: data.creatorId
           canceled: data.canceled

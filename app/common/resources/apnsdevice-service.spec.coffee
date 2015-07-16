@@ -45,11 +45,6 @@ describe 'apnsdevice service', ->
         response = _response_
       $httpBackend.flush 1
 
-      expectedDevice = new APNSDevice
-        id: responseData.id
-        userId: responseData.user
-        registrationId: responseData.registration_id
-        deviceId: responseData.device_id
-        name: responseData.name
-      actualDevice = new APNSDevice(response)
-      expect(actualDevice).toAngularEqual expectedDevice
+      expectedDeviceData = angular.extend {id: responseData.id}, device
+      expectedDevice = new APNSDevice(expectedDeviceData)
+      expect(response).toAngularEqual expectedDevice
