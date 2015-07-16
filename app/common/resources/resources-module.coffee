@@ -5,6 +5,7 @@ Event = require './event-service'
 Friendship = require './friendship-service'
 Invitation = require './invitation-service'
 AllFriendsInvitation = require './allfriendsinvitation-service'
+LinkInvitation = require './linkinvitation-service'
 
 angular.module 'down.resources', ['ngResource']
   .value 'apiRoot', '/api'
@@ -13,3 +14,4 @@ angular.module 'down.resources', ['ngResource']
   .factory 'Friendship', Friendship
   .factory 'Invitation', Invitation
   .factory 'AllFriendsInvitation', AllFriendsInvitation
+  .factory 'LinkInvitation', LinkInvitation
