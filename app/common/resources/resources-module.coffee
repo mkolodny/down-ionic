@@ -7,6 +7,7 @@ Friendship = require './friendship-service'
 Invitation = require './invitation-service'
 LinkInvitation = require './linkinvitation-service'
 User = require './user-service'
+UserPhone = require './userphone-service'
 
 angular.module 'down.resources', ['ngResource']
   .value 'apiRoot', '/api'
@@ -17,3 +18,4 @@ angular.module 'down.resources', ['ngResource']
   .factory 'AllFriendsInvitation', AllFriendsInvitation
   .factory 'LinkInvitation', LinkInvitation
   .factory 'User', User
+  .factory 'UserPhone', UserPhone
