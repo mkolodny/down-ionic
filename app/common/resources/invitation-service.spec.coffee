@@ -21,19 +21,65 @@ describe 'invitation service', ->
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
 
-  serializeInvitation = (invitation) ->
-    invitation =
-      event_id: invitation.eventId
-      to_user_id: invitation.toUserId
-      from_user_id: invitation.fromUserId
-      response: invitation.response
-      previously_accepted: invitation.previouslyAccepted
-      open: invitation.open
-      to_user_messaged: invitation.toUserMessaged
-      muted: invitation.muted
-      created_at: invitation.createdAt.getTime()
-      updated_at: invitation.updatedAt.getTime()
-    invitation
+  describe 'serializing an invitation', ->
+
+    it 'should return the serialized invitation', ->
+      invitation =
+        id: 1
+        eventId: 2
+        toUserId: 3
+        fromUserId: 4
+        response: 1 # TODO: Use an Invitation.accepted property
+        previouslyAccepted: false
+        open: false
+        toUserMessaged: false
+        muted: false
+        createdAt: new Date()
+        updatedAt: new Date()
+      expectedInvitation =
+        id: invitation.id
+        event: invitation.eventId
+        to_user: invitation.toUserId
+        from_user: invitation.fromUserId
+        response: invitation.response
+        previously_accepted: invitation.previouslyAccepted
+        open: invitation.open
+        to_user_messaged: invitation.toUserMessaged
+        muted: invitation.muted
+        created_at: invitation.createdAt.getTime()
+        updated_at: invitation.updatedAt.getTime()
+      expect(Invitation.serialize invitation).toEqual expectedInvitation
+
+
+  describe 'deserializing an invitation', ->
+
+    it 'should return the deserialized invitation', ->
+      response =
+        id: 1
+        event: 2
+        to_user: 3
+        from_user: 4
+        response: 1 # TODO: Use an Invitation.accepted property
+        previously_accepted: false
+        open: false
+        to_user_messaged: false
+        muted: false
+        created_at: new Date().getTime()
+        updated_at: new Date().getTime()
+      expectedInvitation =
+        id: response.id
+        eventId: response.event
+        toUserId: response.to_user
+        fromUserId: response.from_user
+        response: response.response
+        previouslyAccepted: response.previously_accepted
+        open: response.open
+        toUserMessaged: response.to_user_messaged
+        muted: response.muted
+        createdAt: new Date(response.created_at)
+        updatedAt: new Date(response.updated_at)
+      expect(Invitation.deserialize response).toEqual expectedInvitation
+
 
   describe 'creating', ->
 
@@ -49,7 +95,7 @@ describe 'invitation service', ->
         muted: false
         createdAt: new Date()
         updatedAt: new Date()
-      postData = serializeInvitation invitation
+      postData = Invitation.serialize invitation
       responseData = angular.extend {id: 1}, postData
 
       $httpBackend.expectPOST listUrl, postData
@@ -85,7 +131,7 @@ describe 'invitation service', ->
       # Mock an array of invitations for the post data.
       invitationsPostData = []
       for invitation in invitations
-        invitationsPostData.push serializeInvitation(invitation)
+        invitationsPostData.push Invitation.serialize(invitation)
       postData = invitations: invitationsPostData
 
       # Give each invitation in the post data a different id.

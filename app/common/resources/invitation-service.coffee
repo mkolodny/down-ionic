@@ -2,9 +2,10 @@ Invitation = ($resource, apiRoot) ->
   listUrl = "#{apiRoot}/invitations"
   serializeInvitation = (invitation) ->
     invitation =
-      event_id: invitation.eventId
-      to_user_id: invitation.toUserId
-      from_user_id: invitation.fromUserId
+      id: invitation.id
+      event: invitation.eventId
+      to_user: invitation.toUserId
+      from_user: invitation.fromUserId
       response: invitation.response
       previously_accepted: invitation.previouslyAccepted
       open: invitation.open
@@ -16,9 +17,9 @@ Invitation = ($resource, apiRoot) ->
   deserializeInvitation = (invitation) ->
     invitation =
       id: invitation.id
-      eventId: invitation.event_id
-      toUserId: invitation.to_user_id
-      fromUserId: invitation.from_user_id
+      eventId: invitation.event
+      toUserId: invitation.to_user
+      fromUserId: invitation.from_user
       response: invitation.response
       previouslyAccepted: invitation.previously_accepted
       open: invitation.open
@@ -28,7 +29,7 @@ Invitation = ($resource, apiRoot) ->
       updatedAt: new Date(invitation.updated_at)
     invitation
 
-  $resource "#{listUrl}/:id", null,
+  resource = $resource "#{listUrl}/:id", null,
     save:
       method: 'post'
       transformRequest: (data, headersGetter) ->
@@ -48,5 +49,11 @@ Invitation = ($resource, apiRoot) ->
       transformResponse: (data, headersGetter) ->
         data = angular.fromJson data
         (deserializeInvitation(invitation) for invitation in data)
+
+  resource.serialize = serializeInvitation
+
+  resource.deserialize = deserializeInvitation
+
+  resource
 
 module.exports = Invitation
