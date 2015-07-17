@@ -29,4 +29,18 @@ class Auth
 
     deferred.promise
 
+  syncWithFacebook: (syncData) ->
+    deferred = @$q.defer()
+
+    @$http.post "#{@apiRoot}/social-account", syncData
+      .success (data, status) =>
+        @user.email = data.email
+        @user.name = data.name
+        @user.imageUrl = data.image_url
+        deferred.resolve @user
+      .error (data, status) ->
+        deferred.reject()
+
+    deferred.promise
+
 module.exports = Auth
