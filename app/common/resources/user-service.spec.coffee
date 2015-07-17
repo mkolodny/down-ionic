@@ -21,6 +21,9 @@ describe 'user service', ->
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
 
+  it 'should have a list url', ->
+    expect(User.listUrl).toBe listUrl
+
   describe 'serializing a user', ->
 
     it 'should return the serialized user', ->

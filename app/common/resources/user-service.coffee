@@ -66,6 +66,8 @@ User = ($http, $q, $resource, apiRoot) ->
         data = angular.fromJson data
         (deserializeUser(user) for user in data)
 
+  resource.listUrl = listUrl
+
   resource.serialize = serializeUser
 
   resource.deserialize = deserializeUser
