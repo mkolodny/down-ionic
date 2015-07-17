@@ -183,3 +183,39 @@ describe 'Auth service', ->
         $httpBackend.flush 1
 
         expect(rejected).toBe true
+
+
+  describe 'sending a verification text', ->
+    verifyPhoneUrl = null
+    postData = null
+
+    beforeEach ->
+      verifyPhoneUrl = "#{apiRoot}/authcodes"
+      postData = phone: '+1234567890'
+
+    describe 'on success', ->
+
+      it 'should resolve the promise', ->
+        $httpBackend.expectPOST verifyPhoneUrl, postData
+          .respond 200, null
+
+        resolved = false
+        Auth.sendVerificationText(postData).then ->
+          resolved = true
+        $httpBackend.flush 1
+
+        expect(resolved).toBe true
+
+
+    describe 'on error', ->
+
+      it 'should reject the promise', ->
+        $httpBackend.expectPOST verifyPhoneUrl, postData
+          .respond 500, null
+
+        rejected = false
+        Auth.sendVerificationText(postData).then (->), ->
+          rejected = true
+        $httpBackend.flush 1
+
+        expect(rejected).toBe true

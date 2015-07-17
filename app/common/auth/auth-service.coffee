@@ -43,4 +43,7 @@ class Auth
 
     deferred.promise
 
+  sendVerificationText: (phoneData) ->
+     @$http.post "#{@apiRoot}/authcodes", phoneData
+
 module.exports = Auth
