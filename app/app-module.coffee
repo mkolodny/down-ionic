@@ -1,6 +1,7 @@
 require 'angular'
+require './login/login-module'
 
-angular.module 'down', ['ionic']
+angular.module 'down', ['ionic', 'down.login']
   .run ($ionicPlatform, $window) ->
     $ionicPlatform.ready ->
       # Hide the accessory bar by default (remove this to show the accessory bar

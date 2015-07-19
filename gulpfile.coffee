@@ -24,11 +24,7 @@ buildDir = './www'
 appDir = './app'
 dataDir = './data'
 testDir = './tests'
-
-gulp.task 'install', ->
-  bower.commands.install().on 'log', (data) ->
-    gutil.log 'bower', gutil.colors.cyan(data.id), data.message
-
+vendorDir = './app/vendor'
 
 scripts = (watch) ->
   bundler = browserify
@@ -57,17 +53,12 @@ scripts = (watch) ->
   return
 
 
-gulp.task 'scripts', ['clean-scripts'], ->
+gulp.task 'scripts', ->
   scripts false
   return
 
 
-gulp.task 'clean-scripts', ->
-  del 'www/**/*.js'
-  return
-
-
-gulp.task 'styles', ['clean-styles'], ->
+gulp.task 'styles', ->
   gulp.src "#{appDir}/main.scss"
     .pipe sass(errLogToConsole: true)
     .pipe rename(extname: '.css')
@@ -78,23 +69,13 @@ gulp.task 'styles', ['clean-styles'], ->
   return
 
 
-gulp.task 'clean-styles', ->
-  del 'www/**/*.css'
-  return
-
-
-gulp.task 'data', ['clean-data'], ->
+gulp.task 'data', ->
   gulp.src "#{dataDir}/**/*", {base: "#{dataDir}"}
     .pipe gulp.dest(buildDir)
   return
 
 
-gulp.task 'clean-data', ->
-  del 'www/images'
-  return
-
-
-gulp.task 'templates', ['clean-templates'], ->
+gulp.task 'templates', ->
   # NOTE: When we build the webview, we can give the ionic templates/partials an
   # .app.html extension, and the web partials a .web.html extension, then rename them
   # to .html. If we decide to use gulp-template-cache, we can us the transformUrl
@@ -110,8 +91,9 @@ gulp.task 'templates', ['clean-templates'], ->
   return
 
 
-gulp.task 'clean-templates', ->
-  del 'www/**/*.html'
+gulp.task 'vendor', ->
+  gulp.src "#{vendorDir}/**/*", {base: "#{appDir}"}
+    .pipe gulp.dest("#{buildDir}/app")
   return
 
 
@@ -188,22 +170,24 @@ gulp.task 'clean', ->
 
 
 gulp.task 'build', [
+  'clean'
   'scripts'
   'styles'
   'templates'
   'data'
+  'vendor'
   'minify'
 ]
 
 
 gulp.task 'watch', [
-  'clean-scripts'
   'styles'
   'templates'
 ], ->
   scripts true
   gulp.watch "#{appDir}/**/*.scss", ['styles']
   gulp.watch "#{dataDir}/**/*", ['data']
+  gulp.watch "#{vendorDir}/**/*", ['vendor']
   gulp.watch "#{appDir}/**/*.html", ['templates']
   return
 

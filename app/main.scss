@@ -15,9 +15,15 @@ $royal:                           #886aea !default;
 $dark:                            #444 !default;
 */
 
+// Global variables
+$brand-color: #6a38ab;
+
 // The path for our ionicons font files, relative to the built CSS in www/css
 //$ionicons-font-path: "../lib/ionic/fonts" !default;
 
 // Include all of Ionic
 @import "./ionic/scss/ionic";
 
+// Include each view's scss
+@import "./common/intl-phone/intlTelInput";
+@import "./login/login";
