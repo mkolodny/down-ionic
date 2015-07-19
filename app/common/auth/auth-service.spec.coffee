@@ -69,13 +69,17 @@ describe 'Auth service', ->
 
   describe 'authenticating', ->
     authenticateUrl = null
+    code = null
+    phone = null
     postData = null
-
+    
     beforeEach ->
       authenticateUrl = "#{apiRoot}/sessions"
+      phone = '+1234567890'
+      code = 'asdf1234'
       postData =
-        code: 'asdf1234'
-        phone: '+1234567890'
+        phone: phone
+        code: code
 
     describe 'when the request succeeds', ->
       responseData = null
@@ -96,7 +100,7 @@ describe 'Auth service', ->
         $httpBackend.expectPOST authenticateUrl, postData
           .respond 200, responseData
 
-        Auth.authenticate(postData).then (_response_) ->
+        Auth.authenticate(phone, code).then (_response_) ->
           response = _response_
         $httpBackend.flush 1
 
@@ -116,7 +120,7 @@ describe 'Auth service', ->
           .respond 500, null
 
         rejected = false
-        Auth.authenticate(postData).then (->), ->
+        Auth.authenticate(phone, code).then (->), ->
           rejected = true
         $httpBackend.flush 1
 
