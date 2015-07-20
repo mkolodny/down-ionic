@@ -5,10 +5,10 @@
     <input id="phone" intl-phone ng-model="login.phone" name="phone" required
            ng-class="{'has-error': loginForm.$submitted && loginForm.phone.$invalid }">
     <div class="form-errors" ng-if="loginForm.$submitted">
-      <div ng-if="loginForm.phone.$error.required">
+      <div class="form-error" ng-if="loginForm.phone.$error.required">
         Please enter your phone number.
       </div>
-      <div ng-if="loginForm.phone.$error.validNumber && !loginForm.phone.$error.required">
+      <div class="form-error" ng-if="loginForm.phone.$error.validNumber && !loginForm.phone.$error.required">
         That phone number is invalid.
       </div>
     </div>

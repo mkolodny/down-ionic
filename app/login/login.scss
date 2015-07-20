@@ -36,8 +36,10 @@
   }
   .form-errors {
     text-align: center;
-    padding-top: 5px;
     color: #fff;
+  }
+  .form-error {
+    padding-top: 5px;
   }
   .has-error {
     border-bottom: 2px solid red;

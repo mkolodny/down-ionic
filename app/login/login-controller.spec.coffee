@@ -69,7 +69,7 @@ describe 'login controller', ->
           $rootScope.$apply()
 
         it 'should go to the verify phone view', ->
-          expect($state.go).toHaveBeenCalledWith 'down.verifyPhone'
+          expect($state.go).toHaveBeenCalledWith 'verifyPhone'
 
 
       describe 'when the request fails', ->
