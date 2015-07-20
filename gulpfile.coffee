@@ -8,6 +8,7 @@ glob = require 'glob'
 gulp = require 'gulp'
 gutil = require 'gulp-util'
 imagemin = require 'gulp-imagemin'
+livereload = require 'gulp-livereload'
 karma = require('karma').server
 karmaConf = require './config/karma.conf'
 minifyCss = require 'gulp-minify-css'
@@ -44,7 +45,7 @@ scripts = (watch) ->
       # i.e. .pipe streamify(plugin())
       .pipe ngAnnotate()
       .pipe gulp.dest("#{buildDir}/app")
-    return bundleStream
+    bundleStream
 
   if watch
     bundler.on 'update', bundle
@@ -189,6 +190,10 @@ gulp.task 'watch', [
   gulp.watch "#{dataDir}/**/*", ['data']
   gulp.watch "#{vendorDir}/**/*", ['vendor']
   gulp.watch "#{appDir}/**/*.html", ['templates']
+  childProcess.spawn 'serve', ['www', '--no-logs'], stdio: 'inherit'
+  livereload.listen()
+  gulp.watch "#{buildDir}/**/*"
+    .on 'change', livereload.changed
   return
 
 
