@@ -1,3 +1,4 @@
+window.jQuery = require 'jquery' # required for intl phone
 require 'angular'
 
 beforeEach ->

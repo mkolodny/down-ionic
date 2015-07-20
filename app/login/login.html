@@ -1,3 +1,19 @@
-<link href="http://fonts.googleapis.com/css?family=Viga" rel="stylesheet">
-<h1>Down</h1>
-<input id="phone" type="tel">
+<div id="login">
+  <link href="http://fonts.googleapis.com/css?family=Viga" rel="stylesheet">
+  <h1>Down</h1>
+  <form role="form" novalidate name="loginForm" ng-submit="login.login()">
+    <input id="phone" intl-phone ng-model="login.phone" name="phone" required
+           ng-class="{'has-error': loginForm.$submitted && loginForm.phone.$invalid }">
+    <div class="form-errors" ng-if="loginForm.$submitted">
+      <div ng-if="loginForm.phone.$error.required">
+        Please enter your phone number.
+      </div>
+      <div ng-if="loginForm.phone.$error.validNumber && !loginForm.phone.$error.required">
+        That phone number is invalid.
+      </div>
+    </div>
+    <button class="button button-full button-positive" type="submit">
+      Login
+    </button>
+  </form>
+</div>

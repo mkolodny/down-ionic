@@ -1,9 +1,10 @@
 require 'angular'
 require 'angular-ui-router'
-#require '../common/intl-phone/intl-phone-module'
+require '../common/auth/auth-module'
+require '../common/intl-phone/intl-phone-module'
 LoginCtrl = require './login-controller'
 
-angular.module 'down.login', ['ui.router']
+angular.module 'down.login', ['ui.router', 'down.intlPhone', 'down.auth']
   .config ($stateProvider) ->
     $stateProvider.state 'login',
       url: '/login'

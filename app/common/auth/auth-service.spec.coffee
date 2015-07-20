@@ -187,11 +187,13 @@ describe 'Auth service', ->
 
   describe 'sending a verification text', ->
     verifyPhoneUrl = null
+    phone = null
     postData = null
 
     beforeEach ->
       verifyPhoneUrl = "#{apiRoot}/authcodes"
-      postData = phone: '+1234567890'
+      phone = '+1234567890'
+      postData = {phone: phone}
 
     describe 'on success', ->
 
@@ -200,7 +202,7 @@ describe 'Auth service', ->
           .respond 200, null
 
         resolved = false
-        Auth.sendVerificationText(postData).then ->
+        Auth.sendVerificationText(phone).then ->
           resolved = true
         $httpBackend.flush 1
 
@@ -214,7 +216,7 @@ describe 'Auth service', ->
           .respond 500, null
 
         rejected = false
-        Auth.sendVerificationText(postData).then (->), ->
+        Auth.sendVerificationText(phone).then (->), ->
           rejected = true
         $httpBackend.flush 1
 
