@@ -21,7 +21,7 @@ class Auth
 
   ###*
    * Check verifcation code with the server
-   * 
+   *
    * @param  {String} phone
    * @param  {String} code
    * @return {Promise}
@@ -29,7 +29,7 @@ class Auth
   authenticate: (phone, code) ->
     deferred = @$q.defer()
 
-    params = 
+    params =
       phone: phone
       code: code
 
@@ -38,7 +38,7 @@ class Auth
         @user = @User.deserialize data
         deferred.resolve @user
       .error (data, status) ->
-        deferred.reject()
+        deferred.reject status
 
     deferred.promise
 
@@ -52,7 +52,7 @@ class Auth
         @user.imageUrl = data.image_url
         deferred.resolve @user
       .error (data, status) ->
-        deferred.reject()
+        deferred.reject status
 
     deferred.promise
 

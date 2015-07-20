@@ -1,17 +1,21 @@
 require 'angular'
 require 'angular-mocks'
+require 'angular-local-storage'
 require 'angular-ui-router'
 VerifyPhoneCtrl = require './verify-phone-controller'
 
 describe 'verify phone controller', ->
+  $q = null
+  $rootScope = null
+  $state = null
   ctrl = null
   Auth = null
+  localStorage = null
   User = null
-  $q = null
-  $state = null
-  $rootScope = null
 
   beforeEach angular.mock.module('ui.router')
+
+  beforeEach angular.mock.module('LocalStorageModule')
 
   beforeEach angular.mock.module('down.auth')
 
@@ -20,9 +24,10 @@ describe 'verify phone controller', ->
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $q = $injector.get '$q'
-    $state = $injector.get '$state'
     $rootScope = $injector.get '$rootScope'
+    $state = $injector.get '$state'
     Auth = angular.copy $injector.get('Auth')
+    localStorage = $injector.get 'localStorageService'
     User = $injector.get 'User'
 
     Auth.phone = '+15555555555'
@@ -30,6 +35,9 @@ describe 'verify phone controller', ->
     ctrl = $controller VerifyPhoneCtrl,
       Auth: Auth
   )
+
+  afterEach ->
+    localStorage.clearAll()
 
   describe 'when form is submitted', ->
     deferred = null
@@ -60,8 +68,80 @@ describe 'verify phone controller', ->
           $rootScope.$apply()
 
         it 'should go to the sync with facebook view', ->
-          expect($state.go).toHaveBeenCalledWith 'down.syncWithFacebook'
+          expect($state.go).toHaveBeenCalledWith 'facebookSync'
+
 
       describe 'the user doesn\'t have a username', ->
-      
+
+        beforeEach ->
+          user =
+            id: 1
+            name: 'Alan Turing'
+            email: 'aturing@gmail.com'
+            imageUrl: 'https://facebook.com/profile-pic/tdog'
+          deferred.resolve user
+          $rootScope.$apply()
+
         it 'should go to the add username view', ->
+          expect($state.go).toHaveBeenCalledWith 'setUsername'
+
+
+      describe 'the user hasn\'t allowed push notifications yet', ->
+
+        beforeEach ->
+          user =
+            id: 1
+            name: 'Alan Turing'
+            email: 'aturing@gmail.com'
+            imageUrl: 'https://facebook.com/profile-pic/tdog'
+            location:
+              lat: 40.7265834
+              long: -73.9821535
+            username: 'tdog'
+          deferred.resolve user
+          $rootScope.$apply()
+
+        it 'should go to the request push notifications view', ->
+          expect($state.go).toHaveBeenCalledWith 'requestPushServices'
+
+
+      describe 'the user has already signed up', ->
+
+        beforeEach ->
+          user =
+            id: 1
+            name: 'Alan Turing'
+            email: 'aturing@gmail.com'
+            imageUrl: 'https://facebook.com/profile-pic/tdog'
+            location:
+              lat: 40.7265834
+              long: -73.9821535
+            username: 'tdog'
+          localStorage.set 'hasAllowedPushNotifications', true
+          deferred.resolve user
+          $rootScope.$apply()
+
+        it 'should go to the events view', ->
+          expect($state.go).toHaveBeenCalledWith 'events'
+
+
+    describe 'when authentication fails', ->
+
+      describe 'because the code was incorrect', ->
+
+        beforeEach ->
+          deferred.reject 401
+          $rootScope.$apply()
+
+        it 'should show an error', ->
+          expect(ctrl.error).toBe 'Oops, something went wrong.'
+
+
+      describe 'because the code was incorrect', ->
+
+        beforeEach ->
+          deferred.reject 500
+          $rootScope.$apply()
+
+        it 'should show an error', ->
+          expect(ctrl.error).toBe 'Looks like you entered the wrong code :('

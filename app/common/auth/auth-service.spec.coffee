@@ -72,7 +72,7 @@ describe 'Auth service', ->
     code = null
     phone = null
     postData = null
-    
+
     beforeEach ->
       authenticateUrl = "#{apiRoot}/sessions"
       phone = '+1234567890'
@@ -116,15 +116,16 @@ describe 'Auth service', ->
     describe 'when the request fails', ->
 
       it 'should reject the promise', ->
+        status = 500
         $httpBackend.expectPOST authenticateUrl, postData
-          .respond 500, null
+          .respond status, null
 
-        rejected = false
-        Auth.authenticate(phone, code).then (->), ->
-          rejected = true
+        rejectedStatus = null
+        Auth.authenticate(phone, code).then (->), (_status_) ->
+          rejectedStatus = _status_
         $httpBackend.flush 1
 
-        expect(rejected).toBe true
+        expect(rejectedStatus).toEqual status
 
 
   describe 'syncing with facebook', ->
@@ -178,15 +179,16 @@ describe 'Auth service', ->
     describe 'on error', ->
 
       it 'should reject the promise', ->
+        status = 500
         $httpBackend.expectPOST fbSyncUrl, postData
-          .respond 500, null
+          .respond status, null
 
-        rejected = false
-        Auth.syncWithFacebook(postData).then (->), ->
-          rejected = true
+        rejectedStatus = null
+        Auth.syncWithFacebook(postData).then (->), (_status_) ->
+          rejectedStatus = _status_
         $httpBackend.flush 1
 
-        expect(rejected).toBe true
+        expect(rejectedStatus).toBe status
 
 
   describe 'sending a verification text', ->
