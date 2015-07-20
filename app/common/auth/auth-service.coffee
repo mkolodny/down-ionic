@@ -17,10 +17,23 @@ class Auth
 
     deferred.promise
 
-  authenticate: (authData) ->
+
+
+  ###*
+   * Check verifcation code with the server
+   * 
+   * @param  {String} phone
+   * @param  {String} code
+   * @return {Promise}
+  ###
+  authenticate: (phone, code) ->
     deferred = @$q.defer()
 
-    @$http.post "#{@apiRoot}/sessions", authData
+    params = 
+      phone: phone
+      code: code
+
+    @$http.post "#{@apiRoot}/sessions", params
       .success (data, status) =>
         @user = @User.deserialize data
         deferred.resolve @user
