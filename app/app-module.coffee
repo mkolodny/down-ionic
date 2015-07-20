@@ -1,7 +1,8 @@
 require 'angular'
 require './login/login-module'
+require './verify-phone/verify-phone-module'
 
-angular.module 'down', ['ionic', 'down.login']
+angular.module 'down', ['ionic', 'down.login', 'down.verifyPhone']
   .run ($ionicPlatform, $window) ->
     $ionicPlatform.ready ->
       # Hide the accessory bar by default (remove this to show the accessory bar

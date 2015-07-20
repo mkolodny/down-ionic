@@ -1,9 +1,9 @@
 require 'angular'
 require 'angular-ui-router'
-#require '../common/intl-phone/intl-phone-module'
+require '../common/auth/auth-module'
 VerifyPhoneCtrl = require './verify-phone-controller'
 
-angular.module 'down.verifyPhone', ['ui.router']
+angular.module 'down.verifyPhone', ['ui.router', 'down.auth']
   .config ($stateProvider) ->
     $stateProvider.state 'verifyPhone',
       url: '/verify-phone'
