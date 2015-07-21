@@ -44,7 +44,6 @@ describe 'verify phone controller', ->
 
   describe 'when form is submitted', ->
     deferred = null
-    promise = null
 
     beforeEach ->
       spyOn ctrl, 'validate'
@@ -201,5 +200,5 @@ describe 'verify phone controller', ->
 
         result = ctrl.validate()
 
-      it 'should return true', ->
+      it 'should return false', ->
         expect(result).toBe false

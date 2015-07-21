@@ -37,6 +37,15 @@ User = ($http, $q, $resource, apiRoot) ->
         data = angular.fromJson data
         deserializeUser data
 
+    update:
+      method: 'put'
+      transformRequest: (data, headersGetter) ->
+        request = serializeUser data
+        angular.toJson request
+      transformResponse: (data, headersGetter) ->
+        data = angular.fromJson data
+        deserializeUser data
+
     get:
       method: 'get'
       transformResponse: (data, headersGetter) ->
@@ -72,7 +81,7 @@ User = ($http, $q, $resource, apiRoot) ->
 
   resource.deserialize = deserializeUser
 
-  resource.isUsernameTaken = (username) ->
+  resource.isUsernameAvailable = (username) ->
     deferred = $q.defer()
 
     $http.get "#{listUrl}/username/#{username}"

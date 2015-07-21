@@ -29,6 +29,7 @@ $brand-color: #6a38ab;
 @import "./login/login";
 @import "./verify-phone/verify-phone";
 @import "./facebook-sync/facebook-sync";
+@import "./set-username/set-username";
 
 /*
 Global Sass
@@ -51,6 +52,7 @@ Global Sass
     width: 100%;
     font-size: 23px;
     text-align: center;
+    border-style: none;
   }
   .form-errors {
     text-align: center;

@@ -107,6 +107,33 @@ describe 'user service', ->
       expect(response).toAngularEqual expectedUser
 
 
+  describe 'updating', ->
+
+    it 'should PUT the user', ->
+      user =
+        id: 1
+        email: 'aturing@gmail.com'
+        name: 'Alan Turing'
+        username: 'tdog'
+        imageUrl: 'https://facebook.com/profile-pic/tdog'
+        location:
+          lat: 40.7265834
+          long: -73.9821535
+      postData = User.serialize user
+      responseData = postData
+
+      $httpBackend.expectPUT listUrl, postData
+        .respond 200, angular.toJson(responseData)
+
+      response = null
+      User.update(user).$promise.then (_response_) ->
+        response = _response_
+      $httpBackend.flush 1
+
+      expectedUser = new User(user)
+      expect(response).toAngularEqual expectedUser
+
+
   describe 'getting', ->
 
     it 'should GET the user', ->
@@ -161,7 +188,7 @@ describe 'user service', ->
       expect(response).toAngularEqual expectedUsers
 
 
-  describe 'checking if a username is taken', ->
+  describe 'checking if a username is available', ->
     username = null
     testUsernameUrl = null
 
@@ -176,7 +203,7 @@ describe 'user service', ->
           .respond 404, null
 
         result = null
-        User.isUsernameTaken(username).then (_result_) ->
+        User.isUsernameAvailable(username).then (_result_) ->
           result = _result_
         $httpBackend.flush 1
 
@@ -190,7 +217,7 @@ describe 'user service', ->
           .respond 200, null
 
         result = null
-        User.isUsernameTaken(username).then (_result_) ->
+        User.isUsernameAvailable(username).then (_result_) ->
           result = _result_
         $httpBackend.flush 1
 
@@ -204,7 +231,7 @@ describe 'user service', ->
           .respond 500, null
 
         rejected = false
-        User.isUsernameTaken(username).then (->), ->
+        User.isUsernameAvailable(username).then (->), ->
           rejected = true
         $httpBackend.flush 1
 

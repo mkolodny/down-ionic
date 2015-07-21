@@ -1,0 +1,29 @@
+<div id="set-username" class="onboard-view">
+  <div id="explanation" class="explanation">
+    Please set your username.
+  </div>
+  <div class="list">
+    <form name="setUsernameForm" novalidate role="form"
+          ng-submit="setUsername.setUsername()">
+      <label class="item item-input"
+             ng-class="{'has-error': setUsernameForm.$submitted && setUsernameForm.username.$invalid }">
+        <input ng-model="setUsername.username" name="username" required
+               placeholder="Username">
+      </label>
+      <div class="form-errors" ng-if="setUsernameForm.$submitted">
+        <div class="form-error" ng-if="setUsernameForm.username.$error.required">
+          Please enter a username.
+        </div>
+        <div class="form-error" ng-if="setUsername.error">
+          {{setUsername.error}}
+        </div>
+      </div>
+      <button type="submit" class="button button-full button-positive">
+        Submit
+      </button>
+    </form>
+  </div>
+  <div class="explanation">
+    By creating an account you agree to the Down Terms of Service
+  </div>
+</div>
