@@ -16,9 +16,9 @@ class VerifyPhoneCtrl
         else if not user.username?
           @$state.go 'setUsername'
         else if not @localStorage.get 'hasAllowedLocationServices'
-          @$state.go 'requestLocationServices'
+          @$state.go 'requestLocation'
         else if not @localStorage.get 'hasAllowedPushNotifications'
-          @$state.go 'requestPushServices'
+          @$state.go 'requestPush'
         else
           @$state.go 'events'
 

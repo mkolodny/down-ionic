@@ -112,7 +112,7 @@ describe 'verify phone controller', ->
             $rootScope.$apply()
 
           it 'should go to the request push notifications view', ->
-            expect($state.go).toHaveBeenCalledWith 'requestLocationServices'
+            expect($state.go).toHaveBeenCalledWith 'requestLocation'
 
 
         describe 'the user hasn\'t allowed push notifications yet', ->
@@ -132,7 +132,7 @@ describe 'verify phone controller', ->
             $rootScope.$apply()
 
           it 'should go to the request push notifications view', ->
-            expect($state.go).toHaveBeenCalledWith 'requestPushServices'
+            expect($state.go).toHaveBeenCalledWith 'requestPush'
 
 
         describe 'the user has already signed up', ->
