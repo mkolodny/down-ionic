@@ -42,10 +42,10 @@ class Auth
 
     deferred.promise
 
-  syncWithFacebook: (syncData) ->
+  syncWithFacebook: (accessToken) ->
     deferred = @$q.defer()
 
-    @$http.post "#{@apiRoot}/social-account", syncData
+    @$http.post "#{@apiRoot}/social-account", {access_token: accessToken}
       .success (data, status) =>
         @user.email = data.email
         @user.name = data.name

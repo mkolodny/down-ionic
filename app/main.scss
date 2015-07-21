@@ -28,13 +28,25 @@ $brand-color: #6a38ab;
 @import "./common/intl-phone/intlTelInput";
 @import "./login/login";
 @import "./verify-phone/verify-phone";
+@import "./facebook-sync/facebook-sync";
 
 /*
 Global Sass
 */
 
+// Global
+.button {
+  border-radius: 4px;
+}
+
 // Onboarding
 .onboard-view {
+  .explanation {
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+    width: 250px;
+  }
   input {
     width: 100%;
     font-size: 23px;
@@ -49,5 +61,9 @@ Global Sass
   }
   .has-error {
     border-bottom: 2px solid red;
+  }
+  .button {
+    padding-left: 25px;
+    padding-right: 25px;
   }
 }

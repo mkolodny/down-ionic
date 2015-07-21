@@ -1,0 +1,13 @@
+<div id="facebook-sync" class="onboard-view">
+  <div id="explanation" class="explanation">
+    Down uses Facebook to make it easy for you to find your friends on Down.
+  </div>
+  <div id="button-container">
+    <button class="button" ng-click="fbSync.syncWithFacebook()">
+      Sync With Facebook
+    </button>
+  </div>
+  <div id="error" class="explanation" ng-show="fbSync.error">
+    {{fbSync.error}}
+  </div>
+</div>

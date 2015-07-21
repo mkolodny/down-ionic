@@ -1,8 +1,14 @@
 require 'angular'
 require './login/login-module'
 require './verify-phone/verify-phone-module'
+require './facebook-sync/facebook-sync-module'
 
-angular.module 'down', ['ionic', 'down.login', 'down.verifyPhone']
+angular.module 'down', [
+    'ionic'
+    'down.login'
+    'down.verifyPhone'
+    'down.facebookSync'
+  ]
   .config ($httpProvider) ->
     $httpProvider.defaults.headers.common['Accept'] = 'application/json; version=1.2'
   .run ($ionicPlatform, $window) ->

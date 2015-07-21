@@ -130,11 +130,13 @@ describe 'Auth service', ->
 
   describe 'syncing with facebook', ->
     fbSyncUrl = null
+    accessToken = null
     postData = null
 
     beforeEach ->
       fbSyncUrl = "#{apiRoot}/social-account"
-      postData = access_token: 'poiu0987'
+      accessToken = 'poiu0987'
+      postData = access_token: accessToken
 
     describe 'on success', ->
       responseData = null
@@ -159,7 +161,7 @@ describe 'Auth service', ->
         $httpBackend.expectPOST fbSyncUrl, postData
           .respond 201, responseData
 
-        Auth.syncWithFacebook(postData).then (_response_) ->
+        Auth.syncWithFacebook(accessToken).then (_response_) ->
           response = _response_
         $httpBackend.flush 1
 
@@ -184,7 +186,7 @@ describe 'Auth service', ->
           .respond status, null
 
         rejectedStatus = null
-        Auth.syncWithFacebook(postData).then (->), (_status_) ->
+        Auth.syncWithFacebook(accessToken).then (->), (_status_) ->
           rejectedStatus = _status_
         $httpBackend.flush 1
 
