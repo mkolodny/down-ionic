@@ -3,6 +3,7 @@ require './login/login-module'
 require './verify-phone/verify-phone-module'
 require './facebook-sync/facebook-sync-module'
 require './set-username/set-username-module'
+require './request-push/request-push-module'
 
 angular.module 'down', [
     'ionic'
@@ -10,6 +11,7 @@ angular.module 'down', [
     'down.verifyPhone'
     'down.facebookSync'
     'down.setUsername'
+    'down.requestPush'
   ]
   .config ($httpProvider) ->
     $httpProvider.defaults.headers.common['Accept'] = 'application/json; version=1.2'

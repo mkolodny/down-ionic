@@ -9,7 +9,7 @@ class SetUsernameCtrl
     user.username = @username
     @User.update(user).$promise.then (user) =>
       @Auth.user = user
-      @$state.go 'requestPushNotifications'
+      @$state.go 'requestPush'
     , =>
       @error = 'For some reason, that didn\'t work.'
 

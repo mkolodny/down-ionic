@@ -30,6 +30,7 @@ $brand-color: #6a38ab;
 @import "./verify-phone/verify-phone";
 @import "./facebook-sync/facebook-sync";
 @import "./set-username/set-username";
+@import "./request-push/request-push";
 
 /*
 Global Sass
@@ -67,5 +68,20 @@ Global Sass
   .button {
     padding-left: 25px;
     padding-right: 25px;
+  }
+}
+.request-view {
+  #explanation {
+    margin: 66px auto 25px;
+  }
+  #button-container {
+    text-align: center;
+  }
+  .button {
+    border: none;
+    color: $brand-color;    
+  }
+  #error {
+    margin: 15px auto 0;
   }
 }

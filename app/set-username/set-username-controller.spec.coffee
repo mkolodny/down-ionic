@@ -74,7 +74,7 @@ describe 'set username controller', ->
           expect(Auth.user).toEqual user
 
         it 'should go to the push notifications view', ->
-          expect($state.go).toHaveBeenCalledWith 'requestPushNotifications'
+          expect($state.go).toHaveBeenCalledWith 'requestPush'
 
 
       describe 'when the update fails', ->
