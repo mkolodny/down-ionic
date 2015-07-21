@@ -100,6 +100,22 @@ describe 'verify phone controller', ->
             expect($state.go).toHaveBeenCalledWith 'setUsername'
 
 
+        describe 'the user hasn\'t allowed location services yet', ->
+
+          beforeEach ->
+            user =
+              id: 1
+              name: 'Alan Turing'
+              email: 'aturing@gmail.com'
+              imageUrl: 'https://facebook.com/profile-pic/tdog'
+              username: 'tdog'
+            deferred.resolve user
+            $rootScope.$apply()
+
+          it 'should go to the request push notifications view', ->
+            expect($state.go).toHaveBeenCalledWith 'requestLocationServices'
+
+
         describe 'the user hasn\'t allowed push notifications yet', ->
 
           beforeEach ->
@@ -112,6 +128,7 @@ describe 'verify phone controller', ->
                 lat: 40.7265834
                 long: -73.9821535
               username: 'tdog'
+            localStorage.set 'hasAllowedLocationServices', true
             deferred.resolve user
             $rootScope.$apply()
 
@@ -131,6 +148,7 @@ describe 'verify phone controller', ->
                 lat: 40.7265834
                 long: -73.9821535
               username: 'tdog'
+            localStorage.set 'hasAllowedLocationServices', true
             localStorage.set 'hasAllowedPushNotifications', true
             deferred.resolve user
             $rootScope.$apply()

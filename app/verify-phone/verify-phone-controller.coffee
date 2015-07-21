@@ -15,6 +15,8 @@ class VerifyPhoneCtrl
           @$state.go 'facebookSync'
         else if not user.username?
           @$state.go 'setUsername'
+        else if not @localStorage.get 'hasAllowedLocationServices'
+          @$state.go 'requestLocationServices'
         else if not @localStorage.get 'hasAllowedPushNotifications'
           @$state.go 'requestPushServices'
         else
