@@ -6,25 +6,22 @@
     font-size: 76px;
   }
   #phone {
-    width: 100%;
-    height: 49px;
-    font-size: 23px;
     padding-right: 48px; // To keep things centered with the 48px padding-left
-    text-align: center;
+    height: 47px;
   }
-  #phone::-webkit-input-placeholder {
-    text-align: center;
-    padding-top: 5px;
-  }
-  #phone:-moz-placeholder {
+  ::-webkit-input-placeholder {
     text-align: center;
     padding-top: 5px;
   }
-  #phone::-moz-placeholder {
+  :-moz-placeholder {
     text-align: center;
     padding-top: 5px;
   }
-  #phone:-ms-input-placeholder {
+  ::-moz-placeholder {
+    text-align: center;
+    padding-top: 5px;
+  }
+  :-ms-input-placeholder {
     text-align: center;
     padding-top: 5px;
   }
@@ -33,16 +30,6 @@
   }
   .iti-flag {
     background-image: url('../images/flags.png');
-  }
-  .form-errors {
-    text-align: center;
-    color: #fff;
-  }
-  .form-error {
-    padding-top: 5px;
-  }
-  .has-error {
-    border-bottom: 2px solid red;
   }
 
   @media only screen and (-webkit-min-device-pixel-ratio: 2),

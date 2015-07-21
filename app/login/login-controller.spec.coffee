@@ -94,3 +94,15 @@ describe 'login controller', ->
 
       it 'should return true', ->
         expect(result).toBe true
+
+
+    describe 'when the form is invalid', ->
+      result = null
+
+      beforeEach ->
+        scope.loginForm = $valid: false
+
+        result = ctrl.validate()
+
+      it 'should return true', ->
+        expect(result).toBe false

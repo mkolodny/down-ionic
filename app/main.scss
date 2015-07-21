@@ -28,3 +28,26 @@ $brand-color: #6a38ab;
 @import "./common/intl-phone/intlTelInput";
 @import "./login/login";
 @import "./verify-phone/verify-phone";
+
+/*
+Global Sass
+*/
+
+// Onboarding
+.onboard-view {
+  input {
+    width: 100%;
+    font-size: 23px;
+    text-align: center;
+  }
+  .form-errors {
+    text-align: center;
+    color: #fff;
+  }
+  .form-error {
+    padding-top: 5px;
+  }
+  .has-error {
+    border-bottom: 2px solid red;
+  }
+}

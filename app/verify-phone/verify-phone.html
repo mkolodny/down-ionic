@@ -1,4 +1,4 @@
-<div id="verify-phone" >
+<div id="verify-phone" class="onboard-view">
   <div id="explanation">
     Please enter the verification code you get by text message.
   </div>
@@ -6,9 +6,21 @@
     <form name="verifyPhoneForm" novalidate role="form"
           ng-submit="verifyPhone.authenticate()">
       <label class="item item-input">
-        <input ng-model="verifyPhone.code" type="number" min="4" max="4"
-               placeholder="1234" required>
+        <input ng-model="verifyPhone.code" name="code" minlength="4"
+               maxlength="4" placeholder="1234" required
+               ng-class="{'has-error': verifyPhoneForm.$submitted && verifyPhoneForm.phone.$invalid }">
       </label>
+      <div class="form-errors" ng-if="verifyPhoneForm.$submitted">
+        <div class="form-error" ng-if="verifyPhoneForm.code.$error.required">
+          Please enter your verification code.
+        </div>
+        <div class="form-error" ng-if="verifyPhoneForm.code.$error.minlength">
+          Your verification code should be 4 numbers.
+        </div>
+        <div class="form-error" ng-if="verifyPhone.error">
+          {{verifyPhone.error}}
+        </div>
+      </div>
       <button type="submit" class="button button-full button-positive">
         Submit
       </button>

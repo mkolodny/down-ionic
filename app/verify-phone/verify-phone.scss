@@ -5,23 +5,13 @@
     text-align: center;
     height: 40px;
     width: 250px;
-    margin: 70px auto 15px;
+    margin: 66px auto 15px;
+  }
+  .item {
+    padding-left: 0;
   }
   input {
-    text-align: center;
-    font-size: 23px;
     padding-right: 0;
-  }
-  ::-webkit-input-placeholder {
-    padding-top: 5px;
-  }
-  :-moz-placeholder {
-    padding-top: 5px;
-  }
-  ::-moz-placeholder {
-    padding-top: 5px;
-  }
-  :-ms-input-placeholder {
-    padding-top: 5px;
+    border-style: none;
   }
 }

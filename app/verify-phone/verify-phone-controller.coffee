@@ -1,9 +1,11 @@
 class VerifyPhoneCtrl
-  constructor: (@$state, @Auth, localStorageService, @User) ->
+  constructor: (@$scope, @$state, @Auth, localStorageService, @User) ->
     @localStorage = localStorageService
 
   authenticate: ->
-    # TODO: handle validation (check login-controller/html for an example)
+    if not @validate()
+      return
+
     # TODO: handle when the user doesn't have location services turned on. Use
     # the cordova geolocation plugin's getCurrentPosition function.
     @Auth.authenticate @Auth.phone, @code
@@ -24,5 +26,8 @@ class VerifyPhoneCtrl
           @error = 'Looks like you entered the wrong code :('
         else
           @error = 'Oops, something went wrong.'
+
+  validate: ->
+    @$scope.verifyPhoneForm.$valid
 
 module.exports = VerifyPhoneCtrl
