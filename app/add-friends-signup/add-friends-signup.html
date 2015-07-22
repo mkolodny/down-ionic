@@ -1,14 +1,22 @@
 <div id="add-friends-signup">
-  <div class="bar bar-header">
+  <ion-header-bar>
     <h1 class="title">Add Friends</h1>
     <button class="button button-clear button-light">Done</button>
-  </div>
-  <div class="content has-header">
-    <div class="list">
-      <!-- this item's not appearing because the .list's height is too small -->
-      <div class="item">
-        Friends Using Down
-      </div>
-    </div>
-  </div>
+  </ion-header-bar>
+  <ion-content>
+    <ion-list>
+      <ion-item collection-repeat="item in addFriendsSignup.friends"
+                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider}"
+                item-height="item.isDivider ? '35px' : '71px'">
+        <span ng-if="item.isDivider">{{item.title}}</span>
+        <img ng-src="{{item.imageUrl}}" alt="{{item.name}}'s Profile Picture"
+             ng-if="!item.isDivider">
+        <h2 ng-if="!item.isDivider">{{item.name}}</h2>
+        <p ng-if="!item.isDivider">{{item.username}}</p>
+        <a href="#" ng-if="!item.isDivider">
+          <i class="icon fa fa-plus-square-o"></i>
+        </a>
+      </ion-item>
+    </ion-list>
+  </ion-content>
 </div>

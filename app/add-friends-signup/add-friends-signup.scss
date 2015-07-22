@@ -8,5 +8,23 @@
   }
   .item-divider {
     text-transform: uppercase;
+    background-color: #fff;
+    color: $brand-color;
+    font-size: 12px;
+    border: none;
+  }
+  .item {
+    border-color: #eee;
+    border-top: none;
+    border-bottom-width: 2px;
+  }
+  img {
+    max-width: 50px;
+    max-height: 50px;
+    top: 11px;
+    left: 11px;
+  }
+  .fa-plus-square-o {
+    color: #888;    
   }
 }

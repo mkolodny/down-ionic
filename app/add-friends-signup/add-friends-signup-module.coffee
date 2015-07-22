@@ -1,9 +1,12 @@
 require 'angular'
 require 'angular-ui-router'
+require '../common/resources/resources-module'
 AddFriendsSignupCtrl = require './add-friends-signup-controller'
 
 angular.module 'down.addFriendsSignup', [
     'ui.router'
+    'ionic'
+    'down.resources'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'addFriendsSignup',
