@@ -11,7 +11,7 @@ User = require './user-service'
 UserPhone = require './userphone-service'
 
 angular.module 'down.resources', ['ngResource', 'down.auth']
-  .value 'apiRoot', 'http://down-staging.herokuapp.com/api'
+  .value 'apiRoot', 'http://localhost:5000/api'
   .factory 'APNSDevice', APNSDevice
   .factory 'Event', Event
   .factory 'Friendship', Friendship
