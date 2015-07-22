@@ -6,6 +6,7 @@ require './facebook-sync/facebook-sync-module'
 require './set-username/set-username-module'
 require './request-push/request-push-module'
 require './request-location/request-location-module'
+require './add-friends-signup/add-friends-signup-module'
 
 angular.module 'down', [
     'ionic'
@@ -15,6 +16,7 @@ angular.module 'down', [
     'down.setUsername'
     'down.requestPush'
     'down.requestLocation'
+    'down.addFriendsSignup'
   ]
   .config ($httpProvider, $urlRouterProvider) ->
     $httpProvider.defaults.headers.common['Accept'] = 'application/json; version=1.2'
