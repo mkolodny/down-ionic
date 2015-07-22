@@ -8,6 +8,6 @@ angular.module 'down.verifyPhone', ['ui.router', 'down.auth', 'LocalStorageModul
   .config ($stateProvider) ->
     $stateProvider.state 'verifyPhone',
       url: '/verify-phone'
-      templateUrl: '/app/verify-phone/verify-phone.html'
+      templateUrl: 'app/verify-phone/verify-phone.html'
       controller: 'VerifyPhoneCtrl as verifyPhone'
   .controller 'VerifyPhoneCtrl', VerifyPhoneCtrl

@@ -10,6 +10,6 @@ angular.module 'down.requestPush', [
   .config ($stateProvider) ->
     $stateProvider.state 'requestPush',
       url: '/push-notifications'
-      templateUrl: '/app/request-push/request-push.html'
+      templateUrl: 'app/request-push/request-push.html'
       controller: 'RequestPushCtrl as requestPush'
   .controller 'RequestPushCtrl', RequestPushCtrl

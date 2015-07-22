@@ -10,6 +10,6 @@ angular.module 'down.requestLocation', [
   .config ($stateProvider) ->
     $stateProvider.state 'requestLocation',
       url: '/location-services'
-      templateUrl: '/app/request-location/request-location.html'
+      templateUrl: 'app/request-location/request-location.html'
       controller: 'RequestLocationCtrl as requestLocation'
   .controller 'RequestLocationCtrl', RequestLocationCtrl

@@ -10,6 +10,6 @@ angular.module 'down.setUsername', [
   .config ($stateProvider) ->
     $stateProvider.state 'setUsername',
       url: '/set-username'
-      templateUrl: '/app/set-username/set-username.html'
+      templateUrl: 'app/set-username/set-username.html'
       controller: 'SetUsernameCtrl as setUsername'
   .controller 'SetUsernameCtrl', SetUsernameCtrl
