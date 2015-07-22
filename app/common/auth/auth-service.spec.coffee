@@ -204,18 +204,18 @@ describe 'Auth service', ->
       postData = {phone: phone}
 
     describe 'on success', ->
+      response = null
 
-      it 'should resolve the promise', ->
+      beforeEach ->
         $httpBackend.expectPOST verifyPhoneUrl, postData
           .respond 200, null
 
-        resolved = false
-        Auth.sendVerificationText(phone).then ->
-          resolved = true
+        Auth.sendVerificationText(phone).then (->), (_response_) ->
+          response = _response_
         $httpBackend.flush 1
 
-        expect(resolved).toBe true
-
+      it 'should set Auth.phone', ->
+        expect(Auth.phone).toBe phone
 
     describe 'on error', ->
 

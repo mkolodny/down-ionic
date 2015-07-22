@@ -8,11 +8,11 @@
     Please enter the verification code you get by text message.
   </div>
   <div class="list">
-    <form name="verifyPhoneForm" novalidate role="form"
-          ng-submit="verifyPhone.authenticate()">
+    <form name="verifyPhoneForm" novalidate role="form">
       <label class="item item-input">
         <input ng-model="verifyPhone.code" name="code" minlength="4"
                maxlength="4" placeholder="1234" required
+               type="tel"
                ng-class="{'has-error': verifyPhoneForm.$submitted && verifyPhoneForm.phone.$invalid }">
       </label>
       <div class="form-errors" ng-if="verifyPhoneForm.$submitted">
@@ -26,7 +26,7 @@
           {{verifyPhone.error}}
         </div>
       </div>
-      <button type="submit" class="button button-full button-positive">
+      <button on-tap="verifyPhone.authenticate()" type="submit" class="button button-full button-positive">
         Submit
       </button>
     </form>
