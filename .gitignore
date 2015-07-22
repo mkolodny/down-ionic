@@ -13,3 +13,7 @@ www/
 
 # test directory
 tests/
+
+# sublime
+down-ionic.sublime-project
+down-ionic.sublime-workspace
