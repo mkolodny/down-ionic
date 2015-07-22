@@ -171,7 +171,7 @@ gulp.task 'clean', ->
 
 
 gulp.task 'build', [
-  'clean'
+  # 'clean'
   'scripts'
   'styles'
   'templates'
