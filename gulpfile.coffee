@@ -107,7 +107,7 @@ gulp.task 'minify-js', ->
 
 gulp.task 'minify-css', ->
   gulp.src "#{buildDir}/app/main.css"
-    .pipe minifyCSS()
+    .pipe minifyCss()
     .pipe gulp.dest("#{buildDir}/app")
   return
 
