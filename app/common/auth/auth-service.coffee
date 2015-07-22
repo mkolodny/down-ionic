@@ -58,5 +58,7 @@ class Auth
 
   sendVerificationText: (phone) ->
     @$http.post "#{@apiRoot}/authcodes", {phone: phone}
+      .success (data, status) =>
+        @phone = phone
 
 module.exports = Auth
