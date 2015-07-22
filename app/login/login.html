@@ -1,7 +1,7 @@
 <div id="login" class="onboard-view">
   <link href="http://fonts.googleapis.com/css?family=Viga" rel="stylesheet">
   <h1>Down</h1>
-  <form role="form" novalidate name="loginForm" ng-submit="login.login()">
+  <form role="form" novalidate name="loginForm" >
     <input id="phone" intl-phone ng-model="login.phone" name="phone" required
            ng-class="{'has-error': loginForm.$submitted && loginForm.phone.$invalid }">
     <div class="form-errors" ng-if="loginForm.$submitted">
@@ -12,7 +12,7 @@
         That phone number is invalid.
       </div>
     </div>
-    <button class="button button-full button-positive" type="submit">
+    <button on-tap="login.login()" type="submit" class="button button-full button-positive">
       Login
     </button>
   </form>
