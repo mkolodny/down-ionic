@@ -1,4 +1,5 @@
 require 'angular'
+require 'angular-ui-router'
 require './login/login-module'
 require './verify-phone/verify-phone-module'
 require './facebook-sync/facebook-sync-module'
@@ -15,8 +16,9 @@ angular.module 'down', [
     'down.requestPush'
     'down.requestLocation'
   ]
-  .config ($httpProvider) ->
+  .config ($httpProvider, $urlRouterProvider) ->
     $httpProvider.defaults.headers.common['Accept'] = 'application/json; version=1.2'
+    $urlRouterProvider.when '', '/login'
   .run ($ionicPlatform, $window) ->
     $ionicPlatform.ready ->
       # Hide the accessory bar by default (remove this to show the accessory bar
