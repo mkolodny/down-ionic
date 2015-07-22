@@ -1,7 +1,7 @@
-Friendship = ($resource, apiRoot) ->
+Friendship = ($http, $resource, apiRoot) ->
   listUrl = "#{apiRoot}/friendships"
 
-  $resource "#{listUrl}/:id", null,
+  resource = $resource "#{listUrl}/:id", null,
     save:
       method: 'post'
       transformRequest: (data, headersGetter) ->
@@ -17,16 +17,14 @@ Friendship = ($resource, apiRoot) ->
           friendId: data.friend
         response
 
-    ###
-    TODO: The request data is being sent as query parameters.
-    See: http://stackoverflow.com/questions/22186671/angular-resource-delete-wont-send-body-to-express-js-server
-    and http://stackoverflow.com/questions/18924217/how-to-set-custom-headers-with-a-resource-action
-    A backup option is to make a PUT request.
-
-    deleteWithFriend:
+  resource.deleteWithFriendId = (friendId) ->
+    $http
       method: 'delete'
       url: "#{listUrl}/friend"
-      headers: 'Content-Type': 'application/json;charset=utf-8'
-    ###
+      data: {friend: friendId}
+      headers:
+        'Content-Type': 'application/json;charset=utf-8'
+
+  resource
 
 module.exports = Friendship

@@ -45,14 +45,21 @@ describe 'friendship service', ->
       expect(response).toAngularEqual expectedFriendship
 
 
-  xdescribe 'deleting with a friend', ->
+  describe 'deleting with a friend', ->
 
     it 'should DELETE the friendship', ->
-      deleteData = friend: 1
+      friendId = 1
       url = "#{listUrl}/friend"
+      deleteData = friend: friendId
+      checkHeaders = (headers) ->
+        headers['Content-Type'] is 'application/json;charset=utf-8'
 
-      $httpBackend.expectDELETE url, deleteData
+      $httpBackend.expect 'DELETE', url, deleteData, checkHeaders
         .respond 200, null
 
-      Friendship.deleteWithFriend deleteData
+      deleted = false
+      Friendship.deleteWithFriendId(friendId).then ->
+        deleted = true
       $httpBackend.flush 1
+
+      expect(deleted).toBe true
