@@ -4,7 +4,7 @@ require 'angular-ui-router'
 require '../common/auth/auth-module'
 AddFriendsSignupCtrl = require './add-friends-signup-controller'
 
-describe 'add friends during signup controller', ->
+xdescribe 'add friends during signup controller', ->
   $q = null
   $state = null
   Auth = null
@@ -34,10 +34,10 @@ describe 'add friends during signup controller', ->
       $scope: scope
   )
 
-  xit 'should request the user\'s facebook friends', ->
+  it 'should request the user\'s facebook friends', ->
     expect(User.getFacebookFriends).toHaveBeenCalled()
 
-  xdescribe 'when the facebook friends request returns', ->
+  describe 'when the facebook friends request returns', ->
 
     describe 'successfully', ->
       friend = null
@@ -50,6 +50,11 @@ describe 'add friends during signup controller', ->
           imageUrl: 'https://graph.facebook.com/2.2/1598714293871/picture'
         deferred.resolve [friend]
         scope.$apply()
+
+      it 'should set the friends on Auth', ->
+        friends = {}
+        friends[friend.id] = friend
+        expect(Auth.friends).toEqual friends
 
       it 'should generate the items list', ->
         items = [

@@ -4,14 +4,18 @@ require './resources-module'
 
 describe 'friendship service', ->
   $httpBackend = null
+  Auth = null
   Friendship = null
   listUrl = null
 
   beforeEach angular.mock.module('down.resources')
 
+  beforeEach angular.mock.module('down.auth')
+
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
     apiRoot = $injector.get 'apiRoot'
+    Auth = angular.copy $injector.get('Auth')
     Friendship = $injector.get 'Friendship'
 
     listUrl = "#{apiRoot}/friendships"
@@ -22,11 +26,16 @@ describe 'friendship service', ->
     $httpBackend.verifyNoOutstandingRequest()
 
   describe 'creating', ->
+    friendId = null
+    friendship = null
+    responseData = null
+    response = null
 
-    it 'should POST the friendship', ->
+    beforeEach ->
+      friendId = 2
       friendship =
         userId: 1
-        friendId: 2
+        friendId: friendId
       postData =
         user: friendship.userId
         friend: friendship.friendId
@@ -40,26 +49,59 @@ describe 'friendship service', ->
         response = _response_
       $httpBackend.flush 1
 
+    it 'should POST the friendship', ->
       expectedFriendshipData = angular.extend {id: responseData.id}, friendship
       expectedFriendship = new Friendship(expectedFriendshipData)
       expect(response).toAngularEqual expectedFriendship
 
+    it 'should add the friend to Auth', ->
+      expect(Auth.friends[friendId]).toBe true
+
 
   describe 'deleting with a friend', ->
+    friendId = null
+    url = null
+    deleteData = null
+    checkHeaders = null
 
-    it 'should DELETE the friendship', ->
+    beforeEach ->
       friendId = 1
       url = "#{listUrl}/friend"
       deleteData = friend: friendId
       checkHeaders = (headers) ->
         headers['Content-Type'] is 'application/json;charset=utf-8'
 
-      $httpBackend.expect 'DELETE', url, deleteData, checkHeaders
-        .respond 200, null
-
+    describe 'successfully', ->
       deleted = false
-      Friendship.deleteWithFriendId(friendId).then ->
-        deleted = true
-      $httpBackend.flush 1
 
-      expect(deleted).toBe true
+      beforeEach ->
+        $httpBackend.expect 'DELETE', url, deleteData, checkHeaders
+          .respond 200, null
+
+        # Set the user as a friend on Auth.
+        Auth.friends[friendId] = true
+
+        Friendship.deleteWithFriendId(friendId).then ->
+          deleted = true
+        $httpBackend.flush 1
+
+      it 'should DELETE the friendship', ->
+        expect(deleted).toBe true
+
+      it 'should remove the friend from Auth', ->
+        expect(Auth.friends[friendId]).not.toBeDefined()
+
+
+    describe 'with an error', ->
+      rejected = false
+
+      beforeEach ->
+        $httpBackend.expect 'DELETE', url, deleteData, checkHeaders
+          .respond 500, null
+
+        Friendship.deleteWithFriendId(friendId).then (->), ->
+          rejected = true
+        $httpBackend.flush 1
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true

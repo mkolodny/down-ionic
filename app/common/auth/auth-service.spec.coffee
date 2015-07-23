@@ -19,6 +19,9 @@ describe 'Auth service', ->
   it 'should init the user', ->
     expect(Auth.user).toEqual {}
 
+  it 'should init the user\'s friends', ->
+    expect(Auth.friends).toEqual {}
+
   describe 'checking whether the user is authenticated', ->
     testAuthUrl = null
 
@@ -229,3 +232,28 @@ describe 'Auth service', ->
         $httpBackend.flush 1
 
         expect(rejected).toBe true
+
+
+  describe 'checking whether a user is a friend', ->
+    user = null
+
+    beforeEach ->
+      user =
+        id: 1
+
+    describe 'when the user is a friend', ->
+
+      beforeEach ->
+        Auth.friends[user.id] = true
+
+      it 'should return true', ->
+        expect(Auth.isFriend(user.id)).toBe true
+
+
+    describe 'when the user isn\'t a friend', ->
+
+      beforeEach ->
+        Auth.friends = {}
+
+      it 'should return true', ->
+        expect(Auth.isFriend(user.id)).toBe false

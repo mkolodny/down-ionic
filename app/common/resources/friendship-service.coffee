@@ -1,4 +1,4 @@
-Friendship = ($http, $resource, apiRoot) ->
+Friendship = ($http, $resource, $q, apiRoot, Auth) ->
   listUrl = "#{apiRoot}/friendships"
 
   resource = $resource "#{listUrl}/:id", null,
@@ -15,15 +15,30 @@ Friendship = ($http, $resource, apiRoot) ->
           id: data.id
           userId: data.user
           friendId: data.friend
+
+        # Save the friend on Auth.
+        Auth.friends[data.friend] = true
+
         response
 
   resource.deleteWithFriendId = (friendId) ->
+    deferred = $q.defer()
+
     $http
       method: 'delete'
       url: "#{listUrl}/friend"
       data: {friend: friendId}
       headers:
         'Content-Type': 'application/json;charset=utf-8'
+    .success (data, status, headers, config) ->
+      # Remove the friend from Auth.
+      delete Auth.friends[friendId]
+
+      deferred.resolve()
+    .error (data, status, headers, config) ->
+      deferred.reject()
+
+    deferred.promise
 
   resource
 

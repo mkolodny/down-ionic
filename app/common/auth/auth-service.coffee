@@ -3,6 +3,8 @@ class Auth
 
   user: {}
 
+  friends: {}
+
   isAuthenticated: ->
     deferred = @$q.defer()
 
@@ -16,8 +18,6 @@ class Auth
           deferred.reject()
 
     deferred.promise
-
-
 
   ###*
    * Check verifcation code with the server
@@ -60,5 +60,8 @@ class Auth
     @$http.post "#{@apiRoot}/authcodes", {phone: phone}
       .success (data, status) =>
         @phone = phone
+
+  isFriend: (userId) ->
+    @friends[userId]?
 
 module.exports = Auth
