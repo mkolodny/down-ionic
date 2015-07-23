@@ -40,7 +40,7 @@ class AddFriendsSignupCtrl
 
   friends: [
     isDivider: true
-    title: 'Facebook Friends'
+    title: 'Friends Using Down'
   ,
     isDivider: false
     id: 1
