@@ -8,7 +8,10 @@
       <ion-item collection-repeat="item in addFriendsSignup.friends"
                 ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider}"
                 item-height="item.isDivider ? '35px' : '71px'">
+        <!-- Divider -->
         <span ng-if="item.isDivider">{{item.title}}</span>
+
+        <!-- Facebook Friend -->
         <img ng-src="{{item.imageUrl}}" alt="{{item.name}}'s Profile Picture"
              ng-if="!item.isDivider">
         <h2 ng-if="!item.isDivider">{{item.name}}</h2>
