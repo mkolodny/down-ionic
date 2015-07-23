@@ -24,3 +24,9 @@ module.exports =
   browsers: ['Chrome']
 
   singleRun: false
+
+  browserDisconnectTimeout: 10000
+
+  browserDisconnectTolerance: 1
+
+  browserNoActivityTimeout: 60000
