@@ -1,7 +1,8 @@
-window.jQuery = require 'jquery' # required for intl phone
 require 'angular'
 
 beforeEach ->
+  jasmine.DEFAULT_UPDATE_INTERVAL = 0
+
   jasmine.addMatchers
     toAngularEqual: ->
       compare: (actual, expected) ->
