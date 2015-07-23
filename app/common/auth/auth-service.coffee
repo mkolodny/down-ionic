@@ -1,5 +1,5 @@
 class Auth
-  constructor: (@$http, @$q, @apiRoot, @User) ->
+  constructor: (@$http, @$q, @apiRoot, @User, @$cordovaGeolocation) ->
 
   user: {}
 
@@ -63,5 +63,13 @@ class Auth
 
   isFriend: (userId) ->
     @friends[userId]?
+
+  watchLocation: () ->
+    @$cordovaGeolocation.watchPosition()
+      # .then null
+      # , (error) ->
+      #   console.log error
+      # , (position) ->
+      #   console.log position
 
 module.exports = Auth
