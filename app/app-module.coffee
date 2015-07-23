@@ -8,6 +8,7 @@ require './request-push/request-push-module'
 require './request-location/request-location-module'
 require './request-contacts/request-contacts-module'
 require './find-friends/find-friends-module'
+require './events/events-module'
 
 angular.module 'down', [
     'ionic'
@@ -19,10 +20,11 @@ angular.module 'down', [
     'down.requestLocation'
     'down.requestContacts'
     'down.findFriends'
+    'down.events'
   ]
   .config ($httpProvider, $urlRouterProvider) ->
     $httpProvider.defaults.headers.common['Accept'] = 'application/json; version=1.2'
-    $urlRouterProvider.when '', '/login'
+    $urlRouterProvider.when '', '/'
   .run ($ionicPlatform, $window) ->
     $ionicPlatform.ready ->
       # Hide the accessory bar by default (remove this to show the accessory bar

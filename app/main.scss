@@ -34,6 +34,7 @@ $brand-color: #6a38ab;
 @import "./request-location/request-location";
 @import "./request-contacts/request-contacts";
 @import "./find-friends/find-friends";
+@import "./events/events";
 
 /*
 Global Sass
@@ -42,6 +43,33 @@ Global Sass
 // Global
 .button {
   border-radius: 4px;
+}
+.bar {
+  background-color: $brand-color;
+
+  .title {
+    color: #fff;
+    font-size: 23px;
+  }
+}
+.item-divider {
+  text-transform: uppercase;
+  background-color: #fff;
+  color: $brand-color;
+  font-size: 12px;
+  border: none;
+  padding-left: 12px;
+}
+.item {
+  border-color: #eee;
+  border-top: none;
+  border-bottom-width: 2px;
+}
+.item-avatar > img:first-child {
+  max-width: 50px;
+  max-height: 50px;
+  top: 11px;
+  left: 11px;
 }
 
 // Onboarding
