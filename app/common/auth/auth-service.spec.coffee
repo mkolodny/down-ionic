@@ -1,13 +1,29 @@
 require 'angular-mocks'
+require 'ng-cordova'
 require './auth-module'
 
 describe 'Auth service', ->
+  $cordovaGeolocation = null
   $httpBackend = null
   apiRoot = null
   Auth = null
   User = null
 
   beforeEach angular.mock.module('down.auth')
+
+  beforeEach angular.mock.module('ngCordova.plugins.geolocation')
+
+  beforeEach angular.mock.module(($provide) ->
+    $cordovaGeolocation =
+      watchPosition: jasmine.createSpy('$cordovaGeolocation.watchPosition').and.returnValue
+        then: (success, error, progress) ->
+    $provide.value '$cordovaGeolocation', $cordovaGeolocation
+
+    User =
+      save: jasmine.createSpy('User.save')
+    $provide.value 'User', User
+    return
+  )
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
@@ -257,3 +273,38 @@ describe 'Auth service', ->
 
       it 'should return true', ->
         expect(Auth.isFriend(user.id)).toBe false
+
+  describe 'watching the users location', ->
+
+    beforeEach ->
+      Auth.watchLocation()
+
+    it 'should periodically ask the device for the users location', ->
+      expect($cordovaGeolocation.watchPosition).toHaveBeenCalled()
+
+    xdescribe 'when location data is received sucessfully', ->
+      user = null
+
+      beforeEach ->
+        user = angular.copy Auth.user
+        location =
+          lat: 180.0
+          long: 180.0
+        user.location = location
+
+
+      fit 'should save the user with the location data', ->
+        expect(User.save).toHaveBeenCalledWith user
+
+
+      describe 'when successful', ->
+
+        it 'should update the Auth.user', ->
+
+    describe 'when location data cannot be recieved', ->
+
+      describe 'because location permissions are denied', ->
+
+        it 'should send the user to the enable location services view', ->
+
+
