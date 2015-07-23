@@ -1,4 +1,4 @@
-class AddFriendsSignupCtrl
+class FindFriendsCtrl
   constructor: (@$state, @Auth, @User) ->
     # Use mock data for now.
     user =
@@ -38,7 +38,7 @@ class AddFriendsSignupCtrl
   done: ->
     @$state.go 'events'
 
-  friends: [
+  items: [
     isDivider: true
     title: 'Friends Using Down'
   ,
@@ -58,4 +58,4 @@ class AddFriendsSignupCtrl
     title: 'Contacts'
   ]
 
-module.exports = AddFriendsSignupCtrl
+module.exports = FindFriendsCtrl

@@ -7,7 +7,7 @@ require './set-username/set-username-module'
 require './request-push/request-push-module'
 require './request-location/request-location-module'
 require './request-contacts/request-contacts-module'
-require './add-friends-signup/add-friends-signup-module'
+require './find-friends/find-friends-module'
 
 angular.module 'down', [
     'ionic'
@@ -18,7 +18,7 @@ angular.module 'down', [
     'down.requestPush'
     'down.requestLocation'
     'down.requestContacts'
-    'down.addFriendsSignup'
+    'down.findFriends'
   ]
   .config ($httpProvider, $urlRouterProvider) ->
     $httpProvider.defaults.headers.common['Accept'] = 'application/json; version=1.2'
