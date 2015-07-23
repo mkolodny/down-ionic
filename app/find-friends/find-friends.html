@@ -1,14 +1,17 @@
-<div id="add-friends-signup">
+<div id="find-friends">
   <ion-header-bar>
-    <h1 class="title">Add Friends</h1>
+    <h1 class="title">Find Friends</h1>
     <button class="button button-clear button-light">Done</button>
   </ion-header-bar>
   <ion-content>
     <ion-list>
-      <ion-item collection-repeat="item in addFriendsSignup.friends"
+      <ion-item collection-repeat="item in findFriends.items"
                 ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider}"
                 item-height="item.isDivider ? '35px' : '71px'">
+        <!-- Divider -->
         <span ng-if="item.isDivider">{{item.title}}</span>
+
+        <!-- Facebook Friend -->
         <img ng-src="{{item.imageUrl}}" alt="{{item.name}}'s Profile Picture"
              ng-if="!item.isDivider">
         <h2 ng-if="!item.isDivider">{{item.name}}</h2>

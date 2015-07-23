@@ -2,9 +2,9 @@ require 'angular'
 require 'angular-mocks'
 require 'angular-ui-router'
 require '../common/auth/auth-module'
-AddFriendsSignupCtrl = require './add-friends-signup-controller'
+FindFriendsCtrl = require './find-friends-controller'
 
-xdescribe 'add friends during signup controller', ->
+xdescribe 'find friends controller', ->
   $q = null
   $state = null
   Auth = null
@@ -29,7 +29,7 @@ xdescribe 'add friends during signup controller', ->
     deferred = $q.defer()
     spyOn(User, 'getFacebookFriends').and.returnValue {$promise: deferred.promise}
 
-    ctrl = $controller AddFriendsSignupCtrl,
+    ctrl = $controller FindFriendsCtrl,
       Auth: Auth
       $scope: scope
   )
