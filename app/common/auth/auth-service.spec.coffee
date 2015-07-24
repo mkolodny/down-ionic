@@ -1,35 +1,53 @@
 require 'angular-mocks'
+require 'angular-ui-router'
 require 'ng-cordova'
 require './auth-module'
 
 describe 'Auth service', ->
   $cordovaGeolocation = null
   $httpBackend = null
+  scope = null
+  $state = null
+  $q = null
   apiRoot = null
   Auth = null
   User = null
+  userDeserialize = null
 
   beforeEach angular.mock.module('down.auth')
 
   beforeEach angular.mock.module('ngCordova.plugins.geolocation')
 
+  beforeEach angular.mock.module('ui.router')
+
   beforeEach angular.mock.module(($provide) ->
+
     $cordovaGeolocation =
-      watchPosition: jasmine.createSpy('$cordovaGeolocation.watchPosition').and.returnValue
-        then: (success, error, progress) ->
+      watchPosition: jasmine.createSpy('$cordovaGeolocation.watchPosition') 
     $provide.value '$cordovaGeolocation', $cordovaGeolocation
 
+    userDeserialize = 'userDeserialize'
+
     User =
-      save: jasmine.createSpy('User.save')
+      update: jasmine.createSpy('User.update')
+      deserialize: jasmine.createSpy('User.deserialize').and.returnValue userDeserialize
     $provide.value 'User', User
+
+    $state = 
+      go: jasmine.createSpy('$state.go')
+    $provide.value '$state', $state
+
     return
   )
 
   beforeEach inject(($injector) ->
+    $q = $injector.get '$q'
     $httpBackend = $injector.get '$httpBackend'
+    $rootScope = $injector.get '$rootScope'
+    $state = $injector.get '$state'
     apiRoot = $injector.get 'apiRoot'
     Auth = angular.copy $injector.get('Auth')
-    User = $injector.get 'User'
+    scope = $rootScope.$new()
   )
 
   it 'should init the user', ->
@@ -123,14 +141,15 @@ describe 'Auth service', ->
           response = _response_
         $httpBackend.flush 1
 
+      it 'should call deserialize with response data', ->
+        expect(User.deserialize).toHaveBeenCalledWith responseData
+        expect(User.deserialize.calls.count()).toBe 1
+
       it 'should get or create the user', ->
-        expectedUserData = User.deserialize responseData
-        expectedUser = new User expectedUserData
-        expect(response).toAngularEqual expectedUser
+        expect(response).toAngularEqual userDeserialize
 
       it 'should set the returned user on the Auth object', ->
-        expect(Auth.user).toBe response
-
+        expect(Auth.user).toBe userDeserialize
 
     describe 'when the request fails', ->
 
@@ -190,8 +209,7 @@ describe 'Auth service', ->
           name: responseData.name
           imageUrl: responseData.image_url
         , Auth.user
-        expectedUser = new User(expectedUserData)
-        expect(response).toAngularEqual expectedUser
+        expect(response).toAngularEqual expectedUserData
 
       it 'should update the logged in user', ->
         expect(Auth.user).toBe response
@@ -275,36 +293,64 @@ describe 'Auth service', ->
         expect(Auth.isFriend(user.id)).toBe false
 
   describe 'watching the users location', ->
+    deferred = null
+    updatedDeferred = null
 
     beforeEach ->
+      deferred = $q.defer()
+      $cordovaGeolocation.watchPosition.and.returnValue deferred.promise
+
+      updatedDeferred = $q.defer()
+      User.update.and.returnValue {$promise: updatedDeferred.promise}
+
       Auth.watchLocation()
 
     it 'should periodically ask the device for the users location', ->
       expect($cordovaGeolocation.watchPosition).toHaveBeenCalled()
 
-    xdescribe 'when location data is received sucessfully', ->
+    describe 'when location data is received sucessfully', ->
       user = null
 
       beforeEach ->
+        lat = 180.0
+        long = 180.0
+
         user = angular.copy Auth.user
-        location =
-          lat: 180.0
-          long: 180.0
-        user.location = location
+        user.location = 
+          lat: lat
+          long: long
+        
+        position =
+          coords:
+            latitude: lat
+            longitude: long
 
+        deferred.notify position
+        scope.$apply()
 
-      fit 'should save the user with the location data', ->
-        expect(User.save).toHaveBeenCalledWith user
-
+      it 'should save the user with the location data', ->
+        expect(User.update).toHaveBeenCalledWith user
 
       describe 'when successful', ->
 
+        beforeEach ->
+          updatedDeferred.resolve user
+          scope.$apply()
+
         it 'should update the Auth.user', ->
+          expect(Auth.user).toBe user
 
     describe 'when location data cannot be recieved', ->
 
       describe 'because location permissions are denied', ->
+        beforeEach ->
+          error = 
+            code: 'PositionError.PERMISSION_DENIED'
+
+          deferred.reject error
+          scope.$apply()
 
         it 'should send the user to the enable location services view', ->
+          expect($state.go).toHaveBeenCalledWith 'requestLocation'
 
 

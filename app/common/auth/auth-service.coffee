@@ -1,5 +1,5 @@
 class Auth
-  constructor: (@$http, @$q, @apiRoot, @User, @$cordovaGeolocation) ->
+  constructor: (@$http, @$q, @apiRoot, @User, @$cordovaGeolocation, @$state) ->
 
   user: {}
 
@@ -64,12 +64,19 @@ class Auth
   isFriend: (userId) ->
     @friends[userId]?
 
-  watchLocation: () ->
-    @$cordovaGeolocation.watchPosition()
-      # .then null
-      # , (error) ->
-      #   console.log error
-      # , (position) ->
-      #   console.log position
-
+  watchLocation: ->
+    watch = @$cordovaGeolocation.watchPosition()
+    watch.then null
+      , (error) =>
+         if error.code is 'PositionError.PERMISSION_DENIED'
+            @$state.go 'requestLocation'
+      , (position) =>
+        location =
+          lat: position.coords.latitude
+          long: position.coords.longitude
+        user = angular.copy @user
+        user.location = location
+        @User.update(user).$promise.then (user) =>
+          @user = user
+         
 module.exports = Auth
