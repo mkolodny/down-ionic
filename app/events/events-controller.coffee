@@ -1,4 +1,17 @@
 class EventsCtrl
+  constructor: (@Invitation) ->
+    return
+    @Invitation.getMyInvitations().then (events) ->
+      # Create a list of the user's invitations, with the event set on the
+      # invitation.
+      invitations = []
+      #for event in events
+
+      items = []
+      items.push
+        isDivider: true
+        title: 'New'
+
   items: [
     isDivider: true
     title: 'New'
@@ -11,7 +24,7 @@ class EventsCtrl
     lastViewed: new Date(1437672887387)
     event:
       id: 1
-      title: 'Bars?!?!?'
+      title: 'bars?!?!?'
     fromUser:
       id: 1
       name: 'Michael Kolodny'

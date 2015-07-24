@@ -52,6 +52,7 @@ xdescribe 'find friends controller', ->
         scope.$apply()
 
       it 'should set the friends on Auth', ->
+        # TODO: Remove this.
         friends = {}
         friends[friend.id] = friend
         expect(Auth.friends).toEqual friends

@@ -13,6 +13,7 @@ describe 'invitation service', ->
     $httpBackend = $injector.get '$httpBackend'
     apiRoot = $injector.get 'apiRoot'
     Invitation = $injector.get 'Invitation'
+    User = $injector.get 'User'
 
     listUrl = "#{apiRoot}/invitations"
   )
@@ -20,6 +21,18 @@ describe 'invitation service', ->
   afterEach ->
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
+
+  it 'should have a no response property', ->
+    expect(Invitation.noResponse).toBe 0
+
+  it 'should have an accepted property', ->
+    expect(Invitation.accepted).toBe 1
+
+  it 'should have a declined property', ->
+    expect(Invitation.declined).toBe 2
+
+  it 'should have a maybe property', ->
+    expect(Invitation.maybe).toBe 3
 
   describe 'serializing an invitation', ->
 
@@ -29,7 +42,7 @@ describe 'invitation service', ->
         eventId: 2
         toUserId: 3
         fromUserId: 4
-        response: 1 # TODO: Use an Invitation.accepted property
+        response: Invitation.accepted
         previouslyAccepted: false
         open: false
         toUserMessaged: false
@@ -59,7 +72,7 @@ describe 'invitation service', ->
         event: 2
         to_user: 3
         from_user: 4
-        response: 1 # TODO: Use an Invitation.accepted property
+        response: Invitation.accepted
         previously_accepted: false
         open: false
         to_user_messaged: false
@@ -88,7 +101,7 @@ describe 'invitation service', ->
         eventId: 1
         toUserId: 2
         fromUserId: 3
-        response: 0
+        response: Invitation.noResponse
         previouslyAccepted: false
         open: false
         toUserMessaged: false
@@ -118,7 +131,7 @@ describe 'invitation service', ->
         eventId: 1
         toUserId: 2
         fromUserId: 3
-        response: 0
+        response: Invitation.noResponse
         previouslyAccepted: false
         open: false
         toUserMessaged: false

@@ -54,6 +54,14 @@ Invitation = ($resource, apiRoot) ->
 
   resource.deserialize = deserializeInvitation
 
+  resource.noResponse = 0
+
+  resource.accepted = 1
+
+  resource.declined = 2
+
+  resource.maybe = 3
+
   resource
 
 module.exports = Invitation

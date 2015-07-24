@@ -7,6 +7,7 @@ describe 'Auth service', ->
   $httpBackend = null
   apiRoot = null
   Auth = null
+  Invitation = null
   User = null
 
   beforeEach angular.mock.module('down.auth')
@@ -29,6 +30,7 @@ describe 'Auth service', ->
     $httpBackend = $injector.get '$httpBackend'
     apiRoot = $injector.get 'apiRoot'
     Auth = angular.copy $injector.get('Auth')
+    Invitation = $injector.get 'Invitation'
     User = $injector.get 'User'
   )
 
@@ -274,7 +276,82 @@ describe 'Auth service', ->
       it 'should return true', ->
         expect(Auth.isFriend(user.id)).toBe false
 
-  describe 'watching the users location', ->
+
+  describe 'fetching the user\'s invitations', ->
+    url = null
+
+    beforeEach ->
+      url = "#{User.listUrl}/invitations"
+
+    describe 'successfully', ->
+      responseData = null
+      response = null
+
+      beforeEach ->
+        responseData = [
+          id: 1
+          event:
+            id: 2
+            title: 'bars?!??!'
+            creator: 3
+            canceled: false
+            datetime: new Date().getTime()
+            created_at: new Date().getTime()
+            updated_at: new Date().getTime()
+            place:
+              name: 'Fuku'
+              geo:
+                type: 'Point'
+                coordinates: [40.7285098, -73.9871264]
+          to_user: Auth.user.id
+          from_user:
+            id: 2
+            email: 'jclarke@gmail.com'
+            name: 'Joan Clarke'
+            username: 'jmamba'
+            image_url: 'http://imgur.com/jcke'
+            location:
+              type: 'Point'
+              coordinates: [40.7265836, -73.9821539]
+          response: Invitation.accepted
+          previously_accepted: false
+          open: false
+          to_user_messaged: false
+          muted: false
+          created_at: new Date().getTime()
+          updated_at: new Date().getTime()
+        ]
+
+        $httpBackend.expectGET url
+          .respond 200, angular.toJson(responseData)
+
+        Auth.getInvitations().then (_response_) ->
+          response = _response_
+        $httpBackend.flush 1
+
+      it 'should GET the invitations', ->
+        # Set the returned ids on the original invitations.
+        expectedInvitations = [Invitation.deserialize responseData[0]]
+        expect(response).toAngularEqual expectedInvitations
+
+
+    describe 'with an error', ->
+      rejected = null
+
+      beforeEach ->
+        $httpBackend.expectGET url
+          .respond 500, null
+
+        rejected = false
+        Auth.getInvitations().then (->), ->
+          rejected = true
+        $httpBackend.flush 1
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
+
+
+  xdescribe 'watching the users location', ->
 
     beforeEach ->
       Auth.watchLocation()
@@ -282,7 +359,7 @@ describe 'Auth service', ->
     it 'should periodically ask the device for the users location', ->
       expect($cordovaGeolocation.watchPosition).toHaveBeenCalled()
 
-    xdescribe 'when location data is received sucessfully', ->
+    describe 'when location data is received sucessfully', ->
       user = null
 
       beforeEach ->
@@ -293,7 +370,7 @@ describe 'Auth service', ->
         user.location = location
 
 
-      fit 'should save the user with the location data', ->
+      it 'should save the user with the location data', ->
         expect(User.save).toHaveBeenCalledWith user
 
 
@@ -306,5 +383,3 @@ describe 'Auth service', ->
       describe 'because location permissions are denied', ->
 
         it 'should send the user to the enable location services view', ->
-
-
