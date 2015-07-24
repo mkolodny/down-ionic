@@ -4,14 +4,17 @@ require './resources-module'
 
 describe 'invitation service', ->
   $httpBackend = null
-  Invitation = null
+  Event = null
   listUrl = null
+  Invitation = null
+  User = null
 
   beforeEach angular.mock.module('down.resources')
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
     apiRoot = $injector.get 'apiRoot'
+    Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
     User = $injector.get 'User'
 
@@ -65,13 +68,15 @@ describe 'invitation service', ->
 
 
   describe 'deserializing an invitation', ->
+    response = null
+    expectedInvitation = null
+    event = null
+    toUser = null
+    fromUser = null
 
-    it 'should return the deserialized invitation', ->
+    beforeEach ->
       response =
         id: 1
-        event: 2
-        to_user: 3
-        from_user: 4
         response: Invitation.accepted
         previously_accepted: false
         open: false
@@ -79,11 +84,42 @@ describe 'invitation service', ->
         muted: false
         created_at: new Date().getTime()
         updated_at: new Date().getTime()
+      event =
+        id: 2
+        title: 'bars?!??!'
+        creator: 3
+        canceled: false
+        datetime: new Date().getTime()
+        created_at: new Date().getTime()
+        updated_at: new Date().getTime()
+        place:
+          name: 'Fuku'
+          geo:
+            type: 'Point'
+            coordinates: [40.7285098, -73.9871264]
+      fromUser =
+        id: 1
+        email: 'aturing@gmail.com'
+        name: 'Alan Turing'
+        username: 'tdog'
+        image_url: 'https://facebook.com/profile-pic/tdog'
+        location:
+          type: 'Point'
+          coordinates: [40.7265834, -73.9821535]
+      toUser =
+        id: 2
+        email: 'jclarke@gmail.com'
+        name: 'Joan Clarke'
+        username: 'jmamba'
+        image_url: 'http://imgur.com/jcke'
+        location:
+          type: 'Point'
+          coordinates: [40.7265836, -73.9821539]
       expectedInvitation =
         id: response.id
-        eventId: response.event
-        toUserId: response.to_user
-        fromUserId: response.from_user
+        eventId: event.id
+        toUserId: toUser.id
+        fromUserId: fromUser.id
         response: response.response
         previouslyAccepted: response.previously_accepted
         open: response.open
@@ -91,7 +127,31 @@ describe 'invitation service', ->
         muted: response.muted
         createdAt: new Date(response.created_at)
         updatedAt: new Date(response.updated_at)
-      expect(Invitation.deserialize response).toEqual expectedInvitation
+
+    describe 'when the relations are ids', ->
+
+      beforeEach ->
+        response.event = event.id
+        response.to_user = toUser.id
+        response.from_user = fromUser.id
+
+      it 'should return the deserialized invitation', ->
+        expect(Invitation.deserialize response).toEqual expectedInvitation
+
+
+    describe 'when the relations are objects', ->
+
+      beforeEach ->
+        response.event = event
+        response.to_user = toUser
+        response.from_user = fromUser
+
+      it 'should return the deserialized invitation', ->
+        expectedInvitation = angular.extend {}, expectedInvitation,
+          event: Event.deserialize event
+          fromUser: User.deserialize fromUser
+          toUser: User.deserialize toUser
+        expect(Invitation.deserialize response).toEqual expectedInvitation
 
 
   describe 'creating', ->

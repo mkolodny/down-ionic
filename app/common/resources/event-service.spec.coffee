@@ -85,19 +85,6 @@ describe 'event service', ->
           geo:
             type: 'Point'
             coordinates: [40.7270718, -73.9919324]
-        members: [
-          id: 7
-          event: 1
-          from_user: 1
-          to_user: 2
-          response: 0 # TODO: Set a noResponse property on Invitation
-          previously_accepted: false
-          open: false
-          to_user_messaged: false
-          muted: false
-          created_at: new Date().getTime()
-          updated_at: new Date().getTime()
-        ]
       expectedEvent =
         id: response.id
         title: response.title
@@ -110,8 +97,6 @@ describe 'event service', ->
           name: response.place.name
           lat: response.place.geo.coordinates[0]
           long: response.place.geo.coordinates[1]
-        members: (new Invitation(Invitation.deserialize(invitation)) \
-            for invitation in response.members)
       expect(Event.deserialize response).toEqual expectedEvent
 
 

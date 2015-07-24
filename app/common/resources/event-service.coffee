@@ -1,4 +1,4 @@
-Event = ($http, $q, $resource, apiRoot, Auth, Invitation, User) ->
+Event = ($http, $q, $resource, apiRoot, User) ->
   listUrl = "#{apiRoot}/events"
   detailUrl = "#{listUrl}/:id"
   serializeEvent = (event) ->
@@ -29,9 +29,6 @@ Event = ($http, $q, $resource, apiRoot, Auth, Invitation, User) ->
         name: event.place?.name
         lat: event.place?.geo.coordinates[0]
         long: event.place?.geo.coordinates[1]
-    if event.members?
-      response.members = (new Invitation(Invitation.deserialize(invitation)) \
-          for invitation in event.members)
     response
 
   resource = $resource "#{detailUrl}", null,
