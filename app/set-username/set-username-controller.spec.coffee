@@ -65,7 +65,7 @@ describe 'set username controller', ->
       describe 'when the update succeeds', ->
 
         beforeEach ->
-          spyOn $state, 'go'
+          spyOn Auth, 'redirectForAuthState'
 
           deferred.resolve user
           scope.$apply()
@@ -73,9 +73,8 @@ describe 'set username controller', ->
         it 'should set the user on Auth', ->
           expect(Auth.user).toEqual user
 
-        it 'should go to the push notifications view', ->
-          expect($state.go).toHaveBeenCalledWith 'requestPush'
-
+        it 'should redirect for auth state', ->
+          expect(Auth.redirectForAuthState).toHaveBeenCalled()
 
       describe 'when the update fails', ->
 

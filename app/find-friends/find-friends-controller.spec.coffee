@@ -1,6 +1,7 @@
 require 'angular'
 require 'angular-mocks'
 require 'angular-ui-router'
+require 'angular-local-storage'
 require '../common/auth/auth-module'
 FindFriendsCtrl = require './find-friends-controller'
 
@@ -12,10 +13,13 @@ xdescribe 'find friends controller', ->
   deferred = null
   scope = null
   User = null
+  localStorage = null
 
   beforeEach angular.mock.module('down.auth')
 
   beforeEach angular.mock.module('ui.router')
+
+  beforeEach angular.mock.module('LocalStorageModule')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
@@ -25,6 +29,7 @@ xdescribe 'find friends controller', ->
     Auth = angular.copy $injector.get('Auth')
     scope = $rootScope.$new true
     User = $injector.get 'User'
+    localStorage = $injector.get 'localStorageService'
 
     deferred = $q.defer()
     spyOn(User, 'getFacebookFriends').and.returnValue {$promise: deferred.promise}
@@ -87,9 +92,16 @@ xdescribe 'find friends controller', ->
   describe 'when the user finishes', ->
 
     beforeEach ->
-      spyOn $state, 'go'
+      spyOn Auth, 'redirectForAuthState'
+      localStorage.set 'hasCompletedFindFriends', false
 
       ctrl.done()
 
-    it 'should go to the events view', ->
-      expect($state.go).toHaveBeenCalledWith 'events'
+    afterEach ->
+      localStorage.clearAll()
+
+    it 'should set localStorage.hasCompletedFindFriends', ->
+      expect(localStorage.get('hasCompletedFindFriends')).toBe true
+
+    it 'should redirect for auth state', ->
+      expect(Auth.redirectForAuthState).toHaveBeenCalled()

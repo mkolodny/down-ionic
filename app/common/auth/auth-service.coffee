@@ -1,6 +1,7 @@
 class Auth
   constructor: (@$http, @$q, @apiRoot, @Invitation, @User, @$cordovaGeolocation,
-                @$state) ->
+                @$state, localStorageService) ->
+    @localStorage = localStorageService
 
   user: {}
 
@@ -77,6 +78,25 @@ class Auth
   isFriend: (userId) ->
     @friends[userId]?
 
+  redirectForAuthState: ->
+    if not @phone?
+      @$state.go 'login'
+    else if not @user?.id
+      @$state.go 'verifyPhone'
+    else if not @user.email?
+      @$state.go 'facebookSync'
+    else if not @user.username?
+      @$state.go 'setUsername'
+    else if not @localStorage.get 'hasRequestedLocationServices'
+      @$state.go 'requestLocation'
+    else if not @localStorage.get 'hasRequestedPushNotifications'
+      @$state.go 'requestPush'
+    else if not @localStorage.get 'hasRequestedContacts'
+      @$state.go 'requestContacts'
+    else if not @localStorage.get 'hasCompletedFindFriends'
+      @$state.go 'findFriends'
+    else
+      @$state.go 'events'
   watchLocation: ->
     deferred = @$q.defer()
 

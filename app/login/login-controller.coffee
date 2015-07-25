@@ -6,7 +6,7 @@ class LoginCtrl
       return
 
     @Auth.sendVerificationText(@phone).then =>
-      @$state.go 'verifyPhone'
+      @Auth.redirectForAuthState()
     , =>
       @error = 'For some reason, that didn\'t work'
 

@@ -70,91 +70,12 @@ describe 'verify phone controller', ->
         user = null
 
         beforeEach ->
-          spyOn $state, 'go'
+          spyOn Auth, 'redirectForAuthState'
+          deferred.resolve()
+          scope.$apply()
 
-        describe 'when the user doesn\'t have an email', ->
-
-          beforeEach ->
-            user =
-              id: 1
-            deferred.resolve user
-            $rootScope.$apply()
-
-          it 'should go to the sync with facebook view', ->
-            expect($state.go).toHaveBeenCalledWith 'facebookSync'
-
-
-        describe 'the user doesn\'t have a username', ->
-
-          beforeEach ->
-            user =
-              id: 1
-              name: 'Alan Turing'
-              email: 'aturing@gmail.com'
-              imageUrl: 'https://facebook.com/profile-pic/tdog'
-            deferred.resolve user
-            $rootScope.$apply()
-
-          it 'should go to the add username view', ->
-            expect($state.go).toHaveBeenCalledWith 'setUsername'
-
-
-        describe 'the user hasn\'t allowed location services yet', ->
-
-          beforeEach ->
-            user =
-              id: 1
-              name: 'Alan Turing'
-              email: 'aturing@gmail.com'
-              imageUrl: 'https://facebook.com/profile-pic/tdog'
-              username: 'tdog'
-            deferred.resolve user
-            $rootScope.$apply()
-
-          it 'should go to the request push notifications view', ->
-            expect($state.go).toHaveBeenCalledWith 'requestLocation'
-
-
-        describe 'the user hasn\'t allowed push notifications yet', ->
-
-          beforeEach ->
-            user =
-              id: 1
-              name: 'Alan Turing'
-              email: 'aturing@gmail.com'
-              imageUrl: 'https://facebook.com/profile-pic/tdog'
-              location:
-                lat: 40.7265834
-                long: -73.9821535
-              username: 'tdog'
-            localStorage.set 'hasAllowedLocationServices', true
-            deferred.resolve user
-            $rootScope.$apply()
-
-          it 'should go to the request push notifications view', ->
-            expect($state.go).toHaveBeenCalledWith 'requestPush'
-
-
-        describe 'the user has already signed up', ->
-
-          beforeEach ->
-            user =
-              id: 1
-              name: 'Alan Turing'
-              email: 'aturing@gmail.com'
-              imageUrl: 'https://facebook.com/profile-pic/tdog'
-              location:
-                lat: 40.7265834
-                long: -73.9821535
-              username: 'tdog'
-            localStorage.set 'hasAllowedLocationServices', true
-            localStorage.set 'hasAllowedPushNotifications', true
-            deferred.resolve user
-            $rootScope.$apply()
-
-          it 'should go to the events view', ->
-            expect($state.go).toHaveBeenCalledWith 'events'
-
+        it 'should redirect for auth state', ->
+          expect(Auth.redirectForAuthState).toHaveBeenCalled()
 
       describe 'when authentication fails', ->
 

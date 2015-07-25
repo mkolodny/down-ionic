@@ -43,13 +43,17 @@ describe 'request location controller', ->
     afterEach ->
       localStorage.clearAll()
 
-    it 'should set the hasAllowedLocationServices to true', ->
-      expect(localStorage.hasAllowedLocationServices).toBe true
+    it 'should set the hasRequestLocationServices to true', ->
+      expect(localStorage.get 'hasRequestedLocationServices').toBe true
 
-    xit 'should start watching the users location', ->
+    it 'should start watching the users location', ->
       expect(Auth.watchLocation).toHaveBeenCalled()
 
-    describe 'permission granted', ->        
+    describe 'permission granted', ->
+
+      beforeEach ->
+        deferred.resolve()
+        scope.$apply()     
 
       describe 'user has completed sign up before', ->
 
@@ -58,7 +62,3 @@ describe 'request location controller', ->
       describe 'user has not completed sign up', ->
 
         it 'should send the user to add friends on sign up view', ->
-
-    describe 'permission denied', ->
-
-      it 'should display an error', ->

@@ -1,5 +1,7 @@
 class FindFriendsCtrl
-  constructor: (@$state, @Auth, @User) ->
+  constructor: (@$state, @Auth, @User, localStorageService) ->
+    @localStorage = localStorageService
+
     # Use mock data for now.
     user =
       id: 2
@@ -36,7 +38,8 @@ class FindFriendsCtrl
       @fbFriendsRequestError = true
 
   done: ->
-    @$state.go 'events'
+    @localStorage.set 'hasCompletedFindFriends', true
+    @Auth.redirectForAuthState()
 
   items: [
     isDivider: true

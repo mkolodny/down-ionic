@@ -24,7 +24,7 @@ describe 'request push controller', ->
 
     # should it be hasRequestedPushNotifications?
     # the flag represents whether or not the promt has been shown yet
-    it 'should set localStorage.hasAllowedPushNotifications to true', -> 
+    it 'should set localStorage hasRequestedPushNotifications to true', -> 
 
     describe 'permission granted', ->
 
