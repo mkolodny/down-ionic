@@ -49,7 +49,6 @@ describe 'request location controller', ->
     xit 'should start watching the users location', ->
       expect(Auth.watchLocation).toHaveBeenCalled()
 
-
     describe 'permission granted', ->        
 
       describe 'user has completed sign up before', ->

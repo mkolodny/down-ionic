@@ -78,18 +78,30 @@ class Auth
     @friends[userId]?
 
   watchLocation: ->
-    watch = @$cordovaGeolocation.watchPosition()
-    watch.then null
+    deferred = @$q.defer()
+
+    @$cordovaGeolocation.watchPosition().then null
       , (error) =>
-         if error.code is 'PositionError.PERMISSION_DENIED'
-            @$state.go 'requestLocation'
+        if error.code is 'PositionError.PERMISSION_DENIED'
+          @$state.go 'requestLocation'
+          deferred.reject()
+        else
+          deferred.resolve()
+
       , (position) =>
+        deferred.resolve()
+
         location =
           lat: position.coords.latitude
           long: position.coords.longitude
-        user = angular.copy @user
-        user.location = location
-        @User.update(user).$promise.then (user) =>
-          @user = user
+        @updateLocation location
+
+    deferred.promise
+
+  updateLocation: (location) ->
+    user = angular.copy @user
+    user.location = location
+    @User.update(user).$promise.then (user) =>
+      @user = user
 
 module.exports = Auth

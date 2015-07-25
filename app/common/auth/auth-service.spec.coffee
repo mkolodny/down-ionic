@@ -371,62 +371,119 @@ describe 'Auth service', ->
 
 
   describe 'watching the users location', ->
-    deferred = null
-    updatedDeferred = null
+    cordovaDeferred = null
+    promise = null
 
     beforeEach ->
-      deferred = $q.defer()
-      $cordovaGeolocation.watchPosition.and.returnValue deferred.promise
+      cordovaDeferred = $q.defer()
+      $cordovaGeolocation.watchPosition.and.returnValue cordovaDeferred.promise
 
-      updatedDeferred = $q.defer()
-      User.update.and.returnValue {$promise: updatedDeferred.promise}
+      spyOn Auth, 'updateLocation'
 
-      Auth.watchLocation()
+      promise = Auth.watchLocation()
 
     it 'should periodically ask the device for the users location', ->
       expect($cordovaGeolocation.watchPosition).toHaveBeenCalled()
 
     describe 'when location data is received sucessfully', ->
       user = null
+      location = null
+      resolved = null
 
       beforeEach ->
         lat = 180.0
         long = 180.0
 
-        user = angular.copy Auth.user
-        user.location =
+        location = 
           lat: lat
           long: long
-
+          
         position =
           coords:
             latitude: lat
             longitude: long
 
-        deferred.notify position
+        resolved = false
+        promise.then ()->
+          resolved = true
+
+        cordovaDeferred.notify position
         scope.$apply()
 
-      it 'should save the user with the location data', ->
-        expect(User.update).toHaveBeenCalledWith user
+      it 'should call update location with the location data', ->
+        expect(Auth.updateLocation).toHaveBeenCalledWith location
 
-      describe 'when successful', ->
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
 
-        beforeEach ->
-          updatedDeferred.resolve user
-          scope.$apply()
-
-        it 'should update the Auth.user', ->
-          expect(Auth.user).toBe user
 
     describe 'when location data cannot be recieved', ->
+      rejected = null
 
       describe 'because location permissions are denied', ->
         beforeEach ->
           error =
             code: 'PositionError.PERMISSION_DENIED'
 
-          deferred.reject error
+          rejected = false
+          promise.then null, ()->
+            rejected = true
+
+          cordovaDeferred.reject error
           scope.$apply()
 
         it 'should send the user to the enable location services view', ->
           expect($state.go).toHaveBeenCalledWith 'requestLocation'
+
+        it 'should reject the promise', ->
+          expect(rejected).toBe true
+
+      describe 'because of timeout or location unavailible', ->
+        resolved = null
+
+        beforeEach ->
+          resolved = false
+          promise.then ()->
+            resolved = true
+
+          error =
+            code: 'PositionError.POSITION_UNAVAILABLE'
+
+          cordovaDeferred.reject error
+          scope.$apply()
+
+        fit 'should resolve the promise', ->
+          expect(resolved).toBe true
+
+  describe 'update the users location', ->
+    deferred = null
+    user = null
+
+    beforeEach ->
+      lat = 180.0
+      long = 180.0
+
+      location = 
+        lat: 180.0
+        long: 180.0
+
+      user = angular.copy Auth.user
+      user.location = location
+
+      deferred = $q.defer()
+      User.update.and.returnValue {$promise: deferred.promise}
+
+      Auth.updateLocation(location)
+
+    it 'should save the user with the location data', ->
+      expect(User.update).toHaveBeenCalledWith user
+
+      describe 'when successful', ->
+
+        beforeEach ->
+          deferred.resolve user
+          scope.$apply()
+
+        it 'should update the Auth.user', ->
+          expect(Auth.user).toBe user
+
