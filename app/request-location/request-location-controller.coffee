@@ -4,7 +4,7 @@ class RequestLocationCtrl
 
   enableLocation: () ->
     @localStorage.set 'hasRequestedLocationServices', true
-    @Auth.watchLocation().then ()->
-
+    @Auth.watchLocation().then () =>
+      @Auth.redirectForAuthState()
 
 module.exports = RequestLocationCtrl

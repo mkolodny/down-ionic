@@ -49,16 +49,14 @@ describe 'request location controller', ->
     it 'should start watching the users location', ->
       expect(Auth.watchLocation).toHaveBeenCalled()
 
+    # Note: Permission denied case handled by Auth.watchLocation
     describe 'permission granted', ->
 
       beforeEach ->
+        spyOn Auth, 'redirectForAuthState'
+
         deferred.resolve()
-        scope.$apply()     
+        scope.$apply()
 
-      describe 'user has completed sign up before', ->
-
-        it 'should send the user to the feed view', ->
-
-      describe 'user has not completed sign up', ->
-
-        it 'should send the user to add friends on sign up view', ->
+      it 'should redirect for auth state', ->
+        expect(Auth.redirectForAuthState).toHaveBeenCalled()
