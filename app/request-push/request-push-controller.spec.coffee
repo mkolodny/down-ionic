@@ -8,8 +8,6 @@ describe 'request push controller', ->
   scope = null
   ctrl = null
 
-  beforeEach angular.mock.module('down.requestPush')
-
   beforeEach angular.mock.module('ui.router')
 
   beforeEach inject(($injector) ->
@@ -22,4 +20,24 @@ describe 'request push controller', ->
       $scope: scope
   )
 
-  describe 'enabling push notifications', ->
+  describe 'requesting push notifications permission', ->
+
+    # should it be hasRequestedPushNotifications?
+    # the flag represents whether or not the promt has been shown yet
+    it 'should set localStorage.hasAllowedPushNotifications to true', -> 
+
+    describe 'permission granted', ->
+
+      it 'should save the token to the database', ->
+
+        describe 'sucessfully', ->
+
+          it 'should send the user to the request contacts view', ->
+
+        describe 'save failed', ->
+
+          it 'should show an error', ->
+
+    describe 'permission denied', ->
+
+      it 'should send the user to the request contacts view', ->
