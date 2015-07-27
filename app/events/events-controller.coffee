@@ -4,16 +4,12 @@ class EventsCtrl
     @sections = {}
     @sections[@Invitation.noResponse] =
       title: 'New'
-      order: 1
     @sections[@Invitation.accepted] =
       title: 'Down'
-      order: 2
     @sections[@Invitation.maybe] =
       title: 'Maybe'
-      order: 3
     @sections[@Invitation.declined] =
       title: 'Can\'t'
-      order: 4
 
     return # Mock data for now.
 
@@ -41,36 +37,32 @@ class EventsCtrl
           wasUpdated: true
         , invitation
 
-    accepted = {}
-    accepted[@Invitation.accepted] = @sections[@Invitation.accepted].title
-    maybe = {}
-    maybe[@Invitation.maybe] = @sections[@Invitation.maybe].title
-    for section in [accepted, maybe]
-      for response, title of section
-        response = parseInt response, 10
-        updatedInvitations = (invitation for invitation in invitations \
-            when invitation.response is response \
-            and invitation.lastViewed < invitation.event.updatedAt)
-        oldInvitations = (invitation for invitation in invitations \
-            when invitation.response is response \
-            and invitation.lastViewed >= invitation.event.updatedAt)
-        if updatedInvitations.length > 0 or oldInvitations.length > 0
-          @items.push
-            isDivider: true
-            title: title
-            #id: -@sections[response].order
-          for invitation in updatedInvitations
-            @items.push angular.extend
-              isDivider: false
-              wasJoined: true
-              wasUpdated: true
-            , invitation
-          for invitation in oldInvitations
-            @items.push angular.extend
-              isDivider: false
-              wasJoined: true
-              wasUpdated: false
-            , invitation
+    for response in [@Invitation.accepted, @Invitation.maybe]
+      title = @sections[response].title
+      response = parseInt response, 10
+      updatedInvitations = (invitation for invitation in invitations \
+          when invitation.response is response \
+          and invitation.lastViewed < invitation.event.updatedAt)
+      oldInvitations = (invitation for invitation in invitations \
+          when invitation.response is response \
+          and invitation.lastViewed >= invitation.event.updatedAt)
+      if updatedInvitations.length > 0 or oldInvitations.length > 0
+        @items.push
+          isDivider: true
+          title: title
+          #id: -@sections[response].order
+        for invitation in updatedInvitations
+          @items.push angular.extend
+            isDivider: false
+            wasJoined: true
+            wasUpdated: true
+          , invitation
+        for invitation in oldInvitations
+          @items.push angular.extend
+            isDivider: false
+            wasJoined: true
+            wasUpdated: false
+          , invitation
 
     declinedInvitations = (invitation for invitation in invitations \
         when invitation.response is @Invitation.declined)
