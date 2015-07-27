@@ -1,5 +1,6 @@
 require 'angular'
 require 'angular-ui-router'
+require 'angular-local-storage'
 require '../common/auth/auth-module'
 require '../common/friendship-button/friendship-button-module'
 require '../common/resources/resources-module'
@@ -11,6 +12,7 @@ angular.module 'down.findFriends', [
     'down.resources'
     'down.auth'
     'down.friendshipButton'
+    'LocalStorageModule'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'findFriends',

@@ -1,5 +1,6 @@
 require 'angular-mocks'
 require 'angular-ui-router'
+require 'angular-local-storage'
 require 'ng-cordova'
 require './auth-module'
 
@@ -14,12 +15,15 @@ describe 'Auth service', ->
   Invitation = null
   User = null
   deserializedUser = null
+  localStorage = null
 
   beforeEach angular.mock.module('down.auth')
 
   beforeEach angular.mock.module('ngCordova.plugins.geolocation')
 
   beforeEach angular.mock.module('ui.router')
+
+  beforeEach angular.mock.module('LocalStorageModule')
 
   beforeEach angular.mock.module(($provide) ->
 
@@ -51,7 +55,11 @@ describe 'Auth service', ->
     Auth = angular.copy $injector.get('Auth')
     Invitation = $injector.get 'Invitation'
     scope = $rootScope.$new()
+    localStorage = $injector.get 'localStorageService'
   )
+
+  afterEach ->
+    localStorage.clearAll()
 
   it 'should init the user', ->
     expect(Auth.user).toEqual {}
@@ -369,64 +377,263 @@ describe 'Auth service', ->
       it 'should reject the promise', ->
         expect(rejected).toBe true
 
+  describe 'redirecting for auth state', ->
+
+    describe 'no phone number entered', ->
+
+      beforeEach ->
+        Auth.phone = undefined
+        Auth.redirectForAuthState()
+
+      it 'should send the user to the enter phone view', ->
+        expect($state.go).toHaveBeenCalledWith 'login'
+
+    describe 'no authenticated user', ->
+
+      beforeEach ->
+        Auth.phone = '+19252852230'
+        Auth.user = {}
+        Auth.redirectForAuthState()
+
+      it 'should send the user to the enter verification code view', ->
+        expect($state.go).toHaveBeenCalledWith 'verifyPhone'
+
+    describe 'the user doesn\'t have an email', ->
+
+      beforeEach ->
+        Auth.phone = '+19252852230'
+        Auth.user =
+          id: 1
+        Auth.redirectForAuthState()
+
+      it 'should send the user to the sync with facebook view', ->
+        expect($state.go).toHaveBeenCalledWith 'facebookSync'
+
+    describe 'the user doesn\'t have a username', ->
+
+      beforeEach ->
+        Auth.phone = '+19252852230'
+        Auth.user =
+          id: 1
+          name: 'Alan Turing'
+          email: 'aturing@gmail.com'
+          imageUrl: 'https://facebook.com/profile-pic/tdog'
+        Auth.redirectForAuthState()
+
+      it 'should go to the add username view', ->
+        expect($state.go).toHaveBeenCalledWith 'setUsername'
+
+    describe 'we haven\'t requested location services', ->
+
+      beforeEach ->
+        Auth.phone = '+19252852230'
+        Auth.user =
+          id: 1
+          name: 'Alan Turing'
+          email: 'aturing@gmail.com'
+          imageUrl: 'https://facebook.com/profile-pic/tdog'
+          username: 'tdog'
+        Auth.redirectForAuthState()
+
+      it 'should go to the request push notifications view', ->
+        expect($state.go).toHaveBeenCalledWith 'requestLocation'
+
+
+    describe 'we haven\'t requested push services', ->
+
+      beforeEach ->
+        Auth.phone = '+19252852230'
+        Auth.user =
+          id: 1
+          name: 'Alan Turing'
+          email: 'aturing@gmail.com'
+          imageUrl: 'https://facebook.com/profile-pic/tdog'
+          location:
+            lat: 40.7265834
+            long: -73.9821535
+          username: 'tdog'
+        localStorage.set 'hasRequestedLocationServices', true
+        Auth.redirectForAuthState()
+
+      it 'should go to the request push notifications view', ->
+        expect($state.go).toHaveBeenCalledWith 'requestPush'
+
+    describe 'we haven\'t requested contacts access', ->
+
+      beforeEach ->
+        Auth.phone = '+19252852230'
+        Auth.user =
+          id: 1
+          name: 'Alan Turing'
+          email: 'aturing@gmail.com'
+          imageUrl: 'https://facebook.com/profile-pic/tdog'
+          location:
+            lat: 40.7265834
+            long: -73.9821535
+          username: 'tdog'
+        localStorage.set 'hasRequestedLocationServices', true
+        localStorage.set 'hasRequestedPushNotifications', true
+        Auth.redirectForAuthState()
+
+      it 'should go to the request contacts view', ->
+        expect($state.go).toHaveBeenCalledWith 'requestContacts'
+
+    describe 'we haven\'t shown the find friends view', ->
+      beforeEach ->
+        Auth.phone = '+19252852230'
+        Auth.user =
+          id: 1
+          name: 'Alan Turing'
+          email: 'aturing@gmail.com'
+          imageUrl: 'https://facebook.com/profile-pic/tdog'
+          location:
+            lat: 40.7265834
+            long: -73.9821535
+          username: 'tdog'
+        localStorage.set 'hasRequestedLocationServices', true
+        localStorage.set 'hasRequestedPushNotifications', true
+        localStorage.set 'hasRequestedContacts', true
+        Auth.redirectForAuthState()
+
+      it 'should go to the find friends view', ->
+        expect($state.go).toHaveBeenCalledWith 'findFriends'
+
+    describe 'user has already completed sign up', ->
+
+      beforeEach ->
+        Auth.phone = '+19252852230'
+        Auth.user =
+          id: 1
+          name: 'Alan Turing'
+          email: 'aturing@gmail.com'
+          imageUrl: 'https://facebook.com/profile-pic/tdog'
+          location:
+            lat: 40.7265834
+            long: -73.9821535
+          username: 'tdog'
+        localStorage.set 'hasRequestedLocationServices', true
+        localStorage.set 'hasRequestedPushNotifications', true
+        localStorage.set 'hasRequestedContacts', true
+        localStorage.set 'hasCompletedFindFriends', true
+        Auth.redirectForAuthState()
+
+      it 'should go to the events view', ->
+        expect($state.go).toHaveBeenCalledWith 'events'
 
   describe 'watching the users location', ->
-    deferred = null
-    updatedDeferred = null
+    cordovaDeferred = null
+    promise = null
 
     beforeEach ->
-      deferred = $q.defer()
-      $cordovaGeolocation.watchPosition.and.returnValue deferred.promise
+      cordovaDeferred = $q.defer()
+      $cordovaGeolocation.watchPosition.and.returnValue cordovaDeferred.promise
 
-      updatedDeferred = $q.defer()
-      User.update.and.returnValue {$promise: updatedDeferred.promise}
+      spyOn Auth, 'updateLocation'
 
-      Auth.watchLocation()
+      promise = Auth.watchLocation()
 
     it 'should periodically ask the device for the users location', ->
       expect($cordovaGeolocation.watchPosition).toHaveBeenCalled()
 
     describe 'when location data is received sucessfully', ->
       user = null
+      location = null
+      resolved = null
 
       beforeEach ->
         lat = 180.0
         long = 180.0
 
-        user = angular.copy Auth.user
-        user.location =
+        location = 
           lat: lat
           long: long
-
+          
         position =
           coords:
             latitude: lat
             longitude: long
 
-        deferred.notify position
+        resolved = false
+        promise.then ()->
+          resolved = true
+
+        cordovaDeferred.notify position
         scope.$apply()
 
-      it 'should save the user with the location data', ->
-        expect(User.update).toHaveBeenCalledWith user
+      it 'should call update location with the location data', ->
+        expect(Auth.updateLocation).toHaveBeenCalledWith location
 
-      describe 'when successful', ->
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
 
-        beforeEach ->
-          updatedDeferred.resolve user
-          scope.$apply()
-
-        it 'should update the Auth.user', ->
-          expect(Auth.user).toBe user
 
     describe 'when location data cannot be recieved', ->
+      rejected = null
 
       describe 'because location permissions are denied', ->
         beforeEach ->
           error =
             code: 'PositionError.PERMISSION_DENIED'
 
-          deferred.reject error
+          rejected = false
+          promise.then null, ()->
+            rejected = true
+
+          cordovaDeferred.reject error
           scope.$apply()
 
         it 'should send the user to the enable location services view', ->
           expect($state.go).toHaveBeenCalledWith 'requestLocation'
+
+        it 'should reject the promise', ->
+          expect(rejected).toBe true
+
+      describe 'because of timeout or location unavailible', ->
+        resolved = null
+
+        beforeEach ->
+          resolved = false
+          promise.then ()->
+            resolved = true
+
+          error =
+            code: 'PositionError.POSITION_UNAVAILABLE'
+
+          cordovaDeferred.reject error
+          scope.$apply()
+
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
+
+  describe 'update the users location', ->
+    deferred = null
+    user = null
+
+    beforeEach ->
+      lat = 180.0
+      long = 180.0
+
+      location = 
+        lat: 180.0
+        long: 180.0
+
+      user = angular.copy Auth.user
+      user.location = location
+
+      deferred = $q.defer()
+      User.update.and.returnValue {$promise: deferred.promise}
+
+      Auth.updateLocation(location)
+
+    it 'should save the user with the location data', ->
+      expect(User.update).toHaveBeenCalledWith user
+
+      describe 'when successful', ->
+
+        beforeEach ->
+          deferred.resolve user
+          scope.$apply()
+
+        it 'should update the Auth.user', ->
+          expect(Auth.user).toBe user
+

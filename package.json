@@ -48,7 +48,8 @@
     "cordova-plugin-console",
     "cordova-plugin-device",
     "cordova-plugin-splashscreen",
-    "cordova-plugin-whitelist"
+    "cordova-plugin-whitelist",
+    "cordova-plugin-contacts"
   ],
   "cordovaPlatforms": [
     "android",

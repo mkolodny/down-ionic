@@ -1,6 +1,7 @@
 class Auth
   constructor: (@$http, @$q, @apiRoot, @Invitation, @User, @$cordovaGeolocation,
-                @$state) ->
+                @$state, localStorageService) ->
+    @localStorage = localStorageService
 
   user: {}
 
@@ -77,19 +78,50 @@ class Auth
   isFriend: (userId) ->
     @friends[userId]?
 
+  redirectForAuthState: ->
+    if not @phone?
+      @$state.go 'login'
+    else if not @user?.id
+      @$state.go 'verifyPhone'
+    else if not @user.email?
+      @$state.go 'facebookSync'
+    else if not @user.username?
+      @$state.go 'setUsername'
+    else if not @localStorage.get 'hasRequestedLocationServices'
+      @$state.go 'requestLocation'
+    else if not @localStorage.get 'hasRequestedPushNotifications'
+      @$state.go 'requestPush'
+    else if not @localStorage.get 'hasRequestedContacts'
+      @$state.go 'requestContacts'
+    else if not @localStorage.get 'hasCompletedFindFriends'
+      @$state.go 'findFriends'
+    else
+      @$state.go 'events'
   watchLocation: ->
-    watch = @$cordovaGeolocation.watchPosition()
-    watch.then null
+    deferred = @$q.defer()
+
+    @$cordovaGeolocation.watchPosition().then null
       , (error) =>
-         if error.code is 'PositionError.PERMISSION_DENIED'
-            @$state.go 'requestLocation'
+        if error.code is 'PositionError.PERMISSION_DENIED'
+          @$state.go 'requestLocation'
+          deferred.reject()
+        else
+          deferred.resolve()
+
       , (position) =>
+        deferred.resolve()
+
         location =
           lat: position.coords.latitude
           long: position.coords.longitude
-        user = angular.copy @user
-        user.location = location
-        @User.update(user).$promise.then (user) =>
-          @user = user
+        @updateLocation location
+
+    deferred.promise
+
+  updateLocation: (location) ->
+    user = angular.copy @user
+    user.location = location
+    @User.update(user).$promise.then (user) =>
+      @user = user
 
 module.exports = Auth

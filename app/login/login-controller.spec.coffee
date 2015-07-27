@@ -55,7 +55,7 @@ describe 'login controller', ->
         ctrl.phone = '+1234567890'
 
         ctrl.validate.and.returnValue true
-        spyOn $state, 'go'
+        spyOn Auth, 'redirectForAuthState'
 
         ctrl.login()
 
@@ -69,7 +69,7 @@ describe 'login controller', ->
           $rootScope.$apply()
 
         it 'should go to the verify phone view', ->
-          expect($state.go).toHaveBeenCalledWith 'verifyPhone'
+          expect(Auth.redirectForAuthState).toHaveBeenCalled()
 
 
       describe 'when the request fails', ->
