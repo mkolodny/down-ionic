@@ -1,10 +1,12 @@
 require 'angular'
+require 'angular-animate'
 require 'angular-ui-router'
 require '../common/auth/auth-module'
 require '../common/resources/resources-module'
 EventsCtrl = require './events-controller'
 
 angular.module 'down.events', [
+    'ngAnimate'
     'ui.router'
     'down.auth'
     'down.resources'

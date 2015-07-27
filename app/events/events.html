@@ -4,9 +4,10 @@
   </ion-header-bar>
   <ion-content>
     <ion-list>
-      <ion-item collection-repeat="item in events.items"
-                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, 'updated': item.lastViewed < item.updatedAt}"
-                item-height="item.isDivider ? '35px' : '71px'">
+      <!-- We might need to use `track by item.id` for the animations to work -->
+      <ion-item ng-repeat="item in events.items"
+                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, 'updated': item.wasUpdated}"
+                ng-click="!item.isDivider ? (item.wasJoined ? null : events.toggleIsExpanded(item)) : null">
         <!-- Divider -->
         <span ng-if="item.isDivider">{{item.title}}</span>
 
@@ -15,14 +16,60 @@
         <h2>{{item.event.title}}</h2>
         <p>Suggested by {{item.fromUser.name}}</p>
         <span class="updated-at">{{item.createdAt | date:'shortTime' | lowercase}}</span>
-        <i class="fa fa-chevron-down" ng-if="item.isNew"></i>
-        <i class="fa fa-chevron-right" ng-if="!item.isNew"></i>
+        <i class="fa" ng-if="!item.wasJoined"
+           ng-class="{'fa-chevron-down': !item.isExpanded, 'fa-chevron-up': item.isExpanded}"
+           ></i>
+        <i class="fa fa-chevron-right" ng-if="item.wasJoined"></i>
+        <div ng-if="item.isExpanded" class="event-details">
+          <div class="event-detail" ng-if="item.event.datetime">
+            <i class="fa fa-calendar-o"></i>
+            <div>
+              <div>{{item.event.datetime | date:'EEEE, MMM d'}}</div>
+              <div>{{item.event.datetime | date:'shortTime' | lowercase}}</div>
+            </div>
+          </div>
+          <div class="event-detail" ng-if="item.event.place">
+            <i class="fa fa-map-marker"></i>
+            <span>{{item.event.place.name}}</span>
+          </div>
+          <div class="event-detail" ng-if="item.event.comment">
+            <i class="fa fa-comment-o"></i>
+            <span>{{item.event.comment}}</span>
+          </div>
+          <div class="respond-buttons">
+            <button class="respond"
+                    ng-click="events.acceptInvitation(item, $event)"
+                    ontouchstart
+                    >Down</button>
+            <button class="respond"
+                    ng-click="events.maybeInvitation(item, $event)"
+                    ontouchstart
+                    >Maybe</button>
+            <button class="respond"
+                    ng-click="events.declineInvitation(item, $event)"
+                    ontouchstart
+                    >Can't</button>
+          </div>
+        </div>
       </ion-item>
     </ion-list>
   </ion-content>
   <ion-footer-bar class="bar-light" keyboard-attach>
     <div class="footer-subheader">
       <input placeholder="Suggest something to do...">
+    </div>
+    <div ng-if="events.newEvent.date">
+      <i class="fa fa-calendar-o"></i>
+      <span>{{events.newEvent.date | date:'EEEE, MMM d'}}</span>
+      <span>{{events.newEvent.date | date:'shortTime' | lowercase}}</span>
+    </div>
+    <div ng-if="events.newEvent.place">
+      <i class="fa fa-map-marker"></i>
+      <span>{{events.newEvent.place.name}}</span>
+    </div>
+    <div ng-if="events.newEvent.comment">
+      <i class="fa fa-comment-o"></i>
+      <span>{{events.newEvent.comment}}</span>
     </div>
     <div id="actions" class="footer-subheader">
       <i class="fa fa-calendar-o"></i>

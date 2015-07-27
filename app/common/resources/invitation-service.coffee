@@ -1,5 +1,6 @@
 Invitation = ($resource, apiRoot, Event, User) ->
   listUrl = "#{apiRoot}/invitations"
+  detailUrl =
   serializeInvitation = (invitation) ->
     invitation =
       id: invitation.id
@@ -67,6 +68,17 @@ Invitation = ($resource, apiRoot, Event, User) ->
       transformResponse: (data, headersGetter) ->
         data = angular.fromJson data
         (deserializeInvitation(invitation) for invitation in data)
+
+    update:
+      method: 'put'
+      params:
+        id: '@id'
+      transformRequest: (data, headersGetter) ->
+        request = serializeInvitation data
+        angular.toJson request
+      transformResponse: (data, headersGetter) ->
+        data = angular.fromJson data
+        deserializeInvitation data
 
   resource.serialize = serializeInvitation
 

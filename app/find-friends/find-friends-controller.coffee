@@ -7,7 +7,7 @@ class FindFriendsCtrl
       username: 'a'
       imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
     @Auth.friends[user.id] = new @User(user)
-    return
+    return # Mock for now.
 
     @User.getFacebookFriends().$promise.then (facebookFriends) =>
       # Set the user's facebook friends on the Auth service.

@@ -122,7 +122,8 @@ describe 'user service', ->
       postData = User.serialize user
       responseData = postData
 
-      $httpBackend.expectPUT listUrl, postData
+      url = "#{listUrl}/#{user.id}"
+      $httpBackend.expectPUT url, postData
         .respond 200, angular.toJson(responseData)
 
       response = null

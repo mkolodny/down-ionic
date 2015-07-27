@@ -39,6 +39,8 @@ User = ($http, $q, $resource, apiRoot) ->
 
     update:
       method: 'put'
+      params:
+        id: '@id'
       transformRequest: (data, headersGetter) ->
         request = serializeUser data
         angular.toJson request

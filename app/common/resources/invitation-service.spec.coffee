@@ -230,3 +230,34 @@ describe 'invitation service', ->
         expectedInvitations.push(new Invitation(invitation))
         i += 1
       expect(response).toAngularEqual expectedInvitations
+
+
+  describe 'updating an invitation', ->
+    invitation = null
+    response = null
+
+    beforeEach ->
+      invitation =
+        id: 4
+        eventId: 1
+        toUserId: 2
+        fromUserId: 3
+        response: Invitation.noResponse
+        previouslyAccepted: false
+        open: false
+        toUserMessaged: false
+        muted: false
+        createdAt: new Date()
+        updatedAt: new Date()
+      putData = Invitation.serialize invitation
+      responseData = putData
+      url = "#{listUrl}/#{invitation.id}"
+      $httpBackend.expectPUT url, putData
+        .respond 201, angular.toJson(responseData)
+
+      Invitation.update(invitation).$promise.then (_response_) ->
+        response = _response_
+      $httpBackend.flush 1
+
+    it 'should PUT the invitation', ->
+      expect(response).toAngularEqual invitation
