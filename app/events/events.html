@@ -3,12 +3,12 @@
     <h1 class="title">Down</h1>
   </ion-header-bar>
   <ion-content>
-    <ion-list>
+    <ion-list ng-class="{moving: events.moving}">
       <!-- We might need to use `track by item.id` for the animations to work -->
       <ion-item ng-repeat="item in events.items"
-                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, 'updated': item.wasUpdated}"
+                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, updated: item.wasUpdated}"
                 ng-click="!item.isDivider ? (item.wasJoined ? null : events.toggleIsExpanded(item)) : null"
-                ng-style="{top: event.getTop(item)}">
+                ng-style="{top: events.moving ? item.top+'px': none, right: item.right+'px'}">
         <!-- Divider -->
         <span ng-if="item.isDivider">{{item.title}}</span>
 
@@ -47,6 +47,7 @@
                     ontouchstart
                     >Maybe</button>
             <button class="respond"
+                    ng-class="{'activated': events.itemWasDeclined(item)}"
                     ng-click="events.declineInvitation(item, $event)"
                     ontouchstart
                     >Can't</button>
@@ -56,26 +57,38 @@
     </ion-list>
   </ion-content>
   <ion-footer-bar class="bar-light" keyboard-attach>
-    <div class="footer-subheader">
-      <input placeholder="Suggest something to do...">
-    </div>
-    <div ng-if="events.newEvent.date">
-      <i class="fa fa-calendar-o"></i>
-      <span>{{events.newEvent.date | date:'EEEE, MMM d'}}</span>
-      <span>{{events.newEvent.date | date:'shortTime' | lowercase}}</span>
-    </div>
-    <div ng-if="events.newEvent.place">
-      <i class="fa fa-map-marker"></i>
-      <span>{{events.newEvent.place.name}}</span>
-    </div>
-    <div ng-if="events.newEvent.comment">
-      <i class="fa fa-comment-o"></i>
-      <span>{{events.newEvent.comment}}</span>
+    <div id="new-event-details">
+      <input placeholder="Suggest something to do..." id="suggestion">
+      <div class="event-detail" ng-if="events.newEvent.hasDate">
+        <i class="fa fa-calendar-o"></i>
+        <div>
+          <div>{{events.newEvent.datetime | date:'EEEE, MMM d'}}</div>
+          <div>{{events.newEvent.datetime | date:'shortTime' | lowercase}}</div>
+        </div>
+      </div>
+      <div class="event-detail" ng-if="events.newEvent.place">
+        <i class="fa fa-map-marker"></i>
+        <span>{{events.newEvent.place.name}}</span>
+      </div>
+      <div class="event-detail" ng-show="events.newEvent.hasComment">
+        <i class="fa fa-comment-o"></i>
+        <textarea id="comment" ng-model="event.newEvent.comment" msd-elastic
+                  placeholder="Add a comment..."></textarea>
+      </div>
     </div>
     <div id="actions" class="footer-subheader">
-      <i class="fa fa-calendar-o"></i>
-      <i class="fa fa-map-marker"></i>
-      <i class="fa fa-comment-o"></i>
+      <a href="" ng-click="events.toggleHasDate()">
+        <i class="fa fa-calendar-o"
+           ng-class="{selected: events.newEvent.hasDate}"></i>
+      </a>
+      <a href="" ng-click="events.toggleHasPlace()">
+        <i class="fa fa-map-marker"
+           ng-class="{selected: events.newEvent.hasPlace}"></i>
+      </a>
+      <a href="" ng-click="events.toggleHasComment()">
+        <i class="fa fa-comment-o"
+           ng-class="{selected: events.newEvent.hasComment}"></i>
+      </a>
       <i class="fa fa-arrow-right" id="suggest"></i>
     </div>
   </ion-footer-bar>

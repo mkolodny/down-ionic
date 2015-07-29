@@ -59,11 +59,21 @@ Global Sass
   font-size: 12px;
   border: none;
   padding-left: 12px;
+
+  &.activated {
+    background-color: #fff;
+  }
 }
 .item {
   border-color: #eee;
   border-top: none;
+  border-left: none;
+  border-right: none;
   border-bottom-width: 2px;
+
+  &:last-child {
+    border-bottom-width: 1px;
+  }
 }
 .item-avatar > img:first-child {
   max-width: 50px;

@@ -1,5 +1,6 @@
 class EventsCtrl
-  constructor: (@$scope, @$state, @Auth, @Invitation) ->
+  constructor: (@$ionicModal, @$scope, @$state, @$timeout, @$window, @Auth,
+                @dividerHeight, @eventHeight, @Invitation, @transitionDuration) ->
     # Save the section titles.
     @sections = {}
     @sections[@Invitation.noResponse] =
@@ -11,27 +12,109 @@ class EventsCtrl
     @sections[@Invitation.declined] =
       title: 'Can\'t'
 
+    # Init the set place modal.
+    templateUrl = 'app/common/place-autocomplete/place-autocomplete.html'
+    @$ionicModal.fromTemplateUrl templateUrl,
+        scope: @$scope
+        animation: 'slide-in-up'
+      .then (modal) =>
+        @setPlaceModal = modal
+
+    @invitations =
+      1:
+        id: 1
+        response: 0
+        createdAt: new Date()
+        updatedAt: new Date()
+        lastViewed: new Date(1437672889145)
+        event:
+          id: 1
+          title: 'bars?!?!?'
+          datetime: new Date()
+          place:
+            name: '169 Bar'
+            lat: 40.7138251
+            long: -73.9897481
+          comment: 'Go Go dancers galore'
+          updatedAt: new Date(1437672889146)
+        fromUser:
+          id: 1
+          name: 'Michael Kolodny'
+          imageUrl: 'https://graph.facebook.com/v2.2/4900498025333/picture'
+      2:
+        id: 2
+        response: 1
+        createdAt: new Date()
+        updatedAt: new Date()
+        lastViewed: new Date(1437672889146)
+        event:
+          id: 1
+          title: 'Beach Day'
+          createdAt: new Date()
+          updatedAt: new Date(1437672889145)
+        fromUser:
+          id: 1
+          name: 'Andrew Linfoot'
+          imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
+    @items = [
+      isDivider: true
+      title: 'New'
+    , angular.extend({}, @invitations[1],
+      isDivider: false
+      wasJoined: false
+      wasUpdated: true
+    ),
+      isDivider: true
+      title: 'Down'
+    , angular.extend({}, @invitations[2],
+      isDivider: false
+      wasJoined: true
+      wasUpdated: false
+    )]
+    @setPositions @items
+
     return # Mock data for now.
 
     @Auth.getInvitations().then (invitations) =>
-      # Save the invitations on the controller.
+      # TODO: Save the invitations on the controller.
       @buildItems invitations
     , =>
       @getInvitationsError = true
 
+  newEvent: {}
+
+  toggleHasDate: ->
+    if not @newEvent.hasDate
+      @newEvent.hasDate = true
+      if not @newEvent.datetime?
+        @newEvent.datetime = new Date()
+    else
+      @newEvent.hasDate = false
+
+  toggleHasPlace: ->
+    if not @newEvent.hasPlace
+      @setPlaceModal.show()
+    else
+      @newEvent.hasPlace = false
+
+  toggleHasComment: ->
+    if not @newEvent.hasComment
+      @newEvent.hasComment = true
+    else
+      @newEvent.hasComment = false
+
   buildItems: (invitations) ->
     # Build the list of items to show on the view.
-    @items = []
+    items = []
 
-    noResponseInvitations = (invitation for invitation in invitations \
+    noResponseInvitations = (invitation for id, invitation of invitations \
         when invitation.response is @Invitation.noResponse)
     if noResponseInvitations.length > 0
-      @items.push
+      items.push
         isDivider: true
         title: @sections[@Invitation.noResponse].title
-        #id: -@sections[@Invitation.noResponse].order
       for invitation in noResponseInvitations
-        @items.push angular.extend
+        items.push angular.extend
           isDivider: false
           wasJoined: false
           wasUpdated: true
@@ -39,111 +122,90 @@ class EventsCtrl
 
     for response in [@Invitation.accepted, @Invitation.maybe]
       title = @sections[response].title
-      response = parseInt response, 10
-      updatedInvitations = (invitation for invitation in invitations \
+      updatedInvitations = (invitation for id, invitation of invitations \
           when invitation.response is response \
           and invitation.lastViewed < invitation.event.updatedAt)
-      oldInvitations = (invitation for invitation in invitations \
+      oldInvitations = (invitation for id, invitation of invitations \
           when invitation.response is response \
           and invitation.lastViewed >= invitation.event.updatedAt)
       if updatedInvitations.length > 0 or oldInvitations.length > 0
-        @items.push
+        items.push
           isDivider: true
           title: title
-          #id: -@sections[response].order
         for invitation in updatedInvitations
-          @items.push angular.extend
+          items.push angular.extend
             isDivider: false
             wasJoined: true
             wasUpdated: true
           , invitation
         for invitation in oldInvitations
-          @items.push angular.extend
+          items.push angular.extend
             isDivider: false
             wasJoined: true
             wasUpdated: false
           , invitation
 
-    declinedInvitations = (invitation for invitation in invitations \
+    declinedInvitations = (invitation for id, invitation of invitations \
         when invitation.response is @Invitation.declined)
     if declinedInvitations.length > 0
-      @items.push
+      items.push
         isDivider: true
         title: @sections[@Invitation.declined].title
-        #id: -@sections[@Invitation.declined].order
       for invitation in declinedInvitations
-        @items.push angular.extend
+        items.push angular.extend
           isDivider: false
           wasJoined: false
           wasUpdated: false
         , invitation
 
-  moveItem: (item, items) ->
-    item.isExpanded = false
-    item.wasUpdated = false
-    if item.response in [@Invitation.accepted, @Invitation.maybe]
-      item.wasJoined = true
+    # Give every item a top and a right property to allow for transitions.
+    @setPositions items
 
-    # Find the number of items in the no response section.
-    noResponseItemsLength = 0
-    for _item in items[1...items.length]
-      if _item.isDivider
-        break
-      noResponseItemsLength += 1
+    items
 
-    # Find `item`'s current index in `items`.
-    index = -1
-    for i in [1..noResponseItemsLength]
-      if items[i] is item
-        index = i
-
-    # Get the index where each section starts.
-    sectionStart = {}
-    sectionStart[@Invitation.accepted] = -1
-    sectionStart[@Invitation.maybe] = -1
-    sectionStart[@Invitation.declined] = -1
-    for i in [1...items.length]
-      responses = [@Invitation.accepted, @Invitation.maybe, @Invitation.declined]
-      for response in responses
-        if items[i].isDivider \
-            and items[i].title is @sections[response].title
-          sectionStart[response] = i
-
-    newIndex = null
-    newSectionStart = sectionStart[item.response]
-    if newSectionStart is -1
-      # Find the index where the new section should go.
-      if item.response is @Invitation.accepted
-        newSectionStart = 1 + noResponseItemsLength
-      else if item.response is @Invitation.maybe \
-          and sectionStart[@Invitation.declined] isnt -1
-        newSectionStart = sectionStart[@Invitation.declined]
+  setPositions: (items) ->
+    top = 0
+    for item in items
+      item.top = top
+      item.right = 0
+      if item.isDivider
+        top += @dividerHeight
       else
-        # Insert the section at the end of the items.
-        newSectionStart = items.length
+        top += @eventHeight
 
-      # This is the first item in the new section. Insert a new divider into the
-      # `items`.
-      newDivider =
-        isDivider: true
-        title: @sections[item.response].title
-      items.splice newSectionStart, 0, newDivider
-      newIndex = newSectionStart + 1
-    else
-      # Set the new index to the end of the new section.
-      sectionItems = (_item for _item in items[sectionStart...items.length] \
-          when _item.response is item.response)
-      newIndex = newSectionStart + sectionItems.length + 1
+  moveItems: (invitations) ->
+    @moving = true
 
-    # Insert the item at the end of the section.
-    items.splice newIndex, 0, item
+    # Wait for the moving flag to be set on the view so that the list becomes
+    # absolutely positioned.
+    @$timeout =>
+      newItems = @buildItems invitations
 
-    # Remove the item from its old position.
-    items.splice index, 1
+      # Update the top position of the current items in the DOM to match where
+      # they'll be after we update the items.
+      for newItem in newItems
+        for oldItem in @items
+          if (newItem.isDivider and newItem.title is oldItem.title) or \
+              (not newItem.isDivider and newItem.id is oldItem.id)
+            oldItem.top = newItem.top
 
-    if noResponseItemsLength is 1
-      # Remove the no response divider.
-      items.shift()
+      # Set the right position of items we'll be removing so that they're off the
+      # screen.
+      for oldItem in @items
+        willBeRemoved = true
+        # The item won't be removed if it's in the array of new items.
+        for newItem in newItems
+          if (newItem.isDivider and newItem.title is oldItem.title) or \
+              (not newItem.isDivider and newItem.id is oldItem.id)
+            willBeRemoved = false
+        if willBeRemoved
+          oldItem.right = @$window.innerWidth
+
+      # After `transitionDuration` ms, replace the old items array with the new one.
+      @$timeout =>
+        @moving = false
+        @items = newItems
+      , @transitionDuration
 
   toggleIsExpanded: (item) ->
     item.isExpanded = not item.isExpanded
@@ -158,7 +220,7 @@ class EventsCtrl
     @respondToInvitation item, $event, @Invitation.declined
 
   respondToInvitation: (item, $event, response) ->
-    invitation = angular.copy item
+    invitation = @invitations[item.id]
 
     # Prevent calling the ion-item element's ng-click.
     $event.stopPropagation()
@@ -169,61 +231,19 @@ class EventsCtrl
     invitation.response = response
     invitation.lastViewed = new Date()
     @Invitation.update invitation
-      .$promise.then (invitation) =>
-        item.response = invitation.response
-
-        @moveItem item, @items
+      .$promise.then (_invitation) =>
+        @invitations[_invitation.id] = _invitation
+        @toggleIsExpanded item
+        @moveItems @invitations
       , =>
         #item.respondError = true # Mock a successful response for now.
 
-        item.response = invitation.response
+        @invitations[invitation.id] = invitation
+        @toggleIsExpanded item
+        @moveItems @invitations
 
-        @moveItem item, @items
-
-  items: [
-    isDivider: true
-    title: 'New'
-  ,
-    isDivider: false
-    wasJoined: false
-    wasUpdated: true
-    id: 1
-    response: 0
-    createdAt: new Date()
-    updatedAt: new Date(1437672889146)
-    lastViewed: null
-    event:
-      id: 1
-      title: 'bars?!?!?'
-      datetime: new Date()
-      place:
-        name: '169 Bar'
-        lat: 40.7138251
-        long: -73.9897481
-      comment: 'Go Go dancers galore'
-    fromUser:
-      id: 1
-      name: 'Michael Kolodny'
-      imageUrl: 'https://graph.facebook.com/v2.2/4900498025333/picture'
-  ,
-    isDivider: true
-    title: 'Down'
-  ,
-    isDivider: false
-    wasJoined: true
-    wasUpdated: false
-    id: 2
-    response: 1
-    createdAt: new Date()
-    updatedAt: new Date(1437672887387)
-    lastViewed: new Date(1437672889146)
-    event:
-      id: 1
-      title: 'Beach Day'
-    fromUser:
-      id: 1
-      name: 'Andrew Linfoot'
-      imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
-  ]
+  itemWasDeclined: (item) ->
+    if item.response is @Invitation.declined
+      return true
 
 module.exports = EventsCtrl
