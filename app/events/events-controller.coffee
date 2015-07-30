@@ -13,12 +13,28 @@ class EventsCtrl
       title: 'Can\'t'
 
     # Init the set place modal.
-    templateUrl = 'app/common/place-autocomplete/place-autocomplete.html'
-    @$ionicModal.fromTemplateUrl templateUrl,
+    @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
         scope: @$scope
         animation: 'slide-in-up'
       .then (modal) =>
         @setPlaceModal = modal
+
+    # Set functions to control the place modal on the scope so that they can be
+    # called from inside the modal.
+    @$scope.hidePlaceModal = =>
+      @setPlaceModal.hide()
+
+    @$scope.$on 'placeAutocomplete:placeChanged', (event, place) =>
+      @newEvent.hasPlace = true
+      @newEvent.place =
+        name: place.name
+        lat: place.geometry.location.G
+        long: place.geometry.location.K
+      @$scope.hidePlaceModal()
+
+    # Clean up the set place modal after hiding it.
+    @$scope.$on '$destroy', =>
+      @setPlaceModal.remove()
 
     @invitations =
       1:
@@ -234,12 +250,14 @@ class EventsCtrl
       .$promise.then (_invitation) =>
         @invitations[_invitation.id] = _invitation
         @toggleIsExpanded item
+        item.isReordering = true
         @moveItems @invitations
       , =>
         #item.respondError = true # Mock a successful response for now.
 
         @invitations[invitation.id] = invitation
         @toggleIsExpanded item
+        item.isReordering = true
         @moveItems @invitations
 
   itemWasDeclined: (item) ->

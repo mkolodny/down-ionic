@@ -91,6 +91,12 @@ describe 'events controller', ->
       wasJoined: true
       wasUpdated: false
 
+    # This is necessary because for some reason ionic is requesting this file
+    # when the promise gets resolved.
+    # TODO: Figure out why, and remove this.
+    $httpBackend.whenGET 'app/events/events.html'
+      .respond ''
+
     deferredGetInvitations = $q.defer()
     spyOn(Auth, 'getInvitations').and.returnValue deferredGetInvitations.promise
 
@@ -105,7 +111,7 @@ describe 'events controller', ->
     expect(ctrl.newEvent).toEqual {}
 
   it 'should init a set place modal', ->
-    templateUrl = 'app/common/place-autocomplete/place-autocomplete.html'
+    templateUrl = 'app/set-place/set-place.html'
     expect($ionicModal.fromTemplateUrl).toHaveBeenCalledWith templateUrl,
       scope: scope
       animation: 'slide-in-up'
@@ -150,12 +156,6 @@ describe 'events controller', ->
       modal = null
 
       beforeEach ->
-        # This is necessary because for some reason ionic is requesting this file
-        # when the promise gets resolved.
-        # TODO: Figure out why, and remove this.
-        $httpBackend.whenGET 'app/events/events.html'
-          .respond ''
-
         modal = 'modal'
         deferredTemplate.resolve modal
         scope.$apply()
@@ -467,6 +467,9 @@ describe 'events controller', ->
       it 'should set the new response on the invitation', ->
         expect(ctrl.invitations[invitation.id]).toBe updatedInvitation
 
+      it 'should set a reordering property on the item', ->
+        expect(item.isReordering).toBe true
+
       it 'should move the item in the items array', ->
         expect(ctrl.moveItems).toHaveBeenCalledWith ctrl.invitations
 
@@ -594,7 +597,7 @@ describe 'events controller', ->
 
         ctrl.toggleHasPlace()
 
-      fit 'should show the set place modal', ->
+      it 'should show the set place modal', ->
         expect(ctrl.setPlaceModal.show).toHaveBeenCalled()
 
 
@@ -629,3 +632,54 @@ describe 'events controller', ->
 
       it 'should hide the comment input', ->
         expect(ctrl.newEvent.hasComment).toBe false
+
+
+  describe 'hiding the set place modal', ->
+
+    beforeEach ->
+      ctrl.setPlaceModal =
+        hide: jasmine.createSpy 'setPlaceModal.hide'
+
+      scope.hidePlaceModal()
+
+    it 'should hide the modal', ->
+      expect(ctrl.setPlaceModal.hide).toHaveBeenCalled()
+
+
+  describe 'cleaning up the set place modal', ->
+
+    beforeEach ->
+      ctrl.setPlaceModal =
+        remove: jasmine.createSpy 'setPlaceModal.remove'
+
+      scope.$broadcast '$destroy'
+
+    it 'should remove the modal', ->
+      expect(ctrl.setPlaceModal.remove).toHaveBeenCalled()
+
+
+  describe 'setting a place', ->
+    place = null
+
+    beforeEach ->
+      spyOn scope, 'hidePlaceModal'
+
+      place =
+        name: 'Pianos'
+        geometry:
+          location:
+            G: 40.721025
+            K: -73.987692
+      scope.$broadcast 'placeAutocomplete:placeChanged', place
+
+    it 'should mark the new event as having a place', ->
+      expect(ctrl.newEvent.hasPlace).toBe true
+
+    it 'should set the place on the new event', ->
+      expect(ctrl.newEvent.place).toEqual
+        name: place.name
+        lat: place.geometry.location.G
+        long: place.geometry.location.K
+
+    it 'should close the modal', ->
+      expect(scope.hidePlaceModal).toHaveBeenCalled()

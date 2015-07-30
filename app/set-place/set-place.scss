@@ -1,0 +1,22 @@
+#set-place {
+  .fa-close {
+    color: #fff;
+  }
+  .fa-search {
+    position: absolute;
+    padding: 13px 16px;
+    color: #aaa;
+  }
+  input {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #e6e6e6;
+    padding: 10px 39px;
+    font-size: 16px;
+  }
+  #no-results {
+    text-align: center;
+    margin-top: 10px;
+    color: #777;
+  }
+}

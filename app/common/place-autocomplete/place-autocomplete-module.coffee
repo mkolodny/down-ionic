@@ -1,4 +1,4 @@
-angular = require 'angular'
+require 'angular'
 placeAutocompleteDirective = require './place-autocomplete-directive'
 
 angular.module 'down.placeAutocomplete', []
