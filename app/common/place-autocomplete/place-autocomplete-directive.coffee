@@ -1,13 +1,14 @@
 placeAutocompleteDirective = ->
   require: 'ngModel'
   link: (scope, element, attrs, model) ->
+    # TODO: Get the options from an element attribute to make this more generic.
     options =
       componentRestrictions:
         country: 'us'
     place = new google.maps.places.Autocomplete(element[0], options)
 
     google.maps.event.addListener place, 'place_changed', ->
-      model.$setViewValue element.val()
+      model.$setViewValue element.val() # TODO: Test this.
       scope.$emit 'placeAutocomplete:placeChanged', place.getPlace()
 
     element.on 'focus', =>

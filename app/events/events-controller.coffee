@@ -102,7 +102,7 @@ class EventsCtrl
   toggleHasDate: ->
     if not @newEvent.hasDate
       @newEvent.hasDate = true
-      if not @newEvent.datetime?
+      if not angular.isDate(@newEvent)
         @newEvent.datetime = new Date()
     else
       @newEvent.hasDate = false

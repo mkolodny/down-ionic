@@ -564,6 +564,8 @@ describe 'events controller', ->
         date = new Date(1438195002656)
         jasmine.clock().mockDate date
 
+        ctrl.newEvent = {}
+
         ctrl.toggleHasDate()
 
       afterEach ->
@@ -572,7 +574,7 @@ describe 'events controller', ->
       it 'should set the new event date to the current date', ->
         expect(ctrl.newEvent.datetime).toEqual date
 
-      it 'should show the comment input', ->
+      it 'should highlight the date icon', ->
         expect(ctrl.newEvent.hasDate).toBe true
 
 
@@ -683,3 +685,13 @@ describe 'events controller', ->
 
     it 'should close the modal', ->
       expect(scope.hidePlaceModal).toHaveBeenCalled()
+
+
+  describe 'inviting friends', ->
+
+    describe 'when a title has been set', ->
+
+      beforeEach ->
+        ctrl.newEvent.title = 'bars?!?!?'
+
+        ctrl.inviteFriends()

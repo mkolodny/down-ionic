@@ -33,7 +33,7 @@ describe 'place-autocomplete', ->
   )
 
   it 'should create an Autocomplete object', ->
-    expect(google.maps.places.Autocomplete).toHaveBeenCalledWith el[0],
+    expect(google.maps.places.Autocomplete).toHaveBeenCalledWith element[0],
       componentRestrictions: {country: 'us'}
 
   describe 'changing the place', ->
