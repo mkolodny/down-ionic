@@ -140,6 +140,12 @@ $new-event-margin-left: 5px;
     .selected {
       color: $brand-color;
     }
+    .enabled {
+      color: #357ded !important;
+      /*color: #232ed1 !important; */
+      /*color: #7678ed !important; */
+      /*color: $brand-color !important;*/
+    }
   }
   input,
   textarea {
@@ -159,7 +165,12 @@ $new-event-margin-left: 5px;
   }
   #suggest {
     float: right;
-    margin-right: 0;
-    color: #ccc !important;
+    border: none;
+    background-color: #fff;
+    padding: 0;
+
+    & > i {
+      color: #ccc !important;
+    }
   }
 }

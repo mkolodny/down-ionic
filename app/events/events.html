@@ -1,3 +1,4 @@
+
 <div id="events">
   <ion-header-bar>
     <h1 class="title">Down</h1>
@@ -58,7 +59,8 @@
   </ion-content>
   <ion-footer-bar class="bar-light" keyboard-attach>
     <div id="new-event-details">
-      <input placeholder="Suggest something to do..." id="suggestion">
+      <input id="suggestion" placeholder="Suggest something to do..."
+             ng-model="events.newEvent.title">
       <div class="event-detail" ng-if="events.newEvent.hasDate">
         <i class="fa fa-calendar-o"></i>
         <div>
@@ -72,7 +74,7 @@
       </div>
       <div class="event-detail" ng-show="events.newEvent.hasComment">
         <i class="fa fa-comment-o"></i>
-        <textarea id="comment" ng-model="event.newEvent.comment" msd-elastic
+        <textarea id="comment" ng-model="events.newEvent.comment" msd-elastic
                   placeholder="Add a comment..."></textarea>
       </div>
     </div>
@@ -89,7 +91,11 @@
         <i class="fa fa-comment-o"
            ng-class="{selected: events.newEvent.hasComment}"></i>
       </a>
-      <i class="fa fa-arrow-right" id="suggest"></i>
+      <button id="suggest" ng-click="events.inviteFriends()"
+              ng-disabled="!events.newEvent.title">
+        <i class="fa fa-arrow-right" ng-class="{enabled: events.newEvent.title}"
+           ></i>
+      </button>
     </div>
   </ion-footer-bar>
 </div>

@@ -13,6 +13,7 @@ describe 'events controller', ->
   $httpBackend = null
   $ionicModal = null
   $q = null
+  $state = null
   $timeout = null
   $window = null
   ctrl = null
@@ -42,6 +43,7 @@ describe 'events controller', ->
     $ionicModal = $injector.get '$ionicModal'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
+    $state = $injector.get '$state'
     $timeout = $injector.get '$timeout'
     $window = $injector.get '$window'
     Auth = $injector.get 'Auth'
@@ -688,10 +690,78 @@ describe 'events controller', ->
 
 
   describe 'inviting friends', ->
+    newEvent = null
 
-    describe 'when a title has been set', ->
+    beforeEach ->
+      ctrl.newEvent =
+        title: 'bars?!?!?!?'
+        hasDate: false
+      # ctrl.getNewEvent creates an event object with attributes set based on
+      # which icons are selected.
+      newEvent =
+        title: ctrl.newEvent.title
+      spyOn(ctrl, 'getNewEvent').and.returnValue newEvent
+      spyOn $state, 'go'
+
+      ctrl.inviteFriends()
+
+    it 'should navigate to the invite friends view', ->
+      expect($state.go).toHaveBeenCalledWith 'inviteFriends', {event: newEvent}
+
+
+  describe 'getting the new event', ->
+
+    describe 'when the user only set a title', ->
 
       beforeEach ->
-        ctrl.newEvent.title = 'bars?!?!?'
+        ctrl.newEvent =
+          title: 'bars?!!?!'
 
-        ctrl.inviteFriends()
+      it 'should set the title on the event', ->
+        expect(ctrl.getNewEvent()).toEqual
+          title: ctrl.newEvent.title
+
+
+    describe 'when the user set a date', ->
+
+      beforeEach ->
+        ctrl.newEvent =
+          title: 'bars?!!?!'
+          hasDate: true
+          datetime: new Date()
+
+      it 'should set the datetime on the event', ->
+        expect(ctrl.getNewEvent()).toEqual
+          title: ctrl.newEvent.title
+          datetime: ctrl.newEvent.datetime
+
+
+    describe 'when the user set a place', ->
+
+      beforeEach ->
+        ctrl.newEvent =
+          title: 'bars?!!?!'
+          hasPlace: true
+          place:
+            name: '169 Bar'
+            lat: 40.7138251
+            long: -73.9897481
+
+      it 'should set the place on the event', ->
+        expect(ctrl.getNewEvent()).toEqual
+          title: ctrl.newEvent.title
+          place: ctrl.newEvent.place
+
+
+    describe 'when the user added a comment', ->
+
+      beforeEach ->
+        ctrl.newEvent =
+          title: 'bars?!!?!'
+          hasComment: true
+          comment: 'Who doesn\'t love go go dancers?'
+
+      it 'should set the place on the event', ->
+        expect(ctrl.getNewEvent()).toEqual
+          title: ctrl.newEvent.title
+          comment: ctrl.newEvent.comment

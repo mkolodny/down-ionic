@@ -264,4 +264,18 @@ class EventsCtrl
     if item.response is @Invitation.declined
       return true
 
+  inviteFriends: ->
+    newEvent = @getNewEvent()
+    @$state.go 'inviteFriends', {event: newEvent}
+
+  getNewEvent: ->
+    event = {title: @newEvent.title}
+    if @newEvent.hasDate
+      event.datetime = @newEvent.datetime
+    if @newEvent.hasPlace
+      event.place = @newEvent.place
+    if @newEvent.hasComment
+      event.comment = @newEvent.comment
+    event
+
 module.exports = EventsCtrl
