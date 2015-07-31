@@ -24,8 +24,11 @@ angular.module 'down', [
     'down.events'
     'down.inviteFriends'
   ]
-  .config ($httpProvider, $urlRouterProvider) ->
-    $httpProvider.defaults.headers.common['Accept'] = 'application/json; version=1.2'
+  .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider) ->
+    acceptHeader = 'application/json; version=1.2'
+    $httpProvider.defaults.headers.common['Accept'] = acceptHeader
+    $ionicConfigProvider.backButton.text ''
+      .previousTitleText false
     $urlRouterProvider.when '', '/'
   .run ($ionicPlatform, $window) ->
     $ionicPlatform.ready ->
