@@ -9,6 +9,7 @@ require './request-location/request-location-module'
 require './request-contacts/request-contacts-module'
 require './find-friends/find-friends-module'
 require './events/events-module'
+require './invite-friends/invite-friends-module'
 
 angular.module 'down', [
     'ionic'
@@ -21,6 +22,7 @@ angular.module 'down', [
     'down.requestContacts'
     'down.findFriends'
     'down.events'
+    'down.inviteFriends'
   ]
   .config ($httpProvider, $urlRouterProvider) ->
     $httpProvider.defaults.headers.common['Accept'] = 'application/json; version=1.2'

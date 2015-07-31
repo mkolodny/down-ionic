@@ -1,4 +1,6 @@
 #verify-phone {
+  background-color: $brand-color;
+
   .explanation {
     height: 40px;
     margin: 66px auto 15px;
@@ -8,5 +10,6 @@
   }
   input {
     padding-right: 0;
+    line-height: 34px;
   }
 }

@@ -17,6 +17,7 @@ $dark:                            #444 !default;
 
 // Global variables
 $brand-color: #6a38ab;
+$new-event-margin-left: 5px;
 
 // The path for our ionicons font files, relative to the built CSS in www/css
 //$ionicons-font-path: "../lib/ionic/fonts" !default;
@@ -36,6 +37,7 @@ $brand-color: #6a38ab;
 @import "./find-friends/find-friends";
 @import "./events/events";
 @import "./set-place/set-place";
+@import "./invite-friends/invite-friends";
 
 /*
 Global Sass
@@ -44,6 +46,9 @@ Global Sass
 // Global
 .button {
   border-radius: 4px;
+}
+.button-full {
+  border-radius: 0;
 }
 .bar {
   background-color: $brand-color;
@@ -151,4 +156,10 @@ Global Sass
 }
 .pac-item-query {
   font-size: 16px;
+}
+
+// Navbar
+#nav-logo {
+  font-family: 'Viga', 'Helvetica Neue', sans-serif;
+  font-size: 36px;
 }

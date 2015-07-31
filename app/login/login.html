@@ -1,9 +1,4 @@
-<div id="login" class="onboard-view">
-  <style>
-    body {
-      background-color: #6a38ab;
-    }
-  </style>
+<ion-view id="login" class="onboard-view" hide-nav-bar="true">
   <link href="http://fonts.googleapis.com/css?family=Viga" rel="stylesheet">
   <h1>Down</h1>
   <form role="form" novalidate name="loginForm" >
@@ -13,7 +8,8 @@
       <div class="form-error" ng-if="loginForm.phone.$error.required">
         Please enter your phone number.
       </div>
-      <div class="form-error" ng-if="loginForm.phone.$error.validNumber && !loginForm.phone.$error.required">
+      <div class="form-error"
+           ng-if="loginForm.phone.$error.validNumber && !loginForm.phone.$error.required">
         That phone number is invalid.
       </div>
     </div>
@@ -21,4 +17,4 @@
       Login
     </button>
   </form>
-</div>
+</ion-view>
