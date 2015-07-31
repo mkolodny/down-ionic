@@ -1,27 +1,28 @@
 class Contacts
-  constructor: (localStorageService, @$http) ->
+  constructor: (localStorageService, @$http, @Auth) ->
     @localStorage = localStorageService
-    # Make sure intlTelInputUtils are loaded?
-    @$http.get 'app/vendor/intl-phone/libphonenumber-utils.js'
+    @i18n = window.intlTelInputUtils
 
-  formatContacts: (contacts) ->
-    forattedContacts = []
+  filterContacts: (contacts) ->
+    filteredContacts = []
     for contact in contacts
+      if contact.name.formatted.length is 0
+        continue
+      filteredContacts.push contact
+    return filteredContacts
 
-      formattedPhoneNumbers = []
-      for contactField in contact?.phoneNumbers
-        phoneNumber = contactField.value
-        # Check if valid phone number
-        if intlTelInputUtils.isValidNumber(phoneNumber)
-          # Overright with E164 formatted version
-          contactField.value = intlTelInputUtils.formatE164(phoneNumber)
-          # Only return valid phone numbers for each contact
-          formattedPhoneNumbers.push phoneNumber
-      contact.phoneNumbers = formattedPhoneNumbers
+  filterNumbers: (numbers) ->
+    filteredNumbers = []
+    for number in numbers
+      if @i18n.isValidNumber number.value
+        filteredNumbers.push number
+    return filteredNumbers
 
-      if contact.phoneNumbers.length > 0
-        formatContacts.push contact
-
-    return formatContacts
+  formatNumbers: (numbers) ->
+    E164 = @i18n.numberFormat.E164
+    # TODO : Use users country code
+    for number in numbers
+      number.value = @i18n.formatNumberByType(number.value, 'US', E164)
+    return numbers
 
 module.exports = Contacts
