@@ -59,7 +59,105 @@ describe 'Contacts service', ->
     it 'should get contacts name and phone numbers', ->
       expect($cordovaContacts.find).toHaveBeenCalledWith fields
 
+  describe 'map contact id', ->
+    contactIdMap = null
+    phone1 = null
+    phone2 = null
+    contactId = null
+
+    beforeEach ->
+      contactId = '12345'
+      phone1 = '+19252852230'
+      phone2 = '+12345678910'
+      contact = 
+        id: contactId
+        phoneNumbers: [
+          { value: phone1 }
+          { value: phone2 }
+        ]
+
+      contactIdMap = Contacts.mapContactIds [contact]
+
+    it 'should return an object with all phones as keys and contact id as value', ->
+      expectResult = {}
+      expectResult[phone1] = contactId
+      expectResult[phone2] = contactId
+      expect(contactIdMap).toEqual expectResult
+
   describe 'identify contacts', ->
+    deferred = null
+
+    beforeEach ->
+      deferred = $q.defer()
+      spyOn(Contacts, 'getContactUsers').and.returnValue deferred.promise
+
+    describe 'successfully', ->
+      contactId = null
+      phone = null
+      userId = null
+      contact = null
+      identifiedContacts = null
+
+      beforeEach ->
+        contactId = '1234'
+        phone = '+19252855230'
+        userId = '98765'
+
+        contact =
+          id: contactId
+          phoneNumbers: [
+            { value: phone }
+          ]
+
+        contactCopy = angular.copy contact
+        Contacts.identifyContacts([contactCopy])
+          .then (_contacts_) ->
+            identifiedContacts = _contacts_
+
+        userPhone = 
+          user:
+            id: userId
+          phone: phone
+        deferred.resolve [userPhone]
+        scope.$apply()
+
+      it 'should add userId properties to contacts that have users', ->
+        expectedUserId = identifiedContacts[contactId].userId
+        expect(expectedUserId).toEqual userId
+
+    describe 'not successfully :( ', ->
+      rejected = null
+
+      beforeEach ->
+        rejected = false
+        Contacts.identifyContacts([])
+          .then (()->), () ->
+            rejected = true
+
+        deferred.reject()
+        scope.$apply()
+
+      it 'should reject the promise', ->
+        expect(rejected).toEqual true
+
+  describe 'contacts array to object', ->
+    contactId = null
+    contact = null
+    contactsObject = null
+
+    beforeEach ->
+      contactId = '12345'
+      contact =
+        id: contactId
+        name: 'Mike Pleb'
+      contactsObject = Contacts.contactArrayToObject [contact]
+
+    it 'should return an object with key contact id and value contact', ->
+      expectResult = {}
+      expectResult[contactId] = contact
+      expect(contactsObject).toEqual expectResult
+
+  describe 'get contact users', ->
     phone1 = null
     phone2 = null
     phone3 = null
@@ -90,7 +188,7 @@ describe 'Contacts service', ->
       contacts = [contact1, contact2]
       contactsCopy = angular.copy contacts
 
-      promise = Contacts.identifyContacts contactsCopy
+      promise = Contacts.getContactUsers contactsCopy
 
     it 'should check contacts to see if a users exist for every number', ->
       allPhones = [phone1, phone2, phone3]
