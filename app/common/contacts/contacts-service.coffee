@@ -7,7 +7,28 @@ class Contacts
     @localStorage.set('hasRequestedContacts', true)
 
     fields = ['id', 'name', 'phoneNumbers']
+
+    deferred = @$q.defer()
+
     @$cordovaContacts.find(fields)
+      .then (contacts) =>
+        contacts = @filterContacts contacts
+        for contact in contacts
+          phoneNumbers = contact.phoneNumbers
+          phoneNumbers = @filterNumbers phoneNumbers
+          phoneNumbers = @formatNumbers phoneNumbers
+        @identifyContacts(contacts)
+          .then (contactsObject) =>
+            @saveContacts contactsObject
+            deferred.resolve()
+          , ->
+            error = 
+              code: 'IDENTIFY_FAILED'
+            deferred.reject error
+      , (error) ->
+        deferred.reject error
+
+    return deferred.promise
 
   identifyContacts: (contacts) ->
     contactsObject = @contactArrayToObject contacts
@@ -21,7 +42,7 @@ class Contacts
           contactId = contactsIdMap[phone]
           contactsObject[contactId].userId = userId
         deferred.resolve contactsObject
-      , ()=>
+      , ->
         deferred.reject()
 
     return deferred.promise
@@ -75,12 +96,3 @@ class Contacts
     @localStorage.set 'contacts', contacts
 
 module.exports = Contacts
-
-
-# fields = ['name', 'phoneNumbers']
-# -    @$cordovaContacts.find(fields)
-# -      .then (contacts) =>
-# -        @formatContacts(contacts)
-# -      , (error) =>
-# -        if error.code is 'ContactError.PERMISSION_DENIED_ERROR'
-# -          @Auth.redirectForAuthState()

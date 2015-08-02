@@ -47,17 +47,107 @@ describe 'Contacts service', ->
 
   describe 'get contacts', ->
     fields = null
+    cordovaDeferred = null
+    resolved = null
+    error = null
 
     beforeEach ->
       fields = ['id', 'name', 'phoneNumbers']
       localStorage.set('hasRequestedContacts', false)
+
+      cordovaDeferred = $q.defer()
+      $cordovaContacts.find.and.returnValue cordovaDeferred.promise
+
+      resolved = false
+      error = null
       Contacts.getContacts()
+        .then () ->
+          resolved = true
+        , (_error_) ->
+          error = _error_
 
     it 'should set hasRequestedContacts to true', ->
       expect(localStorage.get('hasRequestedContacts')).toEqual true
 
     it 'should get contacts name and phone numbers', ->
       expect($cordovaContacts.find).toHaveBeenCalledWith fields
+
+    describe 'read contacts successfully', ->
+      contact = null
+      contactId = null
+      contacts = null
+      phoneNumbers = null
+      identifyDeferred = null
+
+      beforeEach ->
+        contactId = '1234'
+        phoneNumbers = [
+          { value: '+19252852230'}
+        ]
+        contact =
+          id: contactId
+          name: 'Mike Pleb'
+          phoneNumbers: phoneNumbers
+        contacts = [contact]
+
+        spyOn(Contacts, 'filterContacts').and.returnValue contacts
+        spyOn(Contacts, 'filterNumbers').and.returnValue phoneNumbers
+        spyOn(Contacts, 'formatNumbers').and.returnValue phoneNumbers
+
+        identifyDeferred = $q.defer()
+        spyOn(Contacts, 'identifyContacts').and.returnValue identifyDeferred.promise
+
+        cordovaDeferred.resolve contacts
+        scope.$apply()
+
+      it 'should filter contacts', ->
+        expect(Contacts.filterContacts).toHaveBeenCalledWith contacts
+
+      it 'should filter contact numbers', ->
+        expect(Contacts.filterNumbers).toHaveBeenCalledWith phoneNumbers
+
+      it 'should format contact numbers', ->
+        expect(Contacts.formatNumbers).toHaveBeenCalledWith phoneNumbers
+
+      it 'should identify contacts', ->
+        expect(Contacts.identifyContacts).toHaveBeenCalledWith contacts
+
+      describe 'identify successfull', ->
+        contactsObject = null
+
+        beforeEach ->
+          contactsObject = {}
+          contactsObject[contactId] = contact
+
+          spyOn(Contacts, 'saveContacts')
+
+          identifyDeferred.resolve contactsObject
+          scope.$apply()
+
+        it 'should save the contacts', ->
+          expect(Contacts.saveContacts).toHaveBeenCalledWith contactsObject
+
+        it 'should resolve the promise', ->
+          expect(resolved).toEqual true
+
+      describe 'identify error', ->
+        beforeEach ->
+          identifyDeferred.reject()
+          scope.$apply()
+
+        it 'should reject the promise', ->
+          expect(error.code).toEqual 'IDENTIFY_FAILED'
+
+    describe 'read contacts failed', ->
+      beforeEach ->
+        cordovaError =
+          code: 'PERMISSION_DENIED_ERROR'
+
+        cordovaDeferred.reject cordovaError
+        scope.$apply()
+
+      it 'should reject the promise', ->
+        expect(error.code).toEqual 'PERMISSION_DENIED_ERROR'
 
   describe 'map contact id', ->
     contactIdMap = null
