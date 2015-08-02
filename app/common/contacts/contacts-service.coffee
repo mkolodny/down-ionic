@@ -1,7 +1,20 @@
 class Contacts
-  constructor: (localStorageService, @$http, @Auth) ->
+  constructor: (localStorageService, @$http, @Auth, @$cordovaContacts, @UserPhone) ->
     @localStorage = localStorageService
     @i18n = window.intlTelInputUtils
+
+  getContacts: () ->
+    @localStorage.set('hasRequestedContacts', true)
+
+    fields = ['id', 'name', 'phoneNumbers']
+    @$cordovaContacts.find(fields)
+
+  identifyContacts: (contacts) ->
+    phones = []
+    for contact in contacts
+      for phoneNumber in contact.phoneNumbers
+        phones.push phoneNumber.value
+    return @UserPhone.getFromPhones(phones).$promise
 
   filterContacts: (contacts) ->
     filteredContacts = []
@@ -25,4 +38,16 @@ class Contacts
       number.value = @i18n.formatNumberByType(number.value, 'US', E164)
     return numbers
 
+  saveContacts: (contacts) ->
+    @localStorage.set 'contacts', contacts
+
 module.exports = Contacts
+
+
+# fields = ['name', 'phoneNumbers']
+# -    @$cordovaContacts.find(fields)
+# -      .then (contacts) =>
+# -        @formatContacts(contacts)
+# -      , (error) =>
+# -        if error.code is 'ContactError.PERMISSION_DENIED_ERROR'
+# -          @Auth.redirectForAuthState()

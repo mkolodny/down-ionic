@@ -17,4 +17,9 @@ UserPhone = ($resource, apiRoot, User) ->
           phone: data.phone
         response
 
+    getFromPhones:
+      method: 'post'
+      # url: "#{listUrl}/phones"
+      # isArray: true
+
 module.exports = UserPhone

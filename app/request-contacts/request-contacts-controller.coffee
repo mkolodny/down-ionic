@@ -1,20 +1,7 @@
 class RequestContactsCtrl
-  constructor: (localStorageService, @$cordovaContacts, @Auth) ->
-    @localStorage = localStorageService
+  constructor: (@Auth) ->
 
   requestContacts: () ->
-    @localStorage.set 'hasRequestedContacts', true
-
-    fields = ['name', 'phoneNumbers']
-    @$cordovaContacts.find(fields)
-      .then (contacts) =>
-        @formatContacts(contacts)
-      , (error) =>
-        if error.code is 'ContactError.PERMISSION_DENIED_ERROR'
-          @Auth.redirectForAuthState()
-        
-
-  formatContacts: (contacts) ->
-
+    @Auth.redirectForAuthState()
 
 module.exports = RequestContactsCtrl
