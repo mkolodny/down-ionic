@@ -1,0 +1,46 @@
+#invite-friends {
+  .item {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 16px;
+  }
+  h2 {
+    color: #333;
+  }
+  .icon {
+    color: #ccc;    
+  }
+  .fa-check-square {
+    color: #6a38ab;
+  }
+  ion-footer-bar {
+    &.hidden {
+      bottom: -44px;
+    }
+
+    .buttons {
+      position: absolute;
+      right: 5px;
+    }
+  }
+  .selected {
+    background-color: #eee;
+
+    h2 {
+      font-weight: 500;
+    }
+  }
+  #all-friends-icon {
+    right: 13px; // TODO: Find out why this is necessary, and remove it.
+  }
+  #selected-friends {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    padding-top: 7px;
+    padding-left: 11px;
+    overflow-x: scroll;
+    white-space: nowrap;
+    max-width: 85%;
+  }
+}

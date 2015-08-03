@@ -80,7 +80,7 @@ Global Sass
   border-right: none;
   border-bottom-width: 2px;
 
-  &:last-child {
+  &.last {
     border-bottom-width: 1px;
   }
 }

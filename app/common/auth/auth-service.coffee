@@ -1,3 +1,5 @@
+haversine = require 'haversine'
+
 class Auth
   constructor: (@$http, @$q, @apiRoot, @Invitation, @User, @$cordovaGeolocation,
                 @$state, localStorageService) ->
@@ -77,6 +79,15 @@ class Auth
 
   isFriend: (userId) ->
     @friends[userId]?
+
+  isNearby: (user) ->
+    start =
+      latitude: @user.location.lat
+      longitude: @user.location.long
+    end =
+      latitude: user.location.lat
+      longitude: user.location.long
+    haversine(start, end, {unit: 'mile'}) <= 5
 
   redirectForAuthState: ->
     if not @phone?

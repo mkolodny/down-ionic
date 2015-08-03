@@ -5,7 +5,7 @@
   <ion-content>
     <ion-list>
       <ion-item collection-repeat="item in findFriends.items"
-                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider}"
+                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, last: $last}"
                 item-height="item.isDivider ? '35px' : '71px'">
         <!-- Divider -->
         <span ng-if="item.isDivider">{{item.title}}</span>

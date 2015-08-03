@@ -6,7 +6,7 @@
     <ion-list ng-class="{moving: events.moving}">
       <!-- We might need to use `track by item.id` for the animations to work -->
       <ion-item ng-repeat="item in events.items"
-                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, updated: item.wasUpdated, 'item-reordering': item.isReordering}"
+                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, updated: item.wasUpdated, 'item-reordering': item.isReordering, last: $last}"
                 ng-click="!item.isDivider ? (item.wasJoined ? null : events.toggleIsExpanded(item)) : null"
                 ng-style="{top: events.moving ? item.top+'px': none, right: item.right+'px'}">
         <!-- Divider -->

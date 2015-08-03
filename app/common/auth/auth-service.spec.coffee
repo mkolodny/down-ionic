@@ -544,10 +544,10 @@ describe 'Auth service', ->
         lat = 180.0
         long = 180.0
 
-        location = 
+        location =
           lat: lat
           long: long
-          
+
         position =
           coords:
             latitude: lat
@@ -613,7 +613,7 @@ describe 'Auth service', ->
       lat = 180.0
       long = 180.0
 
-      location = 
+      location =
         lat: 180.0
         long: 180.0
 
@@ -637,3 +637,38 @@ describe 'Auth service', ->
         it 'should update the Auth.user', ->
           expect(Auth.user).toBe user
 
+
+  describe 'checking whether a friend is nearby', ->
+    user = null
+
+    beforeEach ->
+      Auth.user.location =
+        lat: 40.7265834
+        long: -73.9821535
+      user =
+        id: 2
+        email: 'jclarke@gmail.com'
+        name: 'Joan Clarke'
+        username: 'jnasty'
+        imageUrl: 'https://facebook.com/profile-pics/jnasty'
+
+    describe 'when the user is at most 5 mi away', ->
+
+      beforeEach ->
+        user.location =
+          lat: 40.7265834 # just under 5 mi away
+          long: -73.9821535
+
+      it 'should return true', ->
+        expect(Auth.isNearby(user)).toBe true
+
+
+    describe 'when the user is more than 5 mi away', ->
+
+      beforeEach ->
+        user.location =
+          lat: 40.79893 # just over 5 mi away
+          long: -73.9821535
+
+      it 'should return false', ->
+        expect(Auth.isNearby(user)).toBe false
