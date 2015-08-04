@@ -12,8 +12,8 @@
              ng-if="!item.isDivider">
         <h2 ng-if="!item.isDivider">{{item.name}}</h2>
         <p ng-if="!item.isDivider">{{item.username}}</p>
-        <friendship-button user-id="item.id"
-                           ng-if="!item.isDivider"></friendship-button>
+        <friendship-button user-id="item.id" ng-if="!item.isDivider"
+                           ></friendship-button>
       </ion-item>
     </ion-list>
   </ion-content>

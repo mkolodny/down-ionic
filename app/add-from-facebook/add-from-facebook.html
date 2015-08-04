@@ -1,0 +1,31 @@
+<ion-view id="add-from-facebook" view-title="Facebook Friends">
+  <ion-content>
+    <ion-refresher pulling-text="Pull to refresh..."
+                   on-refresh="addFromFacebook.refresh()">
+    </ion-refresher>
+    <ion-list class="list-avatar">
+      <ion-item collection-repeat="item in addFromFacebook.items"
+                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, last: $last}"
+                item-height="item.isDivider ? '35px' : '71px'">
+        <!-- Divider -->
+        <span ng-if="item.isDivider">{{item.title}}</span>
+
+        <!-- User -->
+        <img ng-src="{{item.user.imageUrl}}" alt="Profile Pic"
+             ng-if="!item.isDivider">
+        <h2 ng-if="!item.isDivider">{{item.user.name}}</h2>
+        <p ng-if="!item.isDivider">{{item.user.username}}</p>
+        <friendship-button user-id="item.user.id" ng-if="!item.isDivider"
+                           ></friendship-button>
+      </ion-item>
+    </ion-list>
+    <div id="spinner-container" ng-if="addFromFacebook.isLoading">
+      <ion-spinner></ion-spinner>
+    </div>
+    <div id="load-error"
+         ng-if="addFromFacebook.loadError && !addFromFacebook.items.length">
+      There was a problem loading your facebook friends. Please try again in a little
+      while.
+    </div>
+  </ion-content>
+</ion-view>
