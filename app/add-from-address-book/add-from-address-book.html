@@ -1,17 +1,15 @@
-<ion-view id="find-friends" view-title="Find Friends" can-swipe-back="false">
-  <ion-nav-buttons side="secondary">
-    <button class="button button-clear button-light">Done</button>
-  </ion-nav-buttons>
+<ion-view id="add-from-address-book" view-title="Address Book">
   <ion-content>
     <ion-list class="list-avatar">
-      <ion-item collection-repeat="item in findFriends.items"
+      <ion-item collection-repeat="item in addFromAddressBook.items"
                 ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, last: $last}"
                 item-height="item.isDivider ? '35px' : '71px'">
         <!-- Divider -->
         <span ng-if="item.isDivider">{{item.title}}</span>
 
-        <!-- Facebook Friend -->
-        <img ng-src="{{item.imageUrl}}" alt="Profile Pic" ng-if="!item.isDivider">
+        <!-- User -->
+        <img ng-src="{{item.imageUrl}}" alt="Profile Pic"
+             ng-if="!item.isDivider">
         <h2 ng-if="!item.isDivider">{{item.name}}</h2>
         <p ng-if="!item.isDivider">{{item.username}}</p>
         <friendship-button user-id="item.id"
@@ -19,4 +17,4 @@
       </ion-item>
     </ion-list>
   </ion-content>
-</div>
+</ion-view>
