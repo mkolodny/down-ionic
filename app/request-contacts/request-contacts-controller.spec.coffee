@@ -28,7 +28,8 @@ describe 'request contacts controller', ->
 
   describe 'tapping continue', ->
     beforeEach ->
-      spyOn(Auth, 'redirectForAuthState')
+      spyOn Auth, 'redirectForAuthState'
+
       ctrl.requestContacts()
 
     it 'should redirect for auth state', ->

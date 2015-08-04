@@ -105,12 +105,12 @@ describe 'request push controller', ->
       Auth.user =
         id: 1
 
-      device = 
-          cordova: '5.0'
-          model: 'iPhone 8'
-          platform: 'iOS'
-          UUID: '1234'
-          version: '8.1'
+      device =
+        cordova: '5.0'
+        model: 'iPhone 8'
+        platform: 'iOS'
+        UUID: '1234'
+        version: '8.1'
       spyOn($cordovaDevice, 'getDevice').and.returnValue device
 
       deferred = $q.defer()
@@ -145,4 +145,3 @@ describe 'request push controller', ->
         scope.$apply()
 
       xit 'should show an error', ->
-

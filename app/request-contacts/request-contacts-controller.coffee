@@ -1,7 +1,7 @@
 class RequestContactsCtrl
   constructor: (@Auth) ->
 
-  requestContacts: () ->
+  requestContacts: ->
     @Auth.redirectForAuthState()
 
 module.exports = RequestContactsCtrl

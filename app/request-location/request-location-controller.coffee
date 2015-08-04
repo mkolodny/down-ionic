@@ -1,10 +1,10 @@
 class RequestLocationCtrl
-  constructor: (@$state, @localStorageService, @Auth)->
+  constructor: (@$state, @localStorageService, @Auth) ->
     @localStorage = @localStorageService
 
-  enableLocation: () ->
+  enableLocation: ->
     @localStorage.set 'hasRequestedLocationServices', true
-    @Auth.watchLocation().then () =>
+    @Auth.watchLocation().then =>
       @Auth.redirectForAuthState()
 
 module.exports = RequestLocationCtrl
