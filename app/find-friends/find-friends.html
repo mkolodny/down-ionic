@@ -3,7 +3,7 @@
     <button class="button button-clear button-light">Done</button>
   </ion-nav-buttons>
   <ion-content>
-    <ion-list>
+    <ion-list class="list-avatar">
       <ion-item collection-repeat="item in findFriends.items"
                 ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, last: $last}"
                 item-height="item.isDivider ? '35px' : '71px'">
@@ -15,7 +15,8 @@
              ng-if="!item.isDivider">
         <h2 ng-if="!item.isDivider">{{item.name}}</h2>
         <p ng-if="!item.isDivider">{{item.username}}</p>
-        <friendship-button user-id="item.id" ng-if="!item.isDivider"></friendship-button>
+        <friendship-button user-id="item.id"
+                           ng-if="!item.isDivider"></friendship-button>
       </ion-item>
     </ion-list>
   </ion-content>

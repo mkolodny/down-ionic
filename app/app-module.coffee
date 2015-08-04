@@ -10,6 +10,8 @@ require './request-contacts/request-contacts-module'
 require './find-friends/find-friends-module'
 require './events/events-module'
 require './invite-friends/invite-friends-module'
+require './add-friends/add-friends-module'
+require './add-by-username/add-by-username-module'
 
 angular.module 'down', [
     'ionic'
@@ -23,6 +25,8 @@ angular.module 'down', [
     'down.findFriends'
     'down.events'
     'down.inviteFriends'
+    'down.addFriends'
+    'down.addByUsername'
   ]
   .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider) ->
     acceptHeader = 'application/json; version=1.2'

@@ -38,6 +38,8 @@ $new-event-margin-left: 5px;
 @import "./events/events";
 @import "./set-place/set-place";
 @import "./invite-friends/invite-friends";
+@import "./add-friends/add-friends";
+@import "./add-by-username/add-by-username";
 
 /*
 Global Sass
@@ -67,10 +69,14 @@ Global Sass
   color: $brand-color;
   font-size: 12px;
   border: none;
-  padding-left: 12px;
 
   &.activated {
     background-color: #fff;
+  }
+}
+.list-avatar {
+  .item-divider {
+    padding-left: 12px;
   }
 }
 .item {

@@ -1,0 +1,22 @@
+<ion-view id="add-by-username" view-title="Add Username" hide-back-button="false">
+  <ion-content scroll="false">
+    <i class="fa fa-search"></i>
+    <input ng-model="addByUsername.username" placeholder="Search" autofocus
+           ng-change="addByUsername.search()">
+    <div id="input-empty" ng-if="!addByUsername.username">
+      <div id="your-username">{{addByUsername.user.username}}</div>
+      <div id="username-explanation">is your username.</div>
+    </div>
+    <ion-list ng-if="addByUsername.username">
+      <ion-item class="item-divider">
+        <span>Username</span>
+      </ion-item>
+      <ion-item class="item-icon-right">
+        <h2>{{addByUsername.username}}</h2>
+        <friendship-button user-id="addByUsername.friend.id"
+                           ng-if="addByUsername.friend"></friendship-button>
+        <i class="icon fa fa-spinner fa-pulse" ng-if="addByUsername.isSearching"></i>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>
