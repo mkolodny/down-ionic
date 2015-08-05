@@ -48,21 +48,18 @@ describe 'Contacts service', ->
   describe 'get contacts', ->
     fields = null
     cordovaDeferred = null
-    resolved = null
+    response = null
     error = null
 
     beforeEach ->
       fields = ['id', 'name', 'phoneNumbers']
-      localStorage.set 'hasRequestedContacts', false
 
       cordovaDeferred = $q.defer()
       $cordovaContacts.find.and.returnValue cordovaDeferred.promise
 
-      resolved = false
-      error = null
       Contacts.getContacts()
-        .then ->
-          resolved = true
+        .then (_response_) ->
+          response = _response_
         , (_error_) ->
           error = _error_
 
@@ -127,8 +124,9 @@ describe 'Contacts service', ->
         it 'should save the contacts', ->
           expect(Contacts.saveContacts).toHaveBeenCalledWith contactsObject
 
-        it 'should resolve the promise', ->
-          expect(resolved).toEqual true
+        it 'should resolve the promise with the contacts', ->
+          expect(response).toEqual contactsObject
+
 
       describe 'identify error', ->
 
@@ -138,6 +136,7 @@ describe 'Contacts service', ->
 
         it 'should reject the promise', ->
           expect(error.code).toEqual 'IDENTIFY_FAILED'
+
 
     describe 'read contacts failed', ->
 
@@ -150,6 +149,7 @@ describe 'Contacts service', ->
 
       it 'should reject the promise', ->
         expect(error.code).toEqual 'PERMISSION_DENIED_ERROR'
+
 
   describe 'map contact id', ->
     contactIdMap = null
@@ -251,6 +251,7 @@ describe 'Contacts service', ->
       expectResult[contactId] = contact
       expect(contactsObject).toEqual expectResult
 
+
   describe 'get contact users', ->
     phone1 = null
     phone2 = null
@@ -326,6 +327,7 @@ describe 'Contacts service', ->
       it 'should return contacts with names', ->
         expect(filteredContacts).toEqual contacts
 
+
   describe 'filter numbers', ->
     phoneNumbers = null
     filteredNumbers = null
@@ -351,6 +353,7 @@ describe 'Contacts service', ->
       it 'should remove invalid numbers', ->
         expect(filteredNumbers).toEqual []
 
+
   describe 'format numbers', ->
     phoneNumbers = null
     formattedNumbers = null
@@ -364,6 +367,7 @@ describe 'Contacts service', ->
       expectedPhoneFormat =
         value: '+19252852230'
       expect(formattedNumbers).toEqual [expectedPhoneFormat]
+
 
   describe 'save contacts', ->
     contact = null
