@@ -7,9 +7,12 @@
     position: absolute;
     width: 100%;
     top: $bar-height;
+    z-index: 1;
   }
   #members {
     margin-top: 10px;
+    max-height: 36px;
+    overflow-x: scroll;
   }
   .member {
     border-radius: 50%;
