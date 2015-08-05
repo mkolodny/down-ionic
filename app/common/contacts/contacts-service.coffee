@@ -1,5 +1,6 @@
 class Contacts
-  constructor: (localStorageService, @$http, @Auth, @$cordovaContacts, @UserPhone, @$q) ->
+  constructor: (localStorageService, @$http, @Auth, @$cordovaContacts, @UserPhone,
+                @$q) ->
     @localStorage = localStorageService
     @i18n = window.intlTelInputUtils
 

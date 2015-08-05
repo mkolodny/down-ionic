@@ -26,7 +26,7 @@ describe 'Contacts service', ->
 
   beforeEach angular.mock.module(($provide) ->
     $cordovaContacts =
-      find: jasmine.createSpy('$cordovaContacts.find')
+      find: jasmine.createSpy '$cordovaContacts.find'
     $provide.value '$cordovaContacts', $cordovaContacts
 
     return
@@ -53,7 +53,7 @@ describe 'Contacts service', ->
 
     beforeEach ->
       fields = ['id', 'name', 'phoneNumbers']
-      localStorage.set('hasRequestedContacts', false)
+      localStorage.set 'hasRequestedContacts', false
 
       cordovaDeferred = $q.defer()
       $cordovaContacts.find.and.returnValue cordovaDeferred.promise
@@ -61,13 +61,13 @@ describe 'Contacts service', ->
       resolved = false
       error = null
       Contacts.getContacts()
-        .then () ->
+        .then ->
           resolved = true
         , (_error_) ->
           error = _error_
 
     it 'should set hasRequestedContacts to true', ->
-      expect(localStorage.get('hasRequestedContacts')).toEqual true
+      expect(localStorage.get 'hasRequestedContacts').toEqual true
 
     it 'should get contacts name and phone numbers', ->
       expect($cordovaContacts.find).toHaveBeenCalledWith fields
@@ -82,7 +82,7 @@ describe 'Contacts service', ->
       beforeEach ->
         contactId = '1234'
         phoneNumbers = [
-          { value: '+19252852230'}
+          value: '+19252852230'
         ]
         contact =
           id: contactId
@@ -112,14 +112,14 @@ describe 'Contacts service', ->
       it 'should identify contacts', ->
         expect(Contacts.identifyContacts).toHaveBeenCalledWith contacts
 
-      describe 'identify successfull', ->
+      describe 'identify successfully', ->
         contactsObject = null
 
         beforeEach ->
           contactsObject = {}
           contactsObject[contactId] = contact
 
-          spyOn(Contacts, 'saveContacts')
+          spyOn Contacts, 'saveContacts'
 
           identifyDeferred.resolve contactsObject
           scope.$apply()
@@ -131,6 +131,7 @@ describe 'Contacts service', ->
           expect(resolved).toEqual true
 
       describe 'identify error', ->
+
         beforeEach ->
           identifyDeferred.reject()
           scope.$apply()
@@ -139,6 +140,7 @@ describe 'Contacts service', ->
           expect(error.code).toEqual 'IDENTIFY_FAILED'
 
     describe 'read contacts failed', ->
+
       beforeEach ->
         cordovaError =
           code: 'PERMISSION_DENIED_ERROR'
@@ -159,20 +161,22 @@ describe 'Contacts service', ->
       contactId = '12345'
       phone1 = '+19252852230'
       phone2 = '+12345678910'
-      contact = 
+      contact =
         id: contactId
         phoneNumbers: [
-          { value: phone1 }
-          { value: phone2 }
+          value: phone1
+        ,
+          value: phone2
         ]
 
       contactIdMap = Contacts.mapContactIds [contact]
 
-    it 'should return an object with all phones as keys and contact id as value', ->
+    it 'should return an object with phones as keys and contact id as value', ->
       expectResult = {}
       expectResult[phone1] = contactId
       expectResult[phone2] = contactId
       expect(contactIdMap).toEqual expectResult
+
 
   describe 'identify contacts', ->
     deferred = null
@@ -196,15 +200,15 @@ describe 'Contacts service', ->
         contact =
           id: contactId
           phoneNumbers: [
-            { value: phone }
+            value: phone
           ]
 
         contactCopy = angular.copy contact
-        Contacts.identifyContacts([contactCopy])
+        Contacts.identifyContacts [contactCopy]
           .then (_contacts_) ->
             identifiedContacts = _contacts_
 
-        userPhone = 
+        userPhone =
           user:
             id: userId
           phone: phone
@@ -215,13 +219,13 @@ describe 'Contacts service', ->
         expectedUserId = identifiedContacts[contactId].userId
         expect(expectedUserId).toEqual userId
 
-    describe 'not successfully :( ', ->
+    describe 'not successfully :(', ->
       rejected = null
 
       beforeEach ->
         rejected = false
-        Contacts.identifyContacts([])
-          .then (()->), () ->
+        Contacts.identifyContacts []
+          .then null, ->
             rejected = true
 
         deferred.reject()
@@ -260,20 +264,21 @@ describe 'Contacts service', ->
       contact1 =
         id: '1234'
         phoneNumbers: [
-          { value: phone1 }
+          value: phone1
         ]
-        
+
       phone2 = '+12345678910'
       phone3 = '+15555555555'
       contact2 =
         id: '1122'
         phoneNumbers: [
-          { value: phone2 }
-          { value: phone3 }
+          value: phone2
+        ,
+          value: phone3
         ]
 
       deferred = $q.defer()
-      spyOn(UserPhone, 'getFromPhones').and.returnValue {$promise : deferred.promise}
+      spyOn(UserPhone, 'getFromPhones').and.returnValue {$promise: deferred.promise}
 
       contacts = [contact1, contact2]
       contactsCopy = angular.copy contacts
@@ -299,11 +304,13 @@ describe 'Contacts service', ->
       beforeEach ->
         contact =
           name:
-            formatted: '' #note: formatted may not be an empty string, test on devices
+            formatted: '' # NOTE: formatted may not be an empty string,
+                          #   test on devices.
         filteredContacts = Contacts.filterContacts [contact]
 
       it 'should remove contacts with no names', ->
         expect(filteredContacts).toEqual []
+
 
     describe 'when a contact does have a name', ->
       filteredContacts = null
@@ -317,8 +324,8 @@ describe 'Contacts service', ->
         filteredContacts = Contacts.filterContacts contactsCopy
 
       it 'should return contacts with names', ->
-        expect(filteredContacts).toEqual contacts 
-    
+        expect(filteredContacts).toEqual contacts
+
   describe 'filter numbers', ->
     phoneNumbers = null
     filteredNumbers = null
@@ -334,13 +341,13 @@ describe 'Contacts service', ->
       it 'should return valid numbers', ->
         expect(filteredNumbers).toEqual phoneNumbers
 
-    describe 'invalid numbers', ->      
+    describe 'invalid numbers', ->
 
       beforeEach ->
         phone =
           value: ''
         filteredNumbers = Contacts.filterNumbers [phone]
-      
+
       it 'should remove invalid numbers', ->
         expect(filteredNumbers).toEqual []
 
@@ -352,7 +359,7 @@ describe 'Contacts service', ->
       phone =
         value: '9252852230'
       formattedNumbers = Contacts.formatNumbers [phone]
-    
+
     it 'should convert numbers to E164 format', ->
       expectedPhoneFormat =
         value: '+19252852230'
@@ -367,12 +374,9 @@ describe 'Contacts service', ->
         name:
           formatted: 'Mike Pleb'
 
-      localStorage.set('contacts', {})
+      localStorage.set 'contacts', {}
       Contacts.saveContacts [contact]
 
     it 'should save the contact to localStorage', ->
       savedContacts = localStorage.get 'contacts'
       expect(savedContacts).toEqual [contact]
-
-
-
