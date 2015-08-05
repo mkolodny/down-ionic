@@ -17,7 +17,6 @@ class Event
           name: 'Andrew Linfoot'
           imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
         ]
-        @$scope.$apply()
         return
         @membersError = true
 
