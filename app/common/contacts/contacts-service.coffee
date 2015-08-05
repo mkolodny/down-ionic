@@ -4,25 +4,25 @@ class Contacts
     @i18n = window.intlTelInputUtils
 
   getContacts: ->
-    @localStorage.set('hasRequestedContacts', true)
+    @localStorage.set 'hasRequestedContacts', true
 
     fields = ['id', 'name', 'phoneNumbers']
 
     deferred = @$q.defer()
 
-    @$cordovaContacts.find(fields)
+    @$cordovaContacts.find fields
       .then (contacts) =>
         contacts = @filterContacts contacts
         for contact in contacts
           phoneNumbers = contact.phoneNumbers
           phoneNumbers = @filterNumbers phoneNumbers
           phoneNumbers = @formatNumbers phoneNumbers
-        @identifyContacts(contacts)
+        @identifyContacts contacts
           .then (contactsObject) =>
             @saveContacts contactsObject
             deferred.resolve()
           , ->
-            error = 
+            error =
               code: 'IDENTIFY_FAILED'
             deferred.reject error
       , (error) ->
@@ -34,7 +34,7 @@ class Contacts
     contactsObject = @contactArrayToObject contacts
     contactsIdMap = @mapContactIds contacts
     deferred = @$q.defer()
-    @getContactUsers(contacts)
+    @getContactUsers contacts
       .then (userPhones) =>
         for userPhone in userPhones
           phone = userPhone.phone
@@ -87,9 +87,10 @@ class Contacts
 
   formatNumbers: (numbers) ->
     E164 = @i18n.numberFormat.E164
-    # TODO : Use users country code
+    # TODO: Use users country code - get it from the logged in user's phone.
+    #   Make a new build of the libphonenumber library.
     for number in numbers
-      number.value = @i18n.formatNumberByType(number.value, 'US', E164)
+      number.value = @i18n.formatNumberByType number.value, 'US', E164
     return numbers
 
   saveContacts: (contacts) ->
