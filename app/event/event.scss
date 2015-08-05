@@ -11,8 +11,8 @@
   }
   #members {
     margin-top: 10px;
-    max-height: 36px;
     overflow-x: scroll;
+    white-space: nowrap;
   }
   .member {
     border-radius: 50%;
