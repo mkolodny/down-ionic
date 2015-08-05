@@ -86,7 +86,7 @@ describe 'events controller', ->
       deferred.resolve invitations
       scope.$apply()
 
-    xit 'should set the invitations on the controller', ->
+    it 'should set the invitations on the controller', ->
       members = (invitation.toUser for invitation in invitations)
       expect(ctrl.members).toEqual members
 

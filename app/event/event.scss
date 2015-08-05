@@ -4,6 +4,9 @@
     padding-left: 20px;
     padding-right: 20px;
     padding-bottom: 20px;
+    position: absolute;
+    width: 100%;
+    top: $bar-height;
   }
   #members {
     margin-top: 10px;
