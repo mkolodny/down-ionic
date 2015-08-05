@@ -14,6 +14,7 @@ require './add-friends/add-friends-module'
 require './add-by-username/add-by-username-module'
 require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
+require './event/event-module'
 
 angular.module 'down', [
     'ionic'
@@ -31,6 +32,7 @@ angular.module 'down', [
     'down.addByUsername'
     'down.addFromAddressBook'
     'down.addFromFacebook'
+    'down.event'
   ]
   .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider) ->
     acceptHeader = 'application/json; version=1.2'
@@ -38,6 +40,7 @@ angular.module 'down', [
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
     $urlRouterProvider.when '', '/'
+      .otherwise '/'
   .run ($ionicPlatform, $window) ->
     $ionicPlatform.ready ->
       # Hide the accessory bar by default (remove this to show the accessory bar

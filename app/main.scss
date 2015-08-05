@@ -42,6 +42,7 @@ $new-event-margin-left: 5px;
 @import "./add-by-username/add-by-username";
 @import "./add-from-address-book/add-from-address-book";
 @import "./add-from-facebook/add-from-facebook";
+@import "./event/event";
 
 /*
 Global Sass
@@ -53,6 +54,9 @@ Global Sass
 }
 .button-full {
   border-radius: 0;
+}
+.buttons-right {
+  padding-right: 3px;
 }
 .bar {
   background-color: $brand-color;
@@ -173,4 +177,23 @@ Global Sass
 #nav-logo {
   font-family: 'Viga', 'Helvetica Neue', sans-serif;
   font-size: 36px;
+}
+.back-button {
+  padding-left: 3px !important;
+}
+
+// Events
+.respond {
+  color: $brand-color;
+  border: 1px solid $brand-color;
+  background-color: #fff;
+  border-radius: 16px;
+  height: 26px;
+  width: 73px;
+  line-height: 20px;
+
+  &.activated {
+    color: #fff;
+    background-color: $brand-color;
+  }
 }

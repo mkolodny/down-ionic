@@ -53,6 +53,8 @@ Event = ($http, $q, $resource, apiRoot, User) ->
       method: 'delete'
       url: detailUrl
 
+  resource.listUrl = listUrl
+
   resource.serialize = serializeEvent
 
   resource.deserialize = deserializeEvent

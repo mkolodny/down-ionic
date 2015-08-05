@@ -38,6 +38,9 @@ describe 'event service', ->
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
 
+  it 'should have a list url', ->
+    expect(Event.listUrl).toBe listUrl
+
   describe 'serializing an event', ->
 
     it 'should return the serialized event', ->

@@ -26,8 +26,8 @@ Invitation = ($resource, apiRoot, Event, User) ->
       createdAt: new Date(response.created_at)
       updatedAt: new Date(response.updated_at)
 
-    # Always set a `relationId` attribute on the invitation. If the response
-    # relation is an object, also set the relation on the invitation.
+    # Always set a `<relation>Id` attribute on the invitation. If the relation is
+    # an object, also set the relation on the invitation.
     if angular.isNumber response.event
       invitation.eventId = response.event
     else
@@ -79,6 +79,16 @@ Invitation = ($resource, apiRoot, Event, User) ->
       transformResponse: (data, headersGetter) ->
         data = angular.fromJson data
         deserializeInvitation data
+
+    getEventInvitations:
+      method: 'get'
+      url: "#{Event.listUrl}/:id/invitations"
+      params:
+        id: '@id'
+      isArray: true
+      transformResponse: (data, headersGetter) ->
+        data = angular.fromJson data
+        (deserializeInvitation(invitation) for invitation in data)
 
   resource.serialize = serializeInvitation
 
