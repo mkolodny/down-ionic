@@ -50,6 +50,10 @@
       margin-top: 1px;
     }
   }
+  #event-comment {
+    max-height: 50px;
+    overflow: auto;
+  }
   ion-footer-bar {
     padding-left: 10px;
     padding-right: 10px;

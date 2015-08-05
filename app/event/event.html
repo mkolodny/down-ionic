@@ -21,11 +21,11 @@
     </div>
     <div class="event-detail" ng-if="event.event.place">
       <i class="fa fa-map-marker"></i>
-      <span>{{event.event.place.name}}</span>
+      {{event.event.place.name}}
     </div>
-    <div class="event-detail" ng-if="event.event.comment">
+    <div id="event-comment" class="event-detail" ng-if="event.event.comment">
       <i class="fa fa-comment-o"></i>
-      <span>{{event.event.comment}}</span>
+      {{event.event.comment}}
     </div>
     <div id="members">
       <img class="member" ng-src="{{member.imageUrl}}" alt="{{member.name}}"
