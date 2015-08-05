@@ -41,8 +41,9 @@ describe 'apnsdevice service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      APNSDevice.save(device).$promise.then (_response_) ->
-        response = _response_
+      APNSDevice.save device
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedDeviceData = angular.extend {id: responseData.id}, device

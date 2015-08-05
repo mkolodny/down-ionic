@@ -108,6 +108,7 @@ class Auth
       @$state.go 'findFriends'
     else
       @$state.go 'events'
+
   watchLocation: ->
     deferred = @$q.defer()
 
@@ -132,7 +133,8 @@ class Auth
   updateLocation: (location) ->
     user = angular.copy @user
     user.location = location
-    @User.update(user).$promise.then (user) =>
-      @user = user
+    @User.update user
+      .$promise.then (user) =>
+        @user = user
 
 module.exports = Auth

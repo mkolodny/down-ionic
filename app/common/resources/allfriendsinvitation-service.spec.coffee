@@ -38,8 +38,9 @@ describe 'allfriendsinvitation service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      AllFriendsInvitation.save(allFriendsInvitation).$promise.then (_response_) ->
-        response = _response_
+      AllFriendsInvitation.save allFriendsInvitation
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedAllFriendsInvitationData = angular.extend {id: responseData.id}, allFriendsInvitation

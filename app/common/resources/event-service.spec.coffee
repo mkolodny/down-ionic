@@ -126,8 +126,9 @@ describe 'event service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      Event.save(event).$promise.then (_response_) ->
-        response = _response_
+      Event.save event
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedEventData = angular.extend {id: responseData.id}, event

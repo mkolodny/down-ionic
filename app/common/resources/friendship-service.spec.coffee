@@ -45,8 +45,9 @@ describe 'friendship service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      Friendship.save(friendship).$promise.then (_response_) ->
-        response = _response_
+      Friendship.save friendship
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
     it 'should POST the friendship', ->
@@ -81,8 +82,9 @@ describe 'friendship service', ->
         # Set the user as a friend on Auth.
         Auth.friends[friendId] = true
 
-        Friendship.deleteWithFriendId(friendId).then ->
-          deleted = true
+        Friendship.deleteWithFriendId friendId
+          .then ->
+            deleted = true
         $httpBackend.flush 1
 
       it 'should DELETE the friendship', ->
@@ -99,8 +101,9 @@ describe 'friendship service', ->
         $httpBackend.expect 'DELETE', url, deleteData, checkHeaders
           .respond 500, null
 
-        Friendship.deleteWithFriendId(friendId).then (->), ->
-          rejected = true
+        Friendship.deleteWithFriendId friendId
+          .then null, ->
+            rejected = true
         $httpBackend.flush 1
 
       it 'should reject the promise', ->

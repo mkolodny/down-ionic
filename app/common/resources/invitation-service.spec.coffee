@@ -175,8 +175,9 @@ describe 'invitation service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      Invitation.save(invitation).$promise.then (_response_) ->
-        response = _response_
+      Invitation.save invitation
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedInvitationData = angular.extend {id: responseData.id}, invitation
@@ -218,8 +219,9 @@ describe 'invitation service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      Invitation.bulkCreate(invitations).$promise.then (_response_) ->
-        response = _response_
+      Invitation.bulkCreate invitations
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       # Set the returned ids on the original invitations.
@@ -255,8 +257,9 @@ describe 'invitation service', ->
       $httpBackend.expectPUT url, putData
         .respond 201, angular.toJson(responseData)
 
-      Invitation.update(invitation).$promise.then (_response_) ->
-        response = _response_
+      Invitation.update invitation
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
     it 'should PUT the invitation', ->

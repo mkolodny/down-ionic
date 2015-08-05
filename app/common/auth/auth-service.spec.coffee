@@ -26,21 +26,20 @@ describe 'Auth service', ->
   beforeEach angular.mock.module('LocalStorageModule')
 
   beforeEach angular.mock.module(($provide) ->
-
     $cordovaGeolocation =
-      watchPosition: jasmine.createSpy('$cordovaGeolocation.watchPosition')
+      watchPosition: jasmine.createSpy '$cordovaGeolocation.watchPosition'
     $provide.value '$cordovaGeolocation', $cordovaGeolocation
 
     deserializedUser = 'deserializedUser'
     User =
-      update: jasmine.createSpy('User.update')
+      update: jasmine.createSpy 'User.update'
       deserialize: jasmine.createSpy('User.deserialize').and.returnValue \
           deserializedUser
       listUrl: 'listUrl'
     $provide.value 'User', User
 
     $state =
-      go: jasmine.createSpy('$state.go')
+      go: jasmine.createSpy '$state.go'
     $provide.value '$state', $state
 
     return
@@ -80,8 +79,9 @@ describe 'Auth service', ->
           .respond 200, null
 
         result = null
-        Auth.isAuthenticated().then (_result_) ->
-          result = _result_
+        Auth.isAuthenticated()
+          .then (_result_) ->
+            result = _result_
         $httpBackend.flush 1
 
         expect(result).toBe true
@@ -94,8 +94,9 @@ describe 'Auth service', ->
           .respond 401, null
 
         result = null
-        Auth.isAuthenticated().then (_result_) ->
-          result = _result_
+        Auth.isAuthenticated()
+          .then (_result_) ->
+            result = _result_
         $httpBackend.flush 1
 
         expect(result).toBe false
@@ -108,8 +109,9 @@ describe 'Auth service', ->
           .respond 500, null
 
         rejected = false
-        Auth.isAuthenticated().then (->), ->
-          rejected = true
+        Auth.isAuthenticated()
+          .then null, ->
+            rejected = true
         $httpBackend.flush 1
 
         expect(rejected).toBe true
@@ -148,8 +150,9 @@ describe 'Auth service', ->
         $httpBackend.expectPOST authenticateUrl, postData
           .respond 200, responseData
 
-        Auth.authenticate(phone, code).then (_response_) ->
-          response = _response_
+        Auth.authenticate phone, code
+          .then (_response_) ->
+            response = _response_
         $httpBackend.flush 1
 
       it 'should call deserialize with response data', ->
@@ -170,8 +173,9 @@ describe 'Auth service', ->
           .respond status, null
 
         rejectedStatus = null
-        Auth.authenticate(phone, code).then (->), (_status_) ->
-          rejectedStatus = _status_
+        Auth.authenticate phone, code
+          .then null, (_status_) ->
+            rejectedStatus = _status_
         $httpBackend.flush 1
 
         expect(rejectedStatus).toEqual status
@@ -210,8 +214,9 @@ describe 'Auth service', ->
         $httpBackend.expectPOST fbSyncUrl, postData
           .respond 201, responseData
 
-        Auth.syncWithFacebook(accessToken).then (_response_) ->
-          response = _response_
+        Auth.syncWithFacebook accessToken
+          .then (_response_) ->
+            response = _response_
         $httpBackend.flush 1
 
       it 'should return the user', ->
@@ -234,8 +239,9 @@ describe 'Auth service', ->
           .respond status, null
 
         rejectedStatus = null
-        Auth.syncWithFacebook(accessToken).then (->), (_status_) ->
-          rejectedStatus = _status_
+        Auth.syncWithFacebook accessToken
+          .then null, (_status_) ->
+            rejectedStatus = _status_
         $httpBackend.flush 1
 
         expect(rejectedStatus).toBe status
@@ -258,8 +264,9 @@ describe 'Auth service', ->
         $httpBackend.expectPOST verifyPhoneUrl, postData
           .respond 200, null
 
-        Auth.sendVerificationText(phone).then (->), (_response_) ->
-          response = _response_
+        Auth.sendVerificationText phone
+          .then null, (_response_) ->
+            response = _response_
         $httpBackend.flush 1
 
       it 'should set Auth.phone', ->
@@ -272,8 +279,9 @@ describe 'Auth service', ->
           .respond 500, null
 
         rejected = false
-        Auth.sendVerificationText(phone).then (->), ->
-          rejected = true
+        Auth.sendVerificationText phone
+          .then null, ->
+            rejected = true
         $httpBackend.flush 1
 
         expect(rejected).toBe true
@@ -292,7 +300,7 @@ describe 'Auth service', ->
         Auth.friends[user.id] = true
 
       it 'should return true', ->
-        expect(Auth.isFriend(user.id)).toBe true
+        expect(Auth.isFriend user.id).toBe true
 
 
     describe 'when the user isn\'t a friend', ->
@@ -301,7 +309,7 @@ describe 'Auth service', ->
         Auth.friends = {}
 
       it 'should return true', ->
-        expect(Auth.isFriend(user.id)).toBe false
+        expect(Auth.isFriend user.id).toBe false
 
 
   describe 'fetching the user\'s invitations', ->
@@ -554,7 +562,7 @@ describe 'Auth service', ->
             longitude: long
 
         resolved = false
-        promise.then ()->
+        promise.then ->
           resolved = true
 
         cordovaDeferred.notify position
@@ -576,7 +584,7 @@ describe 'Auth service', ->
             code: 'PositionError.PERMISSION_DENIED'
 
           rejected = false
-          promise.then null, ()->
+          promise.then null, ->
             rejected = true
 
           cordovaDeferred.reject error
@@ -623,7 +631,7 @@ describe 'Auth service', ->
       deferred = $q.defer()
       User.update.and.returnValue {$promise: deferred.promise}
 
-      Auth.updateLocation(location)
+      Auth.updateLocation location
 
     it 'should save the user with the location data', ->
       expect(User.update).toHaveBeenCalledWith user
@@ -660,7 +668,7 @@ describe 'Auth service', ->
           long: -73.9821535
 
       it 'should return true', ->
-        expect(Auth.isNearby(user)).toBe true
+        expect(Auth.isNearby user).toBe true
 
 
     describe 'when the user is more than 5 mi away', ->
@@ -671,4 +679,4 @@ describe 'Auth service', ->
           long: -73.9821535
 
       it 'should return false', ->
-        expect(Auth.isNearby(user)).toBe false
+        expect(Auth.isNearby user).toBe false
