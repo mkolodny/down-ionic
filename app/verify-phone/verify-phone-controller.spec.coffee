@@ -2,6 +2,7 @@ require 'angular'
 require 'angular-mocks'
 require 'angular-local-storage'
 require 'angular-ui-router'
+Asteroid = require '../common/asteroid/asteroid-module'
 VerifyPhoneCtrl = require './verify-phone-controller'
 
 describe 'verify phone controller', ->
@@ -10,6 +11,7 @@ describe 'verify phone controller', ->
   $state = null
   ctrl = null
   Auth = null
+  Asteroid = null
   localStorage = null
   scope = null
   User = null
@@ -22,12 +24,15 @@ describe 'verify phone controller', ->
 
   beforeEach angular.mock.module('down.resources')
 
+  beforeEach angular.mock.module('down.asteroid')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     Auth = angular.copy $injector.get('Auth')
+    Asteroid = $injector.get 'Asteroid'
     localStorage = $injector.get 'localStorageService'
     scope = $rootScope.$new()
     User = $injector.get 'User'
@@ -70,12 +75,17 @@ describe 'verify phone controller', ->
         user = null
 
         beforeEach ->
-          spyOn Auth, 'redirectForAuthState'
+          spyOn ctrl, 'meteorLogin'
+
           deferred.resolve()
           scope.$apply()
 
+        it 'should login to the meteor server', ->
+          expect(ctrl.meteorLogin).toHaveBeenCalled()
+        ###
         it 'should redirect for auth state', ->
           expect(Auth.redirectForAuthState).toHaveBeenCalled()
+        ###
 
 
       describe 'when authentication fails', ->
@@ -124,3 +134,37 @@ describe 'verify phone controller', ->
 
       it 'should return false', ->
         expect(result).toBe false
+
+
+  describe 'logging into the meteor server', ->
+    deferred = null
+
+    beforeEach ->
+      deferred = $q.defer()
+      spyOn(Asteroid, 'login').and.returnValue deferred.promise
+
+      ctrl.meteorLogin()
+
+    it 'should attempt to login', ->
+      expect(Asteroid.login).toHaveBeenCalled()
+
+    describe 'successfully', ->
+
+      beforeEach ->
+        spyOn Auth, 'redirectForAuthState'
+
+        deferred.resolve()
+        scope.$apply()
+
+      it 'should redirect for the auth state', ->
+        expect(Auth.redirectForAuthState).toHaveBeenCalled()
+
+
+    describe 'unsuccessfully', ->
+
+      beforeEach ->
+        deferred.reject()
+        scope.$apply()
+
+      it 'should show an error', ->
+        expect(ctrl.error).toBe 'Oops, something went wrong.'

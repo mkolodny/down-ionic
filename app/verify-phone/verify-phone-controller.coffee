@@ -1,5 +1,5 @@
 class VerifyPhoneCtrl
-  constructor: (@$scope, @$state, @Auth, localStorageService, @User) ->
+  constructor: (@$scope, @$state, @Asteroid, @Auth, localStorageService, @User) ->
     @localStorage = localStorageService
 
   authenticate: ->
@@ -8,9 +8,7 @@ class VerifyPhoneCtrl
 
     @Auth.authenticate @Auth.phone, @code
       .then (user) =>
-        # Auth successful
-        @Auth.redirectForAuthState()
-
+        @meteorLogin()
       , (status) =>
         # Auth failed
         if status is 500
@@ -20,5 +18,12 @@ class VerifyPhoneCtrl
 
   validate: ->
     @$scope.verifyPhoneForm.$valid
+
+  meteorLogin: ->
+    @Asteroid.login()
+      .then =>
+        @Auth.redirectForAuthState()
+      , =>
+        @error = 'Oops, something went wrong.'
 
 module.exports = VerifyPhoneCtrl
