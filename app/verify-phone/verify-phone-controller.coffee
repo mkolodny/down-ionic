@@ -20,10 +20,9 @@ class VerifyPhoneCtrl
     @$scope.verifyPhoneForm.$valid
 
   meteorLogin: ->
-    @Asteroid.login()
-      .then =>
-        @Auth.redirectForAuthState()
-      , =>
-        @error = 'Oops, something went wrong.'
+    @Asteroid.login().then =>
+      @Auth.redirectForAuthState()
+    , =>
+      @error = 'Oops, something went wrong.'
 
 module.exports = VerifyPhoneCtrl
