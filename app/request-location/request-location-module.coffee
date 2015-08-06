@@ -6,7 +6,7 @@ RequestLocationCtrl = require './request-location-controller'
 
 angular.module 'down.requestLocation', [
     'ui.router'
-    'ngCordova.plugins.geolocation',
+    'ngCordova',
     'down.auth'
   ]
   .config ($stateProvider) ->

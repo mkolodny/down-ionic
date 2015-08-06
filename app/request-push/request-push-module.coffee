@@ -6,8 +6,7 @@ RequestPushCtrl = require './request-push-controller'
 
 angular.module 'down.requestPush', [
     'ui.router'
-    'ngCordova.plugins.push'
-    'ngCordova.plugins.device'
+    'ngCordova'
     'LocalStorageModule'
   ]
   .config ($stateProvider) ->

@@ -77,6 +77,7 @@ describe 'verify phone controller', ->
         it 'should redirect for auth state', ->
           expect(Auth.redirectForAuthState).toHaveBeenCalled()
 
+
       describe 'when authentication fails', ->
 
         describe 'because the code was incorrect', ->
