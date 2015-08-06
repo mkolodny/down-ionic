@@ -175,8 +175,9 @@ describe 'invitation service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      Invitation.save(invitation).$promise.then (_response_) ->
-        response = _response_
+      Invitation.save invitation
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedInvitationData = angular.extend {id: responseData.id}, invitation
@@ -218,8 +219,9 @@ describe 'invitation service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      Invitation.bulkCreate(invitations).$promise.then (_response_) ->
-        response = _response_
+      Invitation.bulkCreate invitations
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       # Set the returned ids on the original invitations.
@@ -255,9 +257,62 @@ describe 'invitation service', ->
       $httpBackend.expectPUT url, putData
         .respond 201, angular.toJson(responseData)
 
-      Invitation.update(invitation).$promise.then (_response_) ->
-        response = _response_
+      Invitation.update invitation
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
     it 'should PUT the invitation', ->
       expect(response).toAngularEqual invitation
+
+
+  describe 'fetching event members\' invitations', ->
+    response = null
+    invitation = null
+
+    beforeEach ->
+      event =
+        id: 1
+        title: 'bars?!?!!?'
+        creatorId: 1
+        canceled: false
+        datetime: new Date()
+        createdAt: new Date()
+        updatedAt: new Date()
+        place:
+          name: 'B Bar & Grill'
+          lat: 40.7270718
+          long: -73.9919324
+      invitation =
+        id: 1
+        event: event.id
+        to_user:
+          id: 1
+          email: 'aturing@gmail.com'
+          name: 'Alan Turing'
+          username: 'tdog'
+          image_url: 'https://facebook.com/profile-pic/tdog'
+          location:
+            type: 'Point'
+            coordinates: [40.7265834, -73.9821535]
+        from_user: 4
+        response: Invitation.accepted
+        previously_accepted: false
+        open: false
+        to_user_messaged: false
+        muted: false
+        created_at: new Date()
+        updated_at: new Date()
+      url = "#{Event.listUrl}/#{event.id}/invitations"
+      responseData = [invitation]
+      $httpBackend.expectGET url
+        .respond 200, angular.toJson(responseData)
+
+      Invitation.getEventInvitations {id: event.id}
+        .$promise.then (_response_) ->
+          response = _response_
+      $httpBackend.flush 1
+
+    it 'should GET the invitations', ->
+      invitations = [Invitation.deserialize invitation]
+      expect(response).toAngularEqual invitations

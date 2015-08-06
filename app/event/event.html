@@ -1,0 +1,54 @@
+<ion-view id="event">
+  <ion-nav-title>
+    <span>{{event.event.title}}</span>
+    <i class="fa"
+       ng-class="{'fa-caret-down': !event.isHeaderExpanded, 'fa-caret-up': event.isHeaderExpanded}"
+       ></i>
+  </ion-nav-title>
+  <ion-nav-buttons side="right">
+    <button class="button button-clear icon"
+            ng-click="event.toggleIsHeaderExpanded()" ontouchstart
+            ><i class="fa fa-ellipsis-h fa-2x"></i></button>
+  </ion-nav-buttons>
+  <!--<div id="expanded-header" ng-if="event.isHeaderExpanded">-->
+  <div id="expanded-header">
+    <div class="event-detail" ng-if="event.event.datetime">
+      <i class="fa fa-calendar-o"></i>
+      <div>
+        <div>{{event.event.datetime | date:'EEEE, MMM d'}}</div>
+        <div>{{event.event.datetime | date:'shortTime' | lowercase}}</div>
+      </div>
+    </div>
+    <div class="event-detail" ng-if="event.event.place">
+      <i class="fa fa-map-marker"></i>
+      {{event.event.place.name}}
+    </div>
+    <div id="event-comment" class="event-detail" ng-if="event.event.comment">
+      <i class="fa fa-comment-o"></i>
+      {{event.event.comment}}
+    </div>
+    <div id="members">
+      <img class="member" ng-src="{{member.imageUrl}}" alt="{{member.name}}"
+           ng-repeat="member in event.members">
+    </div>
+    <div id="respond-buttons">
+      <button class="respond" ng-click="event.acceptInvitation()" ontouchstart
+              ng-disabled="event.isAccepted()"
+              >Down</button>
+      <button class="respond" ng-click="event.maybeInvitation()" ontouchstart
+              ng-disabled="event.isMaybe()"
+              >Maybe</button>
+      <button class="respond" ng-click="event.declineInvitation()" ontouchstart
+              >Can't</button>
+    </div>
+  </div>
+  <ion-content>
+  </ion-content>
+  <ion-footer-bar class="bar-light" keyboard-attach>
+    <textarea ng-model="event.message" placeholder="Type a message..." msd-elastic
+              rows="1"></textarea>
+    <button id="send-message" class="button button-clear"
+            ng-disabled="!event.message" ng-click="event.sendMessage()" ontouchstart
+            >Send</button>
+  </ion-footer-bar>
+</ion-view>

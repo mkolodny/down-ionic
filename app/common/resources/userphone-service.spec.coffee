@@ -47,8 +47,9 @@ describe 'userphone service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      UserPhone.save(userPhone).$promise.then (_response_) ->
-        response = _response_
+      UserPhone.save userPhone
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedUserPhoneData = angular.extend {id: responseData.id}, userPhone

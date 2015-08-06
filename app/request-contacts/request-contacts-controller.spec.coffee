@@ -16,6 +16,7 @@ describe 'request contacts controller', ->
   )
 
   describe 'tapping continue', ->
+
     beforeEach ->
       spyOn $state, 'go'
 

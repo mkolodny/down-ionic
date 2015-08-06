@@ -94,8 +94,9 @@ describe 'user service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      User.save(user).$promise.then (_response_) ->
-        response = _response_
+      User.save user
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedUserData = angular.extend
@@ -127,8 +128,9 @@ describe 'user service', ->
         .respond 200, angular.toJson(responseData)
 
       response = null
-      User.update(user).$promise.then (_response_) ->
-        response = _response_
+      User.update user
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedUser = new User(user)
@@ -153,8 +155,9 @@ describe 'user service', ->
         .respond 200, angular.toJson(responseData)
 
       response = null
-      User.get(id: responseData.id).$promise.then (_response_) ->
-        response = _response_
+      User.get {id: responseData.id}
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedUserData = User.deserialize responseData
@@ -180,8 +183,9 @@ describe 'user service', ->
         .respond 200, angular.toJson(responseData)
 
       response = null
-      User.query().$promise.then (_response_) ->
-        response = _response_
+      User.query()
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedUserData = User.deserialize responseData[0]
@@ -204,8 +208,9 @@ describe 'user service', ->
           .respond 404, null
 
         result = null
-        User.isUsernameAvailable(username).then (_result_) ->
-          result = _result_
+        User.isUsernameAvailable username
+          .then (_result_) ->
+            result = _result_
         $httpBackend.flush 1
 
         expect(result).toBe true
@@ -218,8 +223,9 @@ describe 'user service', ->
           .respond 200, null
 
         result = null
-        User.isUsernameAvailable(username).then (_result_) ->
-          result = _result_
+        User.isUsernameAvailable username
+          .then (_result_) ->
+            result = _result_
         $httpBackend.flush 1
 
         expect(result).toBe false
@@ -232,8 +238,9 @@ describe 'user service', ->
           .respond 500, null
 
         rejected = false
-        User.isUsernameAvailable(username).then (->), ->
-          rejected = true
+        User.isUsernameAvailable username
+          .then null, ->
+            rejected = true
         $httpBackend.flush 1
 
         expect(rejected).toBe true
@@ -257,8 +264,9 @@ describe 'user service', ->
         .respond 200, angular.toJson(responseData)
 
       response = null
-      User.getFriends().$promise.then (_response_) ->
-        response = _response_
+      User.getFriends()
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedUserData = User.deserialize responseData[0]
@@ -284,8 +292,9 @@ describe 'user service', ->
         .respond 200, angular.toJson(responseData)
 
       response = null
-      User.getFacebookFriends().$promise.then (_response_) ->
-        response = _response_
+      User.getFacebookFriends()
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedUserData = User.deserialize responseData[0]

@@ -38,6 +38,9 @@ describe 'event service', ->
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
 
+  it 'should have a list url', ->
+    expect(Event.listUrl).toBe listUrl
+
   describe 'serializing an event', ->
 
     it 'should return the serialized event', ->
@@ -126,8 +129,9 @@ describe 'event service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      Event.save(event).$promise.then (_response_) ->
-        response = _response_
+      Event.save event
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedEventData = angular.extend {id: responseData.id}, event

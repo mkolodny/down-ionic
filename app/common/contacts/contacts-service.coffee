@@ -1,5 +1,6 @@
 class Contacts
-  constructor: (localStorageService, @$http, @Auth, @$cordovaContacts, @UserPhone, @$q) ->
+  constructor: (localStorageService, @$http, @Auth, @$cordovaContacts, @UserPhone,
+                @$q) ->
     @localStorage = localStorageService
     @i18n = window.intlTelInputUtils
 
@@ -20,7 +21,7 @@ class Contacts
         @identifyContacts contacts
           .then (contactsObject) =>
             @saveContacts contactsObject
-            deferred.resolve()
+            deferred.resolve contactsObject
           , ->
             error =
               code: 'IDENTIFY_FAILED'
@@ -87,7 +88,7 @@ class Contacts
 
   formatNumbers: (numbers) ->
     E164 = @i18n.numberFormat.E164
-    # TODO: Use users country code - get it from the logged in user's phone.
+    # TODO: Use users country code - get it from Auth.phone.
     #   Make a new build of the libphonenumber library.
     for number in numbers
       number.value = @i18n.formatNumberByType number.value, 'US', E164

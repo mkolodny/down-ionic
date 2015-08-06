@@ -40,8 +40,9 @@ describe 'linkinvitation service', ->
         .respond 201, angular.toJson(responseData)
 
       response = null
-      LinkInvitation.save(linkInvitation).$promise.then (_response_) ->
-        response = _response_
+      LinkInvitation.save linkInvitation
+        .$promise.then (_response_) ->
+          response = _response_
       $httpBackend.flush 1
 
       expectedLinkInvitationData = angular.extend {id: responseData.id},

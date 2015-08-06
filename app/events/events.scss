@@ -45,20 +45,6 @@
     .respond-buttons {
       margin-top: 13px;
     }
-    .respond {
-      color: $brand-color;
-      border: 1px solid $brand-color;
-      background-color: #fff;
-      border-radius: 16px;
-      height: 26px;
-      width: 67px;
-      line-height: 20px;
-
-      &.activated {
-        color: #fff;
-        background-color: $brand-color;
-      }
-    }
   }
   .item.updated {
     h2 {
@@ -134,7 +120,8 @@
       color: $brand-color;
     }
     .enabled {
-      color: #357ded !important;
+      color: $link-color;
+      /*color: #357ded !important; *?
       /*color: #232ed1 !important; */
       /*color: #7678ed !important; */
       /*color: $brand-color !important;*/
