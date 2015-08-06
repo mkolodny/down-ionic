@@ -88,10 +88,9 @@ class Contacts
 
   formatNumbers: (numbers) ->
     E164 = @i18n.numberFormat.E164
-    # TODO: Use users country code - get it from Auth.phone.
-    #   Make a new build of the libphonenumber library.
+    countryCode = @i18n.getCountryCode @Auth.phone
     for number in numbers
-      number.value = @i18n.formatNumberByType number.value, 'US', E164
+      number.value = @i18n.formatNumberByType number.value, countryCode, E164
     return numbers
 
   saveContacts: (contacts) ->

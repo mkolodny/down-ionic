@@ -29,6 +29,9 @@ describe 'Contacts service', ->
       find: jasmine.createSpy '$cordovaContacts.find'
     $provide.value '$cordovaContacts', $cordovaContacts
 
+    Auth =
+      phone: '+19252852230'
+    $provide.value 'Auth', Auth
     return
   )
 
@@ -36,7 +39,7 @@ describe 'Contacts service', ->
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     scope = $rootScope.$new()
-    Auth = $injector.get 'Auth'
+    Auth = angular.copy $injector.get('Auth')
     localStorage = $injector.get 'localStorageService'
     UserPhone = $injector.get 'UserPhone'
     Contacts = angular.copy $injector.get('Contacts')
