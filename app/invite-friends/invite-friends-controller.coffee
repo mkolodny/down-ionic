@@ -38,7 +38,6 @@ class InviteFriends
         return -1
       else
         return 1
-      0
 
     # Build the list of alphabetically sorted items.
     friends = (friend for id, friend of friends)
@@ -47,7 +46,6 @@ class InviteFriends
         return -1
       else
         return 1
-      0
     alphabeticalItems = []
     currentLetter = null
     for friend in friends

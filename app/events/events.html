@@ -15,7 +15,8 @@
         <!-- Facebook Friend -->
         <img ng-src="{{item.fromUser.imageUrl}}" alt="{{item.fromUser.name}}">
         <h2>{{item.event.title}}</h2>
-        <p>Suggested by {{item.fromUser.name}}</p>
+        <p ng-if="item.wasJoined">{{item.event.latestMessage}}</p>
+        <p ng-if="!item.wasJoined">Suggested by {{item.fromUser.name}}</p>
         <span class="updated-at">{{item.createdAt | date:'shortTime' | lowercase}}</span>
         <i class="fa" ng-if="!item.wasJoined"
            ng-class="{'fa-chevron-down': !item.isExpanded, 'fa-chevron-up': item.isExpanded}"

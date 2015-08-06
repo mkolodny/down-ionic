@@ -6,6 +6,7 @@ require 'angular-sanitize'
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js'
 require './events-module'
+require '../common/asteroid/asteroid-module'
 EventsCtrl = require './events-controller'
 
 describe 'events controller', ->
@@ -16,6 +17,7 @@ describe 'events controller', ->
   $state = null
   $timeout = null
   $window = null
+  Asteroid = null
   ctrl = null
   deferredGetInvitations = null
   deferredTemplate = null
@@ -29,6 +31,8 @@ describe 'events controller', ->
   scope = null
   transitionDuration = null
   User = null
+
+  beforeEach angular.mock.module('down.asteroid')
 
   beforeEach angular.mock.module('down.auth')
 
@@ -46,7 +50,8 @@ describe 'events controller', ->
     $state = $injector.get '$state'
     $timeout = $injector.get '$timeout'
     $window = $injector.get '$window'
-    Auth = $injector.get 'Auth'
+    Asteroid = $injector.get 'Asteroid'
+    Auth = angular.copy $injector.get('Auth')
     dividerHeight = $injector.get 'dividerHeight'
     eventHeight = $injector.get 'eventHeight'
     Invitation = $injector.get 'Invitation'
@@ -107,6 +112,7 @@ describe 'events controller', ->
 
     ctrl = $controller EventsCtrl,
       $scope: scope
+      Auth: Auth
   )
 
   it 'should init a new event', ->
@@ -121,10 +127,13 @@ describe 'events controller', ->
   xdescribe 'when the events request returns', ->
 
     describe 'successfully', ->
+      items = null
       response = null
 
       beforeEach ->
-        spyOn ctrl, 'buildItems'
+        items = 'items'
+        spyOn(ctrl, 'buildItems').and.returnValue items
+        spyOn ctrl, 'eventsMessagesSubscribe'
 
         response = [item]
         deferredGetInvitations.resolve response
@@ -136,11 +145,15 @@ describe 'events controller', ->
           invitations[invitation.id] = invitation
         expect(ctrl.invitations).toEqual invitations
 
-      it 'should generate the items list', ->
+      it 'should save the items list on the controller', ->
         invitations = {}
         for invitation in response
           invitations[invitation.id] = invitation
         expect(ctrl.buildItems).toHaveBeenCalledWith invitations
+
+      it 'should subscribe to messages for each event', ->
+        events = [invitation.event]
+        expect(ctrl.eventsMessagesSubscribe).toHaveBeenCalledWith events
 
     describe 'with an error', ->
 
@@ -354,10 +367,16 @@ describe 'events controller', ->
 
       noResponseInvitation.response = item.response
       invitations = [noResponseInvitation, acceptedInvitation]
-      ctrl.moveItems invitations
+      ctrl.moveItem item, invitations
 
     it 'should set a moving flag', ->
       expect(ctrl.moving).toBe true
+
+    it 'should collapse the item', ->
+      expect(item.isExpanded).toBe false
+
+    it 'should set a reordering property on the item', ->
+      expect(item.isReordering).toBe true
 
     describe 'after a timeout', ->
 
@@ -408,7 +427,126 @@ describe 'events controller', ->
         expect(item.isExpanded).toBe true
 
 
-  describe 'responding to an invitation', ->
+  describe 'subscribing to events\' messages', ->
+    onChange = null
+    messagesRQ = null
+    messages = null
+    event = null
+    events = null
+
+    beforeEach ->
+      spyOn Asteroid, 'subscribe'
+      messagesRQ =
+        result: 'messagesRQ.result'
+        on: jasmine.createSpy('messagesRQ.on').and.callFake (name, _onChange_) ->
+          onChange = _onChange_
+      messages =
+        reactiveQuery: jasmine.createSpy('messages.reactiveQuery') \
+            .and.returnValue messagesRQ
+      spyOn(Asteroid, 'getCollection').and.returnValue messages
+      spyOn ctrl, 'setLatestMessage'
+
+      event = invitation.event
+      events = [event]
+      ctrl.eventsMessagesSubscribe events
+
+    it 'should subscribe to each events\' messages', ->
+      for event in events
+        expect(Asteroid.subscribe).toHaveBeenCalledWith 'messages', event.id
+
+    it 'should get the messages collection', ->
+      expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+
+    it 'should ask for the messages for each event', ->
+      for event in events
+        expect(messages.reactiveQuery).toHaveBeenCalledWith {eventId: event.id}
+
+    it 'should show each event\'s latest message on the event', ->
+      expect(ctrl.setLatestMessage).toHaveBeenCalledWith event, messagesRQ.result
+
+    it 'should listen for new messages', ->
+      expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)
+
+    describe 'when a new message gets posted', ->
+
+      beforeEach ->
+        ctrl.setLatestMessage.calls.reset()
+
+        onChange()
+
+      it 'should set the latest message on the event', ->
+        expect(ctrl.setLatestMessage).toHaveBeenCalledWith event, messagesRQ.result
+
+
+  describe 'setting an event\'s latest message', ->
+    event = null
+    textMessage = null
+    actionMessage = null
+    earlier = null
+    later = null
+    messages = null
+
+    beforeEach ->
+      event = invitation.event
+      creator =
+        id: 2
+        name: 'Guido van Rossum'
+        imageUrl: 'http://facebook.com/profile-pics/vrawesome'
+      earlier = new Date()
+      later = new Date(earlier.getTime() + 1)
+      textMessage =
+        _id: 1
+        creator: creator
+        createdAt: new Date()
+        text: 'I\'m in love with a robot.'
+        eventId: invitation.event.id
+        type: 'text'
+      actionMessage =
+        _id: 1
+        creator: creator
+        createdAt: new Date()
+        text: 'Michael Jordan is down'
+        eventId: invitation.event.id
+        type: 'action'
+      messages = [textMessage, actionMessage]
+
+      # Reset the current items in case they were updated somewhere else.
+      ctrl.items = [item]
+
+      spyOn ctrl, 'moveItem'
+
+    describe 'when the latest message is a text', ->
+
+      beforeEach ->
+        textMessage.createdAt = later
+        actionMessage.createdAt = earlier
+
+        ctrl.setLatestMessage event, messages
+
+      it 'should set the most recent message on the event', ->
+        message = "#{textMessage.creator.name}: #{textMessage.text}"
+        expect(event.latestMessage).toBe message
+
+      it 'should update the event\'s updatedAt time', ->
+        expect(event.updatedAt).toBe textMessage.createdAt
+
+      it 'should move the updated item', ->
+        expect(ctrl.moveItem).toHaveBeenCalledWith item, ctrl.invitations
+
+
+    describe 'when the latest message is an action', ->
+
+      beforeEach ->
+        actionMessage.createdAt = later
+        textMessage.createdAt = earlier
+
+        ctrl.setLatestMessage event, messages
+
+      it 'should set the most recent message on the event', ->
+        expect(event.latestMessage).toBe actionMessage.text
+
+
+  xdescribe 'responding to an invitation', ->
     date = null
     $event = null
     deferred = null
@@ -449,8 +587,7 @@ describe 'events controller', ->
       updatedInvitation = null
 
       beforeEach ->
-        spyOn ctrl, 'toggleIsExpanded'
-        spyOn ctrl, 'moveItems'
+        spyOn ctrl, 'moveItem'
 
         # Mock the saved invitations.
         ctrl.invitations = {}
@@ -463,17 +600,11 @@ describe 'events controller', ->
         deferred.resolve updatedInvitation
         scope.$apply()
 
-      it 'should toggle whether the item is expanded', ->
-        expect(ctrl.toggleIsExpanded).toHaveBeenCalledWith item
-
       it 'should set the new response on the invitation', ->
         expect(ctrl.invitations[invitation.id]).toBe updatedInvitation
 
-      it 'should set a reordering property on the item', ->
-        expect(item.isReordering).toBe true
-
       it 'should move the item in the items array', ->
-        expect(ctrl.moveItems).toHaveBeenCalledWith ctrl.invitations
+        expect(ctrl.moveItem).toHaveBeenCalledWith item, ctrl.invitations
 
 
     xdescribe 'when the update fails', ->

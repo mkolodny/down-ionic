@@ -1,6 +1,7 @@
 class EventsCtrl
-  constructor: (@$ionicModal, @$scope, @$state, @$timeout, @$window, @Auth,
-                @dividerHeight, @eventHeight, @Invitation, @transitionDuration) ->
+  constructor: (@$ionicModal, @$scope, @$state, @$timeout, @$window, @Asteroid,
+                @Auth, @dividerHeight, @eventHeight, @Invitation,
+                @transitionDuration) ->
     # Save the section titles.
     @sections = {}
     @sections[@Invitation.noResponse] =
@@ -24,6 +25,7 @@ class EventsCtrl
     @$scope.hidePlaceModal = =>
       @setPlaceModal.hide()
 
+    # Update the new event's place when the user selects a place.
     @$scope.$on 'placeAutocomplete:placeChanged', (event, place) =>
       @newEvent.hasPlace = true
       @newEvent.place =
@@ -92,8 +94,17 @@ class EventsCtrl
     return # Mock data for now.
 
     @Auth.getInvitations().then (invitations) =>
-      # TODO: Save the invitations on the controller.
-      @buildItems invitations
+      # Save the invitations on the controller.
+      @invitations = {}
+      for invitation in invitations
+        @invitations[invitation.id] = invitation
+
+      # Build the list of items to show in the view.
+      @items = @buildItems @invitations
+
+      # Subscribe to the messages for each event.
+      events = (invitation.event for invitation in invitations)
+      @eventsMessagesSubscribe events
     , =>
       @getInvitationsError = true
 
@@ -189,8 +200,56 @@ class EventsCtrl
       else
         top += @eventHeight
 
-  moveItems: (invitations) ->
+  eventsMessagesSubscribe: (events) ->
+    # Subscribe to the messages posted in each event.
+    for event in events
+      @Asteroid.subscribe 'messages', event.id
+
+    messages = @Asteroid.getCollection 'messages'
+    for event in events
+      messagesRQ = messages.reactiveQuery {eventId: event.id}
+
+      # Set the latest message on the event.
+      @setLatestMessage event, messagesRQ.result
+
+      # Whenever a new message gets posted on the event, set the latest message
+      # on the event.
+      messagesRQ.on 'change', =>
+        @setLatestMessage event, messagesRQ.result
+
+  setLatestMessage: (event, messages) ->
+    # Sort the messages from newest to oldest.
+    messages.sort (a, b) ->
+      if a.createdAt > b.createdAt
+        return -1
+      else
+        return 1
+
+    # Set the latest message on the event.
+    latestMessage = messages[0]
+    if latestMessage.type is 'text'
+      event.latestMessage = "#{latestMessage.creator.name}: #{latestMessage.text}"
+    else
+      event.latestMessage = latestMessage.text
+
+    # Update the event's updatedAt date.
+    event.updatedAt = latestMessage.createdAt
+
+    # Move the event's updated item.
+    item = null
+    for item in @items
+      # TODO: item.invitation.event.id
+      if !item.isDivider and item.event.id is event.id
+        @moveItem item, @invitations
+
+  moveItem: (item, invitations) ->
     @moving = true
+
+    # Make sure the item is collapsed.
+    item.isExpanded = false
+
+    # Mark the item as currently being re-ordered.
+    item.isReordering = true
 
     # Wait for the moving flag to be set on the view so that the list becomes
     # absolutely positioned.
@@ -249,16 +308,14 @@ class EventsCtrl
     @Invitation.update invitation
       .$promise.then (_invitation) =>
         @invitations[_invitation.id] = _invitation
-        @toggleIsExpanded item
-        item.isReordering = true
-        @moveItems @invitations
+        @moveItem item, @invitations
       , =>
         #item.respondError = true # Mock a successful response for now.
 
         @invitations[invitation.id] = invitation
-        @toggleIsExpanded item
+        item.isExpanded = false
         item.isReordering = true
-        @moveItems @invitations
+        @moveItem @invitations
 
   itemWasDeclined: (item) ->
     if item.response is @Invitation.declined

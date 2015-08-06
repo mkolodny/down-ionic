@@ -40,7 +40,6 @@ class AddFromFacebook
         return -1
       else
         return 1
-      0
     @items = []
     currentLetter = null
     for user in facebookFriends

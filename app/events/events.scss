@@ -120,7 +120,7 @@
       color: $brand-color;
     }
     .enabled {
-      color: $link-color;
+      color: $link-color !important;
       /*color: #357ded !important; *?
       /*color: #232ed1 !important; */
       /*color: #7678ed !important; */
