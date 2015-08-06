@@ -1,3 +1,4 @@
+require 'angular'
 require 'angular-mocks'
 require 'angular-ui-router'
 require 'angular-local-storage'

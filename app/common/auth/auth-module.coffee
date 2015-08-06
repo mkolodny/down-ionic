@@ -8,7 +8,7 @@ Auth = require './auth-service'
 angular.module 'down.auth', [
     'down.resources'
     'ui.router'
-    'ngCordova.plugins.geolocation'
+    'ngCordova'
     'LocalStorageModule'
   ]
   .service 'Auth', Auth
