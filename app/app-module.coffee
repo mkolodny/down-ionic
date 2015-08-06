@@ -14,9 +14,11 @@ require './add-friends/add-friends-module'
 require './add-by-username/add-by-username-module'
 require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
+require './common/auth/auth-module'
 
 angular.module 'down', [
     'ionic'
+    'down.auth'
     'down.login'
     'down.verifyPhone'
     'down.facebookSync'
@@ -37,10 +39,10 @@ angular.module 'down', [
     $httpProvider.defaults.headers.common['Accept'] = acceptHeader
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
-    $urlRouterProvider.when '', '/'
-  .run ($ionicPlatform, $window) ->
+  .run ($ionicPlatform, $window, Auth) ->
     $ionicPlatform.ready ->
       # Hide the accessory bar by default (remove this to show the accessory bar
       # above the keyboard for form inputs)
       $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
       $window.StatusBar?.styleDefault()
+      Auth.redirectForAuthState()

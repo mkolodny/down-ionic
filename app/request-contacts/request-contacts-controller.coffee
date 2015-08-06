@@ -1,7 +1,7 @@
 class RequestContactsCtrl
-  constructor: (@Auth) ->
+  constructor: (@$state) ->
 
   requestContacts: ->
-    @Auth.redirectForAuthState()
+  	@$state.go 'findFriends'
 
 module.exports = RequestContactsCtrl
