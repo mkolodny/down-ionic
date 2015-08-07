@@ -205,9 +205,9 @@ class EventsCtrl
     for event in events
       @Asteroid.subscribe 'messages', event.id
 
-    messages = @Asteroid.getCollection 'messages'
+    Messages = @Asteroid.getCollection 'messages'
     for event in events
-      messagesRQ = messages.reactiveQuery {eventId: event.id}
+      messagesRQ = Messages.reactiveQuery {eventId: event.id}
 
       # Set the latest message on the event.
       @setLatestMessage event, messagesRQ.result

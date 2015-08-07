@@ -1,20 +1,29 @@
 require 'angular'
 require 'angular-mocks'
 require 'angular-ui-router'
+require '../common/asteroid/asteroid-module'
 require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
 describe 'events controller', ->
   $q = null
   $state = null
+  Asteroid = null
   ctrl = null
   deferred = null
+  earlierMessage = null
   event = null
   invitation = null
   Invitation = null
+  laterMessage = null
+  onChange = null
+  messagesRQ = null
+  messages = null
   scope = null
 
   beforeEach angular.mock.module('down.resources')
+
+  beforeEach angular.mock.module('down.asteroid')
 
   beforeEach angular.mock.module('ui.router')
 
@@ -24,6 +33,7 @@ describe 'events controller', ->
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     $stateParams = $injector.get '$stateParams'
+    Asteroid = $injector.get 'Asteroid'
     Invitation = $injector.get 'Invitation'
     scope = $rootScope.$new true
 
@@ -62,6 +72,38 @@ describe 'events controller', ->
       updatedAt: new Date()
     $stateParams.invitation = invitation
 
+    # Create mocks/spies for getting the messages for this event.
+    spyOn Asteroid, 'subscribe'
+    earlier = new Date()
+    later = new Date(earlier.getTime() + 1)
+    creator =
+      id: 2
+      name: 'Guido van Rossum'
+      imageUrl: 'http://facebook.com/profile-pics/vrawesome'
+    earlierMessage =
+      _id: 1
+      creator: creator
+      createdAt: new Date()
+      text: 'I\'m in love with a robot.'
+      eventId: event.id
+      type: 'text'
+    laterMessage =
+      _id: 1
+      creator: creator
+      createdAt: new Date()
+      text: 'Michael Jordan is down'
+      eventId: event.id
+      type: 'action'
+    messages = [earlierMessage, laterMessage]
+    messagesRQ =
+      result: messages
+      on: jasmine.createSpy('messagesRQ.on').and.callFake (name, _onChange_) ->
+        onChange = _onChange_
+    messages =
+      reactiveQuery: jasmine.createSpy('messages.reactiveQuery') \
+          .and.returnValue messagesRQ
+    spyOn(Asteroid, 'getCollection').and.returnValue messages
+
     deferred = $q.defer()
     spyOn(Invitation, 'getEventInvitations').and.returnValue
       $promise: deferred.promise
@@ -75,8 +117,37 @@ describe 'events controller', ->
   it 'should set the event on the controller', ->
     expect(ctrl.event).toBe event
 
+  xit 'should subscribe to each events\' messages', ->
+    expect(Asteroid.subscribe).toHaveBeenCalledWith 'messages', event.id
+
+  xit 'should get the messages collection', ->
+    expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+
+  xit 'should ask for the messages for the event', ->
+    expect(messages.reactiveQuery).toHaveBeenCalledWith {eventId: event.id}
+
+  xit 'should set the messages on the event from oldest to newest', ->
+    expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
+
+  xit 'should listen for new messages', ->
+    expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)
+
   it 'should request the event members\' invitations', ->
     expect(Invitation.getEventInvitations).toHaveBeenCalledWith {id: event.id}
+
+  xdescribe 'when new messages get posted', ->
+
+    beforeEach ->
+      spyOn ctrl, 'sortMessages'
+
+      # Mock the messages being in the wrong order.
+      ctrl.messages = [earlierMessage, laterMessage]
+
+      onChange()
+
+    it 'should sort the messages', ->
+      expect(ctrl.sortMessages).toHaveBeenCalled()
+
 
   describe 'when the invitations return successfully', ->
     invitations = null
@@ -264,3 +335,30 @@ describe 'events controller', ->
         expect(invitation.response).toBe response
 
       xit 'show an error', ->
+
+
+  describe 'checking whether a message is an action message', ->
+    message = null
+
+    beforeEach ->
+      message = earlierMessage
+
+    describe 'when it is', ->
+
+      beforeEach ->
+        message.type = 'action'
+
+      it 'should return true', ->
+        expect(ctrl.isActionMessage message).toBe true
+
+
+    describe 'when it isn\'t', ->
+
+      beforeEach ->
+        message.type = 'text'
+
+      fit 'should return false', ->
+        expect(ctrl.isActionMessage message).toBe false
+
+
+  xdescribe 'checking whether a message is my message', ->

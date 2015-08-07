@@ -1,5 +1,5 @@
 <ion-view id="event">
-  <ion-nav-title>
+  <ion-nav-title ng-click="event.toggleIsHeaderExpanded()" ontouchstart>
     <span>{{event.event.title}}</span>
     <i class="fa"
        ng-class="{'fa-caret-down': !event.isHeaderExpanded, 'fa-caret-up': event.isHeaderExpanded}"
@@ -10,8 +10,7 @@
             ng-click="event.toggleIsHeaderExpanded()" ontouchstart
             ><i class="fa fa-ellipsis-h fa-2x"></i></button>
   </ion-nav-buttons>
-  <!--<div id="expanded-header" ng-if="event.isHeaderExpanded">-->
-  <div id="expanded-header">
+  <div id="expanded-header" ng-class="{expanded: event.isHeaderExpanded}">
     <div class="event-detail" ng-if="event.event.datetime">
       <i class="fa fa-calendar-o"></i>
       <div>
@@ -43,6 +42,19 @@
     </div>
   </div>
   <ion-content>
+    <ion-list>
+      <!-- We might need to use `track by item.id` to keep this quick. -->
+      <ion-item ng-repeat="message in event.messages">
+        <div class="action-message" ng-if="event.isActionMessage(message)">
+          {{message.text}}
+        </div>
+        <div class="text-message" ng-if="!event.isActionMessage(message)"
+             ng-class="{'mine': event.isMyMessage(message)}">
+          <img class="avatar" ng-src="{{message.creator.imageUrl}}">
+          <div class="text">{{message.text}}</div>
+        </div>
+      </ion-item>
+    </ion-list>
   </ion-content>
   <ion-footer-bar class="bar-light" keyboard-attach>
     <textarea ng-model="event.message" placeholder="Type a message..." msd-elastic

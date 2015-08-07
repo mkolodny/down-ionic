@@ -6,8 +6,13 @@
     padding-bottom: 20px;
     position: absolute;
     width: 100%;
-    top: $bar-height;
     z-index: 1;
+    top: -232px; // The element's max height.
+    transition: top 0.15s ease-out;
+
+    &.expanded {
+      top: $bar-height;
+    }
   }
   #members {
     margin-top: 10px;
@@ -57,6 +62,81 @@
   #event-comment {
     max-height: 50px;
     overflow: auto;
+  }
+  ion-item {
+    border: none;
+    padding: 10px;
+  }
+  .action-message {
+    color: #888;
+    font-size: 13px;
+    text-align: center;
+  }
+  .text-message {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    max-width: 100%;
+
+    .avatar {
+      flex-shrink: 0;
+      flex-grow: 0;
+      z-index: 1;
+      height: 36px;
+      width: 36px;
+      border-radius: 50%;
+    }
+    .text {
+      position: relative;
+      margin-left: 10px;
+      background-color: #eee;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      padding-left: 12px;
+      padding-right: 12px;
+      border-radius: 13px;
+      font-weight: lighter;
+      max-width: 70%;
+      color: #222;
+      font-size: 16px;
+      font-weight: 400;
+      white-space: pre-wrap;
+
+      &::before {
+        position: absolute;
+        right: auto;
+        bottom: .6em;
+        left: -12px;
+        height: 0;
+        content: '';
+        border: 6px solid transparent;
+        border-right-color: #eee;
+        z-index: 2;
+      }
+    }
+    &.mine {
+      flex-direction: row-reverse;
+
+      .avatar {
+        display: none;
+      }
+      .text {
+        border-top: 1px solid #07f;
+        border-bottom: 1px solid #07f;
+        background-color: #08f;
+        color: #fff;
+        margin-left: 0;
+        margin-right: 10px;
+
+        &::before {
+          right: -12px;
+          bottom: .6em;
+          left: auto;
+          border: 6px solid transparent;
+          border-left-color: #08f;
+        }
+      }
+    }
   }
   ion-footer-bar {
     padding-left: 10px;

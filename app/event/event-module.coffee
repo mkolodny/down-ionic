@@ -1,12 +1,14 @@
 require 'angular'
 require 'angular-elastic'
 require 'angular-ui-router'
+require '../common/asteroid/asteroid-module'
 require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
 angular.module 'down.event', [
     'ui.router'
     'monospaced.elastic'
+    'down.asteroid'
     'down.resources'
   ]
   .config ($stateProvider) ->
