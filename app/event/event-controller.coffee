@@ -1,5 +1,5 @@
 class Event
-  constructor: (@$state, @$stateParams, @Asteroid, @Invitation) ->
+  constructor: (@$state, @$stateParams, @Asteroid, @Auth, @Invitation) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -121,5 +121,8 @@ class Event
       return true
     else
       return false
+
+  isMyMessage: (message) ->
+    message.creator.id is @Auth.user.id
 
 module.exports = Event

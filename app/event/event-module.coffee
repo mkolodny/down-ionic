@@ -2,6 +2,7 @@ require 'angular'
 require 'angular-elastic'
 require 'angular-ui-router'
 require '../common/asteroid/asteroid-module'
+require '../common/auth/auth-module'
 require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
@@ -10,6 +11,7 @@ angular.module 'down.event', [
     'monospaced.elastic'
     'down.asteroid'
     'down.resources'
+    'down.auth'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'event',

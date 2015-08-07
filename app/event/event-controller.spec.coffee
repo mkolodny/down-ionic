@@ -9,6 +9,7 @@ describe 'events controller', ->
   $q = null
   $state = null
   Asteroid = null
+  Auth = null
   ctrl = null
   deferred = null
   earlierMessage = null
@@ -27,6 +28,8 @@ describe 'events controller', ->
 
   beforeEach angular.mock.module('ui.router')
 
+  beforeEach angular.mock.module('down.auth')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $q = $injector.get '$q'
@@ -34,6 +37,7 @@ describe 'events controller', ->
     $state = $injector.get '$state'
     $stateParams = $injector.get '$stateParams'
     Asteroid = $injector.get 'Asteroid'
+    Auth = angular.copy $injector.get('Asteroid')
     Invitation = $injector.get 'Invitation'
     scope = $rootScope.$new true
 
@@ -108,7 +112,9 @@ describe 'events controller', ->
     spyOn(Invitation, 'getEventInvitations').and.returnValue
       $promise: deferred.promise
 
-    ctrl = $controller EventCtrl
+    ctrl = $controller EventCtrl,
+      $scope: scope
+      Auth: Auth
   )
 
   it 'should set the user\'s invitation on the controller', ->
@@ -357,8 +363,37 @@ describe 'events controller', ->
       beforeEach ->
         message.type = 'text'
 
-      fit 'should return false', ->
+      it 'should return false', ->
         expect(ctrl.isActionMessage message).toBe false
 
 
-  xdescribe 'checking whether a message is my message', ->
+  describe 'checking whether a message is the current user\'s message', ->
+    message = null
+
+    beforeEach ->
+      message = earlierMessage
+      Auth.user =
+        id: 1
+        name: 'Alan Turing'
+        username: 'tdog'
+        imageUrl: 'https://facebook.com/profile-pics/tdog'
+        location:
+          lat: 40.7265834
+          long: -73.9821535
+
+    describe 'when it is', ->
+
+      beforeEach ->
+        message.creator.id = Auth.user.id
+
+      it 'should return true', ->
+        expect(ctrl.isMyMessage message).toBe true
+
+
+    describe 'when it isn\'t', ->
+
+      beforeEach ->
+        message.creator.id = Auth.user.id + 1
+
+      it 'should return false', ->
+        expect(ctrl.isMyMessage message).toBe false
