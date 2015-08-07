@@ -1,3 +1,3 @@
-class AddFromAddressBook
+class AddFromAddressBookCtrl
 
-module.exports = AddFromAddressBook
+module.exports = AddFromAddressBookCtrl

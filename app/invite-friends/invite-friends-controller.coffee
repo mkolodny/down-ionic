@@ -1,4 +1,4 @@
-class InviteFriends
+class InviteFriendsCtrl
   constructor: (@$state, @$stateParams, @Auth, @Event, @Invitation) ->
     # Make a copy of the user's friends so that when the user selects the friend in
     # one section, they get selected in every section.
@@ -129,4 +129,4 @@ class InviteFriends
       , =>
         @inviteError = true
 
-module.exports = InviteFriends
+module.exports = InviteFriendsCtrl

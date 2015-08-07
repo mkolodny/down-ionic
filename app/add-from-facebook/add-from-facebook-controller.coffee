@@ -1,4 +1,4 @@
-class AddFromFacebook
+class AddFromFacebookCtrl
   constructor: (@$scope, localStorageService, @User) ->
     @localStorage = localStorageService
 
@@ -66,4 +66,4 @@ class AddFromFacebook
         @loadError = true
         @isLoading = false
 
-module.exports = AddFromFacebook
+module.exports = AddFromFacebookCtrl

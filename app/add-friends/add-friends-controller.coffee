@@ -1,4 +1,4 @@
-class AddFriends
+class AddFriendsCtrl
   constructor: (@$state) ->
 
   addByUsername: ->
@@ -10,4 +10,4 @@ class AddFriends
   addFromFacebook: ->
     @$state.go 'addFromFacebook'
 
-module.exports = AddFriends
+module.exports = AddFriendsCtrl

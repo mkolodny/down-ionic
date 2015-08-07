@@ -1,4 +1,4 @@
-class AddByUsername
+class AddByUsernameCtrl
   constructor: (@$timeout, @Auth, @User) ->
     # Mock the user for now.
     @user =
@@ -25,4 +25,4 @@ class AddByUsername
             @isSearching = false
     , 300
 
-module.exports = AddByUsername
+module.exports = AddByUsernameCtrl
