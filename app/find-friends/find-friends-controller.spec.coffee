@@ -61,6 +61,9 @@ describe 'find friends controller', ->
       friend = null
 
       beforeEach ->
+        # Reset the friends.
+        Auth.friends = {}
+
         friend = new User
           id: 1
           name: 'Alan Turing'
@@ -142,7 +145,7 @@ describe 'find friends controller', ->
 
         result = ctrl.sortItems [item1, item2]
 
-      fit 'should be added to the Friends Using Down section', ->
+      it 'should be added to the Friends Using Down section', ->
         expect(result).toEqual [ [item2, item1], [] ]
 
     describe 'item has a phone', ->
@@ -160,7 +163,7 @@ describe 'find friends controller', ->
 
         result = ctrl.sortItems [item1, item2]
 
-      fit 'should be added to the Contacts section', ->
+      it 'should be added to the Contacts section', ->
         expect(result).toEqual [ [], [item2, item1] ]
 
   describe 'set items', ->

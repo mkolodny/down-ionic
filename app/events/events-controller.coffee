@@ -1,7 +1,6 @@
 class EventsCtrl
   constructor: (@$ionicModal, @$scope, @$state, @$timeout, @$window, @Asteroid,
-                @Auth, @dividerHeight, @eventHeight, @Invitation,
-                @transitionDuration) ->
+                @dividerHeight, @eventHeight, @Invitation, @transitionDuration) ->
     # Save the section titles.
     @sections = {}
     @sections[@Invitation.noResponse] =
@@ -93,7 +92,7 @@ class EventsCtrl
 
     return # Mock data for now.
 
-    @Auth.getInvitations().then (invitations) =>
+    @Invitation.getMyInvitations().then (invitations) =>
       # Save the invitations on the controller.
       @invitations = {}
       for invitation in invitations
@@ -305,17 +304,16 @@ class EventsCtrl
 
     invitation.response = response
     invitation.lastViewed = new Date()
-    @Invitation.update invitation
-      .$promise.then (_invitation) =>
-        @invitations[_invitation.id] = _invitation
-        @moveItem item, @invitations
-      , =>
-        #item.respondError = true # Mock a successful response for now.
+    @Invitation.update(invitation).$promise.then (_invitation) =>
+      @invitations[_invitation.id] = _invitation
+      @moveItem item, @invitations
+    , =>
+      #item.respondError = true # Mock a successful response for now.
 
-        @invitations[invitation.id] = invitation
-        item.isExpanded = false
-        item.isReordering = true
-        @moveItem @invitations
+      @invitations[invitation.id] = invitation
+      item.isExpanded = false
+      item.isReordering = true
+      @moveItem @invitations
 
   itemWasDeclined: (item) ->
     if item.response is @Invitation.declined

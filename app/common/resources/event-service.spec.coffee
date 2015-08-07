@@ -5,9 +5,11 @@ require './resources-module'
 
 describe 'event service', ->
   $httpBackend = null
+  Asteroid = null
   Auth = null
   Event = null
   Invitation = null
+  Messages = null
   User = null
   listUrl = null
 
@@ -20,7 +22,17 @@ describe 'event service', ->
     Auth =
       user:
         id: 1
+        name: 'Alan Turing'
+        imageUrl: 'http://facebook.com/profile-pic/tdog'
     $provide.value 'Auth', Auth
+
+    # Mock Asteroid.
+    Messages =
+      insert: jasmine.createSpy 'Messages.insert'
+    Asteroid =
+      getCollection: jasmine.createSpy('Asteroid.getCollection').and.returnValue \
+          Messages
+    $provide.value 'Asteroid', Asteroid
     return
   )
 
@@ -140,8 +152,12 @@ describe 'event service', ->
 
 
   describe 'sending a message', ->
+    event = null
+    text = null
+    url = null
+    requestData = null
 
-    it 'should POST the message', ->
+    beforeEach ->
       # Mock the current user.
       Auth.user = id: 1
 
@@ -153,17 +169,52 @@ describe 'event service', ->
         datetime: new Date()
         createdAt: new Date()
         updatedAt: new Date()
+      text = 'I\'m in love with a robot.'
       url = "#{listUrl}/#{event.id}/messages"
-      postData =
-        text: 'BBar?'
-        user: Auth.user.id
+      requestData = {text: text}
 
-      $httpBackend.expectPOST url, postData
-        .respond 201, null
+    describe 'successfully', ->
+      resolved = false
 
-      requestData = angular.extend {eventId: event.id}, postData
-      Event.sendMessage requestData
-      $httpBackend.flush 1
+      beforeEach ->
+        $httpBackend.expectPOST url, requestData
+          .respond 201, null
+
+        Event.sendMessage(event, text).then ->
+          resolved = true
+        $httpBackend.flush 1
+
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
+
+      it 'should get the messages collection', ->
+        expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+
+      it 'should save the message in the meteor server', ->
+        message =
+          creator:
+            id: Auth.user.id
+            name: Auth.user.name
+            imageUrl: Auth.user.imageUrl
+          text: text
+          eventId: event.id
+          type: 'text'
+        expect(Messages.insert).toHaveBeenCalledWith message
+
+
+    describe 'unsuccessfully', ->
+      rejected = false
+
+      beforeEach ->
+        $httpBackend.expectPOST url, requestData
+          .respond 500, null
+
+        Event.sendMessage(event, text).then null, ->
+          rejected = true
+        $httpBackend.flush 1
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
 
 
   describe 'canceling', ->

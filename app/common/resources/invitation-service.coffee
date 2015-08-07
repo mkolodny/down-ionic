@@ -1,4 +1,4 @@
-Invitation = ($resource, apiRoot, Event, User) ->
+Invitation = ($http, $q, $resource, apiRoot, Event, User) ->
   listUrl = "#{apiRoot}/invitations"
   detailUrl =
   serializeInvitation = (invitation) ->
@@ -101,6 +101,18 @@ Invitation = ($resource, apiRoot, Event, User) ->
   resource.declined = 2
 
   resource.maybe = 3
+
+  resource.getMyInvitations = ->
+    deferred = $q.defer()
+
+    $http.get "#{User.listUrl}/invitations"
+      .success (data, status) =>
+        invitations = (deserializeInvitation invitation for invitation in data)
+        deferred.resolve invitations
+      .error (data, status) =>
+        deferred.reject()
+
+    deferred.promise
 
   resource
 

@@ -1,5 +1,5 @@
-class Event
-  constructor: (@$state, @$stateParams, @Asteroid, @Auth, @Invitation) ->
+class EventCtrl
+  constructor: (@$state, @$stateParams, @Asteroid, @Auth, @Event, @Invitation) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -35,11 +35,12 @@ class Event
       eventId: @event.id
       type: 'text'
     ]
-    ###
+
     # Get/subscribe to the messages posted in this event.
+    ###
     @Asteroid.subscribe 'messages', @event.id
-    Messages = @Asteroid.getCollection 'messages'
-    messagesRQ = Messages.reactiveQuery {eventId: @event.id}
+    @Messages = @Asteroid.getCollection 'messages'
+    messagesRQ = @Messages.reactiveQuery {eventId: @event.id}
     @messages = messagesRQ.result
 
     # Sort the messages from oldest to newest.
@@ -125,4 +126,7 @@ class Event
   isMyMessage: (message) ->
     message.creator.id is @Auth.user.id
 
-module.exports = Event
+  sendMessage: ->
+    @Event.sendMessage @event, @message
+
+module.exports = EventCtrl

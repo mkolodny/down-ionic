@@ -5,7 +5,7 @@ require '../common/asteroid/asteroid-module'
 require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
-describe 'events controller', ->
+describe 'event controller', ->
   $q = null
   $state = null
   Asteroid = null
@@ -13,13 +13,15 @@ describe 'events controller', ->
   ctrl = null
   deferred = null
   earlierMessage = null
+  Event = null
   event = null
   invitation = null
   Invitation = null
   laterMessage = null
   onChange = null
-  messagesRQ = null
+  Messages = null
   messages = null
+  messagesRQ = null
   scope = null
 
   beforeEach angular.mock.module('down.resources')
@@ -38,6 +40,7 @@ describe 'events controller', ->
     $stateParams = $injector.get '$stateParams'
     Asteroid = $injector.get 'Asteroid'
     Auth = angular.copy $injector.get('Asteroid')
+    Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
     scope = $rootScope.$new true
 
@@ -76,6 +79,17 @@ describe 'events controller', ->
       updatedAt: new Date()
     $stateParams.invitation = invitation
 
+    # Mock the current user.
+    Auth.user =
+      id: 3
+      email: 'aturing@gmail.com'
+      name: 'Alan Turing'
+      username: 'tdog'
+      imageUrl: 'https://facebook.com/profile-pics/tdog'
+      location:
+        lat: 40.7265834
+        long: -73.9821535
+
     # Create mocks/spies for getting the messages for this event.
     spyOn Asteroid, 'subscribe'
     earlier = new Date()
@@ -103,10 +117,10 @@ describe 'events controller', ->
       result: messages
       on: jasmine.createSpy('messagesRQ.on').and.callFake (name, _onChange_) ->
         onChange = _onChange_
-    messages =
-      reactiveQuery: jasmine.createSpy('messages.reactiveQuery') \
+    Messages =
+      reactiveQuery: jasmine.createSpy('Messages.reactiveQuery') \
           .and.returnValue messagesRQ
-    spyOn(Asteroid, 'getCollection').and.returnValue messages
+    spyOn(Asteroid, 'getCollection').and.returnValue Messages
 
     deferred = $q.defer()
     spyOn(Invitation, 'getEventInvitations').and.returnValue
@@ -128,6 +142,9 @@ describe 'events controller', ->
 
   xit 'should get the messages collection', ->
     expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+
+  xit 'should set the messages collection on the controller', ->
+    expect(ctrl.Messages).toBe Messages
 
   xit 'should ask for the messages for the event', ->
     expect(messages.reactiveQuery).toHaveBeenCalledWith {eventId: event.id}
@@ -397,3 +414,15 @@ describe 'events controller', ->
 
       it 'should return false', ->
         expect(ctrl.isMyMessage message).toBe false
+
+
+  describe 'sending a message', ->
+
+    beforeEach ->
+      ctrl.message = 'this is gonna be dope!'
+      spyOn Event, 'sendMessage'
+
+      ctrl.sendMessage()
+
+    it 'should send the message', ->
+      expect(Event.sendMessage).toHaveBeenCalledWith event, ctrl.message

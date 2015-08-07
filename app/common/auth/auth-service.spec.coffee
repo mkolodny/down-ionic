@@ -313,79 +313,6 @@ describe 'Auth service', ->
         expect(Auth.isFriend user.id).toBe false
 
 
-  describe 'fetching the user\'s invitations', ->
-    url = null
-
-    beforeEach ->
-      url = "#{User.listUrl}/invitations"
-
-    describe 'successfully', ->
-      responseData = null
-      response = null
-
-      beforeEach ->
-        responseData = [
-          id: 1
-          event:
-            id: 2
-            title: 'bars?!??!'
-            creator: 3
-            canceled: false
-            datetime: new Date().getTime()
-            created_at: new Date().getTime()
-            updated_at: new Date().getTime()
-            place:
-              name: 'Fuku'
-              geo:
-                type: 'Point'
-                coordinates: [40.7285098, -73.9871264]
-          to_user: Auth.user.id
-          from_user:
-            id: 2
-            email: 'jclarke@gmail.com'
-            name: 'Joan Clarke'
-            username: 'jmamba'
-            image_url: 'http://imgur.com/jcke'
-            location:
-              type: 'Point'
-              coordinates: [40.7265836, -73.9821539]
-          response: Invitation.accepted
-          previously_accepted: false
-          open: false
-          to_user_messaged: false
-          muted: false
-          created_at: new Date().getTime()
-          updated_at: new Date().getTime()
-        ]
-
-        $httpBackend.expectGET url
-          .respond 200, angular.toJson(responseData)
-
-        Auth.getInvitations().then (_response_) ->
-          response = _response_
-        $httpBackend.flush 1
-
-      it 'should GET the invitations', ->
-        # Set the returned ids on the original invitations.
-        expectedInvitations = [Invitation.deserialize responseData[0]]
-        expect(response).toAngularEqual expectedInvitations
-
-
-    describe 'with an error', ->
-      rejected = null
-
-      beforeEach ->
-        $httpBackend.expectGET url
-          .respond 500, null
-
-        rejected = false
-        Auth.getInvitations().then (->), ->
-          rejected = true
-        $httpBackend.flush 1
-
-      it 'should reject the promise', ->
-        expect(rejected).toBe true
-
   describe 'redirecting for auth state', ->
 
     describe 'no phone number entered', ->
@@ -397,6 +324,7 @@ describe 'Auth service', ->
       it 'should send the user to the enter phone view', ->
         expect($state.go).toHaveBeenCalledWith 'login'
 
+
     describe 'no authenticated user', ->
 
       beforeEach ->
@@ -406,6 +334,7 @@ describe 'Auth service', ->
 
       it 'should send the user to the enter verification code view', ->
         expect($state.go).toHaveBeenCalledWith 'verifyPhone'
+
 
     describe 'the user doesn\'t have an email', ->
 
@@ -417,6 +346,7 @@ describe 'Auth service', ->
 
       it 'should send the user to the sync with facebook view', ->
         expect($state.go).toHaveBeenCalledWith 'facebookSync'
+
 
     describe 'the user doesn\'t have a username', ->
 
@@ -431,6 +361,7 @@ describe 'Auth service', ->
 
       it 'should go to the add username view', ->
         expect($state.go).toHaveBeenCalledWith 'setUsername'
+
 
     describe 'we haven\'t requested location services', ->
 
@@ -507,6 +438,7 @@ describe 'Auth service', ->
       it 'should go to the find friends view', ->
         expect($state.go).toHaveBeenCalledWith 'findFriends'
 
+
     describe 'user has already completed sign up', ->
 
       beforeEach ->
@@ -528,6 +460,7 @@ describe 'Auth service', ->
 
       it 'should go to the events view', ->
         expect($state.go).toHaveBeenCalledWith 'events'
+
 
   describe 'watching the users location', ->
     cordovaDeferred = null
@@ -597,7 +530,8 @@ describe 'Auth service', ->
         it 'should reject the promise', ->
           expect(rejected).toBe true
 
-      describe 'because of timeout or location unavailible', ->
+
+      describe 'because of timeout or location unavailable', ->
         resolved = null
 
         beforeEach ->
@@ -613,6 +547,7 @@ describe 'Auth service', ->
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true
+
 
   describe 'update the users location', ->
     deferred = null

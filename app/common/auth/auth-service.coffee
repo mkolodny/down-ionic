@@ -1,7 +1,7 @@
 haversine = require 'haversine'
 
 class Auth
-  constructor: (@$http, @$q, @apiRoot, @Invitation, @User, @$cordovaGeolocation,
+  constructor: (@$http, @$q, @apiRoot, @User, @$cordovaGeolocation,
                 @$state, localStorageService) ->
     @localStorage = localStorageService
 
@@ -64,18 +64,6 @@ class Auth
     @$http.post "#{@apiRoot}/authcodes", {phone: phone}
       .success (data, status) =>
         @phone = phone
-
-  getInvitations: ->
-    deferred = @$q.defer()
-
-    @$http.get "#{@User.listUrl}/invitations"
-      .success (data, status) =>
-        invitations = (@Invitation.deserialize invitation for invitation in data)
-        deferred.resolve invitations
-      .error (data, status) =>
-        deferred.reject()
-
-    deferred.promise
 
   isFriend: (userId) ->
     @friends[userId]?

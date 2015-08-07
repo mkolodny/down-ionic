@@ -1,5 +1,6 @@
 require 'angular'
 require 'angular-resource'
+require '../asteroid/asteroid-module'
 require '../auth/auth-module'
 AllFriendsInvitation = require './allfriendsinvitation-service'
 APNSDevice = require './apnsdevice-service'
@@ -10,7 +11,11 @@ LinkInvitation = require './linkinvitation-service'
 User = require './user-service'
 UserPhone = require './userphone-service'
 
-angular.module 'down.resources', ['ngResource', 'down.auth']
+angular.module 'down.resources', [
+    'ngResource'
+    'down.asteroid'
+    'down.auth'
+  ]
   .value 'apiRoot', 'http://localhost:5000/api'
   .factory 'APNSDevice', APNSDevice
   .factory 'Event', Event

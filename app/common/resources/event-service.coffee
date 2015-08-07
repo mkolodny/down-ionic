@@ -1,4 +1,4 @@
-Event = ($http, $q, $resource, apiRoot, User) ->
+Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
   listUrl = "#{apiRoot}/events"
   detailUrl = "#{listUrl}/:id"
   serializeEvent = (event) ->
@@ -41,14 +41,6 @@ Event = ($http, $q, $resource, apiRoot, User) ->
         data = angular.fromJson data
         deserializeEvent data
 
-    sendMessage:
-      method: 'post'
-      url: "#{detailUrl}/messages"
-      params: {id: '@eventId'}
-      transformRequest: (data, headersGetter) ->
-        delete data.eventId
-        angular.toJson data
-
     cancel:
       method: 'delete'
       url: detailUrl
@@ -58,6 +50,23 @@ Event = ($http, $q, $resource, apiRoot, User) ->
   resource.serialize = serializeEvent
 
   resource.deserialize = deserializeEvent
+
+  resource.sendMessage = (event, text) ->
+    # Save the message on the meteor server.
+    Messages = Asteroid.getCollection 'messages'
+    Messages.insert
+      creator:
+        id: Auth.user.id
+        name: Auth.user.name
+        imageUrl: Auth.user.imageUrl
+      text: text
+      eventId: event.id
+      type: 'text'
+
+    # Save the message on the django server.
+    url = "#{listUrl}/#{event.id}/messages"
+    requestData = {text: text}
+    $http.post url, requestData
 
   resource
 

@@ -34,8 +34,6 @@ describe 'events controller', ->
 
   beforeEach angular.mock.module('down.asteroid')
 
-  beforeEach angular.mock.module('down.auth')
-
   beforeEach angular.mock.module('down.events')
 
   beforeEach angular.mock.module('ionic')
@@ -51,7 +49,6 @@ describe 'events controller', ->
     $timeout = $injector.get '$timeout'
     $window = $injector.get '$window'
     Asteroid = $injector.get 'Asteroid'
-    Auth = angular.copy $injector.get('Auth')
     dividerHeight = $injector.get 'dividerHeight'
     eventHeight = $injector.get 'eventHeight'
     Invitation = $injector.get 'Invitation'
@@ -105,14 +102,14 @@ describe 'events controller', ->
       .respond ''
 
     deferredGetInvitations = $q.defer()
-    spyOn(Auth, 'getInvitations').and.returnValue deferredGetInvitations.promise
+    spyOn(Invitation, 'getMyInvitations').and.returnValue \
+        deferredGetInvitations.promise
 
     deferredTemplate = $q.defer()
     spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
 
     ctrl = $controller EventsCtrl,
       $scope: scope
-      Auth: Auth
   )
 
   it 'should init a new event', ->
@@ -135,14 +132,12 @@ describe 'events controller', ->
         spyOn(ctrl, 'buildItems').and.returnValue items
         spyOn ctrl, 'eventsMessagesSubscribe'
 
-        response = [item]
+        response = [invitation]
         deferredGetInvitations.resolve response
         scope.$apply()
 
       it 'should save the invitations on the controller', ->
-        invitations = {}
-        for invitation in response
-          invitations[invitation.id] = invitation
+        invitations = {"#{invitation.id}": invitation}
         expect(ctrl.invitations).toEqual invitations
 
       it 'should save the items list on the controller', ->
@@ -154,6 +149,7 @@ describe 'events controller', ->
       it 'should subscribe to messages for each event', ->
         events = [invitation.event]
         expect(ctrl.eventsMessagesSubscribe).toHaveBeenCalledWith events
+
 
     describe 'with an error', ->
 

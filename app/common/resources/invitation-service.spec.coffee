@@ -4,12 +4,21 @@ require './resources-module'
 
 describe 'invitation service', ->
   $httpBackend = null
+  Auth = null
   Event = null
   listUrl = null
   Invitation = null
   User = null
 
   beforeEach angular.mock.module('down.resources')
+
+  beforeEach angular.mock.module(($provide) ->
+    Auth =
+      user:
+        id: 1
+    $provide.value 'Auth', Auth
+    return
+  )
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
@@ -316,3 +325,77 @@ describe 'invitation service', ->
     it 'should GET the invitations', ->
       invitations = [Invitation.deserialize invitation]
       expect(response).toAngularEqual invitations
+
+
+  describe 'fetching the logged in user\'s invitations', ->
+    url = null
+
+    beforeEach ->
+      url = "#{User.listUrl}/invitations"
+
+    describe 'successfully', ->
+      responseData = null
+      response = null
+
+      beforeEach ->
+        responseData = [
+          id: 1
+          event:
+            id: 2
+            title: 'bars?!??!'
+            creator: 3
+            canceled: false
+            datetime: new Date().getTime()
+            created_at: new Date().getTime()
+            updated_at: new Date().getTime()
+            place:
+              name: 'Fuku'
+              geo:
+                type: 'Point'
+                coordinates: [40.7285098, -73.9871264]
+          to_user: Auth.user.id
+          from_user:
+            id: 2
+            email: 'jclarke@gmail.com'
+            name: 'Joan Clarke'
+            username: 'jmamba'
+            image_url: 'http://imgur.com/jcke'
+            location:
+              type: 'Point'
+              coordinates: [40.7265836, -73.9821539]
+          response: Invitation.accepted
+          previously_accepted: false
+          open: false
+          to_user_messaged: false
+          muted: false
+          created_at: new Date().getTime()
+          updated_at: new Date().getTime()
+        ]
+
+        $httpBackend.expectGET url
+          .respond 200, angular.toJson(responseData)
+
+        Invitation.getMyInvitations().then (_response_) ->
+          response = _response_
+        $httpBackend.flush 1
+
+      it 'should GET the invitations', ->
+        # Set the returned ids on the original invitations.
+        expectedInvitations = [Invitation.deserialize responseData[0]]
+        expect(response).toAngularEqual expectedInvitations
+
+
+    describe 'with an error', ->
+      rejected = null
+
+      beforeEach ->
+        $httpBackend.expectGET url
+          .respond 500, null
+
+        rejected = false
+        Invitation.getMyInvitations().then null, ->
+          rejected = true
+        $httpBackend.flush 1
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
