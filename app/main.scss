@@ -96,11 +96,14 @@ Global Sass
     border-bottom-width: 1px;
   }
 }
-.item-avatar > img:first-child {
-  max-width: 50px;
-  max-height: 50px;
-  top: 11px;
-  left: 11px;
+.item-avatar {
+  & > img:first-child,
+  .item-image {
+    max-width: 50px;
+    max-height: 50px;
+    top: 11px;
+    left: 11px;
+  }
 }
 
 // Onboarding

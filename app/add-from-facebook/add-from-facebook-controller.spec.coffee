@@ -1,4 +1,5 @@
 require 'angular'
+require 'angular-local-storage'
 require 'angular-mocks'
 require '../common/resources/resources-module'
 AddFromFacebookCtrl = require './add-from-facebook-controller'

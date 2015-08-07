@@ -24,37 +24,52 @@ class Contacts
 
     deferred.promise
 
+  ###*
+   * Check which of the user's contacts are Down users. If a contact is a Down
+   * user, set their user object as a property on the contact object.
+   *
+   * @param {Object[]} contacts - The user's contacts, provided by Cordova.
+   * @return {Promise} - Resolved with an object with the user's contacts in the
+   *                     format - {
+   *                       contactId: {
+   *                         user: <User>, # Optional
+   *                         name: <String>,
+   *                         phoneNumbers: [
+   *                           {
+   *                             type: <String>, # e.g. 'home'
+   *                             value: <String>, # e.g. 2345678901
+   *                             pref: <Bool> # True if this is the preferred #
+   *                           }
+   *                         ]
+   *                       }
+   *                     }
+  ###
   identifyContacts: (contacts) ->
     contactsObject = @contactArrayToObject contacts
     contactsIdMap = @mapContactIds contacts
     deferred = @$q.defer()
-    @getContactUsers contacts
-      .then (userPhones) =>
-        for userPhone in userPhones
-          phone = userPhone.phone
-          userId = userPhone.user.id
-          contactId = contactsIdMap[phone]
-          contactsObject[contactId].userId = userId
-        deferred.resolve contactsObject
-      , ->
-        deferred.reject()
+    @getContactUsers(contacts).then (userPhones) =>
+      for userPhone in userPhones
+        contactId = contactsIdMap[userPhone.phone]
+        contactsObject[contactId].user = userPhone.user
+      deferred.resolve contactsObject
+    , ->
+      deferred.reject()
 
     deferred.promise
 
   contactArrayToObject: (contacts) ->
     contactsObject = {}
     for contact in contacts
-      contactId = contact.id
-      contactsObject[contactId] = contact
+      contactsObject[contact.id] = contact
     contactsObject
 
   mapContactIds: (contacts) ->
     contactsIdMap = {}
     for contact in contacts
-      contactId = contact.id
       for phoneNumber in contact.phoneNumbers
         phone = phoneNumber.value
-        contactsIdMap[phone] = contactId
+        contactsIdMap[phone] = contact.id
     contactsIdMap
 
   getContactUsers: (contacts) ->

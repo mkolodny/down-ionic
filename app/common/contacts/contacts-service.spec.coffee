@@ -180,14 +180,13 @@ describe 'Contacts service', ->
     describe 'successfully', ->
       contactId = null
       phone = null
-      userId = null
       contact = null
+      user = null
       identifiedContacts = null
 
       beforeEach ->
         contactId = '1234'
         phone = '+19252855230'
-        userId = '98765'
 
         contact =
           id: contactId
@@ -196,20 +195,19 @@ describe 'Contacts service', ->
           ]
 
         contactCopy = angular.copy contact
-        Contacts.identifyContacts [contactCopy]
-          .then (_contacts_) ->
-            identifiedContacts = _contacts_
+        Contacts.identifyContacts([contactCopy]).then (_contacts_) ->
+          identifiedContacts = _contacts_
 
+        user =
+          id: 98765
         userPhone =
-          user:
-            id: userId
+          user: user
           phone: phone
         deferred.resolve [userPhone]
         scope.$apply()
 
-      it 'should add userId properties to contacts that have users', ->
-        expectedUserId = identifiedContacts[contactId].userId
-        expect(expectedUserId).toEqual userId
+      it 'should add a user property to contacts that have users', ->
+        expect(identifiedContacts[contactId].user).toBe user
 
 
     describe 'not successfully :(', ->
@@ -241,9 +239,7 @@ describe 'Contacts service', ->
       contactsObject = Contacts.contactArrayToObject [contact]
 
     it 'should return an object with key contact id and value contact', ->
-      expectResult = {}
-      expectResult[contactId] = contact
-      expect(contactsObject).toEqual expectResult
+      expect(contactsObject).toEqual {"#{contactId}": contact}
 
 
   describe 'getting contact users', ->
