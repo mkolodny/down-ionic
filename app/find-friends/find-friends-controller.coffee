@@ -1,15 +1,15 @@
 class FindFriendsCtrl
-  constructor: (@$state, @Auth, @User, localStorageService) ->
+  constructor: (@$state, @Auth, @User, localStorageService, @Contacts, @$filter) ->
     @localStorage = localStorageService
 
     # Use mock data for now.
-    user =
-      id: 2
-      name: 'Andrew Linfoot'
-      username: 'a'
-      imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
-    @Auth.friends[user.id] = new @User(user)
-    return # Mock for now.
+    # user =
+    #   id: 2
+    #   name: 'Andrew Linfoot'
+    #   username: 'a'
+    #   imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
+    # @Auth.friends[user.id] = new @User(user)
+    # return # Mock for now.
 
     @User.getFacebookFriends().$promise.then (facebookFriends) =>
       # Set the user's facebook friends on the Auth service.
@@ -36,6 +36,19 @@ class FindFriendsCtrl
       @items = items
     , =>
       @fbFriendsRequestError = true
+
+    @Contacts.getContacts()#.then (contactsObject) =>
+
+  sortItems: (items) ->
+    items = @$filter('orderBy')(items, '+name')
+    friendsUsingDown = []
+    contacts = []
+    for item in items
+      if item.username
+        friendsUsingDown.push item
+      else
+        contacts.push item
+    return [friendsUsingDown, contacts]
 
   done: ->
     @localStorage.set 'hasCompletedFindFriends', true
