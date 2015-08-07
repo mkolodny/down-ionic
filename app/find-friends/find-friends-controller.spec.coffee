@@ -142,7 +142,7 @@ describe 'find friends controller', ->
 
         result = ctrl.sortItems [item1, item2]
 
-      fit 'should be added to the Friends Using Down section', ->
+      it 'should be added to the Friends Using Down section', ->
         expect(result).toEqual [ [item2, item1], [] ]
 
     describe 'item has a phone', ->
@@ -160,12 +160,36 @@ describe 'find friends controller', ->
 
         result = ctrl.sortItems [item1, item2]
 
-      fit 'should be added to the Contacts section', ->
+      it 'should be added to the Contacts section', ->
         expect(result).toEqual [ [], [item2, item1] ]
 
   describe 'set items', ->
+    sections = null
+    result = null
 
-    it 'should add the friends using down and contacts dividers', ->
+    describe 'existing items', ->
 
-    it 'should set the items', ->
+      it 'should merge all items', ->
+
+    describe 'no existing items', ->
+
+      beforeEach ->
+        sections = [
+          ['someitem'],
+          ['someotheritem']
+        ]
+        ctrl.items = [] # make sure items is empty
+        result = ctrl.setItems sections
+
+      it 'should add the friends using down and contacts dividers', ->
+        divider1 =
+          isDivider: true
+          title: 'Friends Using Down'
+        divider2 =
+          isDivider: true
+          title: 'Contacts'
+        expect(result[0]).toEqual divider1
+        expect(result[2]).toEqual divider2
+
+      it 'should set the items', ->
 
