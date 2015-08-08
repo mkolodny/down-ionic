@@ -49,13 +49,13 @@ describe 'find friends controller', ->
       Contacts: Contacts
   )
 
-  it 'should request the user\'s facebook friends', ->
+  xit 'should request the user\'s facebook friends', ->
     expect(User.getFacebookFriends).toHaveBeenCalled()
 
   it 'should request the user\'s contacts', ->
     expect(Contacts.getContacts).toHaveBeenCalled()
 
-  describe 'when the facebook friends request returns', ->
+  xdescribe 'when the facebook friends request returns', ->
 
     describe 'successfully', ->
       friend = null
@@ -125,6 +125,33 @@ describe 'find friends controller', ->
 
     describe 'with an error', ->
 
+  describe 'merge items', ->
+
+    describe 'when there are existing items', ->
+      items = null
+      mergedItems = null
+
+      beforeEach ->
+        ctrl.items = [
+          isDivider: true
+          title: 'Friends Using Down'
+        ,
+          isDivider: false
+        ]
+        newItems = [
+          isDivider: false
+        ,
+          isDivider: false
+        ]
+        mergedItems = ctrl.mergeItems newItems
+
+      it 'should remove dividers', ->
+        for item in mergedItems
+          expect(item.isDivider).toEqual false
+
+      it 'should combine the new and old items', ->
+
+
   describe 'sort items', ->
 
     describe 'item has a username', ->
@@ -179,7 +206,7 @@ describe 'find friends controller', ->
           ['someotheritem']
         ]
         ctrl.items = [] # make sure items is empty
-        result = ctrl.setItems sections
+        ctrl.setItems sections
 
       it 'should add the friends using down and contacts dividers', ->
         divider1 =
@@ -188,8 +215,8 @@ describe 'find friends controller', ->
         divider2 =
           isDivider: true
           title: 'Contacts'
-        expect(result[0]).toEqual divider1
-        expect(result[2]).toEqual divider2
+        expect(ctrl.items[0]).toEqual divider1
+        expect(ctrl.items[2]).toEqual divider2
 
       it 'should set the items', ->
 

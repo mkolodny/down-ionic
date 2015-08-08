@@ -3,13 +3,13 @@ class FindFriendsCtrl
     @localStorage = localStorageService
 
     # Use mock data for now.
-    user =
-      id: 2
-      name: 'Andrew Linfoot'
-      username: 'a'
-      imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
-    @Auth.friends[user.id] = new @User(user)
-    return # Mock for now.
+    # user =
+    #   id: 2
+    #   name: 'Andrew Linfoot'
+    #   username: 'a'
+    #   imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
+    # @Auth.friends[user.id] = new @User(user)
+    # return # Mock for now.
 
     @User.getFacebookFriends().$promise.then (facebookFriends) =>
       # Set the user's facebook friends on the Auth service.
@@ -39,6 +39,10 @@ class FindFriendsCtrl
 
     @Contacts.getContacts()#.then (contactsObject) =>
 
+  mergeItems: (newItems) ->
+    itemsWithoutDividers = @$filter('filter')(@items, {'isDivider': false})
+    itemsWithoutDividers.concat newItems
+
   sortItems: (items) ->
     items = @$filter('orderBy')(items, '+name')
     friendsUsingDown = []
@@ -62,7 +66,7 @@ class FindFriendsCtrl
     for section, index in sections
       items.push dividers[index]
       items = items.concat section
-    return items
+    @items = items
 
   done: ->
     @localStorage.set 'hasCompletedFindFriends', true
