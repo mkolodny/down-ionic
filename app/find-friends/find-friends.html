@@ -8,14 +8,24 @@
                 ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, last: $last}"
                 item-height="item.isDivider ? '35px' : '71px'">
         <!-- Divider -->
-        <span ng-if="item.isDivider">{{item.title}}</span>
+        <span ng-if="item.isDivider && item.id">{{item.title}}</span>
 
-        <!-- Facebook Friend -->
-        <img ng-src="{{item.imageUrl}}" alt="Profile Pic" ng-if="!item.isDivider">
-        <h2 ng-if="!item.isDivider">{{item.name}}</h2>
-        <p ng-if="!item.isDivider">{{item.username}}</p>
+        <!-- Friend Using Down -->
+        <img ng-src="{{item.imageUrl}}" alt="Profile Pic" ng-if="!item.isDivider && item.id">
+        <h2 ng-if="!item.isDivider && item.id">{{item.name}}</h2>
+        <p ng-if="!item.isDivider && item.id">{{item.username}}</p>
         <friendship-button user-id="item.id"
-                           ng-if="!item.isDivider"></friendship-button>
+                           ng-if="!item.isDivider && item.id"></friendship-button>
+
+        <!-- Contact -->
+        <span class="contact-image item-image"
+              ng-if="!item.isDivider && !item.contact.user"
+              >{{findFriends.getInitials(item.contact.name)}}</span>
+        <h2 ng-if="!item.isDivider && !item.contact.user">{{item.contact.name}}</h2>
+        <p ng-if="!item.isDivider && !item.contact.user">Add by SMS</p>
+        <i class="icon fa fa-plus-square-o"
+           ng-if="!item.isDivider && !item.contact.user"></i>
+
       </ion-item>
     </ion-list>
   </ion-content>
