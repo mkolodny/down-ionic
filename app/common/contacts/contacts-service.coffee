@@ -42,6 +42,7 @@ class Contacts
           userId = userPhone.user.id
           contactId = contactsIdMap[phone]
           contactsObject[contactId].userId = userId
+        # TODO : save users in localStorage
         deferred.resolve contactsObject
       , ->
         deferred.reject()

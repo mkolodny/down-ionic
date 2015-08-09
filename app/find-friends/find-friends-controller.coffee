@@ -1,6 +1,7 @@
 class FindFriendsCtrl
   constructor: (@$state, @Auth, @User, localStorageService, @Contacts, @$filter) ->
     @localStorage = localStorageService
+    @items = []
 
     # Use mock data for now.
     # user =
@@ -19,10 +20,7 @@ class FindFriendsCtrl
         @Auth.friends[friend.id] = new @User(friend)
 
       # Build the list of items to show in the view.
-      items = [
-        isDivider: true
-        title: 'Friends Using Down'
-      ]
+      items = []
       for friend in facebookFriends
         items.push
           isDivider: false
@@ -30,14 +28,27 @@ class FindFriendsCtrl
           name: friend.name
           username: friend.username
           imageUrl: friend.imageUrl
-      items.push
-        isDivider: true
-        title: 'Contacts'
-      @items = items
+      items = @mergeItems items
+      items = @sortItems items
+      @setItems items
     , =>
       @fbFriendsRequestError = true
 
-    @Contacts.getContacts()#.then (contactsObject) =>
+    @Contacts.getContacts().then (contactsObject) =>
+      items = @contactsToItems contactsObject
+      items = @mergeItems items
+      items = @sortItems items
+      @setItems items
+
+  contactsToItems: (contacts) ->
+    items = []
+    for contactId, contact of contacts
+      item =
+        name: contact.name.formatted
+        isDivider: false
+        contact: contact
+      items.push item
+    return items
 
   mergeItems: (newItems) ->
     itemsWithoutDividers = @$filter('filter')(@items, {'isDivider': false})
