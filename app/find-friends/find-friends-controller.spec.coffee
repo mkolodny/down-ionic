@@ -174,6 +174,12 @@ describe 'find friends controller', ->
         expect(ctrl.setItems).toHaveBeenCalledWith items
 
     describe 'with an error', ->
+      beforeEach ->
+        contactsDeferred.reject()
+        scope.$apply()
+
+      fit 'should show an error', ->
+        expect(ctrl.contactsRequestError).toBe true
 
   describe 'contacts to items', ->
     contact = null

@@ -39,6 +39,8 @@ class FindFriendsCtrl
       items = @mergeItems items
       items = @sortItems items
       @setItems items
+    , =>
+      @contactsRequestError = true
 
   contactsToItems: (contacts) ->
     items = []
