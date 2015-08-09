@@ -49,6 +49,13 @@ class FindFriendsCtrl
         name: contact.name.formatted
         isDivider: false
         contact: contact
+
+      user = contact.user
+      if user
+        item.username = user.username
+        item.imageUrl = user.imageUrl
+        item.id = user.id
+
       items.push item
     return items
 

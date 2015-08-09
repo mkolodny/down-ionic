@@ -51,7 +51,6 @@ class Contacts
     @getContactUsers(contacts).then (userPhones) =>
       for userPhone in userPhones
         contactId = contactsIdMap[userPhone.phone]
-        # TODO : Save users to localStorage
         contactsObject[contactId].user = userPhone.user
       deferred.resolve contactsObject
     , ->

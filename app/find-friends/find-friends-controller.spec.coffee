@@ -189,7 +189,35 @@ describe 'find friends controller', ->
 
     describe 'when a contact has a user id', ->
 
-      xit 'should format the contacts to the item format', ->
+      beforeEach ->
+        name = 'Andrew Plebfoot'
+        username = 'a'
+        userId = 1
+        imageUrl = 'thatImage.com'
+
+        contact =
+          id: '1234'
+          name:
+            formatted: name
+          phoneNumbers: [ {value: '+19252852230'} ]
+          user:
+            id: userId
+            username: username
+            imageUrl: imageUrl
+        contactsObject =
+          1234: contact
+        item =
+          name: name
+          isDivider: false
+          contact: contact
+          username: username
+          imageUrl: imageUrl
+          id: userId
+
+        items = ctrl.contactsToItems contactsObject
+
+      it 'should format the contacts to the item format', ->
+        expect(items).toEqual [item]
 
     describe 'when a contact doesn\'t have a user id', ->
 
