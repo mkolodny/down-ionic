@@ -31,7 +31,8 @@ describe 'Auth service', ->
       watchPosition: jasmine.createSpy '$cordovaGeolocation.watchPosition'
     $provide.value '$cordovaGeolocation', $cordovaGeolocation
 
-    deserializedUser = 'deserializedUser'
+    deserializedUser =
+      id: 1
     User =
       update: jasmine.createSpy 'User.update'
       deserialize: jasmine.createSpy('User.deserialize').and.returnValue \
@@ -63,9 +64,6 @@ describe 'Auth service', ->
 
   it 'should init the user', ->
     expect(Auth.user).toEqual {}
-
-  it 'should init the user\'s friends', ->
-    expect(Auth.friends).toEqual {}
 
   describe 'checking whether the user is authenticated', ->
     testAuthUrl = null
@@ -151,9 +149,8 @@ describe 'Auth service', ->
         $httpBackend.expectPOST authenticateUrl, postData
           .respond 200, responseData
 
-        Auth.authenticate phone, code
-          .then (_response_) ->
-            response = _response_
+        Auth.authenticate(phone, code).then (_response_) ->
+          response = _response_
         $httpBackend.flush 1
 
       it 'should call deserialize with response data', ->
@@ -165,6 +162,10 @@ describe 'Auth service', ->
 
       it 'should set the returned user on the Auth object', ->
         expect(Auth.user).toBe deserializedUser
+
+      it 'should init the user\'s friends', ->
+        expect(Auth.user.friends).toEqual {}
+
 
     describe 'when the request fails', ->
 
@@ -298,7 +299,8 @@ describe 'Auth service', ->
     describe 'when the user is a friend', ->
 
       beforeEach ->
-        Auth.friends[user.id] = true
+        Auth.user.friends =
+          "#{user.id}": true
 
       it 'should return true', ->
         expect(Auth.isFriend user.id).toBe true
@@ -307,7 +309,7 @@ describe 'Auth service', ->
     describe 'when the user isn\'t a friend', ->
 
       beforeEach ->
-        Auth.friends = {}
+        Auth.user.friends = {}
 
       it 'should return true', ->
         expect(Auth.isFriend user.id).toBe false

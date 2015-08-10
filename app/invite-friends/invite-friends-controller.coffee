@@ -1,8 +1,9 @@
 class InviteFriendsCtrl
   constructor: (@$state, @$stateParams, @Auth, @Event, @Invitation) ->
     # Make a copy of the user's friends so that when the user selects the friend in
-    # one section, they get selected in every section.
-    friends = angular.copy @Auth.friends
+    #   one section, they get selected in every section.
+    # TODO: Handle when the user's friends aren't set on auth yet.
+    friends = angular.copy @Auth.user.friends
 
     @event = @$stateParams.event
     @selectedFriends = []

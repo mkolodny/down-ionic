@@ -7,8 +7,6 @@ class Auth
 
   user: {}
 
-  friends: {}
-
   isAuthenticated: ->
     deferred = @$q.defer()
 
@@ -40,6 +38,10 @@ class Auth
     @$http.post "#{@apiRoot}/sessions", params
       .success (data, status) =>
         @user = @User.deserialize data
+
+        # Init the user's friends.
+        @user.friends = {}
+
         deferred.resolve @user
       .error (data, status) ->
         deferred.reject status
@@ -66,7 +68,7 @@ class Auth
         @phone = phone
 
   isFriend: (userId) ->
-    @friends[userId]?
+    @user.friends[userId]?
 
   isNearby: (user) ->
     start =

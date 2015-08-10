@@ -10,12 +10,18 @@ describe 'friendship service', ->
 
   beforeEach angular.mock.module('down.resources')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module(($provide) ->
+    Auth =
+      user:
+        id: 1
+        friends: {}
+    $provide.value 'Auth', Auth
+    return
+  )
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
     apiRoot = $injector.get 'apiRoot'
-    Auth = angular.copy $injector.get('Auth')
     Friendship = $injector.get 'Friendship'
 
     listUrl = "#{apiRoot}/friendships"
@@ -56,7 +62,7 @@ describe 'friendship service', ->
       expect(response).toAngularEqual expectedFriendship
 
     it 'should add the friend to Auth', ->
-      expect(Auth.friends[friendId]).toBe true
+      expect(Auth.user.friends[friendId]).toBe true
 
 
   describe 'deleting with a friend', ->
@@ -80,7 +86,7 @@ describe 'friendship service', ->
           .respond 200, null
 
         # Set the user as a friend on Auth.
-        Auth.friends[friendId] = true
+        Auth.user.friends[friendId] = true
 
         Friendship.deleteWithFriendId friendId
           .then ->
@@ -91,7 +97,7 @@ describe 'friendship service', ->
         expect(deleted).toBe true
 
       it 'should remove the friend from Auth', ->
-        expect(Auth.friends[friendId]).not.toBeDefined()
+        expect(Auth.user.friends[friendId]).not.toBeDefined()
 
 
     describe 'with an error', ->

@@ -41,7 +41,7 @@ describe 'invite friends controller', ->
         long: -73.9821535
 
     # Mock the user's friends.
-    Auth.friends =
+    Auth.user.friends =
       2:
         id: 2
         email: 'ltorvalds@gmail.com'
@@ -86,7 +86,7 @@ describe 'invite friends controller', ->
     $stateParams.event = event
 
     spyOn(Auth, 'isNearby').and.callFake (friend) ->
-      friend.id in [Auth.friends[2].id, Auth.friends[3].id]
+      friend.id in [Auth.user.friends[2].id, Auth.user.friends[3].id]
 
     ctrl = $controller InviteFriendsCtrl,
       $scope: scope
@@ -107,8 +107,8 @@ describe 'invite friends controller', ->
 
     it 'should be a sorted array of nearby friends', ->
       expect(ctrl.nearbyFriends).toEqual  [ # Alphabetical
-        Auth.friends[3]
-        Auth.friends[2]
+        Auth.user.friends[3]
+        Auth.user.friends[2]
       ]
 
 
@@ -125,22 +125,22 @@ describe 'invite friends controller', ->
           friend: friend
       alphabeticalItems = [
         isDivider: true
-        title: Auth.friends[4].name[0]
+        title: Auth.user.friends[4].name[0]
       ,
         isDivider: false
-        friend: Auth.friends[4]
+        friend: Auth.user.friends[4]
       ,
         isDivider: true
-        title: Auth.friends[3].name[0]
+        title: Auth.user.friends[3].name[0]
       ,
         isDivider: false
-        friend: Auth.friends[3]
+        friend: Auth.user.friends[3]
       ,
         isDivider: true
-        title: Auth.friends[2].name[0]
+        title: Auth.user.friends[2].name[0]
       ,
         isDivider: false
-        friend: Auth.friends[2]
+        friend: Auth.user.friends[2]
       ]
       for item in alphabeticalItems
         items.push item
@@ -151,7 +151,7 @@ describe 'invite friends controller', ->
     friend = null
 
     beforeEach ->
-      friend = Auth.friends[2]
+      friend = Auth.user.friends[2]
 
     describe 'when the friend isn\'t selected', ->
 
@@ -185,9 +185,9 @@ describe 'invite friends controller', ->
     describe 'when all nearby friends hasn\'t been selected', ->
 
       beforeEach ->
-        ctrl.nearbyFriends = [Auth.friends[2], Auth.friends[3]]
+        ctrl.nearbyFriends = [Auth.user.friends[2], Auth.user.friends[3]]
         ctrl.selectedFriendIds = {}
-        ctrl.selectedFriendIds[Auth.friends[3].id] = true
+        ctrl.selectedFriendIds[Auth.user.friends[3].id] = true
 
         spyOn ctrl, 'selectFriend'
 
@@ -197,14 +197,14 @@ describe 'invite friends controller', ->
         expect(ctrl.isAllNearbyFriendsSelected).toBe true
 
       it 'should select each friend in the list of nearby friends', ->
-        expect(ctrl.selectFriend).toHaveBeenCalledWith Auth.friends[2]
+        expect(ctrl.selectFriend).toHaveBeenCalledWith Auth.user.friends[2]
 
 
     describe 'when all nearby friends is selected', ->
 
       beforeEach ->
         ctrl.isAllNearbyFriendsSelected = true
-        ctrl.nearbyFriends = [Auth.friends[2], Auth.friends[3]]
+        ctrl.nearbyFriends = [Auth.user.friends[2], Auth.user.friends[3]]
 
         spyOn ctrl, 'deselectFriend'
 
@@ -225,7 +225,7 @@ describe 'invite friends controller', ->
       ctrl.selectedFriends = []
       ctrl.selectedFriendIds = {}
 
-      friend = Auth.friends[2]
+      friend = Auth.user.friends[2]
       ctrl.selectFriend friend
 
     it 'should set the friend to selected', ->
@@ -244,8 +244,8 @@ describe 'invite friends controller', ->
     friend = null
 
     beforeEach ->
-      friend = Auth.friends[2]
-      ctrl.selectedFriends = [friend, Auth.friends[3]]
+      friend = Auth.user.friends[2]
+      ctrl.selectedFriends = [friend, Auth.user.friends[3]]
       ctrl.selectedFriendIds = {}
       ctrl.selectedFriendIds[friend.id] = true
       friend.isSelected = true
@@ -259,7 +259,7 @@ describe 'invite friends controller', ->
         expect(friend.isSelected).toBe false
 
       it 'should remove the friend from the list of selected friends', ->
-        expect(ctrl.selectedFriends).toEqual [Auth.friends[3]]
+        expect(ctrl.selectedFriends).toEqual [Auth.user.friends[3]]
 
       it 'should remove the friend from the dictionary of selected friend ids', ->
         expect(ctrl.selectedFriendIds).toEqual {}
@@ -286,7 +286,7 @@ describe 'invite friends controller', ->
     newEvent = null
 
     beforeEach ->
-      ctrl.selectedFriends = [Auth.friends[2], Auth.friends[3]]
+      ctrl.selectedFriends = [Auth.user.friends[2], Auth.user.friends[3]]
 
       deferred = $q.defer()
       spyOn(Event, 'save').and.returnValue {$promise: deferred.promise}

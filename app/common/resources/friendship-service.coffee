@@ -17,7 +17,7 @@ Friendship = ($http, $resource, $q, apiRoot, Auth) ->
           friendId: data.friend
 
         # Save the friend on Auth.
-        Auth.friends[data.friend] = true
+        Auth.user.friends[data.friend] = true
 
         response
 
@@ -27,12 +27,13 @@ Friendship = ($http, $resource, $q, apiRoot, Auth) ->
     $http
       method: 'delete'
       url: "#{listUrl}/friend"
-      data: {friend: friendId}
+      data:
+        friend: friendId
       headers:
         'Content-Type': 'application/json;charset=utf-8'
     .success (data, status, headers, config) ->
       # Remove the friend from Auth.
-      delete Auth.friends[friendId]
+      delete Auth.user.friends[friendId]
 
       deferred.resolve()
     .error (data, status, headers, config) ->
