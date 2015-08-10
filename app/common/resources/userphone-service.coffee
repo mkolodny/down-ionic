@@ -1,7 +1,9 @@
-UserPhone = ($resource, apiRoot, User) ->
+require '../../vendor/intl-phone/libphonenumber-utils.js'
+
+UserPhone = ($http, $q, $resource, apiRoot, Auth, localStorageService, User) ->
   listUrl = "#{apiRoot}/userphones"
 
-  $resource "#{listUrl}/:id", null,
+  resource = $resource "#{listUrl}/:id", null,
     save:
       method: 'post'
       transformRequest: (data, headersGetter) ->
@@ -21,5 +23,41 @@ UserPhone = ($resource, apiRoot, User) ->
       method: 'post'
       # url: "#{listUrl}/phones"
       # isArray: true
+
+  resource.create = (contact) ->
+    deferred = $q.defer()
+
+    # Get the contact's preferred phone number, formatted accorded to the current
+    #   user's country code. `intlTelInputUtils` is on the window object from
+    #   libphonenumber-utils.
+    phone = contact.phoneNumbers[0].value
+    countryCode = intlTelInputUtils.getCountryCode Auth.phone
+    intlPhone = intlTelInputUtils.formatNumberByType phone, countryCode,
+        intlTelInputUtils.numberFormat.E164
+
+    requestData =
+      name: contact.name
+      phone: intlPhone
+    $http.post "#{listUrl}/contact", requestData
+      .success (data, status) ->
+        # Update the contact in local storage.
+        contacts = localStorageService.get 'contacts'
+        contact.nationalPhone = intlTelInputUtils.formatNumberByType phone,
+            countryCode, intlTelInputUtils.numberFormat.NATIONAL
+        contacts[contact.id] = contact
+        localStorageService.set 'contacts', contacts
+
+        userphone = data
+        userphone.user = User.deserialize data.user
+        response =
+          contact: contact
+          userphone: userphone
+        deferred.resolve response
+      .error (data, status) ->
+        deferred.reject()
+
+    deferred.promise
+
+  resource
 
 module.exports = UserPhone

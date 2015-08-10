@@ -200,3 +200,14 @@ Global Sass
     background-color: $brand-color;
   }
 }
+
+// Friendship Buttons
+.friendship-button {
+  &.fa-plus-square-o,
+  &.fa-spinner {
+    color: #aaa;
+  }
+  &.fa-check-square {
+    color: $brand-color;
+  }
+}

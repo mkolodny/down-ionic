@@ -15,8 +15,7 @@
              ng-if="!item.isDivider">
         <h2 ng-if="!item.isDivider">{{item.user.name}}</h2>
         <p ng-if="!item.isDivider">{{item.user.username}}</p>
-        <friendship-button user-id="item.user.id" ng-if="!item.isDivider"
-                           ></friendship-button>
+        <user-friendship-button user-id="item.user.id" ng-if="!item.isDivider">
       </ion-item>
     </ion-list>
     <div id="spinner-container" ng-if="addFromFacebook.isLoading">

@@ -1,6 +1,7 @@
 require 'angular'
 require 'angular-ui-router'
 require '../common/auth/auth-module'
+require '../common/user-friendship-button/user-friendship-button-module'
 require '../common/resources/resources-module'
 AddByUsernameCtrl = require './add-by-username-controller'
 
@@ -8,6 +9,7 @@ angular.module 'down.addByUsername', [
     'ui.router'
     'down.auth'
     'down.resources'
+    'down.userFriendshipButton'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'addByUsername',

@@ -292,11 +292,9 @@ describe 'user service', ->
         .respond 200, angular.toJson(responseData)
 
       response = null
-      User.getFacebookFriends()
-        .$promise.then (_response_) ->
-          response = _response_
+      User.getFacebookFriends().$promise.then (_response_) ->
+        response = _response_
       $httpBackend.flush 1
 
-      expectedUserData = User.deserialize responseData[0]
-      expectedUsers = [new User expectedUserData]
+      expectedUsers = [User.deserialize responseData[0]]
       expect(response).toAngularEqual expectedUsers

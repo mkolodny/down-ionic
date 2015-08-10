@@ -2,9 +2,9 @@ require 'angular'
 require 'angular-mocks'
 require '../auth/auth-module'
 require '../resources/resources-module'
-require './friendship-button-module'
+require './user-friendship-button-module'
 
-describe 'friendship button directive', ->
+describe 'user friendship button directive', ->
   $compile = null
   $q = null
   Auth = null
@@ -15,7 +15,7 @@ describe 'friendship button directive', ->
   User = null
   userId = null
 
-  beforeEach angular.mock.module('down.friendshipButton')
+  beforeEach angular.mock.module('down.userFriendshipButton')
 
   beforeEach angular.mock.module('down.auth')
 
@@ -42,7 +42,7 @@ describe 'friendship button directive', ->
 
     userId = 1
     element = angular.element """
-      <friendship-button user-id="#{userId}">
+      <user-friendship-button user-id="#{userId}">
       """
   )
 

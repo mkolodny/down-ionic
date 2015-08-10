@@ -5,25 +5,37 @@
                 ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, last: $last}"
                 item-height="item.isDivider ? '35px' : '71px'">
         <!-- Divider -->
-        <span ng-if="item.isDivider">{{item.title}}</span>
+        <div ng-if="item.isDivider">
+          {{item.title}}
+        </div>
 
-        <!-- User -->
-        <img ng-src="{{item.contact.user.imageUrl}}" alt="Profile Pic"
-             ng-if="!item.isDivider && item.contact.user">
-        <h2 ng-if="!item.isDivider && item.contact.user">{{item.contact.user.name}}</h2>
-        <p ng-if="!item.isDivider && item.contact.user">{{item.contact.user.username}}</p>
-        <friendship-button user-id="item.id"
-                           ng-if="!item.isDivider && item.contact.user"
-                           ></friendship-button>
+        <!-- User who signed up -->
+        <div ng-if="item.contact.user.username">
+          <img class="item-image" ng-src="{{item.contact.user.imageUrl}}"
+               alt="Profile Pic">
+          <h2>{{item.contact.user.name}}</h2>
+          <p>{{item.contact.user.username}}</p>
+          <user-friendship-button user-id="item.id">
+        </div>
+
+        <!-- User who was added from contacts -->
+        <div ng-if="item.contact.user && !item.contact.user.username">
+          <img class="item-image" ng-src="{{item.contact.user.imageUrl}}"
+               alt="Profile Pic">
+          <h2>{{item.contact.user.name}}</h2>
+          <p>{{item.contact.user.username}}</p>
+          <user-friendship-button user-id="item.id">
+        </div>
 
         <!-- Contact -->
-        <span class="contact-image item-image"
-              ng-if="!item.isDivider && !item.contact.user"
-              >{{addFromAddressBook.getInitials(item.contact.name)}}</span>
-        <h2 ng-if="!item.isDivider && !item.contact.user">{{item.contact.name}}</h2>
-        <p ng-if="!item.isDivider && !item.contact.user">Add by SMS</p>
-        <i class="icon fa fa-plus-square-o"
-           ng-if="!item.isDivider && !item.contact.user"></i>
+        <div ng-if="!item.isDivider && !item.contact.user">
+          <span class="contact-image item-image"
+                >{{addFromAddressBook.getInitials(item.contact.name)}}</span>
+          <h2>{{item.contact.name}}</h2>
+          <p>Add by SMS</p>
+          <i class="icon fa fa-plus-square-o"></i>
+          <contact-friendship-button contact="item.contact">
+        </div>
       </ion-item>
     </ion-list>
   </ion-content>

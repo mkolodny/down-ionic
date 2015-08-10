@@ -4,7 +4,7 @@ friendshipButtonDirective = (Auth, Friendship) ->
     userId: '='
   template: """
     <a href="" ng-click="toggleFriendship(userId)">
-      <i class="icon fa"
+      <i class="icon fa friendship-button"
          ng-class="{'fa-plus-square-o': !isFriend(userId) && !isLoading, 'fa-check-square': isFriend(userId) && !isLoading, 'fa-spinner': isLoading, 'fa-pulse': isLoading}"></i>
     </a>
     """
@@ -16,17 +16,13 @@ friendshipButtonDirective = (Auth, Friendship) ->
       $scope.isLoading = true
 
       if Auth.isFriend userId
-        Friendship.deleteWithFriendId(userId).then ->
-          $scope.isLoading = false
-        , ->
+        Friendship.deleteWithFriendId(userId).finally ->
           $scope.isLoading = false
       else
         friendship =
           userId: Auth.user.id
           friendId: userId
-        Friendship.save(friendship).$promise.then ->
-          $scope.isLoading = false
-        , ->
+        Friendship.save(friendship).$promise.finally ->
           $scope.isLoading = false
 
 module.exports = friendshipButtonDirective

@@ -1,4 +1,5 @@
 require 'angular'
+require 'angular-local-storage'
 require 'angular-resource'
 require '../asteroid/asteroid-module'
 require '../auth/auth-module'
@@ -15,6 +16,7 @@ angular.module 'down.resources', [
     'ngResource'
     'down.asteroid'
     'down.auth'
+    'LocalStorageModule'
   ]
   .value 'apiRoot', 'http://localhost:5000/api'
   .factory 'APNSDevice', APNSDevice
