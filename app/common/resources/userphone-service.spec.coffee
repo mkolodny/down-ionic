@@ -130,7 +130,7 @@ describe 'userphone service', ->
       it 'should update the contact in local storage', ->
         contacts = localStorage.get 'contacts'
         updatedContact = angular.extend {}, contact,
-          nationalPhone: '(203) 622-7310'
+          user: User.deserialize user
         updatedContacts =
           "#{contact.id}": updatedContact
         expect(contacts).toEqual updatedContacts

@@ -5,6 +5,7 @@ require '../common/contacts/contacts-module'
 AddFromAddressBookCtrl = require './add-from-address-book-controller'
 
 describe 'add from address book controller', ->
+  $controller = null
   $q = null
   Contacts = null
   contacts = null
@@ -66,7 +67,7 @@ describe 'add from address book controller', ->
       title: 'A'
     ,
       isDivider: false
-      contact: contacts[2]
+      user: user
     ,
       isDivider: true
       title: 'B'
@@ -75,6 +76,52 @@ describe 'add from address book controller', ->
       contact: contacts[1]
     ]
     expect(ctrl.items).toEqual items
+
+  xdescribe 'when the user\'s contacts haven\'t been saved yet', ->
+    deferred = null
+
+    beforeEach ->
+      localStorage.clearAll()
+
+      deferred = $q.defer()
+      spyOn(Contacts, 'getContacts').and.returnValue deferred.promise
+
+      ctrl = $controller AddFromAddressBookCtrl,
+        $scope: scope
+
+    it 'should show the loading spinner', ->
+      expect(ctrl.isLoading).toBe true
+
+    it 'should request the user\'s contacts', ->
+      expect(Contacts.getContacts).toHaveBeenCalled()
+
+    describe 'when the load succeeds', ->
+
+      beforeEach ->
+        spyOn ctrl, 'showContacts'
+
+        deferred.resolve contacts
+        scope.$apply()
+
+      it 'should show the friends', ->
+        expect(ctrl.showContacts).toHaveBeenCalledWith contacts
+
+      it 'should hide the loading spinner', ->
+        expect(ctrl.isLoading).toBe false
+
+
+    describe 'when the load fails', ->
+
+      beforeEach ->
+        deferred.reject()
+        scope.$apply()
+
+      it 'should show an error', ->
+        expect(ctrl.loadError).toBe true
+
+      it 'should hide the loading spinner', ->
+        expect(ctrl.isLoading).toBe false
+
 
   describe 'pulling to refresh', ->
     deferred = null

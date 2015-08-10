@@ -95,10 +95,18 @@ Global Sass
   &.last {
     border-bottom-width: 1px;
   }
+  .contact-image {
+    background-color: #ccc;
+    color: #fff;
+    padding-top: 14px;
+    font-size: 20px;
+    font-weight: 500;
+  }
 }
 .item-avatar {
   & > img:first-child,
   .item-image {
+    background-color: #ccc;
     max-width: 50px;
     max-height: 50px;
     top: 11px;

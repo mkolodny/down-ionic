@@ -10,33 +10,35 @@
         </div>
 
         <!-- User who signed up -->
-        <div ng-if="item.contact.user.username">
-          <img class="item-image" ng-src="{{item.contact.user.imageUrl}}"
+        <div ng-if="item.user">
+          <img class="item-image" ng-src="{{item.user.imageUrl}}"
                alt="Profile Pic">
-          <h2>{{item.contact.user.name}}</h2>
-          <p>{{item.contact.user.username}}</p>
+          <h2>{{item.user.name}}</h2>
+          <p>{{item.user.username}}</p>
           <user-friendship-button user-id="item.id">
         </div>
 
-        <!-- User who was added from contacts -->
-        <div ng-if="item.contact.user && !item.contact.user.username">
-          <img class="item-image" ng-src="{{item.contact.user.imageUrl}}"
-               alt="Profile Pic">
+        <!-- Contact with a user object -->
+        <div ng-if="item.contact && item.contact.user">
+          <span class="contact-image item-image"
+                >{{addFromAddressBook.getInitials(item.contact.name)}}</span>
           <h2>{{item.contact.user.name}}</h2>
-          <p>{{item.contact.user.username}}</p>
-          <user-friendship-button user-id="item.id">
+          <p>Add by SMS</p>
+          <user-friendship-button user-id="item.contact.user.id">
         </div>
 
-        <!-- Contact -->
-        <div ng-if="!item.isDivider && !item.contact.user">
+        <!-- Contact without a user object -->
+        <div ng-if="item.contact && !item.contact.user">
           <span class="contact-image item-image"
                 >{{addFromAddressBook.getInitials(item.contact.name)}}</span>
           <h2>{{item.contact.name}}</h2>
           <p>Add by SMS</p>
-          <i class="icon fa fa-plus-square-o"></i>
           <contact-friendship-button contact="item.contact">
         </div>
       </ion-item>
     </ion-list>
+    <div id="spinner-container" ng-if="addFromAddressBook.isLoading">
+      <ion-spinner></ion-spinner>
+    </div>
   </ion-content>
 </ion-view>

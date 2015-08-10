@@ -40,15 +40,15 @@ UserPhone = ($http, $q, $resource, apiRoot, Auth, localStorageService, User) ->
       phone: intlPhone
     $http.post "#{listUrl}/contact", requestData
       .success (data, status) ->
+        userphone = data
+        userphone.user = User.deserialize data.user
+
         # Update the contact in local storage.
         contacts = localStorageService.get 'contacts'
-        contact.nationalPhone = intlTelInputUtils.formatNumberByType phone,
-            countryCode, intlTelInputUtils.numberFormat.NATIONAL
+        contact.user = userphone.user
         contacts[contact.id] = contact
         localStorageService.set 'contacts', contacts
 
-        userphone = data
-        userphone.user = User.deserialize data.user
         response =
           contact: contact
           userphone: userphone

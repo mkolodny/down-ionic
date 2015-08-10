@@ -20,28 +20,24 @@ class AddFromAddressBookCtrl
       title: 'M'
     ,
       isDivider: false
-      contact:
-        user:
-          id: 1
-          name: 'Michael Kolodny'
-          username: 'm'
-          imageUrl: 'https://graph.facebook.com/v2.2/4900498025333/picture'
+      user:
+        id: 1
         name: 'Michael Kolodny'
-        phoneNumbers: [
-          type: 'mobile'
-          value: '3345678901'
-          pref: true
-        ]
+        username: 'm'
+        imageUrl: 'https://graph.facebook.com/v2.2/4900498025333/picture'
     ]
     return
 
+    # TODO: Handle when the user hasn't saved their contacts yet.
     contacts = @localStorage.get 'contacts'
-    @showContacts contacts
+    if contacts isnt null
+      @showContacts contacts
+    else
+      @isLoading = true
+      @refresh()
 
   showContacts: (contacts) ->
-    contactsArray = []
-    for id, contact of contacts
-      contactsArray.push contact
+    contactsArray = (contact for id, contact of contacts)
     contactsArray.sort (a, b) ->
       if a.name.toLowerCase() < b.name.toLowerCase()
         return -1
@@ -56,9 +52,14 @@ class AddFromAddressBookCtrl
           title: contact.name[0]
         currentLetter = contact.name[0]
 
-      @items.push
-        isDivider: false
-        contact: contact
+      if contact.user?.username
+        @items.push
+          isDivider: false
+          user: contact.user
+      else
+        @items.push
+          isDivider: false
+          contact: contact
 
   refresh: ->
     refreshCompleteEvent = 'scroll.refreshComplete'
@@ -69,6 +70,8 @@ class AddFromAddressBookCtrl
     , =>
       @$scope.$broadcast refreshCompleteEvent
       @loadError = true
+    .finally =>
+      @isLoading = false
 
   getInitials: (name) ->
     words = name.split ' '

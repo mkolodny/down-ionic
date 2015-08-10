@@ -28,11 +28,11 @@ class AddFromFacebookCtrl
     return
 
     facebookFriends = @localStorage.get 'facebookFriends'
-    if facebookFriends is null
+    if facebookFriends isnt null
+      @showFacebookFriends facebookFriends
+    else
       @isLoading = true
       @refresh()
-    else
-      @showFacebookFriends facebookFriends
 
   showFacebookFriends: (facebookFriends) ->
     facebookFriends.sort (a, b) ->
@@ -59,10 +59,10 @@ class AddFromFacebookCtrl
       @showFacebookFriends facebookFriends
       @$scope.$broadcast refreshCompleteEvent
       @loadError = false
-      @isLoading = false
     , =>
       @$scope.$broadcast refreshCompleteEvent
       @loadError = true
+    .finally =>
       @isLoading = false
 
 module.exports = AddFromFacebookCtrl

@@ -17,6 +17,7 @@ describe 'find friends controller', ->
   Contacts = null
   User = null
   localStorage = null
+  facebookFriend = null
 
   beforeEach angular.mock.module('down.auth')
 
@@ -43,66 +44,149 @@ describe 'find friends controller', ->
     contactsDeferred = $q.defer()
     spyOn(Contacts, 'getContacts').and.returnValue contactsDeferred.promise
 
+    # Need dis in the constructor
+    facebookFriend =
+      id: '1234'
+      name: 'Chris Pleb'
+      username: 'm'
+      imageUrl: 'thatImage.com'
+    Auth.user.facebookFriends = [facebookFriend]
+
     ctrl = $controller FindFriendsCtrl,
       Auth: Auth
       $scope: scope
       Contacts: Contacts
   )
 
-  it 'should request the user\'s facebook friends', ->
-    expect(User.getFacebookFriends).toHaveBeenCalled()
-
-  it 'should request the user\'s contacts', ->
+  xit 'should request the user\'s contacts', ->
     expect(Contacts.getContacts).toHaveBeenCalled()
 
-  describe 'when the facebook friends request returns', ->
+  xit 'should set isLoading to true', ->
+    expect(ctrl.isLoading).toEqual true
+
+  xdescribe 'when the user has facebook friends', ->
+
+    it 'should create and set items for facebook friends', ->
+      items = [
+        isDivider: true
+        title: 'Friends Using Down'
+      ,
+        isDivider: false
+        user:
+          id: facebookFriend.id
+          name: facebookFriend.name
+          username: facebookFriend.username
+          imageUrl: facebookFriend.imageUrl
+      ,
+        isDivider: true
+        title: 'Contacts'
+      ]
+
+      expect(ctrl.items).toEqual items
+
+
+  xdescribe 'when get contacts returns', ->
 
     describe 'successfully', ->
-      friend = null
+      contacts = null
+      items = null
 
       beforeEach ->
-        # Reset the friends.
-        Auth.friends = {}
-
-        friend = new User
-          id: 1
-          name: 'Alan Turing'
-          username: 'tdog'
-          imageUrl: 'https://graph.facebook.com/2.2/1598714293871/picture'
-        deferred.resolve [friend]
-        scope.$apply()
-
-      it 'should set the friends on Auth', ->
-        # TODO: Remove this.
-        friends = {}
-        friends[friend.id] = friend
-        expect(Auth.friends).toEqual friends
-
-      it 'should generate the items list', ->
+        contact =
+          id: 1234
+          name: 'Mike Pleb'
+          phoneNumbers: [
+            value: '+1952852230'
+          ]
         items = [
           isDivider: true
           title: 'Friends Using Down'
         ,
           isDivider: false
-          id: friend.id
-          name: friend.name
-          username: friend.username
-          imageUrl: friend.imageUrl
+          user: facebookFriend
         ,
           isDivider: true
           title: 'Contacts'
+        ,
+          isDivider: false
+          contact: contact
         ]
-        expect(ctrl.items).toEqual items
+        spyOn(ctrl, 'buildItems').and.returnValue items
+
+        contacts =
+          1234: contact
+        contactsDeferred.resolve contacts
+        scope.$apply()
+
+      it 'should set isLoading to false', ->
+        expect(ctrl.isLoading).toEqual false
+
+      it 'should build the items list', ->
+        expect(ctrl.buildItems).toHaveBeenCalledWith Auth.user.facebookFriends,
+            contacts
+
+      it 'should set the items on the controller', ->
+        expect(ctrl.items).toBe items
 
 
     describe 'with an error', ->
-
       beforeEach ->
-        deferred.reject()
+        contactsDeferred.reject()
         scope.$apply()
 
+      it 'should set isLoading to false', ->
+        expect(ctrl.isLoading).toEqual false
+
       it 'should show an error', ->
-        expect(ctrl.fbFriendsRequestError).toBe true
+        expect(ctrl.contactsRequestError).toBe true
+
+
+  describe 'building the items list', ->
+    contactNoUser = null
+    contactUser = null
+    result = null
+
+    beforeEach ->
+      contactNoUser =
+        id: 1
+        name: 'Mike Pleb'
+        phoneNumbers: [
+          value: '+1952852230'
+        ]
+      contactUser =
+        id: 2
+        name: 'Andrew Plebfoot'
+        phoneNumbers: [
+          value: '+1952852231'
+        ]
+        user:
+          id: 3
+          name: 'Andrew Plebfoot'
+          username: 'a'
+      contacts =
+        "#{contactNoUser.id}": contactNoUser
+        "#{contactUser.id}": contactUser
+
+      result = ctrl.buildItems Auth.user.facebookFriends, contacts
+
+    it 'should return the built items', ->
+      items = [
+        isDivider: true
+        title: 'Friends Using Down'
+      ,
+        isDivider: false
+        user: contactUser.user
+      ,
+        isDivider: false
+        user: facebookFriend
+      ,
+        isDivider: true
+        title: 'Contacts'
+      ,
+        isDivider: false
+        contact: contactNoUser
+      ]
+      expect(result).toEqual items
 
 
   describe 'when the user finishes', ->
@@ -117,58 +201,27 @@ describe 'find friends controller', ->
       localStorage.clearAll()
 
     it 'should set localStorage.hasCompletedFindFriends', ->
-      expect(localStorage.get('hasCompletedFindFriends')).toBe true
+      expect(localStorage.get 'hasCompletedFindFriends').toBe true
 
     it 'should redirect for auth state', ->
       expect(Auth.redirectForAuthState).toHaveBeenCalled()
 
-  describe 'when get contacts returns', ->
 
-    describe 'successfully', ->
+  describe 'getting a contact\'s initials', ->
 
-    describe 'with an error', ->
+    describe 'when they have multiple words in their name', ->
 
-  describe 'sort items', ->
+      it 'should return the first letter of their first and last name', ->
+        expect(ctrl.getInitials 'Alan Tdog Turing').toBe 'AT'
 
-    describe 'item has a username', ->
-      result = null
-      item1 = null
-      item2 = null
 
-      beforeEach ->
-        item1 =
-          name: 'Jimbo Walker'
-          username: 'j'
-        item2 =
-          name: 'Andrew Linfoot'
-          username: 'a'
+    describe 'when they have one word in their name', ->
 
-        result = ctrl.sortItems [item1, item2]
+      it 'should return the first two letters of their name', ->
+        expect(ctrl.getInitials 'Pele').toBe 'PE'
 
-      it 'should be added to the Friends Using Down section', ->
-        expect(result).toEqual [ [item2, item1], [] ]
 
-    describe 'item has a phone', ->
-      result = null
-      item1 = null
-      item2 = null
+    describe 'when they have one letter in their name', ->
 
-      beforeEach ->
-        item1 =
-          name: 'Mike Pleb'
-          phone: '+19252852230'
-        item2 =
-          name: 'Linfoot Pleb'
-          phone: '+15555555555'
-
-        result = ctrl.sortItems [item1, item2]
-
-      it 'should be added to the Contacts section', ->
-        expect(result).toEqual [ [], [item2, item1] ]
-
-  describe 'set items', ->
-
-    it 'should add the friends using down and contacts dividers', ->
-
-    it 'should set the items', ->
-
+      it 'should return the first letter of their name', ->
+        expect(ctrl.getInitials 'p').toBe 'P'

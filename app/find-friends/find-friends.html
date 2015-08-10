@@ -8,14 +8,45 @@
                 ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, last: $last}"
                 item-height="item.isDivider ? '35px' : '71px'">
         <!-- Divider -->
-        <span ng-if="item.isDivider">{{item.title}}</span>
+        <div ng-if="item.isDivider">
+          {{item.title}}
+        </div>
 
-        <!-- Facebook Friend -->
-        <img ng-src="{{item.imageUrl}}" alt="Profile Pic" ng-if="!item.isDivider">
-        <h2 ng-if="!item.isDivider">{{item.name}}</h2>
-        <p ng-if="!item.isDivider">{{item.username}}</p>
-        <user-friendship-button user-id="item.id" ng-if="!item.isDivider">
+        <!-- Friend Using Down -->
+        <div ng-if="item.user">
+          <img class="item-image" ng-src="{{item.user.imageUrl}}" alt="Profile Pic">
+          <h2>{{item.user.name}}</h2>
+          <p>{{item.user.username}}</p>
+          <user-friendship-button user-id="item.user.id">
+        </div>
+
+        <!-- Contact with a user object -->
+        <div ng-if="item.contact && item.contact.user">
+          <span class="contact-image item-image"
+                >{{findFriends.getInitials(item.contact.name)}}</span>
+          <h2>{{item.contact.name}}</h2>
+          <p>Add by SMS</p>
+          <user-friendship-button user-id="item.contact.user.id">
+        </div>
+
+        <!-- Contact without a user object -->
+        <div ng-if="item.contact && !item.contact.user">
+          <span class="contact-image item-image"
+                >{{findFriends.getInitials(item.contact.name)}}</span>
+          <h2>{{item.contact.name}}</h2>
+          <p>Add by SMS</p>
+          <contact-friendship-button contact="item.contact">
+        </div>
       </ion-item>
+
+      <div id="spinner-container" ng-if="findFriends.isLoading">
+      <ion-spinner></ion-spinner>
+      </div>
+      <div id="load-error"
+           ng-if="contactsRequestError">
+        There was a problem accessing your contacts. Please try again in a little
+        while.
+      </div>
     </ion-list>
   </ion-content>
 </div>

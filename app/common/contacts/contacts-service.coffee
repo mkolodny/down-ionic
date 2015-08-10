@@ -12,9 +12,9 @@ class Contacts
 
     @$cordovaContacts.find(fields).then (contacts) =>
       contacts = @filterContacts contacts
-      @identifyContacts(contacts).then (contactsObject) =>
-        @saveContacts contactsObject
-        deferred.resolve contactsObject
+      @identifyContacts(contacts).then (contacts) =>
+        @saveContacts contacts
+        deferred.resolve contacts
       , ->
         error =
           code: 'IDENTIFY_FAILED'
@@ -32,7 +32,7 @@ class Contacts
    * @return {Promise} - Resolved with an object with the user's contacts in the
    *                     format - {
    *                       contactId: {
-   *                         user: <User>, # Optional
+   *                         id: <String>,
    *                         name: <String>,
    *                         phoneNumbers: [
    *                           {
@@ -41,6 +41,7 @@ class Contacts
    *                             pref: <Bool> # True if this is the preferred #
    *                           }
    *                         ]
+   *                         user: <User>, # Optional
    *                       }
    *                     }
   ###
@@ -55,7 +56,6 @@ class Contacts
       deferred.resolve contactsObject
     , ->
       deferred.reject()
-
     deferred.promise
 
   contactArrayToObject: (contacts) ->

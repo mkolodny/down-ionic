@@ -61,13 +61,14 @@ describe 'contact friendship button directive', ->
       contact = null
 
       beforeEach ->
+        user =
+          id: 1
         contact = angular.extend {}, scope.contact,
-          formattedPhone: '(203) 622-7310'
+          user: user
         data =
           contact: contact
           userphone:
-            user:
-              id: 1
+            user: user
             phone: '+12036227310'
         deferred.resolve data
         scope.$apply()
