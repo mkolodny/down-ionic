@@ -14,9 +14,9 @@
                ng-class="{selected: item.friend.isSelected, 'item-divider': item.isDivider, 'item-icon-right': !item.isDivider, 'last': $last}"
                item-height="item.isDivider ? '35px' : '43px'">
        <div class="divider" ng-if="item.isDivider">
-         <span>{{item.title}}</span>
+         {{item.title}}
        </div>
-       <div class="friend" ng-if="!item.isDivider">
+       <div class="friend" ng-if="item.friend">
          <h2>{{item.friend.name}}</h2>
          <i class="icon fa"
             ng-class="{'fa-square-o': !item.friend.isSelected, 'fa-check-square': item.friend.isSelected}"

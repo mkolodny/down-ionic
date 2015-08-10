@@ -8,13 +8,17 @@
                 ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, last: $last}"
                 item-height="item.isDivider ? '35px' : '71px'">
         <!-- Divider -->
-        <span ng-if="item.isDivider">{{item.title}}</span>
+        <div ng-if="item.isDivider">
+          {{item.title}}
+        </div>
 
         <!-- User -->
-        <img ng-src="{{item.user.imageUrl}}" ng-if="!item.isDivider">
-        <h2 ng-if="!item.isDivider">{{item.user.name}}</h2>
-        <p ng-if="!item.isDivider">{{item.user.username}}</p>
-        <user-friendship-button user-id="item.user.id" ng-if="!item.isDivider">
+        <div ng-if="item.user">
+          <img class="item-image" ng-src="{{item.user.imageUrl}}">
+          <h2>{{item.user.name}}</h2>
+          <p>{{item.user.username}}</p>
+          <user-friendship-button user-id="item.user.id">
+        </div>
       </ion-item>
     </ion-list>
     <div id="spinner-container" ng-if="addFromFacebook.isLoading">

@@ -15,48 +15,53 @@
                 ng-click="!item.isDivider ? (item.wasJoined ? null : events.toggleIsExpanded(item)) : null"
                 ng-style="{top: events.moving ? item.top+'px': none, right: item.right+'px'}">
         <!-- Divider -->
-        <span ng-if="item.isDivider">{{item.title}}</span>
+        <div ng-if="item.isDivider">
+          {{item.title}}
+        </div>
 
         <!-- Facebook Friend -->
-        <img ng-src="{{item.fromUser.imageUrl}}" alt="{{item.fromUser.name}}">
-        <h2>{{item.event.title}}</h2>
-        <p ng-if="item.wasJoined">{{item.event.latestMessage}}</p>
-        <p ng-if="!item.wasJoined">Suggested by {{item.fromUser.name}}</p>
-        <span class="updated-at">{{item.createdAt | date:'shortTime' | lowercase}}</span>
-        <i class="fa" ng-if="!item.wasJoined"
-           ng-class="{'fa-chevron-down': !item.isExpanded, 'fa-chevron-up': item.isExpanded}"
-           ></i>
-        <i class="fa fa-chevron-right" ng-if="item.wasJoined"></i>
-        <div ng-if="item.isExpanded" class="event-details">
-          <div class="event-detail" ng-if="item.event.datetime">
-            <i class="fa fa-calendar-o"></i>
-            <div>
-              <div>{{item.event.datetime | date:'EEEE, MMM d'}}</div>
-              <div>{{item.event.datetime | date:'shortTime' | lowercase}}</div>
+        <div ng-if="item.fromUser">
+          <img class="item-image" ng-src="{{item.fromUser.imageUrl}}"
+               alt="{{item.fromUser.name}}">
+          <h2>{{item.event.title}}</h2>
+          <p ng-if="item.wasJoined">{{item.event.latestMessage}}</p>
+          <p ng-if="!item.wasJoined">Suggested by {{item.fromUser.name}}</p>
+          <span class="updated-at">{{item.createdAt | date:'shortTime' | lowercase}}</span>
+          <i class="fa item-icon" ng-if="!item.wasJoined"
+             ng-class="{'fa-chevron-down': !item.isExpanded, 'fa-chevron-up': item.isExpanded}"
+             ></i>
+          <i class="fa fa-chevron-right item-icon" ng-if="item.wasJoined"></i>
+          <div ng-if="item.isExpanded" class="event-details">
+            <div class="event-detail" ng-if="item.event.datetime">
+              <i class="fa fa-calendar-o"></i>
+              <div>
+                <div>{{item.event.datetime | date:'EEEE, MMM d'}}</div>
+                <div>{{item.event.datetime | date:'shortTime' | lowercase}}</div>
+              </div>
             </div>
-          </div>
-          <div class="event-detail" ng-if="item.event.place">
-            <i class="fa fa-map-marker"></i>
-            <span>{{item.event.place.name}}</span>
-          </div>
-          <div class="event-detail" ng-if="item.event.comment">
-            <i class="fa fa-comment-o"></i>
-            <span>{{item.event.comment}}</span>
-          </div>
-          <div class="respond-buttons">
-            <button class="respond"
-                    ng-click="events.acceptInvitation(item, $event)"
-                    ontouchstart
-                    >Down</button>
-            <button class="respond"
-                    ng-click="events.maybeInvitation(item, $event)"
-                    ontouchstart
-                    >Maybe</button>
-            <button class="respond"
-                    ng-class="{'activated': events.itemWasDeclined(item)}"
-                    ng-click="events.declineInvitation(item, $event)"
-                    ontouchstart
-                    >Can't</button>
+            <div class="event-detail" ng-if="item.event.place">
+              <i class="fa fa-map-marker"></i>
+              <span>{{item.event.place.name}}</span>
+            </div>
+            <div class="event-detail" ng-if="item.event.comment">
+              <i class="fa fa-comment-o"></i>
+              <span>{{item.event.comment}}</span>
+            </div>
+            <div class="respond-buttons">
+              <button class="respond"
+                      ng-click="events.acceptInvitation(item, $event)"
+                      ontouchstart
+                      >Down</button>
+              <button class="respond"
+                      ng-click="events.maybeInvitation(item, $event)"
+                      ontouchstart
+                      >Maybe</button>
+              <button class="respond"
+                      ng-class="{'activated': events.itemWasDeclined(item)}"
+                      ng-click="events.declineInvitation(item, $event)"
+                      ontouchstart
+                      >Can't</button>
+            </div>
           </div>
         </div>
       </ion-item>
