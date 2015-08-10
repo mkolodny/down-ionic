@@ -1,7 +1,6 @@
 class FindFriendsCtrl
   constructor: (@$state, @Auth, @User, localStorageService, @Contacts, @$filter) ->
     @localStorage = localStorageService
-    @items = []
 
     # # Use mock data for now.
     # user =
@@ -12,13 +11,16 @@ class FindFriendsCtrl
     # @Auth.friends[user.id] = new @User(user)
     # return # Mock for now.
 
+    @isLoading = true
     # Request Contacts Permission
     @Contacts.getContacts().then (contactsObject) =>
       items = @contactsToItems contactsObject
       items = @mergeItems items
       items = @sortItems items
       @setItems items
+      @isLoading = false
     , =>
+      @isLoading = false
       @contactsRequestError = true
 
     # Build the list of items to show in the view.
@@ -30,7 +32,6 @@ class FindFriendsCtrl
         name: friend.name
         username: friend.username
         imageUrl: friend.imageUrl
-    items = @mergeItems items
     items = @sortItems items
     @setItems items
 

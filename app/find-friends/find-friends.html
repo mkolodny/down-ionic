@@ -27,6 +27,15 @@
            ng-if="!item.isDivider && !item.contact.user"></i>
 
       </ion-item>
+
+      <div id="spinner-container" ng-if="findFriends.isLoading">
+      <ion-spinner></ion-spinner>
+      </div>
+      <div id="load-error"
+           ng-if="contactsRequestError">
+        There was a problem accessing your contacts. Please try again in a little
+        while.
+      </div>
     </ion-list>
   </ion-content>
 </div>

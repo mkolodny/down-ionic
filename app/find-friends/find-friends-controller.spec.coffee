@@ -59,11 +59,11 @@ describe 'find friends controller', ->
       Contacts: Contacts
   )
 
-  it 'should init a blank items array', ->
-    expect(ctrl.items).toEqual []
-
   it 'should request the user\'s contacts', ->
     expect(Contacts.getContacts).toHaveBeenCalled()
+
+  it 'should set isLoading to true', ->
+    expect(ctrl.isLoading).toEqual true
 
   describe 'when the user has facebook friends', ->
 
@@ -130,6 +130,9 @@ describe 'find friends controller', ->
         contactsDeferred.resolve contactsObject
         scope.$apply()
 
+      it 'should set isLoading to false', ->
+        expect(ctrl.isLoading).toEqual false
+
       it 'should call contactsToItems with contacts', ->
         expect(ctrl.contactsToItems).toHaveBeenCalledWith contactsObject
 
@@ -147,7 +150,10 @@ describe 'find friends controller', ->
         contactsDeferred.reject()
         scope.$apply()
 
-      fit 'should show an error', ->
+      it 'should set isLoading to false', ->
+        expect(ctrl.isLoading).toEqual false
+
+      it 'should show an error', ->
         expect(ctrl.contactsRequestError).toBe true
 
   describe 'contacts to items', ->
