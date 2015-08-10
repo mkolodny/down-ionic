@@ -4,33 +4,6 @@ class FriendsCtrl
   constructor: (@$state, @Auth) ->
     friends = angular.copy @Auth.user.friends
 
-    # Mock friends for now.
-    friend1 =
-      id: 1
-      name: 'Michael Kolodny'
-      username: 'm'
-      imageUrl: 'https://graph.facebook.com/v2.2/4900498025333/picture'
-    friend2 =
-      id: 2
-      name: 'Andrew Linfoot'
-      username: 'a'
-      imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
-    @nearbyFriends = [friend1]
-    alphabeticalItems = [
-      isDivider: true
-      title: 'A'
-    ,
-      isDivider: false
-      friend: friend2
-    ,
-      isDivider: true
-      title: 'M'
-    ,
-      isDivider: false
-      friend: friend1
-    ]
-
-    ###
     # Build the list of alphabetically sorted nearby friends.
     @nearbyFriends = (friend for id, friend of friends when @Auth.isNearby(friend))
     @nearbyFriends.sort (a, b) ->
@@ -58,7 +31,6 @@ class FriendsCtrl
       alphabeticalItems.push
         isDivider: false
         friend: friend
-    ###
 
     # Build the list of items to show in the collection.
     @items = []

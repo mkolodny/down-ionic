@@ -123,7 +123,7 @@ describe 'events controller', ->
       scope: scope
       animation: 'slide-in-up'
 
-  xdescribe 'when the events request returns', ->
+  describe 'when the events request returns', ->
 
     describe 'successfully', ->
       items = null
@@ -544,7 +544,7 @@ describe 'events controller', ->
         expect(event.latestMessage).toBe actionMessage.text
 
 
-  xdescribe 'responding to an invitation', ->
+  describe 'responding to an invitation', ->
     date = null
     $event = null
     deferred = null
@@ -563,7 +563,8 @@ describe 'events controller', ->
       invitation = angular.copy item
       for property in ['isDivider', 'wasJoined', 'wasUpdated']
         delete invitation[property]
-      ctrl.invitations[invitation.id] = invitation
+      ctrl.invitations =
+        "#{invitation.id}": invitation
 
       $event =
         stopPropagation: jasmine.createSpy '$event.stopPropagation'
@@ -903,5 +904,5 @@ describe 'events controller', ->
 
       ctrl.myFriends()
 
-    fit 'should go to the friends view', ->
+    it 'should go to the friends view', ->
       expect($state.go).toHaveBeenCalledWith 'friends'

@@ -37,61 +37,6 @@ class EventsCtrl
     @$scope.$on '$destroy', =>
       @setPlaceModal.remove()
 
-    @invitations =
-      1:
-        id: 1
-        response: 0
-        createdAt: new Date()
-        updatedAt: new Date()
-        lastViewed: new Date(1437672889145)
-        event:
-          id: 1
-          title: 'bars?!?!?'
-          datetime: new Date()
-          place:
-            name: '169 Bar'
-            lat: 40.7138251
-            long: -73.9897481
-          comment: 'Go Go dancers galore'
-          updatedAt: new Date(1437672889146)
-        fromUser:
-          id: 1
-          name: 'Michael Kolodny'
-          imageUrl: 'https://graph.facebook.com/v2.2/4900498025333/picture'
-      2:
-        id: 2
-        response: 1
-        createdAt: new Date()
-        updatedAt: new Date()
-        lastViewed: new Date(1437672889146)
-        event:
-          id: 1
-          title: 'Beach Day'
-          createdAt: new Date()
-          updatedAt: new Date(1437672889145)
-        fromUser:
-          id: 1
-          name: 'Andrew Linfoot'
-          imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
-    @items = [
-      isDivider: true
-      title: 'New'
-    , angular.extend({}, @invitations[1],
-      isDivider: false
-      wasJoined: false
-      wasUpdated: true
-    ),
-      isDivider: true
-      title: 'Down'
-    , angular.extend({}, @invitations[2],
-      isDivider: false
-      wasJoined: true
-      wasUpdated: false
-    )]
-    @setPositions @items
-
-    return # Mock data for now.
-
     @Invitation.getMyInvitations().then (invitations) =>
       # Save the invitations on the controller.
       @invitations = {}

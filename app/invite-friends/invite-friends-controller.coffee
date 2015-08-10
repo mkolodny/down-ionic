@@ -9,29 +9,6 @@ class InviteFriendsCtrl
     @selectedFriends = []
     @selectedFriendIds = {}
 
-    # Mock friends for now.
-    friend1 =
-      id: 1
-      name: 'Michael Kolodny'
-    friend2 =
-      id: 2
-      name: 'Andrew Linfoot'
-    @nearbyFriends = [friend1]
-    alphabeticalItems = [
-      isDivider: true
-      title: 'A'
-    ,
-      isDivider: false
-      friend: friend2
-    ,
-      isDivider: true
-      title: 'M'
-    ,
-      isDivider: false
-      friend: friend1
-    ]
-
-    ###
     # Build the list of alphabetically sorted nearby friends.
     @nearbyFriends = (friend for id, friend of friends when @Auth.isNearby(friend))
     @nearbyFriends.sort (a, b) ->
@@ -59,7 +36,6 @@ class InviteFriendsCtrl
       alphabeticalItems.push
         isDivider: false
         friend: friend
-    ###
 
     # Build the list of items to show in the collection.
     @items = []

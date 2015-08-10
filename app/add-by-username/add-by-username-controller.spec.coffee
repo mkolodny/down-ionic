@@ -29,7 +29,7 @@ describe 'add by username controller', ->
       Auth: Auth
   )
 
-  xit 'should set the user on the controller', ->
+  it 'should set the user on the controller', ->
     expect(ctrl.user).toBe Auth.user
 
   describe 'searching for a user by username', ->

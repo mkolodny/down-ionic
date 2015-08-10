@@ -137,22 +137,22 @@ describe 'event controller', ->
   it 'should set the event on the controller', ->
     expect(ctrl.event).toBe event
 
-  xit 'should subscribe to each events\' messages', ->
+  it 'should subscribe to each events\' messages', ->
     expect(Asteroid.subscribe).toHaveBeenCalledWith 'messages', event.id
 
-  xit 'should get the messages collection', ->
+  it 'should get the messages collection', ->
     expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
-  xit 'should set the messages collection on the controller', ->
+  it 'should set the messages collection on the controller', ->
     expect(ctrl.Messages).toBe Messages
 
-  xit 'should ask for the messages for the event', ->
-    expect(messages.reactiveQuery).toHaveBeenCalledWith {eventId: event.id}
+  it 'should ask for the messages for the event', ->
+    expect(Messages.reactiveQuery).toHaveBeenCalledWith {eventId: event.id}
 
-  xit 'should set the messages on the event from oldest to newest', ->
+  it 'should set the messages on the event from oldest to newest', ->
     expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
 
-  xit 'should listen for new messages', ->
+  it 'should listen for new messages', ->
     expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)
 
   it 'should request the event members\' invitations', ->

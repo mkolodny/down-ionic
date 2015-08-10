@@ -61,7 +61,7 @@ describe 'add from address book controller', ->
   afterEach ->
     localStorage.clearAll()
 
-  xit 'should set the contacts on the controller', ->
+  it 'should set the contacts on the controller', ->
     items = [
       isDivider: true
       title: 'A'
@@ -77,7 +77,7 @@ describe 'add from address book controller', ->
     ]
     expect(ctrl.items).toEqual items
 
-  xdescribe 'when the user\'s contacts haven\'t been saved yet', ->
+  describe 'when the user\'s contacts haven\'t been saved yet', ->
     deferred = null
 
     beforeEach ->

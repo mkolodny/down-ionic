@@ -58,13 +58,13 @@ describe 'find friends controller', ->
       Contacts: Contacts
   )
 
-  xit 'should request the user\'s contacts', ->
+  it 'should request the user\'s contacts', ->
     expect(Contacts.getContacts).toHaveBeenCalled()
 
-  xit 'should set isLoading to true', ->
+  it 'should set isLoading to true', ->
     expect(ctrl.isLoading).toEqual true
 
-  xdescribe 'when the user has facebook friends', ->
+  describe 'when the user has facebook friends', ->
 
     it 'should create and set items for facebook friends', ->
       items = [
@@ -85,7 +85,7 @@ describe 'find friends controller', ->
       expect(ctrl.items).toEqual items
 
 
-  xdescribe 'when get contacts returns', ->
+  describe 'when get contacts returns', ->
 
     describe 'successfully', ->
       contacts = null

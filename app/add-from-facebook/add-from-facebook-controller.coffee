@@ -3,30 +3,6 @@ class AddFromFacebookCtrl
     @localStorage = localStorageService
 
     # Build the array of items to show in the view.
-    # Mock them for now.
-    @items = [
-      isDivider: true
-      title: 'A'
-    ,
-      isDivider: false
-      user:
-        id: 1
-        name: 'Andrew Linfoot'
-        username: 'a'
-        imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
-    ,
-      isDivider: true
-      title: 'M'
-    ,
-      isDivider: false
-      user:
-        id: 1
-        name: 'Michael Kolodny'
-        username: 'm'
-        imageUrl: 'https://graph.facebook.com/v2.2/4900498025333/picture'
-    ]
-    return
-
     facebookFriends = @localStorage.get 'facebookFriends'
     if facebookFriends isnt null
       @showFacebookFriends facebookFriends

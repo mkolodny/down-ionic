@@ -67,7 +67,7 @@ describe 'friends controller', ->
       Auth: Auth
   )
 
-  xit 'should set the user\'s friends on the controller', ->
+  it 'should set the user\'s friends on the controller', ->
     items = [
       isDivider: true
       title: 'Nearby Friends'

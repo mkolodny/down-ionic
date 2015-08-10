@@ -1,9 +1,6 @@
 class AddByUsernameCtrl
   constructor: (@$timeout, @Auth, @User) ->
-    # Mock the user for now.
-    @user =
-      username: 'tdog'
-    #@user = @Auth.user
+    @user = @Auth.user
 
   search: ->
     @isSearching = true

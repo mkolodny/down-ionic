@@ -3,41 +3,7 @@ class EventCtrl
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
-    # Mock the messages for now.
-    oldest = new Date()
-    middle = new Date(oldest.getTime()+1)
-    newest = new Date(middle.getTime()+1)
-    @messages = [
-      _id: 1
-      creator:
-        id: 1
-        name: 'Michael Kolodny'
-        imageUrl: 'https://graph.facebook.com/v2.2/4900498025333/picture'
-      createdAt: oldest
-      text: 'I\'m in love with a robot.'
-      eventId: @event.id
-      type: 'text'
-    ,
-      _id: 2
-      creator: null
-      createdAt: middle
-      text: 'Michael Jordan is down'
-      eventId: @event.id
-      type: 'action'
-    ,
-      _id: 3
-      creator:
-        id: 1
-        name: 'Andrew Linfoot'
-        imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
-      createdAt: newest
-      text: 'That place is super sticky. I love it.'
-      eventId: @event.id
-      type: 'text'
-    ]
-
     # Get/subscribe to the messages posted in this event.
-    ###
     @Asteroid.subscribe 'messages', @event.id
     @Messages = @Asteroid.getCollection 'messages'
     messagesRQ = @Messages.reactiveQuery {eventId: @event.id}
@@ -49,7 +15,6 @@ class EventCtrl
     # Watch for new messages.
     messagesRQ.on 'change', =>
       @sortMessages()
-    ###
 
     @Invitation.getEventInvitations {id: @event.id}
       .$promise.then (invitations) =>

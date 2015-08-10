@@ -103,7 +103,7 @@ describe 'invite friends controller', ->
   it 'should set the event on the controller', ->
     expect(ctrl.event).toBe event
 
-  xdescribe 'getting the array of nearby friends', ->
+  describe 'getting the array of nearby friends', ->
 
     it 'should be a sorted array of nearby friends', ->
       expect(ctrl.nearbyFriends).toEqual  [ # Alphabetical
@@ -112,7 +112,7 @@ describe 'invite friends controller', ->
       ]
 
 
-  xdescribe 'getting the array of items', ->
+  describe 'getting the array of items', ->
 
     it 'should be an array of nearby friends then alphabetical friends', ->
       items = [

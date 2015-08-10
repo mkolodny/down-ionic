@@ -2,33 +2,6 @@ class AddFromAddressBookCtrl
   constructor: (@$scope, @Contacts, localStorageService) ->
     @localStorage = localStorageService
 
-    # Mock contacts for now.
-    @items = [
-      isDivider: true
-      title: 'A'
-    ,
-      isDivider: false
-      contact:
-        name: 'Andrew Linfoot'
-        phoneNumbers: [
-          type: 'mobile'
-          value: '3345678901'
-          pref: true
-        ]
-    ,
-      isDivider: true
-      title: 'M'
-    ,
-      isDivider: false
-      user:
-        id: 1
-        name: 'Michael Kolodny'
-        username: 'm'
-        imageUrl: 'https://graph.facebook.com/v2.2/4900498025333/picture'
-    ]
-    return
-
-    # TODO: Handle when the user hasn't saved their contacts yet.
     contacts = @localStorage.get 'contacts'
     if contacts isnt null
       @showContacts contacts

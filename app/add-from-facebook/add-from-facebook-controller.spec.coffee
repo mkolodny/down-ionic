@@ -47,7 +47,7 @@ describe 'add from facebook controller', ->
   afterEach ->
     localStorage.clearAll()
 
-  xit 'should set the user\'s facebook friends on the controller', ->
+  it 'should set the user\'s facebook friends on the controller', ->
     items = [
       isDivider: true
       title: 'A'
@@ -126,7 +126,7 @@ describe 'add from facebook controller', ->
         expect(ctrl.isLoading).toBe false
 
 
-  xdescribe 'when the user\'s facebook friends haven\'t been saved yet', ->
+  describe 'when the user\'s facebook friends haven\'t been saved yet', ->
 
     beforeEach ->
       localStorage.clearAll()

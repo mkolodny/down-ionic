@@ -2,37 +2,6 @@ class FindFriendsCtrl
   constructor: (@$state, @Auth, @User, localStorageService, @Contacts) ->
     @localStorage = localStorageService
 
-    # Use mock data for now.
-    @items = [
-      isDivider: true
-      title: 'Friends Using Down'
-    ,
-      isDivider: false
-      user:
-        id: 1
-        name: 'Michael Kolodny'
-        username: 'm'
-        imageUrl: 'https://graph.facebook.com/v2.2/4900498025333/picture'
-    ,
-      isDivider: true
-      title: 'Contacts'
-    ,
-      isDivider: false
-      contact:
-        id: 2
-        name: 'Andrew Linfoot'
-        nationalPhone: '(952) 285-2231'
-        user:
-          id: 3
-          name: 'Andrew Linfoot'
-    ,
-      isDivider: false
-      contact:
-        id: 2
-        name: 'Chris MacPherson'
-    ]
-    return
-
     # Request Contacts Permission
     @isLoading = true
     @Contacts.getContacts().then (contacts) =>
