@@ -2,6 +2,11 @@
   <ion-nav-title>
     <span id="nav-logo">Down</span>
   </ion-nav-title>
+  <ion-nav-buttons side="primary">
+    <button class="button button-clear icon" ng-click="events.myFriends()"
+            ontouchstart
+            ><i class="fa fa-users fa-lg"></i></button>
+  </ion-nav-buttons>
   <ion-content>
     <ion-list class="list-avatar" ng-class="{moving: events.moving}">
       <!-- We might need to use `track by item.id` for the animations to work. -->

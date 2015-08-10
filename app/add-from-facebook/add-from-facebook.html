@@ -11,8 +11,7 @@
         <span ng-if="item.isDivider">{{item.title}}</span>
 
         <!-- User -->
-        <img ng-src="{{item.user.imageUrl}}" alt="Profile Pic"
-             ng-if="!item.isDivider">
+        <img ng-src="{{item.user.imageUrl}}" ng-if="!item.isDivider">
         <h2 ng-if="!item.isDivider">{{item.user.name}}</h2>
         <p ng-if="!item.isDivider">{{item.user.username}}</p>
         <user-friendship-button user-id="item.user.id" ng-if="!item.isDivider">

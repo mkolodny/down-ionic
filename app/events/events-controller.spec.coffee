@@ -32,6 +32,8 @@ describe 'events controller', ->
   transitionDuration = null
   User = null
 
+  beforeEach angular.mock.module('ui.router')
+
   beforeEach angular.mock.module('down.asteroid')
 
   beforeEach angular.mock.module('down.events')
@@ -892,3 +894,14 @@ describe 'events controller', ->
         expect(ctrl.getNewEvent()).toEqual
           title: ctrl.newEvent.title
           comment: ctrl.newEvent.comment
+
+
+  describe 'tapping to view my friends', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.myFriends()
+
+    fit 'should go to the friends view', ->
+      expect($state.go).toHaveBeenCalledWith 'friends'

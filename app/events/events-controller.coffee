@@ -333,4 +333,7 @@ class EventsCtrl
       event.comment = @newEvent.comment
     event
 
+  myFriends: ->
+    @$state.go 'friends'
+
 module.exports = EventsCtrl
