@@ -17,6 +17,7 @@ describe 'find friends controller', ->
   Contacts = null
   User = null
   localStorage = null
+  facebookFriend = null
 
   beforeEach angular.mock.module('down.auth')
 
@@ -25,6 +26,7 @@ describe 'find friends controller', ->
   beforeEach angular.mock.module('ui.router')
 
   beforeEach angular.mock.module('LocalStorageModule')
+
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
@@ -43,6 +45,14 @@ describe 'find friends controller', ->
     contactsDeferred = $q.defer()
     spyOn(Contacts, 'getContacts').and.returnValue contactsDeferred.promise
 
+    # Need dis in the constructor
+    facebookFriend =
+      id: '1234'
+      name: 'Mike Pleb'
+      username: 'm'
+      imageUrl: 'thatImage.com'
+    Auth.user.facebookFriends = [facebookFriend]
+
     ctrl = $controller FindFriendsCtrl,
       Auth: Auth
       $scope: scope
@@ -52,68 +62,27 @@ describe 'find friends controller', ->
   it 'should init a blank items array', ->
     expect(ctrl.items).toEqual []
 
-  it 'should request the user\'s facebook friends', ->
-    expect(User.getFacebookFriends).toHaveBeenCalled()
-
   it 'should request the user\'s contacts', ->
     expect(Contacts.getContacts).toHaveBeenCalled()
 
-  describe 'when the facebook friends request returns', ->
+  describe 'when the user has facebook friends', ->
 
-    describe 'successfully', ->
-      friend = null
-      items = null
+    it 'should create and set items for facebook friends', ->
+      items = [
+        isDivider: true
+        title: 'Friends Using Down'
+      ,
+        isDivider: false
+        id: facebookFriend.id
+        name: facebookFriend.name
+        username: facebookFriend.username
+        imageUrl: facebookFriend.imageUrl
+      ,
+        isDivider: true
+        title: 'Contacts'
+      ]
 
-      beforeEach ->
-        # Reset the friends.
-        Auth.friends = {}
-
-        friend = new User
-          id: 1
-          name: 'Alan Turing'
-          username: 'tdog'
-          imageUrl: 'https://graph.facebook.com/2.2/1598714293871/picture'
-        
-        ctrl.items = []
-        items = [
-          isDivider: false
-          id: friend.id
-          name: friend.name
-          username: friend.username
-          imageUrl: friend.imageUrl
-        ]
-
-        spyOn(ctrl, 'mergeItems').and.returnValue items
-        spyOn(ctrl, 'sortItems').and.returnValue items
-        spyOn ctrl, 'setItems'
-
-        deferred.resolve [friend]
-        scope.$apply()
-
-      xit 'should set the friends on Auth', ->
-        # TODO: Remove this.
-        friends = {}
-        friends[friend.id] = friend
-        expect(Auth.friends).toEqual friends
-
-      it 'should merge the items', ->
-        expect(ctrl.mergeItems).toHaveBeenCalledWith items
-
-      it 'should sort the items', ->
-        expect(ctrl.sortItems).toHaveBeenCalledWith items
-
-      it 'should set the items', ->
-        expect(ctrl.setItems).toHaveBeenCalledWith items
-
-    describe 'with an error', ->
-
-      beforeEach ->
-        deferred.reject()
-        scope.$apply()
-
-      it 'should show an error', ->
-        expect(ctrl.fbFriendsRequestError).toBe true
-
+      expect(ctrl.items).toEqual items
 
   describe 'when the user finishes', ->
 
