@@ -6,7 +6,7 @@ class Asteroid
     @_instance = new AsteroidClient(@host, true)
 
   login: ->
-    @_instance.loginWithPassword @Auth.user.id, @Auth.user.authtoken
+    @_instance.loginWithPassword "#{@Auth.user.id}", @Auth.user.authtoken
 
   subscribe: (name, params...) ->
     args = params

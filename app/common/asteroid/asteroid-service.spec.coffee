@@ -38,7 +38,7 @@ describe 'Asteroid service', ->
 
     it 'should login the current user', ->
       expect(Asteroid._instance.loginWithPassword).toHaveBeenCalledWith \
-          Auth.user.id, Auth.user.authtoken
+          "#{Auth.user.id}", Auth.user.authtoken
 
     it 'should return a promise', ->
       expect(result).toBe promise
