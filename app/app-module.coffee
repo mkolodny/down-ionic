@@ -49,4 +49,4 @@ angular.module 'down', [
       # above the keyboard for form inputs)
       $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
       $window.StatusBar?.styleDefault()
-      # Auth.redirectForAuthState()
+      Auth.redirectForAuthState()
