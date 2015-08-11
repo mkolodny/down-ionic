@@ -62,11 +62,7 @@ describe 'request push controller', ->
         sound: true
         alert: true
 
-      localStorage.set 'hasRequestedPushNotifications', false
       ctrl.enablePush()
-
-    it 'should set localStorage hasRequestedPushNotifications to true', ->
-      expect(localStorage.get('hasRequestedPushNotifications')).toBe true
 
     it 'should trigger the request notifications prompt', ->
       expect($cordovaPush.register).toHaveBeenCalledWith iosConfig
@@ -85,6 +81,9 @@ describe 'request push controller', ->
       it 'should call save token', ->
         expect(ctrl.saveToken).toHaveBeenCalledWith deviceToken
 
+      it 'should set localStorage hasRequestedPushNotifications to true', ->
+        expect(localStorage.get 'hasRequestedPushNotifications').toBe true
+
     describe 'permission denied', ->
       beforeEach ->
         spyOn Auth, 'redirectForAuthState'
@@ -94,6 +93,9 @@ describe 'request push controller', ->
 
       it 'should redirect for auth state', ->
         expect(Auth.redirectForAuthState).toHaveBeenCalled()
+
+      it 'should set localStorage hasRequestedPushNotifications to true', ->
+        expect(localStorage.get 'hasRequestedPushNotifications').toBe true
 
   describe 'saving the device token', ->
     device = null

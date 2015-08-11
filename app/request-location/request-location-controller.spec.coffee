@@ -43,9 +43,6 @@ describe 'request location controller', ->
     afterEach ->
       localStorage.clearAll()
 
-    it 'should set the hasRequestLocationServices to true', ->
-      expect(localStorage.get 'hasRequestedLocationServices').toBe true
-
     it 'should start watching the users location', ->
       expect(Auth.watchLocation).toHaveBeenCalled()
 
@@ -60,3 +57,9 @@ describe 'request location controller', ->
 
       it 'should redirect for auth state', ->
         expect(Auth.redirectForAuthState).toHaveBeenCalled()
+
+      it 'should set the hasRequestLocationServices to true', ->
+        expect(localStorage.get 'hasRequestedLocationServices').toBe true
+
+
+    xdescribe 'permission denied', ->

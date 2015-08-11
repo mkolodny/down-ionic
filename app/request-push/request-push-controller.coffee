@@ -3,7 +3,6 @@ class RequestPushCtrl
     @localStorage = localStorageService
 
   enablePush: ->
-    @localStorage.set 'hasRequestedPushNotifications', true
     # iOS Notification Permissions Options
     iosConfig =
       badge: true
@@ -14,6 +13,8 @@ class RequestPushCtrl
         @saveToken deviceToken
       , =>
         @Auth.redirectForAuthState()
+      .finally =>
+        @localStorage.set 'hasRequestedPushNotifications', true
 
   saveToken: (deviceToken)->
     device = @$cordovaDevice.getDevice()
