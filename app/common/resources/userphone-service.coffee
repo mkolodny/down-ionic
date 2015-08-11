@@ -30,6 +30,7 @@ UserPhone = ($http, $q, $resource, apiRoot, Auth, localStorageService, User) ->
     # Get the contact's preferred phone number, formatted accorded to the current
     #   user's country code. `intlTelInputUtils` is on the window object from
     #   libphonenumber-utils.
+    # TODO: Validate the number.
     phone = contact.phoneNumbers[0].value
     countryCode = intlTelInputUtils.getCountryCode Auth.phone
     intlPhone = intlTelInputUtils.formatNumberByType phone, countryCode,

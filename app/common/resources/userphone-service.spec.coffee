@@ -149,3 +149,6 @@ describe 'userphone service', ->
 
       it 'should reject the promise', ->
         expect(rejected).toBe true
+
+
+    xdescribe 'when the phone number is invalid', ->
