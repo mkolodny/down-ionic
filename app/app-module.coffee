@@ -38,6 +38,11 @@ angular.module 'down', [
     'down.event'
     'down.friends'
   ]
+  .service 'apiInterceptor', (Auth) ->
+    request: (config) ->
+      if Auth.user.authtoken?
+        authHeader = "Token #{Auth.user.authtoken}"
+        $http.defaults.headers.common['Authorization'] = authHeader
   .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider) ->
     acceptHeader = 'application/json; version=1.2'
     $httpProvider.defaults.headers.common['Accept'] = acceptHeader
@@ -49,4 +54,5 @@ angular.module 'down', [
       # above the keyboard for form inputs)
       $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
       $window.StatusBar?.styleDefault()
+
       Auth.redirectForAuthState()

@@ -78,9 +78,8 @@ describe 'Auth service', ->
           .respond 200, null
 
         result = null
-        Auth.isAuthenticated()
-          .then (_result_) ->
-            result = _result_
+        Auth.isAuthenticated().then (_result_) ->
+          result = _result_
         $httpBackend.flush 1
 
         expect(result).toBe true
@@ -93,9 +92,8 @@ describe 'Auth service', ->
           .respond 401, null
 
         result = null
-        Auth.isAuthenticated()
-          .then (_result_) ->
-            result = _result_
+        Auth.isAuthenticated().then (_result_) ->
+          result = _result_
         $httpBackend.flush 1
 
         expect(result).toBe false
@@ -108,9 +106,8 @@ describe 'Auth service', ->
           .respond 500, null
 
         rejected = false
-        Auth.isAuthenticated()
-          .then null, ->
-            rejected = true
+        Auth.isAuthenticated().then null, ->
+          rejected = true
         $httpBackend.flush 1
 
         expect(rejected).toBe true
@@ -135,6 +132,15 @@ describe 'Auth service', ->
       response = null
 
       beforeEach ->
+        friend =
+          id: 2
+          email: 'jclarke@gmail.com'
+          name: 'Joan Clarke'
+          username: 'jmamba'
+          image_url: 'http://imgur.com/jcke'
+          location:
+            type: 'Point'
+            coordinates: [40.7265836, -73.9821539]
         responseData =
           id: 1
           email: 'aturing@gmail.com'
@@ -145,7 +151,8 @@ describe 'Auth service', ->
             type: 'Point'
             coordinates: [40.7265834, -73.9821535]
           authtoken: 'fdsa4321'
-          firebaseToken: 'qwer6789'
+          friends: [friend]
+          facebook_friends: [friend]
         $httpBackend.expectPOST authenticateUrl, postData
           .respond 200, responseData
 
@@ -163,9 +170,6 @@ describe 'Auth service', ->
       it 'should set the returned user on the Auth object', ->
         expect(Auth.user).toBe deserializedUser
 
-      it 'should init the user\'s friends', ->
-        expect(Auth.user.friends).toEqual {}
-
 
     describe 'when the request fails', ->
 
@@ -175,9 +179,8 @@ describe 'Auth service', ->
           .respond status, null
 
         rejectedStatus = null
-        Auth.authenticate phone, code
-          .then null, (_status_) ->
-            rejectedStatus = _status_
+        Auth.authenticate(phone, code).then null, (_status_) ->
+          rejectedStatus = _status_
         $httpBackend.flush 1
 
         expect(rejectedStatus).toEqual status
@@ -216,9 +219,8 @@ describe 'Auth service', ->
         $httpBackend.expectPOST fbSyncUrl, postData
           .respond 201, responseData
 
-        Auth.syncWithFacebook accessToken
-          .then (_response_) ->
-            response = _response_
+        Auth.syncWithFacebook(accessToken).then (_response_) ->
+          response = _response_
         $httpBackend.flush 1
 
       it 'should return the user', ->
@@ -241,9 +243,8 @@ describe 'Auth service', ->
           .respond status, null
 
         rejectedStatus = null
-        Auth.syncWithFacebook accessToken
-          .then null, (_status_) ->
-            rejectedStatus = _status_
+        Auth.syncWithFacebook(accessToken).then null, (_status_) ->
+          rejectedStatus = _status_
         $httpBackend.flush 1
 
         expect(rejectedStatus).toBe status
@@ -266,9 +267,8 @@ describe 'Auth service', ->
         $httpBackend.expectPOST verifyPhoneUrl, postData
           .respond 200, null
 
-        Auth.sendVerificationText phone
-          .then null, (_response_) ->
-            response = _response_
+        Auth.sendVerificationText(phone).then null, (_response_) ->
+          response = _response_
         $httpBackend.flush 1
 
       it 'should set Auth.phone', ->
@@ -281,9 +281,8 @@ describe 'Auth service', ->
           .respond 500, null
 
         rejected = false
-        Auth.sendVerificationText phone
-          .then null, ->
-            rejected = true
+        Auth.sendVerificationText(phone).then null, ->
+          rejected = true
         $httpBackend.flush 1
 
         expect(rejected).toBe true
