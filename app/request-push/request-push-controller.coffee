@@ -12,9 +12,11 @@ class RequestPushCtrl
       .then (deviceToken) =>
         @saveToken deviceToken
       , =>
-        @Auth.redirectForAuthState()
+        null
       .finally =>
         @localStorage.set 'hasRequestedPushNotifications', true
+        @Auth.redirectForAuthState()
+        
 
   saveToken: (deviceToken)->
     device = @$cordovaDevice.getDevice()
