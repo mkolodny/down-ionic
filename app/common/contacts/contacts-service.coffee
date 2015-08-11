@@ -4,13 +4,15 @@ class Contacts
     @localStorage = localStorageService
 
   getContacts: ->
-    @localStorage.set 'hasRequestedContacts', true
-
-    fields = ['id', 'name', 'phoneNumbers']
-
     deferred = @$q.defer()
 
-    @$cordovaContacts.find(fields).then (contacts) =>
+    options =
+      fields: [
+        'id'
+        'name'
+        'phoneNumbers'
+      ]
+    @$cordovaContacts.find(options).then (contacts) =>
       contacts = @filterContacts contacts
       @identifyContacts(contacts).then (contacts) =>
         @saveContacts contacts
@@ -19,8 +21,11 @@ class Contacts
         error =
           code: 'IDENTIFY_FAILED'
         deferred.reject error
+      return
     , (error) ->
       deferred.reject error
+    .finally =>
+      @localStorage.set 'hasRequestedContacts', true
 
     deferred.promise
 

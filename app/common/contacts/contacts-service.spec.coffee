@@ -62,12 +62,14 @@ describe 'Contacts service', ->
       , (_error_) ->
         error = _error_
 
-    it 'should set hasRequestedContacts to true', ->
-      expect(localStorage.get 'hasRequestedContacts').toEqual true
-
     it 'should get contacts name and phone numbers', ->
-      fields = ['id', 'name', 'phoneNumbers']
-      expect($cordovaContacts.find).toHaveBeenCalledWith fields
+      options =
+        fields: [
+          'id'
+          'name'
+          'phoneNumbers'
+        ]
+      expect($cordovaContacts.find).toHaveBeenCalledWith options
 
     describe 'when contacts are read successfully', ->
       contact = null
@@ -101,6 +103,9 @@ describe 'Contacts service', ->
 
       it 'should identify contacts', ->
         expect(Contacts.identifyContacts).toHaveBeenCalledWith contacts
+
+      it 'should set hasRequestedContacts to true', ->
+        expect(localStorage.get 'hasRequestedContacts').toEqual true
 
       describe 'and contacts are identified successfully', ->
         contactsObject = null
