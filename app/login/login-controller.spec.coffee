@@ -59,6 +59,9 @@ describe 'login controller', ->
 
         ctrl.login()
 
+      it 'should set phone on auth', ->
+        expect(Auth.phone).toEqual ctrl.phone
+
       it 'should send a verification text', ->
         expect(Auth.sendVerificationText).toHaveBeenCalledWith ctrl.phone
 

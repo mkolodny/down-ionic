@@ -5,6 +5,7 @@ class LoginCtrl
     if not @validate()
       return
 
+    @Auth.phone = @phone
     @Auth.sendVerificationText(@phone).then =>
       @Auth.redirectForAuthState()
     , =>

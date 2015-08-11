@@ -55,7 +55,11 @@
     "cordova-plugin-device",
     "cordova-plugin-splashscreen",
     "cordova-plugin-whitelist",
-    "cordova-plugin-contacts"
+    "cordova-plugin-contacts",
+    {
+      "locator": "https://github.com/phonegap-build/PushPlugin",
+      "id": "com.phonegap.plugins.PushPlugin"
+    }
   ],
   "cordovaPlatforms": [
     "android",
