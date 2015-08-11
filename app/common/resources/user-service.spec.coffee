@@ -49,8 +49,9 @@ describe 'user service', ->
 
 
   describe 'deserializing a user', ->
+    response = null
 
-    it 'should return the deserialized user', ->
+    beforeEach ->
       response =
         id: 1
         email: 'aturing@gmail.com'
@@ -60,16 +61,61 @@ describe 'user service', ->
         location:
           type: 'Point'
           coordinates: [40.7265834, -73.9821535]
-      expectedUser =
-        id: response.id
-        email: response.email
-        name: response.name
-        username: response.username
-        imageUrl: response.image_url
-        location:
-          lat: response.location.coordinates[0]
-          long: response.location.coordinates[1]
-      expect(User.deserialize response).toEqual expectedUser
+
+    describe 'when the user is a friend', ->
+
+      it 'should return the deserialized user', ->
+        expectedUser =
+          id: response.id
+          email: response.email
+          name: response.name
+          username: response.username
+          imageUrl: response.image_url
+          location:
+            lat: response.location.coordinates[0]
+            long: response.location.coordinates[1]
+        expect(User.deserialize response).toEqual expectedUser
+
+
+    describe 'when the user is the current user', ->
+      friend = null
+
+      beforeEach ->
+        friend =
+          id: 2
+          email: 'jclarke@gmail.com'
+          name: 'Joan Clarke'
+          username: 'jmamba'
+          image_url: 'http://imgur.com/jcke'
+          location:
+            type: 'Point'
+            coordinates: [40.7265836, -73.9821539]
+        response = angular.extend response,
+          friends: [friend]
+          facebook_friends: [friend]
+
+      it 'should return the deserialized user', ->
+        expectedFriend =
+          id: friend.id
+          email: friend.email
+          name: friend.name
+          username: friend.username
+          imageUrl: friend.image_url
+          location:
+            lat: friend.location.coordinates[0]
+            long: friend.location.coordinates[1]
+        expectedUser =
+          id: response.id
+          email: response.email
+          name: response.name
+          username: response.username
+          imageUrl: response.image_url
+          location:
+            lat: response.location.coordinates[0]
+            long: response.location.coordinates[1]
+          friends: [expectedFriend]
+          facebookFriends: [expectedFriend]
+        expect(User.deserialize response).toEqual expectedUser
 
 
   describe 'creating', ->
@@ -87,7 +133,6 @@ describe 'user service', ->
       responseData = angular.extend
         id: 1
         authtoken: 'asdf1234'
-        firebase_token: 'fdsa4321'
       , postData
 
       $httpBackend.expectPOST listUrl, postData
@@ -102,7 +147,6 @@ describe 'user service', ->
       expectedUserData = angular.extend
         id: responseData.id
         authtoken: responseData.authtoken
-        firebaseToken: responseData.firebase_token
       , user
       expectedUser = new User(expectedUserData)
       expect(response).toAngularEqual expectedUser

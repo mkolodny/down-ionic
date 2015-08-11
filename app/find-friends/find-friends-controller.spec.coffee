@@ -7,6 +7,7 @@ require '../common/contacts/contacts-module'
 FindFriendsCtrl = require './find-friends-controller'
 
 describe 'find friends controller', ->
+  $controller = null
   $q = null
   $state = null
   Auth = null
@@ -53,10 +54,12 @@ describe 'find friends controller', ->
     Auth.user.facebookFriends = [facebookFriend]
 
     ctrl = $controller FindFriendsCtrl,
-      Auth: Auth
       $scope: scope
-      Contacts: Contacts
+      Auth: Auth
   )
+
+  afterEach ->
+    localStorage.clearAll()
 
   it 'should request the user\'s contacts', ->
     expect(Contacts.getContacts).toHaveBeenCalled()
@@ -81,7 +84,6 @@ describe 'find friends controller', ->
         isDivider: true
         title: 'Contacts'
       ]
-
       expect(ctrl.items).toEqual items
 
 

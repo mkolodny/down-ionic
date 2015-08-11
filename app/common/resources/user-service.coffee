@@ -23,8 +23,11 @@ User = ($http, $q, $resource, apiRoot) ->
         long: data.location.coordinates[1]
     if data.authtoken?
       user.authtoken = data.authtoken
-    if data.firebase_token?
-      user.firebaseToken = data.firebase_token
+    if data.friends?
+      user.friends = (deserializeUser(friend) for friend in data.friends)
+    if data.facebook_friends?
+      user.facebookFriends = (deserializeUser(friend) \
+          for friend in data.facebook_friends)
     user
 
   resource = $resource "#{listUrl}/:id", null,
