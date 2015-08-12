@@ -152,3 +152,49 @@ describe 'userphone service', ->
 
 
     xdescribe 'when the phone number is invalid', ->
+
+
+  describe 'getting from phones', ->
+    url = null
+    phone = null
+    phones = null
+    requestData = null
+
+    beforeEach ->
+      url = "#{listUrl}/phones"
+      phone = '+12036227310'
+      phones = [phone]
+      requestData =
+        phones: phones
+
+    describe 'successfully', ->
+      user = null
+      response = null
+
+      beforeEach ->
+        user =
+          id: 1
+          email: 'aturing@gmail.com'
+          name: 'Alan Turing'
+          username: 'tdog'
+          image_url: 'https://facebook.com/profile-pic/tdog'
+          location:
+            type: 'Point'
+            coordinates: [40.7265834, -73.9821535]
+        responseData = [
+          user: user
+          phone: phone
+        ]
+        $httpBackend.expectPOST url, requestData
+          .respond 200, angular.toJson(responseData)
+
+        UserPhone.getFromPhones phones
+          .$promise.then (_response_) ->
+            response = _response_
+        $httpBackend.flush 1
+
+      it 'should return the userphones', ->
+        userphone =
+          user: User.deserialize user
+          phone: phone
+        expect(response).toAngularEqual [userphone]

@@ -80,16 +80,13 @@ describe 'find friends controller', ->
           name: facebookFriend.name
           username: facebookFriend.username
           imageUrl: facebookFriend.imageUrl
-      ,
-        isDivider: true
-        title: 'Contacts'
       ]
       expect(ctrl.items).toEqual items
 
 
   describe 'when get contacts returns', ->
 
-    describe 'successfully', ->
+    describe 'partially', ->
       contacts = null
       items = null
 
@@ -117,11 +114,8 @@ describe 'find friends controller', ->
 
         contacts =
           1234: contact
-        contactsDeferred.resolve contacts
+        contactsDeferred.notify contacts
         scope.$apply()
-
-      it 'should set isLoading to false', ->
-        expect(ctrl.isLoading).toEqual false
 
       it 'should build the items list', ->
         expect(ctrl.buildItems).toHaveBeenCalledWith Auth.user.facebookFriends,
@@ -129,6 +123,16 @@ describe 'find friends controller', ->
 
       it 'should set the items on the controller', ->
         expect(ctrl.items).toBe items
+
+
+    describe 'completely', ->
+
+      beforeEach ->
+        contactsDeferred.resolve()
+        scope.$apply()
+
+      it 'should stop the loading indicator', ->
+        expect(ctrl.isLoading).toBe false
 
 
     describe 'with an error', ->

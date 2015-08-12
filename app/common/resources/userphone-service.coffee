@@ -21,8 +21,18 @@ UserPhone = ($http, $q, $resource, apiRoot, Auth, localStorageService, User) ->
 
     getFromPhones:
       method: 'post'
-      # url: "#{listUrl}/phones"
-      # isArray: true
+      url: "#{listUrl}/phones"
+      isArray: true
+      transformRequest: (data, headersGetter) ->
+        request = {phones: data}
+        angular.toJson request
+      transformResponse: (data, headersGetter) ->
+        data = angular.fromJson data
+        response = ({
+          user: User.deserialize userphone.user
+          phone: userphone.phone
+        } for userphone in data)
+        response
 
   resource.create = (contact) ->
     deferred = $q.defer()

@@ -4,10 +4,10 @@ class FindFriendsCtrl
 
     # Request Contacts Permission
     @isLoading = true
-    @Contacts.getContacts().then (contacts) =>
-      @items = @buildItems @Auth.user.facebookFriends, contacts
-    , =>
+    @Contacts.getContacts().then null, =>
       @contactsRequestError = true
+    , (contacts) =>
+      @items = @buildItems @Auth.user.facebookFriends, contacts
     .finally =>
       @isLoading = false
 
@@ -38,6 +38,9 @@ class FindFriendsCtrl
       items.push
         isDivider: false
         user: user
+    if contacts.length is 0
+      # Don't show the "Contacts" divider when there are no contacts yet.
+      return items
     items.push
       isDivider: true
       title: 'Contacts'
