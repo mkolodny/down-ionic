@@ -21,7 +21,7 @@ class VerifyPhoneCtrl
 
   meteorLogin: ->
     @Asteroid.login().then =>
-      @Auth.redirectForAuthState()
+      @getFacebookFriends()
     , =>
       @error = 'Oops, something went wrong.'
 
