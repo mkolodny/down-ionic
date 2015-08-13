@@ -38,15 +38,19 @@ angular.module 'down', [
     'down.event'
     'down.friends'
   ]
-  .factory 'apiInterceptor', (Auth) ->
-    console.log 'asfdjahfkdsjh'
-    request: (config) ->
-      if Auth.user.authtoken?
-        authHeader = "Token #{Auth.user.authtoken}"
-        $http.defaults.headers.common['Authorization'] = authHeader
   .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider) ->
     acceptHeader = 'application/json; version=1.2'
     $httpProvider.defaults.headers.common['Accept'] = acceptHeader
+    $httpProvider.interceptors.push ($injector) ->
+      # Include the Authorization header in each request.
+      request: (config) ->
+        # Delay injecting the $http + Auth services to avoid a circular
+        #   dependency.
+        Auth = $injector.get 'Auth'
+        if Auth.user.authtoken?
+          authHeader = "Token #{Auth.user.authtoken}"
+          config.headers.Authorization = authHeader
+        config
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
   .run ($ionicPlatform, $window, Auth) ->
