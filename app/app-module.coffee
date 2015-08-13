@@ -38,7 +38,8 @@ angular.module 'down', [
     'down.event'
     'down.friends'
   ]
-  .service 'apiInterceptor', (Auth) ->
+  .factory 'apiInterceptor', (Auth) ->
+    console.log 'asfdjahfkdsjh'
     request: (config) ->
       if Auth.user.authtoken?
         authHeader = "Token #{Auth.user.authtoken}"
