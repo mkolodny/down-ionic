@@ -7,7 +7,8 @@ User = ($http, $q, $resource, apiRoot) ->
       name: user.name
       username: user.username
       image_url: user.imageUrl
-      location:
+    if user.location?
+      data.location =
         type: 'Point'
         coordinates: [user.location.lat, user.location.long]
     data
@@ -18,7 +19,8 @@ User = ($http, $q, $resource, apiRoot) ->
       name: data.name
       username: data.username
       imageUrl: data.image_url
-      location:
+    if data.location?
+      user.location =
         lat: data.location.coordinates[0]
         long: data.location.coordinates[1]
     if data.authtoken?

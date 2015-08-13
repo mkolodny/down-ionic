@@ -25,8 +25,9 @@ describe 'user service', ->
     expect(User.listUrl).toBe listUrl
 
   describe 'serializing a user', ->
+    user = null
 
-    it 'should return the serialized user', ->
+    beforeEach ->
       user =
         id: 1
         email: 'aturing@gmail.com'
@@ -36,16 +37,35 @@ describe 'user service', ->
         location:
           lat: 40.7265834
           long: -73.9821535
-      expectedUser =
-        id: user.id
-        email: user.email
-        name: user.name
-        username: user.username
-        image_url: user.imageUrl
-        location:
-          type: 'Point'
-          coordinates: [user.location.lat, user.location.long]
-      expect(User.serialize user).toEqual expectedUser
+
+    describe 'when the user has all possible attributes', ->
+
+      it 'should return the serialized user', ->
+        expectedUser =
+          id: user.id
+          email: user.email
+          name: user.name
+          username: user.username
+          image_url: user.imageUrl
+          location:
+            type: 'Point'
+            coordinates: [user.location.lat, user.location.long]
+        expect(User.serialize user).toEqual expectedUser
+
+
+    describe 'when the user doesn\'t have a location', ->
+
+      beforeEach ->
+        delete user.location
+
+      it 'should return the serialized user', ->
+        expectedUser =
+          id: user.id
+          email: user.email
+          name: user.name
+          username: user.username
+          image_url: user.imageUrl
+        expect(User.serialize user).toEqual expectedUser
 
 
   describe 'deserializing a user', ->
@@ -74,6 +94,21 @@ describe 'user service', ->
           location:
             lat: response.location.coordinates[0]
             long: response.location.coordinates[1]
+        expect(User.deserialize response).toEqual expectedUser
+
+
+    describe 'when the user doesn\'t have a location yet', ->
+
+      beforeEach ->
+        response.location = null
+
+      it 'should return the deserialized user', ->
+        expectedUser =
+          id: response.id
+          email: response.email
+          name: response.name
+          username: response.username
+          imageUrl: response.image_url
         expect(User.deserialize response).toEqual expectedUser
 
 
