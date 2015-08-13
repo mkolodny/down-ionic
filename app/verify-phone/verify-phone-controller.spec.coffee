@@ -179,7 +179,7 @@ describe 'verify phone controller', ->
 
     beforeEach ->
       deferred = $q.defer()
-      spyOn(User, 'getFacebookFriends').and.returnValue deferred.promise
+      spyOn(User, 'getFacebookFriends').and.returnValue {$promise: deferred.promise}
 
       ctrl.getFacebookFriends()
 

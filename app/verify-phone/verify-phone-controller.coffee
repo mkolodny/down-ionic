@@ -27,14 +27,15 @@ class VerifyPhoneCtrl
       @error = 'Oops, something went wrong.'
 
   getFacebookFriends: ->
-    @User.getFacebookFriends().then (friends) =>
-      @Auth.user.facebookFriends = friends
-      @Auth.redirectForAuthState()
-    , (error) =>
-      if error?.status is 400
-        @$state.go 'facebookSync'
-      else
-        @error = 'Oops, something went wrong.'
+    @User.getFacebookFriends()
+      .$promise.then (friends) =>
+        @Auth.user.facebookFriends = friends
+        @Auth.redirectForAuthState()
+      , (error) =>
+        if error?.status is 400
+          @$state.go 'facebookSync'
+        else
+          @error = 'Oops, something went wrong.'
 
 
 
