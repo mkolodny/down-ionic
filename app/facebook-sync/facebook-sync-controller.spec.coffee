@@ -71,6 +71,8 @@ describe 'facebook sync controller', ->
 
         beforeEach ->
           spyOn $state, 'go'
+          Auth.user =
+            friends: 'some friends'
           user =
             id: 1
             name: 'Alan Turing'
@@ -80,7 +82,7 @@ describe 'facebook sync controller', ->
           scope.$apply()
 
         it 'should set the user on Auth', ->
-          expect(Auth.user).toBe user
+          expect(Auth.user).toBe angular.extend(Auth.user, user)
 
         it 'should go to the set username view', ->
           expect($state.go).toHaveBeenCalledWith 'setUsername'
