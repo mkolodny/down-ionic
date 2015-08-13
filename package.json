@@ -12,7 +12,7 @@
     "angular-resource": "1.3.13",
     "angular-sanitize": "1.3.13",
     "angular-ui-router": "0.2.13",
-    "asteroid": "https://github.com/mkolodny/asteroid#3e46bca82d0b957961224b28b193ca4a4377c2da",
+    "asteroid": "0.6.1",
     "browserify": "10.2.6",
     "coffee-script": "1.9.3",
     "coffeeify": "1.1.0",
