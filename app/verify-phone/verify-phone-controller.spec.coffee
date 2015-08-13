@@ -151,13 +151,13 @@ describe 'verify phone controller', ->
     describe 'successfully', ->
 
       beforeEach ->
-        spyOn Auth, 'redirectForAuthState'
+        spyOn ctrl, 'getFacebookFriends'
 
         deferred.resolve()
         scope.$apply()
 
       it 'should redirect for the auth state', ->
-        expect(Auth.redirectForAuthState).toHaveBeenCalled()
+        expect(ctrl.getFacebookFriends).toHaveBeenCalled()
 
 
     describe 'unsuccessfully', ->
