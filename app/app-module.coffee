@@ -1,5 +1,6 @@
 require 'angular'
 require 'angular-ui-router'
+require 'ng-cordova'
 require './login/login-module'
 require './verify-phone/verify-phone-module'
 require './facebook-sync/facebook-sync-module'
@@ -20,6 +21,7 @@ require './friends/friends-module'
 
 angular.module 'down', [
     'ionic'
+    'ngCordova'
     'down.auth'
     'down.login'
     'down.verifyPhone'
@@ -53,11 +55,12 @@ angular.module 'down', [
         config
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
-  .run ($ionicPlatform, $window, Auth) ->
+  .run ($cordovaStatusbar, $ionicPlatform, $window, Auth) ->
     $ionicPlatform.ready ->
       # Hide the accessory bar by default (remove this to show the accessory bar
       # above the keyboard for form inputs)
       $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
-      $window.StatusBar?.styleDefault()
+      $cordovaStatusbar.overlaysWebView true
+      $cordovaStatusbar.style 1
 
       Auth.redirectForAuthState()
