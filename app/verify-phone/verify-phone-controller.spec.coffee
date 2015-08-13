@@ -168,3 +168,53 @@ describe 'verify phone controller', ->
 
       it 'should show an error', ->
         expect(ctrl.error).toBe 'Oops, something went wrong.'
+
+  describe 'get facebook friends', ->
+    deferred = null
+
+    beforeEach ->
+      deferred = $q.defer()
+      spyOn(User, 'getFacebookFriends').and.returnValue deferred.promise
+
+      ctrl.getFacebookFriends()
+
+    it 'should call User.getFacebookFriends', ->
+      expect(User.getFacebookFriends).toHaveBeenCalled()
+
+    describe 'successfully', ->
+      friends = null
+
+      beforeEach ->
+        spyOn(Auth, 'redirectForAuthState')
+
+        friends = ['Jim', 'Bob']
+        deferred.resolve friends
+        scope.$apply()
+
+      it 'should set the friends on auth', ->
+        expect(Auth.user.facebookFriends).toEqual friends
+
+      it 'should redirectForAuthState', ->
+        expect(Auth.redirectForAuthState).toHaveBeenCalled()
+
+    describe 'error', ->
+
+      describe 'facebook access token expired', ->
+
+        beforeEach ->
+          spyOn $state, 'go'
+
+          deferred.reject {status: 400}
+          scope.$apply()
+
+        it 'should send user to sync with facebook', ->
+          expect($state.go).toHaveBeenCalledWith 'facebookSync'
+
+      describe 'other error', ->
+        beforeEach ->
+
+          deferred.reject()
+          scope.$apply()
+
+        it 'should show an error', ->
+          expect(ctrl.error).toBe 'Oops, something went wrong.'
