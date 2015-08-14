@@ -10,13 +10,11 @@ class RequestPushCtrl
       alert: true
     @$cordovaPush.register iosConfig
       .then (deviceToken) =>
+        @localStorage.set 'hasRequestedPushNotifications', true
         @saveToken deviceToken
       , =>
-        null
-      .finally =>
         @localStorage.set 'hasRequestedPushNotifications', true
         @Auth.redirectForAuthState()
-        
 
   saveToken: (deviceToken)->
     device = @$cordovaDevice.getDevice()
