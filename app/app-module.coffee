@@ -60,6 +60,12 @@ angular.module 'down', [
       # Hide the accessory bar by default (remove this to show the accessory bar
       # above the keyboard for form inputs)
       $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
+
+      # Fix this problem:
+      #   http://stackoverflow.com/questions/29846816/space-made-for-two-keyboards-in-ionic-on-ios
+      $window.cordova?.plugins.Keyboard?.disableScroll true
+
+      # Make the status bar white.
       $cordovaStatusbar.overlaysWebView true
       $cordovaStatusbar.style 1
 
