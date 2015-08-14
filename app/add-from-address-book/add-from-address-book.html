@@ -30,8 +30,8 @@
         <!-- Contact without a user object -->
         <div ng-if="item.contact && !item.contact.user">
           <span class="contact-image item-image"
-                >{{addFromAddressBook.getInitials(item.contact.name)}}</span>
-          <h2>{{item.contact.name}}</h2>
+                >{{addFromAddressBook.getInitials(item.contact.name.formatted)}}</span>
+          <h2>{{item.contact.name.formatted}}</h2>
           <p>Add by SMS</p>
           <contact-friendship-button contact="item.contact">
         </div>

@@ -67,6 +67,8 @@ describe 'Contacts service', ->
 
     it 'should get contacts name and phone numbers', ->
       options =
+        filter: ''
+        multiple: true
         fields: [
           'id'
           'name'
@@ -297,6 +299,20 @@ describe 'Contacts service', ->
       # Mock the user's phone number.
       Auth.user =
         phone: '+19178699626'
+
+    describe 'when a contact doesn\'t have phoneNumbers', ->
+      filteredContacts = null
+
+      beforeEach ->
+        contact =
+          name:
+            formatted: 'Jim Bob' # NOTE: formatted may not be an empty string,
+                          #   test on devices.
+          phoneNumbers: null
+        filteredContacts = Contacts.filterContacts [contact]
+
+      it 'should remove contacts with no names', ->
+        expect(filteredContacts).toEqual []
 
     describe 'when a contact doesn\'t have a name', ->
       filteredContacts = null

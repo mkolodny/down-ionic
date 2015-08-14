@@ -27,8 +27,8 @@
         <!-- Contact with a user object -->
         <div ng-if="item.contact && item.contact.user">
           <span class="contact-image item-image"
-                >{{findFriends.getInitials(item.contact.name)}}</span>
-          <h2>{{item.contact.name}}</h2>
+                >{{findFriends.getInitials(item.contact.name.formatted)}}</span>
+          <h2>{{item.contact.name.formatted}}</h2>
           <p>Add by SMS</p>
           <user-friendship-button user-id="item.contact.user.id">
         </div>
@@ -36,8 +36,8 @@
         <!-- Contact without a user object -->
         <div ng-if="item.contact && !item.contact.user">
           <span class="contact-image item-image"
-                >{{findFriends.getInitials(item.contact.name)}}</span>
-          <h2>{{item.contact.name}}</h2>
+                >{{findFriends.getInitials(item.contact.name.formatted)}}</span>
+          <h2>{{item.contact.name.formatted}}</h2>
           <p>Add by SMS</p>
           <contact-friendship-button contact="item.contact">
         </div>

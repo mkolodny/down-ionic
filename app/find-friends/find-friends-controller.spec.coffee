@@ -155,13 +155,15 @@ describe 'find friends controller', ->
     beforeEach ->
       contactNoUser =
         id: 1
-        name: 'Mike Pleb'
+        name: 
+          formatted: 'Mike Pleb'
         phoneNumbers: [
           value: '+1952852230'
         ]
       contactUser =
         id: 2
-        name: 'Andrew Plebfoot'
+        name: 
+          formatted: 'Andrew Plebfoot'
         phoneNumbers: [
           value: '+1952852231'
         ]
