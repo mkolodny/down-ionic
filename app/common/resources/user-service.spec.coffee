@@ -127,7 +127,6 @@ describe 'user service', ->
             coordinates: [40.7265836, -73.9821539]
         response = angular.extend response,
           friends: [friend]
-          facebook_friends: [friend]
 
       it 'should return the deserialized user', ->
         expectedFriend =
@@ -148,8 +147,8 @@ describe 'user service', ->
           location:
             lat: response.location.coordinates[0]
             long: response.location.coordinates[1]
-          friends: [expectedFriend]
-          facebookFriends: [expectedFriend]
+          friends:
+            "#{expectedFriend.id}": expectedFriend
         expect(User.deserialize response).toEqual expectedUser
 
 

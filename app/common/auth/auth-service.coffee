@@ -38,10 +38,6 @@ class Auth
     @$http.post "#{@apiRoot}/sessions", params
       .success (data, status) =>
         @user = @User.deserialize data
-
-        # Init the user's friends.
-        @user.friends = {}
-
         deferred.resolve @user
       .error (data, status) ->
         deferred.reject status
