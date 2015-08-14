@@ -5,12 +5,14 @@ require 'angular-animate'
 require 'angular-sanitize'
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js'
-require './events-module'
+require 'ng-cordova'
 require '../common/asteroid/asteroid-module'
+require './events-module'
 EventsCtrl = require './events-controller'
 
 describe 'events controller', ->
   $compile = null
+  $cordovaDatePicker = null
   $httpBackend = null
   $ionicModal = null
   $q = null
@@ -40,9 +42,12 @@ describe 'events controller', ->
 
   beforeEach angular.mock.module('ionic')
 
+  beforeEach angular.mock.module('ngCordova')
+
   beforeEach inject(($injector) ->
     $compile = $injector.get '$compile'
     $controller = $injector.get '$controller'
+    $cordovaDatePicker = $injector.get '$cordovaDatePicker'
     $httpBackend = $injector.get '$httpBackend'
     $ionicModal = $injector.get '$ionicModal'
     $rootScope = $injector.get '$rootScope'
@@ -678,14 +683,42 @@ describe 'events controller', ->
 
 
   describe 'toggling setting the date', ->
+    deferredDatePicker = null
+
+    beforeEach ->
+      deferredDatePicker = $q.defer()
+      spyOn($cordovaDatePicker, 'show').and.returnValue deferredDatePicker.promise
 
     describe 'when there\'s no date right now', ->
 
       beforeEach ->
+        ctrl.hasDate = false
+        ctrl.newEvent =
+          datetime: new Date(1438195002656)
+
         ctrl.toggleHasDate()
 
-      it 'should set a flag', ->
-        expect(ctrl.newEvent.hasDate).toBe true
+      it 'should show the datepicker', ->
+        options =
+          mode: 'datetime'
+          date: ctrl.newEvent.datetime
+          allowOldDates: false
+          doneButtonLabel: 'Set Date'
+        expect($cordovaDatePicker.show).toHaveBeenCalledWith options
+
+      describe 'then a date gets set', ->
+        newDate = null
+
+        beforeEach ->
+          newDate = new Date(1438195002657)
+          deferredDatePicker.resolve newDate
+          scope.$apply()
+
+        it 'should set the date on the new event', ->
+          expect(ctrl.newEvent.datetime).toBe newDate
+
+        it 'should set a flag', ->
+          expect(ctrl.newEvent.hasDate).toBe true
 
 
     describe 'when the date hasn\'t been set yet', ->
@@ -703,11 +736,13 @@ describe 'events controller', ->
       afterEach ->
         jasmine.clock().uninstall()
 
-      it 'should set the new event date to the current date', ->
-        expect(ctrl.newEvent.datetime).toEqual date
-
-      it 'should highlight the date icon', ->
-        expect(ctrl.newEvent.hasDate).toBe true
+      it 'should show the datepicker', ->
+        options =
+          mode: 'datetime'
+          date: date
+          allowOldDates: false
+          doneButtonLabel: 'Set Date'
+        expect($cordovaDatePicker.show).toHaveBeenCalledWith options
 
 
     describe 'when the date is showing', ->

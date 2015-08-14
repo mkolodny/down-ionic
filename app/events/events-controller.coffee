@@ -1,6 +1,7 @@
 class EventsCtrl
-  constructor: (@$ionicModal, @$scope, @$state, @$timeout, @$window, @Asteroid,
-                @dividerHeight, @eventHeight, @Invitation, @transitionDuration) ->
+  constructor: (@$cordovaDatePicker, @$ionicModal, @$scope, @$state, @$timeout,
+                @$window, @Asteroid, @dividerHeight, @eventHeight, @Invitation,
+                @transitionDuration) ->
     # Save the section titles.
     @sections = {}
     @sections[@Invitation.noResponse] =
@@ -56,9 +57,20 @@ class EventsCtrl
 
   toggleHasDate: ->
     if not @newEvent.hasDate
-      @newEvent.hasDate = true
-      if not angular.isDate(@newEvent)
-        @newEvent.datetime = new Date()
+      options =
+        mode: 'datetime'
+        allowOldDates: false
+        doneButtonLabel: 'Set Date'
+      # If the user has set the date before, use the previous date they set.
+      if angular.isDate(@newEvent.datetime)
+        options.date = @newEvent.datetime
+      else
+        options.date = new Date()
+      @$cordovaDatePicker.show options
+        .then (date) =>
+          if date?
+            @newEvent.datetime = date
+            @newEvent.hasDate = true
     else
       @newEvent.hasDate = false
 
