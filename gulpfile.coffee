@@ -1,4 +1,5 @@
 require 'coffee-script/register'
+autoprefixer = require 'gulp-autoprefixer'
 browserify = require 'browserify'
 bower = require 'bower'
 childProcess = require 'child_process'
@@ -62,6 +63,7 @@ gulp.task 'scripts', ->
 gulp.task 'styles', ->
   gulp.src "#{appDir}/main.scss"
     .pipe sass(errLogToConsole: true)
+    .pipe autoprefixer()
     .pipe rename(extname: '.css')
     .pipe gulp.dest("#{buildDir}/app")
     #.pipe minifyCss(keepSpecialComments: 0)
