@@ -19,6 +19,7 @@ angular.module 'down.resources', [
     'LocalStorageModule'
   ]
   .value 'apiRoot', 'http://down-staging.herokuapp.com/api'
+  #.value 'apiRoot', 'http://localhost:8000/api'
   .factory 'APNSDevice', APNSDevice
   .factory 'Event', Event
   .factory 'Friendship', Friendship

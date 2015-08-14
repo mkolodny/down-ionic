@@ -1,6 +1,5 @@
 require 'angular'
 require 'angular-mocks'
-require 'ng-cordova'
 require '../common/auth/auth-module'
 require './facebook-sync-module'
 FacebookSyncCtrl = require './facebook-sync-controller'
@@ -18,7 +17,7 @@ describe 'facebook sync controller', ->
 
   beforeEach angular.mock.module('down.auth')
 
-  beforeEach angular.mock.module('ngCordova.plugins.oauth')
+  beforeEach angular.mock.module('ngCordovaOauth')
 
   beforeEach angular.mock.module('ui.router')
 
@@ -105,4 +104,4 @@ describe 'facebook sync controller', ->
         scope.$apply()
 
       it 'should show an error', ->
-        expect(ctrl.error).toBe 'It looks like you declined syncing with Facebook :('
+        expect(ctrl.error).toBe 'Oops, something went wrong. Please try again.'
