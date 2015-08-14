@@ -1,15 +1,16 @@
 class FindFriendsCtrl
-  constructor: (@$state, @Auth, @User, localStorageService, @Contacts) ->
+  constructor: (@$scope, @$state, @Auth, @User, localStorageService, @Contacts) ->
     @localStorage = localStorageService
 
     # Request Contacts Permission
     @isLoading = true
-    @Contacts.getContacts().then null, =>
-      @contactsRequestError = true
-    , (contacts) =>
-      @items = @buildItems @Auth.user.facebookFriends, contacts
-    .finally =>
-      @isLoading = false
+    @$scope.$on '$ionicView.enter', =>
+      @Contacts.getContacts().then null, =>
+        @contactsRequestError = true
+      , (contacts) =>
+        @items = @buildItems @Auth.user.facebookFriends, contacts
+      .finally =>
+        @isLoading = false
 
     # Build the list of items to show in the view.
     @items = @buildItems @Auth.user.facebookFriends

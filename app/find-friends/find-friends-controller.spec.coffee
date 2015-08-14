@@ -10,6 +10,7 @@ describe 'find friends controller', ->
   $controller = null
   $q = null
   $state = null
+  $timeout = null
   Auth = null
   ctrl = null
   deferred = null
@@ -33,9 +34,10 @@ describe 'find friends controller', ->
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
+    $timeout = $injector.get '$timeout'
     Auth = angular.copy $injector.get('Auth')
     Contacts = $injector.get 'Contacts'
-    scope = $rootScope.$new true
+    scope = $rootScope
     User = $injector.get 'User'
     localStorage = $injector.get 'localStorageService'
 
@@ -61,11 +63,79 @@ describe 'find friends controller', ->
   afterEach ->
     localStorage.clearAll()
 
-  it 'should request the user\'s contacts', ->
-    expect(Contacts.getContacts).toHaveBeenCalled()
-
   it 'should set isLoading to true', ->
     expect(ctrl.isLoading).toEqual true
+
+  describe 'when the view finishes loading', ->
+
+    beforeEach ->
+      scope.$emit '$ionicView.enter'
+
+    it 'should request the user\'s contacts', ->
+      expect(Contacts.getContacts).toHaveBeenCalled()
+
+    describe 'when get contacts returns', ->
+
+      describe 'partially', ->
+        contacts = null
+        items = null
+
+        beforeEach ->
+          contact =
+            id: 1234
+            name: 'Mike Pleb'
+            phoneNumbers: [
+              value: '+1952852230'
+            ]
+          items = [
+            isDivider: true
+            title: 'Friends Using Down'
+          ,
+            isDivider: false
+            user: facebookFriend
+          ,
+            isDivider: true
+            title: 'Contacts'
+          ,
+            isDivider: false
+            contact: contact
+          ]
+          spyOn(ctrl, 'buildItems').and.returnValue items
+
+          contacts =
+            1234: contact
+          contactsDeferred.notify contacts
+          scope.$apply()
+
+        it 'should build the items list', ->
+          expect(ctrl.buildItems).toHaveBeenCalledWith Auth.user.facebookFriends,
+              contacts
+
+        it 'should set the items on the controller', ->
+          expect(ctrl.items).toBe items
+
+
+      describe 'completely', ->
+
+        beforeEach ->
+          contactsDeferred.resolve()
+          scope.$apply()
+
+        it 'should stop the loading indicator', ->
+          expect(ctrl.isLoading).toBe false
+
+
+      describe 'with an error', ->
+        beforeEach ->
+          contactsDeferred.reject()
+          scope.$apply()
+
+        it 'should set isLoading to false', ->
+          expect(ctrl.isLoading).toEqual false
+
+        it 'should show an error', ->
+          expect(ctrl.contactsRequestError).toBe true
+
 
   describe 'when the user has facebook friends', ->
 
@@ -84,69 +154,6 @@ describe 'find friends controller', ->
       expect(ctrl.items).toEqual items
 
 
-  describe 'when get contacts returns', ->
-
-    describe 'partially', ->
-      contacts = null
-      items = null
-
-      beforeEach ->
-        contact =
-          id: 1234
-          name: 'Mike Pleb'
-          phoneNumbers: [
-            value: '+1952852230'
-          ]
-        items = [
-          isDivider: true
-          title: 'Friends Using Down'
-        ,
-          isDivider: false
-          user: facebookFriend
-        ,
-          isDivider: true
-          title: 'Contacts'
-        ,
-          isDivider: false
-          contact: contact
-        ]
-        spyOn(ctrl, 'buildItems').and.returnValue items
-
-        contacts =
-          1234: contact
-        contactsDeferred.notify contacts
-        scope.$apply()
-
-      it 'should build the items list', ->
-        expect(ctrl.buildItems).toHaveBeenCalledWith Auth.user.facebookFriends,
-            contacts
-
-      it 'should set the items on the controller', ->
-        expect(ctrl.items).toBe items
-
-
-    describe 'completely', ->
-
-      beforeEach ->
-        contactsDeferred.resolve()
-        scope.$apply()
-
-      it 'should stop the loading indicator', ->
-        expect(ctrl.isLoading).toBe false
-
-
-    describe 'with an error', ->
-      beforeEach ->
-        contactsDeferred.reject()
-        scope.$apply()
-
-      it 'should set isLoading to false', ->
-        expect(ctrl.isLoading).toEqual false
-
-      it 'should show an error', ->
-        expect(ctrl.contactsRequestError).toBe true
-
-
   describe 'building the items list', ->
     contactNoUser = null
     contactUser = null
@@ -155,14 +162,14 @@ describe 'find friends controller', ->
     beforeEach ->
       contactNoUser =
         id: 1
-        name: 
+        name:
           formatted: 'Mike Pleb'
         phoneNumbers: [
           value: '+1952852230'
         ]
       contactUser =
         id: 2
-        name: 
+        name:
           formatted: 'Andrew Plebfoot'
         phoneNumbers: [
           value: '+1952852231'
