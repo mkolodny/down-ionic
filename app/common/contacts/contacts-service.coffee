@@ -9,6 +9,8 @@ class Contacts
     deferred = @$q.defer()
 
     options =
+      filter: ''
+      multiple: true
       fields: [
         'id'
         'name'
@@ -95,6 +97,7 @@ class Contacts
   filterContacts: (contacts) ->
     filteredContacts = []
     for contact in contacts
+      if contact.phoneNumbers is null then continue
       phone = contact.phoneNumbers[0].value
       countryCode = intlTelInputUtils.getCountryCode @Auth.phone
       isValidNumber = intlTelInputUtils.isValidNumber phone, countryCode

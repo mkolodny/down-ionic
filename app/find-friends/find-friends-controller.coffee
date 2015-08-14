@@ -45,7 +45,7 @@ class FindFriendsCtrl
       isDivider: true
       title: 'Contacts'
     contacts.sort (a, b) ->
-      if a.name.toLowerCase() < b.name.toLowerCase()
+      if a.name.formatted.toLowerCase() < b.name.formatted.toLowerCase()
         return -1
       else
         return 1
