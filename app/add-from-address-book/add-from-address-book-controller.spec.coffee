@@ -38,7 +38,8 @@ describe 'add from address book controller', ->
         long: -73.9821535
     contacts =
       1:
-        name: 'Bruce Lee'
+        name: 
+          formatted: 'Bruce Lee'
         phoneNumbers: [
           type: 'home'
           value: '2345678901'
@@ -46,7 +47,8 @@ describe 'add from address book controller', ->
         ]
       2:
         user: user
-        name: 'Alan Turing'
+        name: 
+          formatted: 'Alan Turing'
         phoneNumbers: [
           type: 'mobile'
           value: '3345678901'
@@ -152,7 +154,8 @@ describe 'add from address book controller', ->
       beforeEach ->
         newContacts = angular.copy contacts
         newContacts[3] =
-          name: 'Marie Curie'
+          name: 
+            formatted: 'Marie Curie'
           phoneNumbers: [
             type: 'home'
             value: '4345678901'

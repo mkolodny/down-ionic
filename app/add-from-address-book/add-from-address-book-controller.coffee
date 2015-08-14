@@ -12,7 +12,7 @@ class AddFromAddressBookCtrl
   showContacts: (contacts) ->
     contactsArray = (contact for id, contact of contacts)
     contactsArray.sort (a, b) ->
-      if a.name.toLowerCase() < b.name.toLowerCase()
+      if a.name.formatted.toLowerCase() < b.name.formatted.toLowerCase()
         return -1
       else
         return 1
@@ -22,8 +22,8 @@ class AddFromAddressBookCtrl
       if contact.name[0] != currentLetter
         @items.push
           isDivider: true
-          title: contact.name[0]
-        currentLetter = contact.name[0]
+          title: contact.name.formatted[0]
+        currentLetter = contact.name.formatted[0]
 
       if contact.user?.username
         @items.push
