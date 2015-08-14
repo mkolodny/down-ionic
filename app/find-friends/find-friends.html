@@ -1,7 +1,9 @@
 <ion-view id="find-friends" view-title="Find Friends" hide-back-button="true"
           can-swipe-back="false">
   <ion-nav-buttons side="secondary">
-    <button class="button button-clear button-light">Done</button>
+    <button class="button button-clear button-light"
+            ng-click="findFriends.done()" ontouchstart
+            >Done</button>
   </ion-nav-buttons>
   <ion-content>
     <div id="spinner-container" ng-if="findFriends.isLoading">

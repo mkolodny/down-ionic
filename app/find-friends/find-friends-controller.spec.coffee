@@ -10,7 +10,6 @@ describe 'find friends controller', ->
   $controller = null
   $q = null
   $state = null
-  $timeout = null
   Auth = null
   ctrl = null
   deferred = null
@@ -34,7 +33,6 @@ describe 'find friends controller', ->
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
-    $timeout = $injector.get '$timeout'
     Auth = angular.copy $injector.get('Auth')
     Contacts = $injector.get 'Contacts'
     scope = $rootScope
