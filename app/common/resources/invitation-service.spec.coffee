@@ -73,6 +73,7 @@ describe 'invitation service', ->
           open: false
           toUserMessaged: false
           muted: false
+          lastViewed: new Date()
 
       it 'should return the serialized invitation', ->
         expectedInvitation =
@@ -85,6 +86,7 @@ describe 'invitation service', ->
           open: invitation.open
           to_user_messaged: invitation.toUserMessaged
           muted: invitation.muted
+          last_viewed: invitation.lastViewed.getTime()
         expect(Invitation.serialize invitation).toEqual expectedInvitation
 
 
@@ -105,6 +107,7 @@ describe 'invitation service', ->
         muted: false
         created_at: new Date().getTime()
         updated_at: new Date().getTime()
+        last_viewed: new Date().getTime()
       event =
         id: 2
         title: 'bars?!??!'
@@ -148,6 +151,7 @@ describe 'invitation service', ->
         muted: response.muted
         createdAt: new Date(response.created_at)
         updatedAt: new Date(response.updated_at)
+        lastViewed: new Date(response.last_viewed)
 
     describe 'when the relations are ids', ->
 
@@ -243,6 +247,7 @@ describe 'invitation service', ->
       responseData = angular.extend {}, putData,
         created_at: new Date()
         updated_at: new Date()
+        last_viewed: new Date()
       url = "#{listUrl}/#{invitation.id}"
       $httpBackend.expectPUT url, putData
         .respond 201, angular.toJson(responseData)
@@ -256,6 +261,7 @@ describe 'invitation service', ->
       expectedInvitation = angular.extend {}, invitation,
         createdAt: responseData.created_at
         updatedAt: responseData.updated_at
+        lastViewed: responseData.last_viewed
       expect(response).toAngularEqual expectedInvitation
 
 

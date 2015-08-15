@@ -3,23 +3,24 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
   detailUrl = "#{listUrl}/:id"
   serializeEvent = (event) ->
     request =
-      id: event.id
       creator: event.creatorId
       title: event.title
-    if event.datetime?
-      request.datetime = event.datetime?.getTime()
+    optionalFields =
+      id: 'id'
+      comment: 'comment'
+      canceled: 'canceled'
+      invitations: 'invitations'
+    for serializedField, deserializedField of optionalFields
+      if event[deserializedField]?
+        request[serializedField] = event[deserializedField]
     if event.place?
       request.place =
         name: event.place?.name
         geo:
           type: 'Point'
           coordinates: [event.place?.lat, event.place?.long]
-    if event.comment?
-      request.comment = event.comment
-    if event.canceled?
-      request.canceled = event.canceled
-    if event.invitations?
-      request.invitations = event.invitations
+    if event.datetime?
+      request.datetime = event.datetime.getTime()
     request
   deserializeEvent = (event) ->
     response =

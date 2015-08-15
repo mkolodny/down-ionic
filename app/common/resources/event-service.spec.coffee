@@ -96,7 +96,7 @@ describe 'event service', ->
           id: event.id
           creator: event.creatorId
           title: event.title
-          datetime: new Date(event.datetime).getTime()
+          datetime: event.datetime.getTime()
           place:
             name: event.place.name
             geo:
