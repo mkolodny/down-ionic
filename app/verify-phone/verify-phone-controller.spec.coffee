@@ -1,11 +1,16 @@
+require '../ionic/ionic.js'
 require 'angular'
+require 'angular-animate'
 require 'angular-mocks'
 require 'angular-local-storage'
+require 'angular-sanitize'
 require 'angular-ui-router'
+require '../ionic/ionic-angular.js'
 Asteroid = require '../common/asteroid/asteroid-module'
 VerifyPhoneCtrl = require './verify-phone-controller'
 
 describe 'verify phone controller', ->
+  $ionicLoading = null
   $q = null
   $rootScope = null
   $state = null
@@ -15,6 +20,8 @@ describe 'verify phone controller', ->
   localStorage = null
   scope = null
   User = null
+
+  beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('ui.router')
 
@@ -28,6 +35,7 @@ describe 'verify phone controller', ->
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $ionicLoading = $injector.get '$ionicLoading'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
@@ -64,6 +72,8 @@ describe 'verify phone controller', ->
     describe 'when the form validates', ->
 
       beforeEach ->
+        spyOn $ionicLoading, 'show'
+        spyOn $ionicLoading, 'hide'
         ctrl.validate.and.returnValue true
 
         ctrl.authenticate()
@@ -88,10 +98,13 @@ describe 'verify phone controller', ->
 
         it 'should login to the meteor server', ->
           expect(ctrl.meteorLogin).toHaveBeenCalled()
-        ###
-        it 'should redirect for auth state', ->
-          expect(Auth.redirectForAuthState).toHaveBeenCalled()
-        ###
+
+        it 'should show the loading indicator', ->
+          template = '''
+            <div class="loading-text">Logging you in...</div>
+            <ion-spinner icon="bubbles"></ion-spinner>
+            '''
+          expect($ionicLoading.show).toHaveBeenCalledWith template: template
 
 
       describe 'when authentication fails', ->
@@ -104,6 +117,9 @@ describe 'verify phone controller', ->
 
           it 'should show an error', ->
             expect(ctrl.error).toBe 'Oops, something went wrong.'
+
+          it 'should hide the loading indicator', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
 
 
         describe 'because the code was incorrect', ->
