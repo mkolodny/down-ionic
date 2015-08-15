@@ -1,13 +1,18 @@
+require '../ionic/ionic.js'
 require 'angular'
+require 'angular-animate'
 require 'angular-mocks'
+require 'angular-sanitize'
 require 'angular-ui-router'
 require 'angular-local-storage'
+require '../ionic/ionic-angular.js'
 require '../common/auth/auth-module'
 require '../common/contacts/contacts-module'
 FindFriendsCtrl = require './find-friends-controller'
 
 describe 'find friends controller', ->
   $controller = null
+  $ionicLoading = null
   $q = null
   $state = null
   Auth = null
@@ -20,6 +25,8 @@ describe 'find friends controller', ->
   localStorage = null
   facebookFriend = null
 
+  beforeEach angular.mock.module('ionic')
+
   beforeEach angular.mock.module('down.auth')
 
   beforeEach angular.mock.module('down.contacts')
@@ -30,6 +37,7 @@ describe 'find friends controller', ->
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $ionicLoading = $injector.get '$ionicLoading'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
@@ -67,7 +75,17 @@ describe 'find friends controller', ->
   describe 'when the view finishes loading', ->
 
     beforeEach ->
+      spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
+
       scope.$emit '$ionicView.enter'
+
+    fit 'should show a loading overlay', ->
+      template = '''
+        <div class="loading-text">Loading your contacts...<br>(This might take a while)</div>
+        <ion-spinner icon="bubbles"></ion-spinner>
+        '''
+      expect($ionicLoading.show).toHaveBeenCalledWith template: template
 
     it 'should request the user\'s contacts', ->
       expect(Contacts.getContacts).toHaveBeenCalled()
