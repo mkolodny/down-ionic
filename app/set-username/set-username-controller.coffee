@@ -8,7 +8,7 @@ class SetUsernameCtrl
     user = angular.copy @Auth.user
     user.username = @username
     @User.update(user).$promise.then (user) =>
-      @Auth.user = angular.extend user, @Auth.user
+      @Auth.setUser user
       @Auth.redirectForAuthState()
     , =>
       @error = 'For some reason, that didn\'t work.'

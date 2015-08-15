@@ -7,7 +7,7 @@ class FacebookSyncCtrl
       .then (response) =>
         @Auth.syncWithFacebook response.access_token
       .then (user) =>
-        @Auth.user = angular.extend @Auth.user, user
+        @Auth.setUser user
         @$state.go 'setUsername'
       , (error) =>
         @error = 'Oops, something went wrong. Please try again.'

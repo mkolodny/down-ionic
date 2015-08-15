@@ -66,12 +66,13 @@ describe 'set username controller', ->
 
         beforeEach ->
           spyOn Auth, 'redirectForAuthState'
+          spyOn Auth, 'setUser'
 
           deferred.resolve user
           scope.$apply()
 
         it 'should set the user on Auth', ->
-          expect(Auth.user).toEqual user
+          expect(Auth.setUser).toHaveBeenCalledWith user
 
         it 'should redirect for auth state', ->
           expect(Auth.redirectForAuthState).toHaveBeenCalled()
