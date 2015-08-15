@@ -1,10 +1,17 @@
 class FindFriendsCtrl
-  constructor: (@$scope, @$state, @Auth, @User, localStorageService, @Contacts) ->
+  constructor: (@$ionicLoading, @$scope, @$state, @Auth, @User,
+                localStorageService, @Contacts) ->
     @localStorage = localStorageService
 
     # Request Contacts Permission
     @isLoading = true
     @$scope.$on '$ionicView.enter', =>
+      @$ionicLoading.show
+        template: '''
+          <div class="loading-text" id="loading-contacts">Loading your contacts...<br>(This might take a while)</div>
+          <ion-spinner icon="bubbles"></ion-spinner>
+          '''
+
       @Contacts.getContacts().then null, =>
         @contactsRequestError = true
       , (contacts) =>
