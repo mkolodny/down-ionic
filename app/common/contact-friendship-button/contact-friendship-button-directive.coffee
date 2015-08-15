@@ -1,6 +1,6 @@
 require '../../vendor/intl-phone/libphonenumber-utils.js'
 
-contactFriendshipButtonDirective = (UserPhone) ->
+contactFriendshipButtonDirective = (Auth, UserPhone) ->
   restrict: 'E'
   scope:
     contact: '='
@@ -15,11 +15,13 @@ contactFriendshipButtonDirective = (UserPhone) ->
     $scope.addFriend = ->
       $scope.isLoading = true
 
-      UserPhone.create($scope.contact).then (data) ->
-        # Update the contact on the scope. It should now have a nationalPhone
-        # property.
-        $scope.contact = data.contact
-      , ->
-        $scope.isLoading = false
+      UserPhone.create $scope.contact
+        .then (data) ->
+          $scope.contact = data.contact
+
+          friend = data.userphone.user
+          Auth.user.friends[friend.id] = friend
+        , ->
+          $scope.isLoading = false
 
 module.exports = contactFriendshipButtonDirective

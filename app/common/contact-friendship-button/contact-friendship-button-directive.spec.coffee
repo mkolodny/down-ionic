@@ -7,6 +7,7 @@ require './contact-friendship-button-module'
 describe 'contact friendship button directive', ->
   $compile = null
   $q = null
+  Auth = null
   element = null
   scope = null
   UserPhone = null
@@ -14,6 +15,15 @@ describe 'contact friendship button directive', ->
   beforeEach angular.mock.module('down.contactFriendshipButton')
 
   beforeEach angular.mock.module('down.resources')
+
+  beforeEach angular.mock.module(($provide) ->
+    Auth =
+      user:
+        id: 1
+        friends: {}
+    $provide.value 'Auth', Auth
+    return
+  )
 
   beforeEach inject(($injector) ->
     $compile = $injector.get '$compile'
@@ -58,6 +68,7 @@ describe 'contact friendship button directive', ->
       expect(UserPhone.create).toHaveBeenCalledWith scope.contact
 
     describe 'when the add succeeds', ->
+      user = null
       contact = null
 
       beforeEach ->
@@ -75,6 +86,9 @@ describe 'contact friendship button directive', ->
 
       it 'should get the contact from local storage', ->
         expect(scope.contact).toEqual contact
+
+      it 'should add the new friend to the user\'s friends object', ->
+        expect(Auth.user.friends[user.id]).toBe user
 
 
     describe 'when the add fails', ->
