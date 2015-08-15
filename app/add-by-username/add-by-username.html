@@ -17,8 +17,12 @@
           user-id="addByUsername.friend.id"
           ng-if="addByUsername.friend" >
         </user-friendship-button>
-        <i class="icon fa fa-spinner fa-pulse"
-           ng-if="addByUsername.isSearching"></i>
+        <i class="icon">
+          <ion-spinner 
+            ng-if="addByUsername.isSearching" 
+            icon="bubbles"
+          ></ion-spinner>
+        </i>
       </ion-item>
     </ion-list>
   </ion-content>
