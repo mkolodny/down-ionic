@@ -80,9 +80,9 @@ describe 'find friends controller', ->
 
       scope.$emit '$ionicView.enter'
 
-    fit 'should show a loading overlay', ->
+    it 'should show a loading overlay', ->
       template = '''
-        <div class="loading-text">Loading your contacts...<br>(This might take a while)</div>
+        <div class="loading-text" id="loading-contacts">Loading your contacts...<br>(This might take a while)</div>
         <ion-spinner icon="bubbles"></ion-spinner>
         '''
       expect($ionicLoading.show).toHaveBeenCalledWith template: template
