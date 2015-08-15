@@ -11,7 +11,7 @@ friendshipButtonDirective = (Auth, Friendship) ->
           'fa-check-square': isFriend(userId),
           }"
       ></i>
-      <i class="icon fa friendship-button"
+      <i class="icon"
          ng-if="isLoading"
       >
         <ion-spinner icon="bubbles"></ion-spinner>
