@@ -6,25 +6,18 @@
     color: #fff;
     text-align: center;
     font-size: 76px;
+    margin-top: 50px;
   }
   #phone {
     padding-right: 48px; // To keep things centered with the 48px padding-left
-    height: 47px;
+    padding-top: 10px;
+    border-radius: 0;
+    height: 45px;
   }
   ::-webkit-input-placeholder {
-    text-align: center;
     padding-top: 5px;
   }
-  :-moz-placeholder {
-    text-align: center;
-    padding-top: 5px;
-  }
-  ::-moz-placeholder {
-    text-align: center;
-    padding-top: 5px;
-  }
-  :-ms-input-placeholder {
-    text-align: center;
+  ::input-placeholder {
     padding-top: 5px;
   }
   .intl-tel-input {
