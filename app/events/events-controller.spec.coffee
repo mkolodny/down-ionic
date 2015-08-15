@@ -644,7 +644,7 @@ describe 'events controller', ->
       spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
 
       # Save the invitation before the item gets updated.
-      invitation = angular.copy item
+      invitation = angular.copy item.invitation
       for property in ['isDivider', 'wasJoined', 'wasUpdated']
         delete invitation[property]
       ctrl.invitations =
@@ -755,10 +755,19 @@ describe 'events controller', ->
     describe 'when it was declined', ->
 
       beforeEach ->
-        item.response = Invitation.declined
+        item.invitation.response = Invitation.declined
 
       it 'should return true', ->
-        expect(ctrl.itemWasDeclined(item)).toBe true
+        expect(ctrl.itemWasDeclined item).toBe true
+
+
+    describe 'when it wasn\'t declined', ->
+
+      beforeEach ->
+        item.invitation.response = Invitation.accepted
+
+      it 'should return false', ->
+        expect(ctrl.itemWasDeclined item).toBe false
 
 
   describe 'toggling setting the date', ->

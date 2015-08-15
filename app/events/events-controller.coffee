@@ -260,7 +260,7 @@ class EventsCtrl
     @respondToInvitation item, $event, @Invitation.declined
 
   respondToInvitation: (item, $event, response) ->
-    invitation = @invitations[item.id]
+    invitation = @invitations[item.invitation.id]
 
     # Prevent calling the ion-item element's ng-click.
     $event.stopPropagation()
@@ -274,16 +274,10 @@ class EventsCtrl
       @invitations[_invitation.id] = _invitation
       @moveItem item, @invitations
     , =>
-      #item.respondError = true # Mock a successful response for now.
-
-      @invitations[invitation.id] = invitation
-      item.isExpanded = false
-      item.isReordering = true
-      @moveItem @invitations
+      item.respondError = true
 
   itemWasDeclined: (item) ->
-    if item.response is @Invitation.declined
-      return true
+    item.invitation.response is @Invitation.declined
 
   inviteFriends: ->
     newEvent = @getNewEvent()
