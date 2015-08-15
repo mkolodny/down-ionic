@@ -213,6 +213,7 @@ describe 'verify phone controller', ->
 
       beforeEach ->
         spyOn(Auth, 'redirectForAuthState')
+        spyOn(Auth, 'setUser')
 
         friends = ['Jim', 'Bob']
         deferred.resolve friends
@@ -220,6 +221,9 @@ describe 'verify phone controller', ->
 
       it 'should set the friends on auth', ->
         expect(Auth.user.facebookFriends).toEqual friends
+
+      fit 'should call Auth.setUser', ->
+        expect(Auth.setUser).toHaveBeenCalledWith Auth.user
 
       it 'should redirectForAuthState', ->
         expect(Auth.redirectForAuthState).toHaveBeenCalled()

@@ -42,6 +42,8 @@ class VerifyPhoneCtrl
     @User.getFacebookFriends()
       .$promise.then (friends) =>
         @Auth.user.facebookFriends = friends
+        # To persist to localstorage
+        @Auth.setUser @Auth.user
         @Auth.redirectForAuthState()
       , (error) =>
         if error?.status is 400
