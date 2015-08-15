@@ -19,11 +19,12 @@ class AddFromAddressBookCtrl
     @items = []
     currentLetter = null
     for contact in contactsArray
-      if contact.name[0] != currentLetter
+      firstLetter = contact.name.formatted[0].toUpperCase()
+      if firstLetter != currentLetter
         @items.push
           isDivider: true
-          title: contact.name.formatted[0]
-        currentLetter = contact.name.formatted[0]
+          title: firstLetter
+        currentLetter = firstLetter
 
       if contact.user?.username
         @items.push
