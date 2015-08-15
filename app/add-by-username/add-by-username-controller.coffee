@@ -4,18 +4,22 @@ class AddByUsernameCtrl
 
   search: ->
     @isSearching = true
+    @friend = null
+
+    # Cancel pending query
+    @$timeout.cancel @timer
 
     # Search for the user after 300ms.
     # Save the current username to make sure the username is still the same after
     # 300ms.
     username = @username
-    @$timeout =>
+    @timer = @$timeout =>
       @User.query {username: @username}
         .$promise.then (friends) =>
+          @isSearching = false
           if @username is username
             if friends.length is 1
               @friend = friends[0]
-            @isSearching = false
         , =>
           if @username is username
             @searchError = true

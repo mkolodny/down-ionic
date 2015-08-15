@@ -34,9 +34,14 @@ describe 'add by username controller', ->
 
   describe 'searching for a user by username', ->
     deferred = null
+    timer = null
 
     beforeEach ->
       ctrl.username = 'tdog'
+      timer = {}
+      ctrl.timer = angular.copy timer
+
+      spyOn($timeout, 'cancel')
 
       deferred = $q.defer()
       spyOn(User, 'query').and.returnValue {$promise: deferred.promise}
@@ -45,6 +50,12 @@ describe 'add by username controller', ->
 
     it 'should set a searching flag', ->
       expect(ctrl.isSearching).toBe true
+
+    it 'should clear the friend', ->
+      expect(ctrl.friend).toBe null
+
+    it 'should cancel existing timeout', ->
+      expect($timeout.cancel).toHaveBeenCalledWith timer
 
     describe 'after 300ms', ->
 
@@ -78,7 +89,6 @@ describe 'add by username controller', ->
           it 'should set searching to false', ->
             expect(ctrl.isSearching).toBe false
 
-
         describe 'when no users are returned', ->
 
           beforeEach ->
@@ -87,7 +97,6 @@ describe 'add by username controller', ->
 
           it 'should set searching to false', ->
             expect(ctrl.isSearching).toBe false
-
 
         describe 'when the search is unsuccessful', ->
 
