@@ -67,6 +67,9 @@ class Auth
     @user.friends[userId]?
 
   isNearby: (user) ->
+    if not user.location?
+      return false
+
     start =
       latitude: @user.location.lat
       longitude: @user.location.long
