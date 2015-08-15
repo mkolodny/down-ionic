@@ -5,7 +5,17 @@ friendshipButtonDirective = (Auth, Friendship) ->
   template: """
     <a href="" ng-click="toggleFriendship(userId)">
       <i class="icon fa friendship-button"
-         ng-class="{'fa-plus-square-o': !isFriend(userId) && !isLoading, 'fa-check-square': isFriend(userId) && !isLoading, 'fa-spinner': isLoading, 'fa-pulse': isLoading}"></i>
+         ng-if="!isLoading"
+         ng-class="{
+          'fa-plus-square-o': !isFriend(userId),
+          'fa-check-square': isFriend(userId),
+          }"
+      ></i>
+      <i class="icon fa friendship-button"
+         ng-if="isLoading"
+      >
+        <ion-spinner icon="bubbles"></ion-spinner>
+      </i>
     </a>
     """
   controller: ($scope) ->
