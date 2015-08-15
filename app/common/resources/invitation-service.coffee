@@ -10,7 +10,6 @@ Invitation = ($http, $q, $resource, apiRoot, Event, User) ->
       from_user: 'fromUserId'
       response: 'response'
       previously_accepted: 'previouslyAccepted'
-      open: 'open'
       to_user_messaged: 'toUserMessaged'
       muted: 'muted'
     for serializedField, deserializedField of optionalFields
@@ -24,7 +23,6 @@ Invitation = ($http, $q, $resource, apiRoot, Event, User) ->
       id: response.id
       response: response.response
       previouslyAccepted: response.previously_accepted
-      open: response.open
       toUserMessaged: response.to_user_messaged
       muted: response.muted
       createdAt: new Date(response.created_at)

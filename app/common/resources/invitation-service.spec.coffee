@@ -70,7 +70,6 @@ describe 'invitation service', ->
           fromUserId: 4
           response: Invitation.accepted
           previouslyAccepted: false
-          open: false
           toUserMessaged: false
           muted: false
           lastViewed: new Date()
@@ -83,7 +82,6 @@ describe 'invitation service', ->
           from_user: invitation.fromUserId
           response: invitation.response
           previously_accepted: invitation.previouslyAccepted
-          open: invitation.open
           to_user_messaged: invitation.toUserMessaged
           muted: invitation.muted
           last_viewed: invitation.lastViewed.getTime()
@@ -102,7 +100,6 @@ describe 'invitation service', ->
         id: 1
         response: Invitation.accepted
         previously_accepted: false
-        open: false
         to_user_messaged: false
         muted: false
         created_at: new Date().getTime()
@@ -146,7 +143,6 @@ describe 'invitation service', ->
         fromUserId: fromUser.id
         response: response.response
         previouslyAccepted: response.previously_accepted
-        open: response.open
         toUserMessaged: response.to_user_messaged
         muted: response.muted
         createdAt: new Date(response.created_at)
@@ -205,7 +201,6 @@ describe 'invitation service', ->
           from_user: 3
           response: Invitation.noResponse
           previously_accepted: false
-          open: false
           to_user_messaged: false
           muted: false
           created_at: new Date()
@@ -240,7 +235,6 @@ describe 'invitation service', ->
         fromUserId: 3
         response: Invitation.noResponse
         previouslyAccepted: false
-        open: false
         toUserMessaged: false
         muted: false
       putData = Invitation.serialize invitation
@@ -297,7 +291,6 @@ describe 'invitation service', ->
         from_user: 4
         response: Invitation.accepted
         previously_accepted: false
-        open: false
         to_user_messaged: false
         muted: false
         created_at: new Date()
@@ -355,7 +348,6 @@ describe 'invitation service', ->
               coordinates: [40.7265836, -73.9821539]
           response: Invitation.accepted
           previously_accepted: false
-          open: false
           to_user_messaged: false
           muted: false
           created_at: new Date().getTime()
