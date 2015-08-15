@@ -38,20 +38,24 @@ class EventsCtrl
     @$scope.$on '$destroy', =>
       @setPlaceModal.remove()
 
-    @Invitation.getMyInvitations().then (invitations) =>
-      # Save the invitations on the controller.
-      @invitations = {}
-      for invitation in invitations
-        @invitations[invitation.id] = invitation
+    @isLoading = true
+    @Invitation.getMyInvitations()
+      .then (invitations) =>
+        # Save the invitations on the controller.
+        @invitations = {}
+        for invitation in invitations
+          @invitations[invitation.id] = invitation
 
-      # Build the list of items to show in the view.
-      @items = @buildItems @invitations
+        # Build the list of items to show in the view.
+        @items = @buildItems @invitations
 
-      # Subscribe to the messages for each event.
-      events = (invitation.event for invitation in invitations)
-      @eventsMessagesSubscribe events
-    , =>
-      @getInvitationsError = true
+        # Subscribe to the messages for each event.
+        events = (invitation.event for invitation in invitations)
+        @eventsMessagesSubscribe events
+      , =>
+        @getInvitationsError = true
+      .finally =>
+        @isLoading = false
 
     @newEvent = {}
 

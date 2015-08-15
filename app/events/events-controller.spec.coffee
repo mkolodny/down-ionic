@@ -128,6 +128,9 @@ describe 'events controller', ->
       scope: scope
       animation: 'slide-in-up'
 
+  it 'should set a loading flag', ->
+    expect(ctrl.isLoading).toBe true
+
   describe 'when the events request returns', ->
 
     describe 'successfully', ->
@@ -157,6 +160,9 @@ describe 'events controller', ->
         events = [invitation.event]
         expect(ctrl.eventsMessagesSubscribe).toHaveBeenCalledWith events
 
+      it 'should clear a loading flag', ->
+        expect(ctrl.isLoading).toBe false
+
 
     describe 'with an error', ->
 
@@ -166,6 +172,9 @@ describe 'events controller', ->
 
       it 'should show an error', ->
         expect(ctrl.getInvitationsError).toBe true
+
+      it 'should clear a loading flag', ->
+        expect(ctrl.isLoading).toBe false
 
 
   describe 'when the modal loads', ->

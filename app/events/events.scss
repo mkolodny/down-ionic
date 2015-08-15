@@ -1,12 +1,16 @@
 #events {
-  h2 {
-    color: $brand-color;
-    font-size: 20px;
+  #spinner-container {
+    text-align: center;
+    margin-top: 25px;
   }
   #no-events {
     text-align: center;
     color: $brand-color;
     margin-top: 124px;
+  }
+  h2 {
+    color: $brand-color;
+    font-size: 20px;
   }
   .moving {
     .list,
