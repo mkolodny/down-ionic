@@ -1,17 +1,24 @@
+require '../ionic/ionic.js'
 require 'angular'
+require 'angular-animate'
 require 'angular-mocks'
+require 'angular-sanitize'
 require 'angular-ui-router'
+require '../ionic/ionic-angular.js'
 require '../common/auth/auth-module'
 LoginCtrl = require './login-controller'
 
 describe 'login controller', ->
   $httpBackend = null
+  $ionicLoading = null
   $rootScope = null
   $q = null
   $state = null
   Auth = null
   ctrl = null
   scope = null
+
+  beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('down.auth')
 
@@ -20,6 +27,7 @@ describe 'login controller', ->
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $httpBackend = $injector.get '$httpBackend'
+    $ionicLoading = $injector.get '$ionicLoading'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
@@ -54,8 +62,9 @@ describe 'login controller', ->
         # Mock a completed form.
         ctrl.phone = '+1234567890'
 
+        spyOn $ionicLoading, 'show'
+        spyOn $ionicLoading, 'hide'
         ctrl.validate.and.returnValue true
-        spyOn Auth, 'redirectForAuthState'
 
         ctrl.login()
 
@@ -65,14 +74,26 @@ describe 'login controller', ->
       it 'should send a verification text', ->
         expect(Auth.sendVerificationText).toHaveBeenCalledWith ctrl.phone
 
+      it 'should show a loading overlay', ->
+        template = '''
+          <div class="loading-text">Sending you a verification text...</div>
+          <ion-spinner icon="bubbles"></ion-spinner>
+          '''
+        expect($ionicLoading.show).toHaveBeenCalledWith template: template
+
       describe 'when the request succeeds', ->
 
         beforeEach ->
+          spyOn Auth, 'redirectForAuthState'
+
           deferred.resolve()
           $rootScope.$apply()
 
         it 'should go to the verify phone view', ->
           expect(Auth.redirectForAuthState).toHaveBeenCalled()
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
       describe 'when the request fails', ->
@@ -83,6 +104,9 @@ describe 'login controller', ->
 
         it 'should show an error', ->
           expect(ctrl.error).toBe 'For some reason, that didn\'t work'
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
   describe 'validating the login form', ->
