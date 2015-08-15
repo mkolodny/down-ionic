@@ -1020,3 +1020,16 @@ describe 'events controller', ->
 
     it 'should go to the friends view', ->
       expect($state.go).toHaveBeenCalledWith 'friends'
+
+
+  describe 'viewing an event group chat', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.viewEvent item
+
+    it 'should go to the event view', ->
+      expect($state.go).toHaveBeenCalledWith 'event',
+        invitation: item.invitation
+        id: item.invitation.event.id

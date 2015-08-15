@@ -19,6 +19,7 @@ angular.module 'down.event', [
       templateUrl: 'app/event/event.html'
       controller: 'EventCtrl as event'
       params:
+        ###
         invitation:
           id: 2
           event:
@@ -39,6 +40,6 @@ angular.module 'down.event', [
           lastViewed: new Date()
           createdAt: new Date()
           updatedAt: new Date()
-        #invitation: null
-        id: 1
+        ###
+        invitation: null
   .controller 'EventCtrl', EventCtrl

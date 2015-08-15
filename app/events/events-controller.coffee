@@ -302,4 +302,9 @@ class EventsCtrl
   myFriends: ->
     @$state.go 'friends'
 
+  viewEvent: (item) ->
+    @$state.go 'event',
+      invitation: item.invitation
+      id: item.invitation.event.id
+
 module.exports = EventsCtrl
