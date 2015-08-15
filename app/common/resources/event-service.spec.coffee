@@ -122,7 +122,7 @@ describe 'event service', ->
           created_at: new Date().getTime()
           updated_at: new Date().getTime()
 
-      fit 'should return the deserialized event', ->
+      it 'should return the deserialized event', ->
         expectedEvent =
           id: response.id
           creatorId: response.creator
@@ -150,7 +150,7 @@ describe 'event service', ->
           created_at: new Date().getTime()
           updated_at: new Date().getTime()
 
-      fit 'should return the deserialized event', ->
+      it 'should return the deserialized event', ->
         expectedEvent =
           id: response.id
           creatorId: response.creator
