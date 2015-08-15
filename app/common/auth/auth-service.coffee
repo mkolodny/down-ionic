@@ -7,6 +7,10 @@ class Auth
 
   user: {}
 
+  setUser: (user) ->
+    @user = angular.extend @user, user
+    @localStorage.set 'currentUser', @user
+
   isAuthenticated: ->
     deferred = @$q.defer()
 

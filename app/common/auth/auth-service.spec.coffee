@@ -65,6 +65,25 @@ describe 'Auth service', ->
   it 'should init the user', ->
     expect(Auth.user).toEqual {}
 
+  describe 'set user', ->
+    user = null
+    expectedUser = null
+
+    beforeEach ->
+      Auth.user =
+        facebookFriends: ['Jim', 'Bob']
+      user =
+        id: 1
+      expectedUser = angular.extend({}, Auth.user, user)
+
+      Auth.setUser user
+
+    it 'should extend passed in user with auth.user', ->
+      expect(Auth.user).toEqual expectedUser
+
+    it 'should save the user to localstorage', ->
+      expect(localStorage.get 'currentUser').toEqual expectedUser
+
   describe 'checking whether the user is authenticated', ->
     testAuthUrl = null
 

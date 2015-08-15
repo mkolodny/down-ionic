@@ -1,5 +1,6 @@
 require 'angular'
 require 'angular-ui-router'
+require 'angular-local-storage'
 require 'ng-cordova'
 require './login/login-module'
 require './verify-phone/verify-phone-module'
@@ -39,6 +40,7 @@ angular.module 'down', [
     'down.addFromFacebook'
     'down.event'
     'down.friends'
+    'LocalStorageModule'
   ]
   .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider) ->
     acceptHeader = 'application/json; version=1.2'
@@ -55,8 +57,14 @@ angular.module 'down', [
         config
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
-  .run ($cordovaStatusbar, $ionicPlatform, $window, Auth) ->
+  .run ($cordovaStatusbar, $ionicPlatform, $window, Auth, localStorageService) ->
     $ionicPlatform.ready ->
+      # Check local storage for currentUser
+      currentUser = localStorageService.get 'currentUser'
+      if currentUser isnt null
+        Auth.user = currentUser
+      Auth.redirectForAuthState()
+
       # Hide the accessory bar by default (remove this to show the accessory bar
       # above the keyboard for form inputs)
       $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
@@ -69,4 +77,3 @@ angular.module 'down', [
       $cordovaStatusbar.overlaysWebView true
       $cordovaStatusbar.style 1
 
-      Auth.redirectForAuthState()

@@ -8,7 +8,7 @@ class VerifyPhoneCtrl
 
     @Auth.authenticate @Auth.phone, @code
       .then (user) =>
-        @Auth.user = user
+        @Auth.setUser user
         @meteorLogin()
       , (status) =>
         # Auth failed
