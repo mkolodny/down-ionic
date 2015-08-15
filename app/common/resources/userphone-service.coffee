@@ -47,7 +47,7 @@ UserPhone = ($http, $q, $resource, apiRoot, Auth, localStorageService, User) ->
         intlTelInputUtils.numberFormat.E164
 
     requestData =
-      name: contact.name
+      name: contact.name.formatted
       phone: intlPhone
     $http.post "#{listUrl}/contact", requestData
       .success (data, status) ->

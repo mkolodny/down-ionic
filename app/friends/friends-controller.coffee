@@ -47,4 +47,17 @@ class FriendsCtrl
   addFriends: ->
     @$state.go 'addFriends'
 
+  getInitials: (name) ->
+    words = name.split ' '
+    firstName = words[0]
+    if words.length is 1 and firstName.length > 1 # Their name is only one word.
+      initials = "#{firstName[0]}#{firstName[1]}"
+    else if words.length is 1 # Their name is only one letter.
+      initials = firstName[0]
+    else # Their name has multiple words.
+      words.reverse()
+      lastName = words[0]
+      initials = "#{firstName[0]}#{lastName[0]}"
+    initials.toUpperCase()
+
 module.exports = FriendsCtrl
