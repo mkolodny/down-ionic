@@ -54,34 +54,58 @@ describe 'event service', ->
     expect(Event.listUrl).toBe listUrl
 
   describe 'serializing an event', ->
+    event = null
 
-    it 'should return the serialized event', ->
+    beforeEach ->
       event =
         id: 1
-        title: 'bars?!?!!?'
         creatorId: 1
-        canceled: false
-        datetime: new Date()
-        createdAt: new Date()
-        updatedAt: new Date()
-        place:
-          name: 'B Bar & Grill'
-          lat: 40.7270718
-          long: -73.9919324
-      expectedEvent =
-        id: event.id
-        title: event.title
-        creator: event.creatorId
-        canceled: event.canceled
-        datetime: new Date(event.datetime).getTime()
-        created_at: new Date(event.createdAt).getTime()
-        updated_at: new Date(event.updatedAt).getTime()
-        place:
-          name: event.place.name
-          geo:
-            type: 'Point'
-            coordinates: [event.place.lat, event.place.long]
-      expect(Event.serialize event).toEqual expectedEvent
+        title: 'bars?!?!!?'
+
+    describe 'with the minimum amount of data', ->
+
+      it 'should return the serialized event', ->
+        expectedEvent =
+          id: event.id
+          creator: event.creatorId
+          title: event.title
+        expect(Event.serialize event).toEqual expectedEvent
+
+
+    describe 'with the max amount of data', ->
+      invitations = null
+
+      beforeEach ->
+        invitations = [
+          to_user: 2
+        ]
+        event = angular.extend event,
+          datetime: new Date()
+          place:
+            name: 'B Bar & Grill'
+            lat: 40.7270718
+            long: -73.9919324
+          comment: 'awwww yisssss'
+          canceled: false
+          createdAt: new Date()
+          updatedAt: new Date()
+          invitations: invitations
+
+      it 'should return the serialized event', ->
+        expectedEvent =
+          id: event.id
+          creator: event.creatorId
+          title: event.title
+          datetime: new Date(event.datetime).getTime()
+          place:
+            name: event.place.name
+            geo:
+              type: 'Point'
+              coordinates: [event.place.lat, event.place.long]
+          comment: 'awwww yisssss'
+          canceled: event.canceled
+          invitations: invitations
+        expect(Event.serialize event).toEqual expectedEvent
 
 
   describe 'deserializing an event', ->
@@ -89,29 +113,31 @@ describe 'event service', ->
     it 'should return the deserialized event', ->
       response =
         id: 1
-        title: 'bars?!?!!?'
         creator: 1
-        canceled: false
+        title: 'bars?!?!!?'
         datetime: new Date().getTime()
-        created_at: new Date().getTime()
-        updated_at: new Date().getTime()
         place:
           name: 'B Bar & Grill'
           geo:
             type: 'Point'
             coordinates: [40.7270718, -73.9919324]
+        comment: 'awwww yisssss'
+        canceled: false
+        created_at: new Date().getTime()
+        updated_at: new Date().getTime()
       expectedEvent =
         id: response.id
-        title: response.title
         creatorId: response.creator
-        canceled: response.canceled
+        title: response.title
         datetime: new Date(response.datetime)
-        createdAt: new Date(response.created_at)
-        updatedAt: new Date(response.updated_at)
         place:
           name: response.place.name
           lat: response.place.geo.coordinates[0]
           long: response.place.geo.coordinates[1]
+        comment: 'awwww yisssss'
+        canceled: response.canceled
+        createdAt: new Date(response.created_at)
+        updatedAt: new Date(response.updated_at)
       expect(Event.deserialize response).toEqual expectedEvent
 
 
@@ -121,14 +147,12 @@ describe 'event service', ->
       event =
         title: 'bars?!?!!?'
         creatorId: 1
-        canceled: false
         datetime: new Date()
-        createdAt: new Date()
-        updatedAt: new Date()
         place:
           name: 'B Bar & Grill'
           lat: 40.7270718
           long: -73.9919324
+        comment: 'awwww yisssss'
       postData = Event.serialize event
       responseData = angular.extend {id: 1}, postData,
         place:
@@ -136,6 +160,9 @@ describe 'event service', ->
           geo:
             type: 'Point'
             coordinates: [event.place.lat, event.place.long]
+        canceled: false
+        created_at: new Date()
+        updated_at: new Date()
 
       $httpBackend.expectPOST listUrl, postData
         .respond 201, angular.toJson(responseData)
@@ -146,8 +173,7 @@ describe 'event service', ->
           response = _response_
       $httpBackend.flush 1
 
-      expectedEventData = angular.extend {id: responseData.id}, event
-      expectedEvent = new Event expectedEventData
+      expectedEvent = Event.deserialize responseData
       expect(response).toAngularEqual expectedEvent
 
 
@@ -163,10 +189,10 @@ describe 'event service', ->
 
       event =
         id: 1
-        title: 'bars?!?!!?'
         creatorId: 1
-        canceled: false
+        title: 'bars?!?!!?'
         datetime: new Date()
+        canceled: false
         createdAt: new Date()
         updatedAt: new Date()
       text = 'I\'m in love with a robot.'
@@ -222,10 +248,10 @@ describe 'event service', ->
     it 'should DELETE the event', ->
       event =
         id: 1
-        title: 'bars?!?!!?'
         creatorId: 1
-        canceled: false
+        title: 'bars?!?!!?'
         datetime: new Date()
+        canceled: false
         createdAt: new Date()
         updatedAt: new Date()
 

@@ -1,5 +1,6 @@
 class InviteFriendsCtrl
-  constructor: (@$state, @$stateParams, @Auth, @Event, @Invitation) ->
+  constructor: (@$ionicHistory, @$state, @$stateParams, @Auth, @Event,
+                @Invitation) ->
     # Make a copy of the user's friends so that when the user selects the friend in
     #   one section, they get selected in every section.
     # TODO: Handle when the user's friends aren't set on auth yet.
@@ -87,21 +88,17 @@ class InviteFriendsCtrl
     delete @selectedFriendIds[friend.id]
 
   sendInvitations: ->
-    invitations = []
     # Create the user's friends' invitations.
-    for friend in @selectedFriends
-      invitations.push
-        fromUser: @Auth.user.id
-        toUser: friend.id
-        response: @Invitation.noResponse
+    invitations = (@Invitation.serialize {toUserId: friend.id} \
+        for friend in @selectedFriends)
     # Create the user's invitation.
-    invitations.push
-      fromUser: @Auth.user.id
-      toUser: @Auth.user.id
-      response: @Invitation.maybe
+    invitations.push @Invitation.serialize
+      toUserId: @Auth.user.id
     @event.invitations = invitations
     @Event.save @event
       .$promise.then =>
+        @$ionicHistory.clearCache()
+      .then =>
         @$state.go 'events'
       , =>
         @inviteError = true

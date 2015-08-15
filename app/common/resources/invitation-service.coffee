@@ -2,19 +2,21 @@ Invitation = ($http, $q, $resource, apiRoot, Event, User) ->
   listUrl = "#{apiRoot}/invitations"
   detailUrl =
   serializeInvitation = (invitation) ->
-    invitation =
-      id: invitation.id
-      event: invitation.eventId
+    data =
       to_user: invitation.toUserId
-      from_user: invitation.fromUserId
-      response: invitation.response
-      previously_accepted: invitation.previouslyAccepted
-      open: invitation.open
-      to_user_messaged: invitation.toUserMessaged
-      muted: invitation.muted
-      created_at: invitation.createdAt.getTime()
-      updated_at: invitation.updatedAt.getTime()
-    invitation
+    optionalFields =
+      id: 'id'
+      event: 'eventId'
+      from_user: 'fromUserId'
+      response: 'response'
+      previously_accepted: 'previouslyAccepted'
+      open: 'open'
+      to_user_messaged: 'toUserMessaged'
+      muted: 'muted'
+    for serializedField, deserializedField of optionalFields
+      if invitation[deserializedField]?
+        data[serializedField] = invitation[deserializedField]
+    data
   deserializeInvitation = (response) ->
     invitation =
       id: response.id
@@ -49,15 +51,6 @@ Invitation = ($http, $q, $resource, apiRoot, Event, User) ->
     invitation
 
   resource = $resource "#{listUrl}/:id", null,
-    save:
-      method: 'post'
-      transformRequest: (data, headersGetter) ->
-        request = serializeInvitation data
-        angular.toJson request
-      transformResponse: (data, headersGetter) ->
-        data = angular.fromJson data
-        deserializeInvitation data
-
     bulkCreate:
       method: 'post'
       isArray: true

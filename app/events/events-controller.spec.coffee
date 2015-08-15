@@ -795,7 +795,7 @@ describe 'events controller', ->
     describe 'when the comment input is showing', ->
 
       beforeEach ->
-        ctrl.hasComment = true
+        ctrl.newEvent.hasComment = true
 
         ctrl.toggleHasComment()
 

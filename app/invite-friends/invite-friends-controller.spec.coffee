@@ -1,10 +1,15 @@
+require '../ionic/ionic.js'
 require 'angular'
 require 'angular-mocks'
+require 'angular-sanitize'
+require 'angular-ui-router'
+require '../ionic/ionic-angular.js'
 require '../common/auth/auth-module'
 require '../common/resources/resources-module'
 InviteFriendsCtrl = require './invite-friends-controller'
 
 describe 'invite friends controller', ->
+  $ionicHistory = null
   $q = null
   $state = null
   Auth = null
@@ -14,12 +19,17 @@ describe 'invite friends controller', ->
   Invitation = null
   scope = null
 
+  beforeEach angular.mock.module('ionic')
+
+  beforeEach angular.mock.module('ui.router')
+
   beforeEach angular.mock.module('down.auth')
 
   beforeEach angular.mock.module('down.resources')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $ionicHistory = $injector.get '$ionicHistory'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
@@ -282,14 +292,14 @@ describe 'invite friends controller', ->
 
 
   describe 'sending the invitations', ->
-    deferred = null
+    deferredEventSave = null
     newEvent = null
 
     beforeEach ->
       ctrl.selectedFriends = [Auth.user.friends[2], Auth.user.friends[3]]
 
-      deferred = $q.defer()
-      spyOn(Event, 'save').and.returnValue {$promise: deferred.promise}
+      deferredEventSave = $q.defer()
+      spyOn(Event, 'save').and.returnValue {$promise: deferredEventSave.promise}
 
       # Save the current version of the event.
       newEvent = angular.copy event
@@ -297,38 +307,46 @@ describe 'invite friends controller', ->
       ctrl.sendInvitations()
 
     it 'should save the event', ->
-      invitations = []
       # Friend invitations
-      for friend in ctrl.selectedFriends
-        invitations.push
-          fromUser: Auth.user.id
-          toUser: friend.id
-          response: Invitation.noResponse
+      invitations = (Invitation.serialize {toUserId: friend.id} \
+          for friend in ctrl.selectedFriends)
       # The logged in user's invitation
-      invitations.push
-        fromUser: Auth.user.id
-        toUser: Auth.user.id
-        response: Invitation.maybe
+      invitations.push Invitation.serialize
+        toUserId: Auth.user.id
       newEvent.invitations = invitations
       expect(Event.save).toHaveBeenCalledWith newEvent
 
     describe 'successfully', ->
+      deferredCacheClear = null
 
       beforeEach ->
-        spyOn $state, 'go'
+        deferredCacheClear = $q.defer()
+        spyOn($ionicHistory, 'clearCache').and.returnValue \
+            deferredCacheClear.promise
 
-        deferred.resolve()
+        deferredEventSave.resolve()
         scope.$apply()
 
-      it 'should go to the events view', ->
-        # TODO: Go to the events view before the save finishes.
-        expect($state.go).toHaveBeenCalledWith 'events'
+      it 'should clear the cache', ->
+        expect($ionicHistory.clearCache).toHaveBeenCalled()
+
+      describe 'when the cache is cleared', ->
+
+        beforeEach ->
+          spyOn $state, 'go'
+
+          deferredCacheClear.resolve()
+          scope.$apply()
+
+        it 'should go to the events view', ->
+          # TODO: Go to the events view before the save finishes.
+          expect($state.go).toHaveBeenCalledWith 'events'
 
 
     describe 'unsuccessfully', ->
 
       beforeEach ->
-        deferred.reject()
+        deferredEventSave.reject()
         scope.$apply()
 
       it 'should show an error', ->

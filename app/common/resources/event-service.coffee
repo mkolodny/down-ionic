@@ -4,31 +4,37 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
   serializeEvent = (event) ->
     request =
       id: event.id
-      title: event.title
       creator: event.creatorId
-      canceled: event.canceled
-      datetime: event.datetime?.getTime()
-      created_at: event.createdAt?.getTime()
-      updated_at: event.updatedAt?.getTime()
-      place:
+      title: event.title
+    if event.datetime?
+      request.datetime = event.datetime?.getTime()
+    if event.place?
+      request.place =
         name: event.place?.name
         geo:
           type: 'Point'
           coordinates: [event.place?.lat, event.place?.long]
+    if event.comment?
+      request.comment = event.comment
+    if event.canceled?
+      request.canceled = event.canceled
+    if event.invitations?
+      request.invitations = event.invitations
     request
   deserializeEvent = (event) ->
     response =
       id: event.id
-      title: event.title
       creatorId: event.creator
-      canceled: event.canceled
+      title: event.title
       datetime: new Date(event.datetime)
-      createdAt: new Date(event.created_at)
-      updatedAt: new Date(event.updated_at)
       place:
         name: event.place?.name
         lat: event.place?.geo.coordinates[0]
         long: event.place?.geo.coordinates[1]
+      comment: event.comment
+      canceled: event.canceled
+      createdAt: new Date(event.created_at)
+      updatedAt: new Date(event.updated_at)
     response
 
   resource = $resource "#{detailUrl}", null,

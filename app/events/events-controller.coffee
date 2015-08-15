@@ -53,12 +53,12 @@ class EventsCtrl
     , =>
       @getInvitationsError = true
 
-  newEvent: {}
+    @newEvent = {}
 
   toggleHasDate: ->
     if not @newEvent.hasDate
       options =
-        mode: 'datetime'
+        mode: 'datetime' # This can be anything other than 'date' or 'time'
         allowOldDates: false
         doneButtonLabel: 'Set Date'
       # If the user has set the date before, use the previous date they set.

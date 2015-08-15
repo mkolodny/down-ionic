@@ -47,33 +47,45 @@ describe 'invitation service', ->
     expect(Invitation.maybe).toBe 3
 
   describe 'serializing an invitation', ->
+    invitation = null
 
-    it 'should return the serialized invitation', ->
+    beforeEach ->
       invitation =
-        id: 1
-        eventId: 2
         toUserId: 3
-        fromUserId: 4
-        response: Invitation.accepted
-        previouslyAccepted: false
-        open: false
-        toUserMessaged: false
-        muted: false
-        createdAt: new Date()
-        updatedAt: new Date()
-      expectedInvitation =
-        id: invitation.id
-        event: invitation.eventId
-        to_user: invitation.toUserId
-        from_user: invitation.fromUserId
-        response: invitation.response
-        previously_accepted: invitation.previouslyAccepted
-        open: invitation.open
-        to_user_messaged: invitation.toUserMessaged
-        muted: invitation.muted
-        created_at: invitation.createdAt.getTime()
-        updated_at: invitation.updatedAt.getTime()
-      expect(Invitation.serialize invitation).toEqual expectedInvitation
+
+    describe 'with the min amount of data', ->
+
+      it 'should return the serialized invitation', ->
+        expectedInvitation =
+          to_user: invitation.toUserId
+        expect(Invitation.serialize invitation).toEqual expectedInvitation
+
+
+    describe 'with the max amount of data', ->
+
+      beforeEach ->
+        invitation = angular.extend invitation,
+          id: 1
+          eventId: 2
+          fromUserId: 4
+          response: Invitation.accepted
+          previouslyAccepted: false
+          open: false
+          toUserMessaged: false
+          muted: false
+
+      it 'should return the serialized invitation', ->
+        expectedInvitation =
+          id: invitation.id
+          event: invitation.eventId
+          to_user: invitation.toUserId
+          from_user: invitation.fromUserId
+          response: invitation.response
+          previously_accepted: invitation.previouslyAccepted
+          open: invitation.open
+          to_user_messaged: invitation.toUserMessaged
+          muted: invitation.muted
+        expect(Invitation.serialize invitation).toEqual expectedInvitation
 
 
   describe 'deserializing an invitation', ->
@@ -163,89 +175,58 @@ describe 'invitation service', ->
         expect(Invitation.deserialize response).toEqual expectedInvitation
 
 
-  describe 'creating', ->
-
-    it 'should POST the invitation', ->
-      invitation =
-        eventId: 1
-        toUserId: 2
-        fromUserId: 3
-        response: Invitation.noResponse
-        previouslyAccepted: false
-        open: false
-        toUserMessaged: false
-        muted: false
-        createdAt: new Date()
-        updatedAt: new Date()
-      postData = Invitation.serialize invitation
-      responseData = angular.extend {id: 1}, postData
-
-      $httpBackend.expectPOST listUrl, postData
-        .respond 201, angular.toJson(responseData)
-
-      response = null
-      Invitation.save invitation
-        .$promise.then (_response_) ->
-          response = _response_
-      $httpBackend.flush 1
-
-      expectedInvitationData = angular.extend {id: responseData.id}, invitation
-      expectedInvitation = new Invitation(expectedInvitationData)
-      expect(response).toAngularEqual expectedInvitation
-
-
   describe 'bulk creating', ->
+    invitations = null
+    response = null
+    responseData = null
 
-    it 'should POST the invitations', ->
+    beforeEach ->
       invitation1 =
         eventId: 1
         toUserId: 2
-        fromUserId: 3
-        response: Invitation.noResponse
-        previouslyAccepted: false
-        open: false
-        toUserMessaged: false
-        muted: false
-        createdAt: new Date()
-        updatedAt: new Date()
       invitation2 = angular.extend {}, invitation1, {toUserId: 3}
       invitations = [invitation1, invitation2]
 
       # Mock an array of invitations for the post data.
-      invitationsPostData = []
-      for invitation in invitations
-        invitationsPostData.push Invitation.serialize(invitation)
+      invitationsPostData = (Invitation.serialize invitation \
+          for invitation in invitations)
       postData = invitations: invitationsPostData
 
-      # Give each invitation in the post data a different id.
-      responseData = []
+      # Give each invitation in the response data a different id.
       i = 1
+      responseData = []
       for invitation in invitationsPostData
-        responseData.push angular.extend({id: i}, invitation)
+        responseData.push angular.extend
+          id: i
+          from_user: 3
+          response: Invitation.noResponse
+          previously_accepted: false
+          open: false
+          to_user_messaged: false
+          muted: false
+          created_at: new Date()
+          updated_at: new Date()
+        , invitation
         i += 1
 
       $httpBackend.expectPOST listUrl, postData
         .respond 201, angular.toJson(responseData)
 
-      response = null
       Invitation.bulkCreate invitations
         .$promise.then (_response_) ->
           response = _response_
       $httpBackend.flush 1
 
-      # Set the returned ids on the original invitations.
-      expectedInvitations = []
-      i = 0
-      for invitation in invitations
-        invitation = angular.extend {id: responseData[i].id}, invitation
-        expectedInvitations.push(new Invitation(invitation))
-        i += 1
+    it 'should POST the invitations', ->
+      expectedInvitations = (Invitation.deserialize invitation \
+          for invitation in responseData)
       expect(response).toAngularEqual expectedInvitations
 
 
   describe 'updating an invitation', ->
     invitation = null
     response = null
+    responseData = null
 
     beforeEach ->
       invitation =
@@ -258,10 +239,10 @@ describe 'invitation service', ->
         open: false
         toUserMessaged: false
         muted: false
-        createdAt: new Date()
-        updatedAt: new Date()
       putData = Invitation.serialize invitation
-      responseData = putData
+      responseData = angular.extend {}, putData,
+        created_at: new Date()
+        updated_at: new Date()
       url = "#{listUrl}/#{invitation.id}"
       $httpBackend.expectPUT url, putData
         .respond 201, angular.toJson(responseData)
@@ -272,7 +253,10 @@ describe 'invitation service', ->
       $httpBackend.flush 1
 
     it 'should PUT the invitation', ->
-      expect(response).toAngularEqual invitation
+      expectedInvitation = angular.extend {}, invitation,
+        createdAt: responseData.created_at
+        updatedAt: responseData.updated_at
+      expect(response).toAngularEqual expectedInvitation
 
 
   describe 'fetching event members\' invitations', ->
