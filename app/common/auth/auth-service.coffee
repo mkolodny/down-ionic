@@ -131,6 +131,6 @@ class Auth
     user = angular.copy @user
     user.location = location
     @User.update(user).$promise.then (user) =>
-      @user = user
+      @setUser user
 
 module.exports = Auth

@@ -222,7 +222,7 @@ describe 'verify phone controller', ->
       it 'should set the friends on auth', ->
         expect(Auth.user.facebookFriends).toEqual friends
 
-      fit 'should call Auth.setUser', ->
+      it 'should call Auth.setUser', ->
         expect(Auth.setUser).toHaveBeenCalledWith Auth.user
 
       it 'should redirectForAuthState', ->

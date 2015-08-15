@@ -610,11 +610,13 @@ describe 'Auth service', ->
       describe 'when successful', ->
 
         beforeEach ->
+          spyOn Auth, 'setUser'
+
           deferred.resolve user
           scope.$apply()
 
         it 'should update the Auth.user', ->
-          expect(Auth.user).toBe user
+          expect(Auth.setUser).toHaveBeenCalledWith user
 
 
   describe 'checking whether a friend is nearby', ->
