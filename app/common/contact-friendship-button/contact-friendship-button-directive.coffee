@@ -6,9 +6,12 @@ contactFriendshipButtonDirective = (Auth, UserPhone) ->
     contact: '='
   template: """
     <a href="" ng-click="addFriend()">
-      <i class="icon fa friendship-button"
-         ng-class="{'fa-plus-square-o': !isLoading, 'fa-spinner': isLoading, 'fa-pulse': isLoading}"
-         ></i>
+      <i class="icon fa friendship-button fa-plus-square-o"
+        ng-if="!isLoading"></i>
+      <i class="icon" 
+        ng-if="isLoading">
+        <ion-spinner icon="bubbles"></ion-spinner>
+      </i>
     </a>
     """
   controller: ($scope) ->

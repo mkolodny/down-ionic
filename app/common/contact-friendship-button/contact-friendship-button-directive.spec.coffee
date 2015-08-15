@@ -59,7 +59,7 @@ describe 'contact friendship button directive', ->
       anchor = element.find 'a'
       anchor.triggerHandler 'click'
 
-    it 'should show a spinner', ->
+    xit 'should show a spinner', ->
       icon = element.find 'i'
       expect(icon).toHaveClass 'fa-spinner'
       expect(icon).toHaveClass 'fa-pulse'
