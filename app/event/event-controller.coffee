@@ -20,17 +20,6 @@ class EventCtrl
       .$promise.then (invitations) =>
         @members = (invitation.toUser for invitation in invitations)
       , =>
-        # Mock the members for now.
-        @members = [
-          id: 1
-          name: 'Michael Kolodny'
-          imageUrl: 'https://graph.facebook.com/v2.2/4900498025333/picture'
-        ,
-          id: 1
-          name: 'Andrew Linfoot'
-          imageUrl: 'https://graph.facebook.com/v2.2/10155438985280433/picture'
-        ]
-        return
         @membersError = true
 
   sortMessages: ->

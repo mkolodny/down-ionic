@@ -105,7 +105,7 @@ class EventsCtrl
           isDivider: false
           wasJoined: false
           wasUpdated: true
-        , invitation
+          invitation: invitation
 
     for response in [@Invitation.accepted, @Invitation.maybe]
       title = @sections[response].title
@@ -124,13 +124,13 @@ class EventsCtrl
             isDivider: false
             wasJoined: true
             wasUpdated: true
-          , invitation
+            invitation: invitation
         for invitation in oldInvitations
           items.push angular.extend
             isDivider: false
             wasJoined: true
             wasUpdated: false
-          , invitation
+            invitation: invitation
 
     declinedInvitations = (invitation for id, invitation of invitations \
         when invitation.response is @Invitation.declined)
@@ -143,7 +143,7 @@ class EventsCtrl
           isDivider: false
           wasJoined: false
           wasUpdated: false
-        , invitation
+          invitation: invitation
 
     # Give every item a top and a right property to allow for transitions.
     @setPositions items
@@ -198,8 +198,7 @@ class EventsCtrl
     # Move the event's updated item.
     item = null
     for item in @items
-      # TODO: item.invitation.event.id
-      if !item.isDivider and item.event.id is event.id
+      if !item.isDivider and item.invitation.event.id is event.id
         @moveItem item, @invitations
 
   moveItem: (item, invitations) ->
@@ -220,8 +219,7 @@ class EventsCtrl
       # they'll be after we update the items.
       for newItem in newItems
         for oldItem in @items
-          if (newItem.isDivider and newItem.title is oldItem.title) or \
-              (not newItem.isDivider and newItem.id is oldItem.id)
+          if @areItemsEqual(newItem, oldItem)
             oldItem.top = newItem.top
 
       # Set the right position of items we'll be removing so that they're off the
@@ -230,8 +228,7 @@ class EventsCtrl
         willBeRemoved = true
         # The item won't be removed if it's in the array of new items.
         for newItem in newItems
-          if (newItem.isDivider and newItem.title is oldItem.title) or \
-              (not newItem.isDivider and newItem.id is oldItem.id)
+          if @areItemsEqual(newItem, oldItem)
             willBeRemoved = false
         if willBeRemoved
           oldItem.right = @$window.innerWidth
@@ -241,6 +238,14 @@ class EventsCtrl
         @moving = false
         @items = newItems
       , @transitionDuration
+
+  areItemsEqual: (item1, item2) ->
+    if item1.isDivider and item2.isDivider
+      item1.title is item2.title
+    else if item1.invitation? and item2.invitation?
+      item1.invitation.id is item2.invitation.id
+    else
+      false
 
   toggleIsExpanded: (item) ->
     item.isExpanded = not item.isExpanded
@@ -296,5 +301,10 @@ class EventsCtrl
 
   myFriends: ->
     @$state.go 'friends'
+
+  viewEvent: (item) ->
+    @$state.go 'event',
+      invitation: item.invitation
+      id: item.invitation.event.id
 
 module.exports = EventsCtrl

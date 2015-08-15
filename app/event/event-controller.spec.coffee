@@ -158,7 +158,7 @@ describe 'event controller', ->
   it 'should request the event members\' invitations', ->
     expect(Invitation.getEventInvitations).toHaveBeenCalledWith {id: event.id}
 
-  xdescribe 'when new messages get posted', ->
+  describe 'when new messages get posted', ->
 
     beforeEach ->
       spyOn ctrl, 'sortMessages'
@@ -191,7 +191,7 @@ describe 'event controller', ->
       deferred.reject()
       scope.$apply()
 
-    xit 'should show an error', ->
+    it 'should show an error', ->
       # TODO: Show the error in the view.
       expect(ctrl.membersError).toBe true
 
