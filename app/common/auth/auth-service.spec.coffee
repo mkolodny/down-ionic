@@ -597,6 +597,11 @@ describe 'Auth service', ->
         username: 'jnasty'
         imageUrl: 'https://facebook.com/profile-pics/jnasty'
 
+    describe 'when the user doesn\'t have a location', ->
+
+      it 'should return false', ->
+        expect(Auth.isNearby user).toBe false
+
     describe 'when the user is at most 5 mi away', ->
 
       beforeEach ->
