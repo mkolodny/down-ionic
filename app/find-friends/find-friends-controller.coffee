@@ -18,6 +18,7 @@ class FindFriendsCtrl
         @items = @buildItems @Auth.user.facebookFriends, contacts
       .finally =>
         @isLoading = false
+        @$ionicLoading.hide()
 
     # Build the list of items to show in the view.
     @items = @buildItems @Auth.user.facebookFriends

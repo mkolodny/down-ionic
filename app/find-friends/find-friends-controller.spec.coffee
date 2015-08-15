@@ -140,6 +140,9 @@ describe 'find friends controller', ->
         it 'should stop the loading indicator', ->
           expect(ctrl.isLoading).toBe false
 
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
 
       describe 'with an error', ->
         beforeEach ->
@@ -151,6 +154,9 @@ describe 'find friends controller', ->
 
         it 'should show an error', ->
           expect(ctrl.contactsRequestError).toBe true
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
   describe 'when the user has facebook friends', ->
