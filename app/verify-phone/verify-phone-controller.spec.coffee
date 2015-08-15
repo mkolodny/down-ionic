@@ -90,11 +90,16 @@ describe 'verify phone controller', ->
           user = {}
           spyOn Auth, 'setUser'
 
+          spyOn Auth, 'setPhone'
+
           deferred.resolve user
           scope.$apply()
 
         it 'should set the user on auth', ->
           expect(Auth.setUser).toHaveBeenCalledWith user
+
+        it 'should set the phone to store in localStorage', ->
+          expect(Auth.setPhone).toHaveBeenCalledWith Auth.phone
 
         it 'should login to the meteor server', ->
           expect(ctrl.meteorLogin).toHaveBeenCalled()

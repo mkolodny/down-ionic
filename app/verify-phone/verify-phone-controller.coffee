@@ -14,8 +14,10 @@ class VerifyPhoneCtrl
         '''
 
     # TODO: Refactor this to chain promises.
-    @Auth.authenticate @Auth.phone, @code
+    phone = @Auth.phone
+    @Auth.authenticate phone, @code
       .then (user) =>
+        @Auth.setPhone phone
         @Auth.setUser user
         @meteorLogin()
       , (status) =>

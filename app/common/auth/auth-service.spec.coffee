@@ -84,6 +84,21 @@ describe 'Auth service', ->
     it 'should save the user to localstorage', ->
       expect(localStorage.get 'currentUser').toEqual expectedUser
 
+  describe 'set phone', ->
+    phone = null
+
+    beforeEach ->
+      Auth.phone = null
+      phone = '19252852230'
+      Auth.setPhone phone
+
+    it 'should set Auth.phone', ->
+      expect(Auth.phone).toEqual phone
+
+    it 'should save the phone to local storage', ->
+      expect(localStorage.get 'currentPhone').toEqual phone
+
+
   describe 'checking whether the user is authenticated', ->
     testAuthUrl = null
 

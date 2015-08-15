@@ -59,10 +59,12 @@ angular.module 'down', [
       .previousTitleText false
   .run ($cordovaStatusbar, $ionicPlatform, $window, Auth, localStorageService) ->
     $ionicPlatform.ready ->
-      # Check local storage for currentUser
+      # Check local storage for currentUser and currentPhone
       currentUser = localStorageService.get 'currentUser'
-      if currentUser isnt null
+      currentPhone = localStorageService.get 'currentPhone'
+      if currentUser isnt null and currentPhone isnt null
         Auth.user = currentUser
+        Auth.phone = currentPhone
 
       # Hide the accessory bar by default (remove this to show the accessory bar
       # above the keyboard for form inputs)
