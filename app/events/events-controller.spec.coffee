@@ -97,10 +97,11 @@ describe 'events controller', ->
       lastViewed: later
       createdAt: new Date()
       updatedAt: new Date()
-    item = angular.extend {}, invitation,
+    item =
       isDivider: false
       wasJoined: true
       wasUpdated: false
+      invitation: invitation
 
     # This is necessary because for some reason ionic is requesting this file
     # when the promise gets resolved.
@@ -296,7 +297,7 @@ describe 'events controller', ->
         isDivider: false
         wasJoined: false
         wasUpdated: true
-      , noResponseInvitation
+        invitation: noResponseInvitation
       joinedInvitations =
         'Down':
           updatedInvitation: updatedAcceptedInvitation
@@ -312,12 +313,12 @@ describe 'events controller', ->
           isDivider: false
           wasJoined: true
           wasUpdated: true
-        , _invitations.updatedInvitation
+          invitation: _invitations.updatedInvitation
         items.push angular.extend
           isDivider: false
           wasJoined: true
           wasUpdated: false
-        , _invitations.oldInvitation
+          invitation: _invitations.oldInvitation
       items.push
         isDivider: true
         title: 'Can\'t'
@@ -325,7 +326,7 @@ describe 'events controller', ->
         isDivider: false
         wasJoined: false
         wasUpdated: false
-      , declinedInvitation
+        invitation: declinedInvitation
       ctrl.setPositions items
       expect(ctrl.buildItems(ctrl.invitations)).toEqual items
 
@@ -355,7 +356,7 @@ describe 'events controller', ->
         wasJoined: false
         wasUpdated: true
         isExpanded: true
-      , noResponseInvitation
+        invitation: noResponseInvitation
       ctrl.items.push
         isDivider: true
         title: 'Down'
@@ -364,7 +365,7 @@ describe 'events controller', ->
         wasJoined: true
         wasUpdated: false
         isExpanded: false
-      , acceptedInvitation
+        invitation: acceptedInvitation
       ctrl.setPositions ctrl.items
 
       # Save the current items so that we can check equality later.
@@ -413,6 +414,75 @@ describe 'events controller', ->
 
         it 'should replace the old items with the new ones', ->
           expect(ctrl.items).toEqual ctrl.buildItems(invitations)
+
+
+  describe 'checking whether two items are the same', ->
+    item1 = null
+    item2 = null
+
+    describe 'when both are dividers', ->
+
+      beforeEach ->
+        item1 =
+          isDivider: true
+          title: 'Down'
+
+      describe 'that are the same', ->
+
+        beforeEach ->
+          item2 = angular.copy item1
+
+        it 'should return true', ->
+          expect(ctrl.areItemsEqual item1, item2).toBe true
+
+
+      describe 'that are different', ->
+
+        beforeEach ->
+          item2 =
+            isDivider: true
+            title: 'Maybe'
+
+        it 'should return false', ->
+          expect(ctrl.areItemsEqual item1, item2).toBe false
+
+
+    describe 'when both are invitations', ->
+
+      beforeEach ->
+        item1 = angular.copy item
+
+      describe 'that are the same', ->
+
+        beforeEach ->
+          item2 = angular.copy item1
+
+        it 'should return true', ->
+          expect(ctrl.areItemsEqual item1, item2).toBe true
+
+
+      describe 'that are different', ->
+
+        beforeEach ->
+          invitation = angular.extend {}, item1.invitation,
+            id: item1.invitation.id + 1
+          item2 = angular.copy item1
+          item2.invitation = invitation
+
+        it 'should return false', ->
+          expect(ctrl.areItemsEqual item1, item2).toBe false
+
+
+    describe 'when one is a divider and another is an invitation', ->
+
+      beforeEach ->
+        item1 =
+          isDivider: true
+          title: 'Down'
+        item2 = angular.copy item
+
+      it 'should return false', ->
+        expect(ctrl.areItemsEqual item1, item2).toBe false
 
 
   describe 'toggling whether an item is expanded', ->
