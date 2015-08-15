@@ -109,36 +109,62 @@ describe 'event service', ->
 
 
   describe 'deserializing an event', ->
+    response = null
 
-    it 'should return the deserialized event', ->
-      response =
-        id: 1
-        creator: 1
-        title: 'bars?!?!!?'
-        datetime: new Date().getTime()
-        place:
-          name: 'B Bar & Grill'
-          geo:
-            type: 'Point'
-            coordinates: [40.7270718, -73.9919324]
-        comment: 'awwww yisssss'
-        canceled: false
-        created_at: new Date().getTime()
-        updated_at: new Date().getTime()
-      expectedEvent =
-        id: response.id
-        creatorId: response.creator
-        title: response.title
-        datetime: new Date(response.datetime)
-        place:
-          name: response.place.name
-          lat: response.place.geo.coordinates[0]
-          long: response.place.geo.coordinates[1]
-        comment: 'awwww yisssss'
-        canceled: response.canceled
-        createdAt: new Date(response.created_at)
-        updatedAt: new Date(response.updated_at)
-      expect(Event.deserialize response).toEqual expectedEvent
+    describe 'with the min amount of data', ->
+
+      beforeEach ->
+        response =
+          id: 1
+          creator: 1
+          title: 'bars?!?!!?'
+          canceled: false
+          created_at: new Date().getTime()
+          updated_at: new Date().getTime()
+
+      fit 'should return the deserialized event', ->
+        expectedEvent =
+          id: response.id
+          creatorId: response.creator
+          title: response.title
+          canceled: response.canceled
+          createdAt: new Date(response.created_at)
+          updatedAt: new Date(response.updated_at)
+        expect(Event.deserialize response).toEqual expectedEvent
+
+    describe 'with the max amount of data', ->
+
+      beforeEach ->
+        response =
+          id: 1
+          creator: 1
+          title: 'bars?!?!!?'
+          datetime: new Date().getTime()
+          place:
+            name: 'B Bar & Grill'
+            geo:
+              type: 'Point'
+              coordinates: [40.7270718, -73.9919324]
+          comment: 'awwww yisssss'
+          canceled: false
+          created_at: new Date().getTime()
+          updated_at: new Date().getTime()
+
+      fit 'should return the deserialized event', ->
+        expectedEvent =
+          id: response.id
+          creatorId: response.creator
+          title: response.title
+          datetime: new Date(response.datetime)
+          place:
+            name: response.place.name
+            lat: response.place.geo.coordinates[0]
+            long: response.place.geo.coordinates[1]
+          comment: 'awwww yisssss'
+          canceled: response.canceled
+          createdAt: new Date(response.created_at)
+          updatedAt: new Date(response.updated_at)
+        expect(Event.deserialize response).toEqual expectedEvent
 
 
   describe 'creating', ->

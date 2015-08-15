@@ -27,15 +27,18 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
       id: event.id
       creatorId: event.creator
       title: event.title
-      datetime: new Date(event.datetime)
-      place:
-        name: event.place?.name
-        lat: event.place?.geo.coordinates[0]
-        long: event.place?.geo.coordinates[1]
-      comment: event.comment
       canceled: event.canceled
       createdAt: new Date(event.created_at)
       updatedAt: new Date(event.updated_at)
+    if event.datetime?
+      response.datetime = new Date(event.datetime)
+    if event.place?
+      response.place =
+        name: event.place.name
+        lat: event.place.geo.coordinates[0]
+        long: event.place.geo.coordinates[1]
+    if event.comment?
+      response.comment = event.comment
     response
 
   resource = $resource "#{detailUrl}", null,
