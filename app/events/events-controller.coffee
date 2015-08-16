@@ -169,12 +169,14 @@ class EventsCtrl
     for event in events
       messagesRQ = Messages.reactiveQuery {eventId: event.id}
 
-      # Set the latest message on the event.
-      @setLatestMessage event, messagesRQ.result
-
-      # Whenever a new message gets posted on the event, set the latest message
-      # on the event.
+      # Keep the same value of `messagesRQ` even after the variable changes
+      #   next time through the loop.
       do (messagesRQ) =>
+        # Set the latest message on the event.
+        @setLatestMessage event, messagesRQ.result
+
+        # Whenever a new message gets posted on the event, set the latest message
+        # on the event.
         messagesRQ.on 'change', =>
           @setLatestMessage event, messagesRQ.result
 
