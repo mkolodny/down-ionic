@@ -152,8 +152,8 @@ describe 'event controller', ->
   it 'should set the messages reactive query on the controller', ->
     expect(ctrl.messagesRQ).toBe messagesRQ
 
-  it 'should set the messages on the event from oldest to newest', ->
-    expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
+  it 'should set the messages on the event from newest to oldest', ->
+    expect(ctrl.messages).toEqual [earlierMessage, laterMessage]
 
   it 'should listen for new messages', ->
     expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)

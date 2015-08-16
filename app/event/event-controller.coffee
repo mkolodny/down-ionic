@@ -1,5 +1,5 @@
 class EventCtrl
-  constructor: (@$state, @$stateParams, @Asteroid, @Auth, @Event, @Invitation) ->
+  constructor: (@$scope, @$state, @$stateParams, @Asteroid, @Auth, @Event, @Invitation) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -7,14 +7,17 @@ class EventCtrl
     @Asteroid.subscribe 'messages', @event.id
     @Messages = @Asteroid.getCollection 'messages'
     @messagesRQ = @Messages.reactiveQuery {eventId: @event.id}
-    @messages = @messagesRQ.result
+    @messages = angular.copy @messagesRQ.result
 
     # Sort the messages from oldest to newest.
     @sortMessages()
 
     # Watch for new messages.
     @messagesRQ.on 'change', =>
+      @messages = angular.copy @messagesRQ.result
       @sortMessages()
+      if not @$scope.$$phase
+        @$scope.$digest()
 
     @Invitation.getEventInvitations {id: @event.id}
       .$promise.then (invitations) =>
@@ -23,7 +26,6 @@ class EventCtrl
         @membersError = true
 
   sortMessages: ->
-    @messages = @messagesRQ.result
     # Sort the messages from oldest to newest.
     @messages.sort (a, b) ->
       if a.createdAt < b.createdAt
