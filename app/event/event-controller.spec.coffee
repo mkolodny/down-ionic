@@ -149,6 +149,9 @@ describe 'event controller', ->
   it 'should ask for the messages for the event', ->
     expect(Messages.reactiveQuery).toHaveBeenCalledWith {eventId: event.id}
 
+  it 'should set the messages reactive query on the controller', ->
+    expect(ctrl.messagesRQ).toBe messagesRQ
+
   it 'should set the messages on the event from oldest to newest', ->
     expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
 
@@ -170,7 +173,6 @@ describe 'event controller', ->
 
     it 'should sort the messages', ->
       expect(ctrl.sortMessages).toHaveBeenCalled()
-
 
   describe 'when the invitations return successfully', ->
     invitations = null

@@ -6,14 +6,14 @@ class EventCtrl
     # Get/subscribe to the messages posted in this event.
     @Asteroid.subscribe 'messages', @event.id
     @Messages = @Asteroid.getCollection 'messages'
-    messagesRQ = @Messages.reactiveQuery {eventId: @event.id}
-    @messages = messagesRQ.result
+    @messagesRQ = @Messages.reactiveQuery {eventId: @event.id}
+    @messages = @messagesRQ.result
 
     # Sort the messages from oldest to newest.
     @sortMessages()
 
     # Watch for new messages.
-    messagesRQ.on 'change', =>
+    @messagesRQ.on 'change', =>
       @sortMessages()
 
     @Invitation.getEventInvitations {id: @event.id}
@@ -23,6 +23,7 @@ class EventCtrl
         @membersError = true
 
   sortMessages: ->
+    @messages = @messagesRQ.result
     # Sort the messages from oldest to newest.
     @messages.sort (a, b) ->
       if a.createdAt < b.createdAt
