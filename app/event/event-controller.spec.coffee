@@ -428,3 +428,6 @@ describe 'event controller', ->
 
     it 'should send the message', ->
       expect(Event.sendMessage).toHaveBeenCalledWith event, ctrl.message
+
+    fit 'should clear the message', ->
+      expect(ctrl.message).toBeNull()

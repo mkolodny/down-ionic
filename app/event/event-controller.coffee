@@ -85,5 +85,6 @@ class EventCtrl
 
   sendMessage: ->
     @Event.sendMessage @event, @message
+    @message = null
 
 module.exports = EventCtrl
