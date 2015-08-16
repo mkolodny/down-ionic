@@ -628,6 +628,12 @@ describe 'events controller', ->
         expect(event.latestMessage).toBe actionMessage.text
 
 
+    describe 'when messages is an empty array', ->
+
+      it 'should return null', ->
+        expect(ctrl.setLatestMessage event, []).toBeUndefined()
+
+
   describe 'responding to an invitation', ->
     date = null
     $event = null
