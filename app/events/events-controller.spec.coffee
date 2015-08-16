@@ -613,7 +613,7 @@ describe 'events controller', ->
       beforeEach ->
         messagesRQ.result = [newMessage]
         event =
-          updatedAt: oldMessage.createdAt.$date
+          updatedAt: new Date(oldMessage.createdAt.$date)
           latestMessage: 'asdf'
         isNewMessage = ctrl.isNewMessage event, newMessage._id
 
@@ -623,20 +623,22 @@ describe 'events controller', ->
       it 'should return true', ->
         expect(isNewMessage).toBe true
 
+
     describe 'when the message is not new', ->
 
       beforeEach ->
         messagesRQ.result = [oldMessage]
         event =
-          updatedAt: newMessage.createdAt.$date
+          updatedAt: new Date(newMessage.createdAt.$date)
           latestMessage: 'asdf'
         isNewMessage = ctrl.isNewMessage event, oldMessage._id
 
       it 'should query for message object by _id', ->
         expect(messages.reactiveQuery).toHaveBeenCalledWith {_id: oldMessage._id}
 
-      it 'should return true', ->
+      it 'should return false', ->
         expect(isNewMessage).toBe false
+
 
     describe 'when event doesn\'t have a latest message set', ->
 
@@ -646,6 +648,7 @@ describe 'events controller', ->
 
       it 'should return true', ->
         expect(isNewMessage).toBe true
+
 
   describe 'setting an event\'s latest message', ->
     event = null
@@ -697,7 +700,7 @@ describe 'events controller', ->
         expect(event.latestMessage).toBe message
 
       it 'should update the event\'s updatedAt time', ->
-        expect(event.updatedAt).toBe textMessage.createdAt.$date
+        expect(event.updatedAt).toEqual new Date(textMessage.createdAt.$date)
 
       it 'should move the updated item', ->
         expect(ctrl.moveItem).toHaveBeenCalledWith item, ctrl.invitations
@@ -706,8 +709,8 @@ describe 'events controller', ->
     describe 'when the latest message is an action', ->
 
       beforeEach ->
-        actionMessage.createdAt = later
-        textMessage.createdAt = earlier
+        actionMessage.createdAt.$date = later.getTime()
+        textMessage.createdAt.$date = earlier.getTime()
 
         ctrl.setLatestMessage event, messages
 
@@ -715,7 +718,7 @@ describe 'events controller', ->
         expect(event.latestMessage).toBe actionMessage.text
 
       it 'should update the event\'s updatedAt time', ->
-        expect(event.updatedAt).toBe actionMessage.createdAt.$date
+        expect(event.updatedAt).toEqual new Date(actionMessage.createdAt.$date)
 
     describe 'when messages is an empty array', ->
 

@@ -194,7 +194,7 @@ class EventsCtrl
     Messages = @Asteroid.getCollection 'messages'
     messagesRQ = Messages.reactiveQuery {_id: messageId}
     message = messagesRQ.result[0]
-    message.createdAt.$date > event.updatedAt
+    message.createdAt.$date > event.updatedAt.getTime()
 
   setLatestMessage: (event, messages) ->
     if messages.length is 0 then return
@@ -214,7 +214,7 @@ class EventsCtrl
       event.latestMessage = latestMessage.text
 
     # Update the event's updatedAt date.
-    event.updatedAt = latestMessage.createdAt.$date
+    event.updatedAt = new Date(latestMessage.createdAt.$date)
 
     # Move the event's updated item.
     item = null
