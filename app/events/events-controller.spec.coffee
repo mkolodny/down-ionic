@@ -638,8 +638,10 @@ describe 'events controller', ->
     date = null
     $event = null
     deferred = null
-    invitation = null
-    response = null
+    originalResponse = null
+    newResponse = null
+    originalInvitations = null
+    originalInvitation = null
 
     beforeEach ->
       jasmine.clock().install()
@@ -648,18 +650,22 @@ describe 'events controller', ->
 
       deferred = $q.defer()
       spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
+      spyOn ctrl, 'moveItem'
 
-      # Save the invitation before the item gets updated.
-      invitation = angular.copy item.invitation
-      for property in ['isDivider', 'wasJoined', 'wasUpdated']
-        delete invitation[property]
+      # Mock the invitations saved on the controller.
       ctrl.invitations =
-        "#{invitation.id}": invitation
+        "#{item.invitation.id}": item.invitation
+
+      # Save the invitations before the item gets updated so that we can
+      # compare the updated invitations to the original.
+      originalInvitation = angular.copy item.invitation
+      originalInvitations = angular.copy ctrl.invitations
+      originalResponse = item.invitation.response
 
       $event =
         stopPropagation: jasmine.createSpy '$event.stopPropagation'
-      response = Invitation.accepted
-      ctrl.respondToInvitation item, $event, response
+      newResponse = Invitation.accepted
+      ctrl.respondToInvitation item, $event, newResponse
 
     afterEach ->
       jasmine.clock().uninstall()
@@ -668,47 +674,60 @@ describe 'events controller', ->
       expect($event.stopPropagation).toHaveBeenCalled()
 
     it 'should update the invitation', ->
-      invitation.response = response
-      invitation.lastViewed = date
-      expect(Invitation.update).toHaveBeenCalledWith invitation
+      originalInvitation.response = newResponse
+      originalInvitation.lastViewed = date
+      expect(Invitation.update).toHaveBeenCalledWith originalInvitation
+
+    it 'should move the item in the items array', ->
+      invitation = angular.extend originalInvitation,
+        response: newResponse
+        lastViewed: date
+      invitations = originalInvitations
+      invitations[invitation.id] = invitation
+      expect(ctrl.moveItem).toHaveBeenCalledWith item, invitations
 
     describe 'when the update succeeds', ->
       updatedInvitation = null
 
       beforeEach ->
-        spyOn ctrl, 'moveItem'
-
-        # Mock the saved invitations.
-        ctrl.invitations = {}
-        ctrl.invitations[invitation.id] = invitation
-
-        newResponse = Invitation.accepted
-        updatedInvitation = angular.extend {}, invitation,
+        updatedInvitation = angular.extend {}, originalInvitation,
           response: newResponse
           lastViewed: date
+          updatedAt: new Date(1439688265029)
         deferred.resolve updatedInvitation
         scope.$apply()
 
-      it 'should set the new response on the invitation', ->
-        expect(ctrl.invitations[invitation.id]).toBe updatedInvitation
-
-      it 'should move the item in the items array', ->
-        expect(ctrl.moveItem).toHaveBeenCalledWith item, ctrl.invitations
+      it 'should update the invitation\'s updatedAt date', ->
+        invitation = ctrl.invitations[item.invitation.id]
+        expect(invitation).toEqual updatedInvitation
 
 
-    xdescribe 'when the update fails', ->
+    describe 'when the update fails', ->
 
       beforeEach ->
+        ctrl.moveItem.calls.reset()
+
         deferred.reject()
         scope.$apply()
 
       it 'should show an error', ->
         expect(item.respondError).toBe true
 
+      it 'should revert the invitation response', ->
+        expect(item.invitation.response).toBe originalResponse
+
+      xit 'should move the item back to the original location', ->
+        # TODO: Test this live.
+        invitation = angular.extend originalInvitation,
+          lastViewed: date
+        invitations = originalInvitations
+        invitations[invitation.id] = invitation
+        expect(ctrl.moveItem).toHaveBeenCalledWith item, invitations
+
       describe 'then trying again', ->
 
         beforeEach ->
-          ctrl.respondToInvitation item, $event, response
+          ctrl.respondToInvitation item, $event, originalResponse
 
         it 'should clear the error', ->
           expect(item.respondError).toBeNull()
