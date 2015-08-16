@@ -1,5 +1,6 @@
 class EventCtrl
-  constructor: (@$scope, @$state, @$stateParams, @Asteroid, @Auth, @Event, @Invitation) ->
+  constructor: (@$ionicScrollDelegate, @$scope, @$state, @$stateParams, @Asteroid,
+                @Auth, @Event, @Invitation) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -12,12 +13,18 @@ class EventCtrl
     # Sort the messages from oldest to newest.
     @sortMessages()
 
+    # Start out at the most recent message.
+    @$scope.$on '$ionicView.enter', =>
+      @$ionicScrollDelegate.scrollBottom true
+
     # Watch for new messages.
     @messagesRQ.on 'change', =>
       @messages = angular.copy @messagesRQ.result
       @sortMessages()
       if not @$scope.$$phase
         @$scope.$digest()
+      if @maxTop is @$ionicScrollDelegate.getScrollPosition().top
+        @$ionicScrollDelegate.scrollBottom true
 
     @Invitation.getEventInvitations {id: @event.id}
       .$promise.then (invitations) =>
@@ -32,6 +39,9 @@ class EventCtrl
         return -1
       else
         return 1
+
+  saveMaxTop: ->
+    @maxTop = @$ionicScrollDelegate.getScrollPosition().top
 
   toggleIsHeaderExpanded: ->
     if @isHeaderExpanded

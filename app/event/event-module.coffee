@@ -7,6 +7,7 @@ require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
 angular.module 'down.event', [
+    'ionic'
     'ui.router'
     'monospaced.elastic'
     'down.asteroid'

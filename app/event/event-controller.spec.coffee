@@ -1,11 +1,16 @@
+require '../ionic/ionic.js'
 require 'angular'
+require 'angular-animate'
 require 'angular-mocks'
+require 'angular-sanitize'
 require 'angular-ui-router'
+require '../ionic/ionic-angular.js'
 require '../common/asteroid/asteroid-module'
 require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
 describe 'event controller', ->
+  $ionicScrollDelegate = null
   $q = null
   $state = null
   Asteroid = null
@@ -24,6 +29,8 @@ describe 'event controller', ->
   messagesRQ = null
   scope = null
 
+  beforeEach angular.mock.module('ionic')
+
   beforeEach angular.mock.module('down.resources')
 
   beforeEach angular.mock.module('down.asteroid')
@@ -34,6 +41,7 @@ describe 'event controller', ->
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
@@ -163,10 +171,26 @@ describe 'event controller', ->
   it 'should request the event members\' invitations', ->
     expect(Invitation.getEventInvitations).toHaveBeenCalledWith {id: event.id}
 
+  describe 'once the view loads', ->
+
+    beforeEach ->
+      spyOn $ionicScrollDelegate, 'scrollBottom'
+
+      scope.$emit '$ionicView.enter'
+
+    it 'should scroll to the bottom of the view', ->
+      expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
+
+
   describe 'when new messages get posted', ->
+    top = null
 
     beforeEach ->
       spyOn ctrl, 'sortMessages'
+      top = 20
+      ctrl.maxTop = top + 40
+      spyOn($ionicScrollDelegate, 'getScrollPosition').and.returnValue
+        top: top
 
       # Mock the messages being in the wrong order.
       ctrl.messages = [earlierMessage, laterMessage]
@@ -175,6 +199,31 @@ describe 'event controller', ->
 
     it 'should sort the messages', ->
       expect(ctrl.sortMessages).toHaveBeenCalled()
+
+    describe 'and the user was at the bottom of the view', ->
+
+      beforeEach ->
+        ctrl.maxTop = top
+        spyOn $ionicScrollDelegate, 'scrollBottom'
+
+        onChange()
+
+      it 'should scroll to the new bottom of the view', ->
+        expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
+
+
+  describe 'when the user hits the bottom of the view', ->
+    top = null
+
+    beforeEach ->
+      top = 20
+      spyOn($ionicScrollDelegate, 'getScrollPosition').and.returnValue
+        top: top
+
+      ctrl.saveMaxTop()
+
+    it 'should save the current top', ->
+      expect(ctrl.maxTop).toBe top
 
 
   describe 'when the invitations return successfully', ->

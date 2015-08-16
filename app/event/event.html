@@ -55,6 +55,8 @@
         </div>
       </ion-item>
     </ion-list>
+    <ion-infinite-scroll on-infinite="event.saveMaxTop()"
+                         distance="0%" ng-show="false"></ion-infinite-scroll>
   </ion-content>
   <ion-footer-bar class="bar-light" keyboard-attach>
     <textarea ng-model="event.message" placeholder="Type a message..." msd-elastic
