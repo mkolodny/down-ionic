@@ -549,16 +549,103 @@ describe 'events controller', ->
     it 'should listen for new messages', ->
       expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)
 
-    describe 'when a new message gets posted', ->
+
+    describe 'when a message gets posted', ->
+      changedDocId = null
 
       beforeEach ->
         ctrl.setLatestMessage.calls.reset()
+        changedDocId = 'asdf'
 
-        onChange()
 
-      it 'should set the latest message on the event', ->
-        expect(ctrl.setLatestMessage).toHaveBeenCalledWith event, messagesRQ.result
+      describe 'message is new', ->
 
+        beforeEach ->
+          spyOn(ctrl, 'isNewMessage').and.returnValue true
+          onChange changedDocId
+
+        it 'should call isNewMessage with doc _id', ->
+          expect(ctrl.isNewMessage).toHaveBeenCalledWith event, changedDocId
+
+        it 'should set the latest message on the event', ->
+          expect(ctrl.setLatestMessage).toHaveBeenCalledWith event, messagesRQ.result
+
+
+      describe 'message is not new', ->
+
+        beforeEach ->
+          spyOn(ctrl, 'isNewMessage').and.returnValue false
+          onChange changedDocId
+
+        it 'should call isNewMessage with doc _id', ->
+          expect(ctrl.isNewMessage).toHaveBeenCalledWith event, changedDocId
+
+        it 'should not call setLatestMessage', ->
+          expect(ctrl.setLatestMessage).not.toHaveBeenCalled()
+
+
+  describe 'is new message for event', ->
+    oldMessage = null
+    newMessage = null
+    messagesRQ = null
+    messages = null
+    isNewMessage = null
+
+    beforeEach ->
+      oldMessage =
+        _id: 1
+        createdAt:
+          $date: 1
+      newMessage =
+        _id: 2
+        createdAt:
+          $date: 2
+
+      messagesRQ =
+        result: 'messagesRQ.result'
+      messages =
+        reactiveQuery: jasmine.createSpy('messages.reactiveQuery') \
+            .and.returnValue messagesRQ
+      spyOn(Asteroid, 'getCollection').and.returnValue messages
+
+    describe 'when the message is new', ->
+
+      beforeEach ->
+        messagesRQ.result = [newMessage]
+        event =
+          updatedAt: oldMessage.createdAt.$date
+          latestMessage: 'asdf'
+        isNewMessage = ctrl.isNewMessage event, newMessage._id
+
+      it 'should query for message object by _id', ->
+        expect(messages.reactiveQuery).toHaveBeenCalledWith {_id: newMessage._id}
+
+      it 'should return true', ->
+        expect(isNewMessage).toBe true
+
+    describe 'when the message is not new', ->
+
+      beforeEach ->
+        messagesRQ.result = [oldMessage]
+        event =
+          updatedAt: newMessage.createdAt.$date
+          latestMessage: 'asdf'
+        isNewMessage = ctrl.isNewMessage event, oldMessage._id
+
+      it 'should query for message object by _id', ->
+        expect(messages.reactiveQuery).toHaveBeenCalledWith {_id: oldMessage._id}
+
+      it 'should return true', ->
+        expect(isNewMessage).toBe false
+
+    describe 'when event doesn\'t have a latest message set', ->
+
+      beforeEach ->
+        event = {}
+        isNewMessage = ctrl.isNewMessage event, 'asdf'
+
+      it 'should return true', ->
+        expect(isNewMessage).toBe true
 
   describe 'setting an event\'s latest message', ->
     event = null
@@ -610,7 +697,7 @@ describe 'events controller', ->
         expect(event.latestMessage).toBe message
 
       it 'should update the event\'s updatedAt time', ->
-        expect(event.updatedAt).toBe textMessage.createdAt
+        expect(event.updatedAt).toBe textMessage.createdAt.$date
 
       it 'should move the updated item', ->
         expect(ctrl.moveItem).toHaveBeenCalledWith item, ctrl.invitations
@@ -627,6 +714,8 @@ describe 'events controller', ->
       it 'should set the most recent message on the event', ->
         expect(event.latestMessage).toBe actionMessage.text
 
+      it 'should update the event\'s updatedAt time', ->
+        expect(event.updatedAt).toBe actionMessage.createdAt.$date
 
     describe 'when messages is an empty array', ->
 

@@ -178,9 +178,20 @@ class EventsCtrl
 
         # Whenever a new message gets posted on the event, set the latest message
         # on the event.
-        messagesRQ.on 'change', =>
+        messagesRQ.on 'change', (_id) =>
           messages = angular.copy messagesRQ.result
-          @setLatestMessage event, messages
+          if @isNewMessage event, _id
+            @setLatestMessage event, messages
+
+  isNewMessage: (event, messageId) ->
+    # latest message hasn't been set yet
+    if not event.latestMessage? then return true
+
+    # get mesage object by _id
+    Messages = @Asteroid.getCollection 'messages'
+    messagesRQ = Messages.reactiveQuery {_id: messageId}
+    message = messagesRQ.result[0]
+    return message.createdAt.$date > event.updatedAt
 
   setLatestMessage: (event, messages) ->
     if messages.length is 0 then return
@@ -200,7 +211,7 @@ class EventsCtrl
       event.latestMessage = latestMessage.text
 
     # Update the event's updatedAt date.
-    event.updatedAt = latestMessage.createdAt
+    event.updatedAt = latestMessage.createdAt.$date
 
     # Move the event's updated item.
     item = null
