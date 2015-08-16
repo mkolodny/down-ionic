@@ -32,7 +32,7 @@
           <h2>{{item.invitation.event.title}}</h2>
           <p ng-if="item.wasJoined">{{item.invitation.event.latestMessage}}</p>
           <p ng-if="!item.wasJoined">Suggested by {{item.invitation.fromUser.name}}</p>
-          <span class="updated-at">{{item.invitation.createdAt | date:'shortTime' | lowercase}}</span>
+          <span class="updated-at">{{item.invitation.event.updatedAt | date:'shortTime' | lowercase}}</span>
           <i class="fa item-icon" ng-if="!item.wasJoined"
              ng-class="{'fa-chevron-down': !item.isExpanded, 'fa-chevron-up': item.isExpanded}"
              ></i>
