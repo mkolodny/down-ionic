@@ -198,7 +198,7 @@ class EventsCtrl
     # Move the event's updated item.
     item = null
     for item in @items
-      if !item.isDivider and item.invitation.event.id is event.id
+      if item.invitation?.event.id is event.id
         @moveItem item, @invitations
 
   moveItem: (item, invitations) ->
@@ -268,12 +268,17 @@ class EventsCtrl
     # Clear any previous errors.
     item.respondError = null
 
+    # Eagerly update the invitation. Save the original response in case the update
+    #   failse.
+    originalResponse = invitation.response
     invitation.response = response
     invitation.lastViewed = new Date()
+    @moveItem item, @invitations
+
     @Invitation.update(invitation).$promise.then (_invitation) =>
-      @invitations[_invitation.id] = _invitation
-      @moveItem item, @invitations
+      invitation.updatedAt = _invitation.updatedAt
     , =>
+      invitation.response = originalResponse
       item.respondError = true
 
   itemWasDeclined: (item) ->
