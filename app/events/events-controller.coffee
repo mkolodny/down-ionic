@@ -183,6 +183,9 @@ class EventsCtrl
           if @isNewMessage event, _id
             @setLatestMessage event, messages
 
+  # mongo _id's are randomly generated client side via
+  # Asteroid and therefore are not chronological
+  # use the message.createdAt for determining new messages
   isNewMessage: (event, messageId) ->
     # latest message hasn't been set yet
     if not event.latestMessage? then return true
