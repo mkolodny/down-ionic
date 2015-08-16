@@ -11,7 +11,7 @@ class Asteroid
   subscribe: (name, params...) ->
     args = params
     args.unshift name
-    @_instance.subscribe.apply null, args
+    @_instance.subscribe.apply @_instance, args
 
   getCollection: (name) ->
     @_instance.getCollection name
