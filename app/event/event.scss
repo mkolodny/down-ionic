@@ -65,7 +65,17 @@
   }
   ion-item {
     border: none;
-    padding: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    &:first-child {
+      padding-top: 10px;
+    }
+    &:last-child {
+      padding-bottom: 10px;
+    }
   }
   .action-message {
     color: #888;
