@@ -190,11 +190,11 @@ class EventsCtrl
     # latest message hasn't been set yet
     if not event.latestMessage? then return true
 
-    # get mesage object by _id
+    # get message object by _id
     Messages = @Asteroid.getCollection 'messages'
     messagesRQ = Messages.reactiveQuery {_id: messageId}
     message = messagesRQ.result[0]
-    return message.createdAt.$date > event.updatedAt
+    message.createdAt.$date > event.updatedAt
 
   setLatestMessage: (event, messages) ->
     if messages.length is 0 then return
