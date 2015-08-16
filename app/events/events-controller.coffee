@@ -171,20 +171,23 @@ class EventsCtrl
 
       # Keep the same value of `messagesRQ` even after the variable changes
       #   next time through the loop.
-      do (messagesRQ) =>
+      do (event, messagesRQ) =>
         # Set the latest message on the event.
-        @setLatestMessage event, messagesRQ.result
+        messages = angular.copy messagesRQ.result
+        @setLatestMessage event, messages
 
         # Whenever a new message gets posted on the event, set the latest message
         # on the event.
         messagesRQ.on 'change', =>
-          @setLatestMessage event, messagesRQ.result
+          messages = angular.copy messagesRQ.result
+          @setLatestMessage event, messages
 
   setLatestMessage: (event, messages) ->
     if messages.length is 0 then return
+
     # Sort the messages from newest to oldest.
     messages.sort (a, b) ->
-      if a.createdAt > b.createdAt
+      if a.createdAt.$date > b.createdAt.$date
         return -1
       else
         return 1

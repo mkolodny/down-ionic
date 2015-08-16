@@ -574,19 +574,19 @@ describe 'events controller', ->
         id: 2
         name: 'Guido van Rossum'
         imageUrl: 'http://facebook.com/profile-pics/vrawesome'
-      earlier = new Date()
-      later = new Date(earlier.getTime() + 1)
       textMessage =
         _id: 1
         creator: creator
-        createdAt: new Date()
+        createdAt:
+          $date: new Date().getTime()
         text: 'I\'m in love with a robot.'
         eventId: invitation.event.id
         type: 'text'
       actionMessage =
         _id: 1
         creator: creator
-        createdAt: new Date()
+        createdAt:
+          $date: new Date().getTime()
         text: 'Michael Jordan is down'
         eventId: invitation.event.id
         type: 'action'
@@ -600,8 +600,8 @@ describe 'events controller', ->
     describe 'when the latest message is a text', ->
 
       beforeEach ->
-        textMessage.createdAt = later
-        actionMessage.createdAt = earlier
+        textMessage.createdAt.$date = later.getTime()
+        actionMessage.createdAt.$date = earlier.getTime()
 
         ctrl.setLatestMessage event, messages
 
