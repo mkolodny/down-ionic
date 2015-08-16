@@ -178,6 +178,7 @@ class EventsCtrl
         @setLatestMessage event, messagesRQ.result
 
   setLatestMessage: (event, messages) ->
+    if messages.length is 0 then return
     # Sort the messages from newest to oldest.
     messages.sort (a, b) ->
       if a.createdAt > b.createdAt
