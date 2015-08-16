@@ -174,8 +174,9 @@ class EventsCtrl
 
       # Whenever a new message gets posted on the event, set the latest message
       # on the event.
-      messagesRQ.on 'change', =>
-        @setLatestMessage event, messagesRQ.result
+      do (messagesRQ) =>
+        messagesRQ.on 'change', =>
+          @setLatestMessage event, messagesRQ.result
 
   setLatestMessage: (event, messages) ->
     if messages.length is 0 then return
