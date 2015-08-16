@@ -280,6 +280,7 @@ class EventsCtrl
       invitation.updatedAt = _invitation.updatedAt
     , =>
       invitation.response = originalResponse
+      @moveItem item, @invitations
       item.respondError = true
 
   itemWasDeclined: (item) ->

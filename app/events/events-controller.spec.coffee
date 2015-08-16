@@ -705,6 +705,8 @@ describe 'events controller', ->
     describe 'when the update fails', ->
 
       beforeEach ->
+        ctrl.moveItem.calls.reset()
+
         deferred.reject()
         scope.$apply()
 
@@ -713,6 +715,14 @@ describe 'events controller', ->
 
       it 'should revert the invitation response', ->
         expect(item.invitation.response).toBe originalResponse
+
+      xit 'should move the item back to the original location', ->
+        # TODO: Test this live.
+        invitation = angular.extend originalInvitation,
+          lastViewed: date
+        invitations = originalInvitations
+        invitations[invitation.id] = invitation
+        expect(ctrl.moveItem).toHaveBeenCalledWith item, invitations
 
       describe 'then trying again', ->
 
