@@ -101,14 +101,16 @@ describe 'event controller', ->
     earlierMessage =
       _id: 1
       creator: creator
-      createdAt: new Date()
+      createdAt:
+        $date: new Date().getTime()
       text: 'I\'m in love with a robot.'
       eventId: event.id
       type: 'text'
     laterMessage =
       _id: 1
       creator: creator
-      createdAt: new Date()
+      createdAt:
+        $date: new Date().getTime()
       text: 'Michael Jordan is down'
       eventId: event.id
       type: 'action'
@@ -174,6 +176,7 @@ describe 'event controller', ->
     it 'should sort the messages', ->
       expect(ctrl.sortMessages).toHaveBeenCalled()
 
+
   describe 'when the invitations return successfully', ->
     invitations = null
 
@@ -196,6 +199,12 @@ describe 'event controller', ->
     it 'should show an error', ->
       # TODO: Show the error in the view.
       expect(ctrl.membersError).toBe true
+
+
+  describe 'sorting messages', ->
+
+    it 'should sort the messages from oldest to newest', ->
+      expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
 
 
   describe 'toggling whether the header is expanded', ->
