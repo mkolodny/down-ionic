@@ -213,6 +213,10 @@ class EventsCtrl
     else
       event.latestMessage = latestMessage.text
 
+    # Only update the event if the latest message is newer than the updatedAt.
+    if latestMessage.createdAt.$date <= event.updatedAt.getTime()
+      return
+
     # Update the event's updatedAt date.
     event.updatedAt = new Date(latestMessage.createdAt.$date)
 

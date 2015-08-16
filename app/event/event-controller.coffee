@@ -85,10 +85,7 @@ class EventCtrl
     @$state.go 'events'
 
   isActionMessage: (message) ->
-    if message.type is 'action'
-      return true
-    else
-      return false
+    message.type is 'action'
 
   isMyMessage: (message) ->
     message.creator.id is @Auth.user.id
