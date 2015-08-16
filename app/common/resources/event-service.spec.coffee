@@ -229,12 +229,19 @@ describe 'event service', ->
       resolved = false
 
       beforeEach ->
+        jasmine.clock().install()
+        date = new Date(1438195002656)
+        jasmine.clock().mockDate date
+
         $httpBackend.expectPOST url, requestData
           .respond 201, null
 
         Event.sendMessage(event, text).then ->
           resolved = true
         $httpBackend.flush 1
+
+      afterEach ->
+        jasmine.clock().uninstall()
 
       it 'should resolve the promise', ->
         expect(resolved).toBe true
@@ -243,6 +250,7 @@ describe 'event service', ->
         expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
       it 'should save the message in the meteor server', ->
+
         message =
           creator:
             id: Auth.user.id
@@ -251,6 +259,8 @@ describe 'event service', ->
           text: text
           eventId: event.id
           type: 'text'
+          createdAt:
+            $date: new Date().getTime()
         expect(Messages.insert).toHaveBeenCalledWith message
 
 

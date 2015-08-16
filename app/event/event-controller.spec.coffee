@@ -152,8 +152,8 @@ describe 'event controller', ->
   it 'should set the messages reactive query on the controller', ->
     expect(ctrl.messagesRQ).toBe messagesRQ
 
-  it 'should set the messages on the event from newest to oldest', ->
-    expect(ctrl.messages).toEqual [earlierMessage, laterMessage]
+  it 'should set the messages on the event from oldest to newest', ->
+    expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
 
   it 'should listen for new messages', ->
     expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)
@@ -419,15 +419,17 @@ describe 'event controller', ->
 
 
   describe 'sending a message', ->
+    message = null
 
     beforeEach ->
-      ctrl.message = 'this is gonna be dope!'
+      message = 'this is gonna be dope!'
+      ctrl.message = message
       spyOn Event, 'sendMessage'
 
       ctrl.sendMessage()
 
     it 'should send the message', ->
-      expect(Event.sendMessage).toHaveBeenCalledWith event, ctrl.message
+      expect(Event.sendMessage).toHaveBeenCalledWith event, message
 
-    fit 'should clear the message', ->
+    it 'should clear the message', ->
       expect(ctrl.message).toBeNull()

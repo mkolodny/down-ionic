@@ -72,6 +72,8 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
       text: text
       eventId: event.id
       type: 'text'
+      createdAt:
+        $date: new Date().getTime()
 
     # Save the message on the django server.
     url = "#{listUrl}/#{event.id}/messages"
