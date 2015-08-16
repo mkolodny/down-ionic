@@ -27,9 +27,9 @@ class EventCtrl
     # Sort the messages from oldest to newest.
     @messages.sort (a, b) ->
       if a.createdAt < b.createdAt
-        return -1
-      else
         return 1
+      else
+        return -1
 
   toggleIsHeaderExpanded: ->
     if @isHeaderExpanded
