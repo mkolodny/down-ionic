@@ -24,7 +24,6 @@ class EventCtrl
 
   sortMessages: ->
     @messages = @messagesRQ.result
-    console.log @messages
     # Sort the messages from oldest to newest.
     @messages.sort (a, b) ->
       if a.createdAt < b.createdAt
