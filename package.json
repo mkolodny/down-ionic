@@ -70,6 +70,10 @@
     {
       "locator": "https://github.com/VitaliiBlagodir/cordova-plugin-datepicker.git",
       "id": "cordova-plugin-datepicker"
+    },
+    {
+      "locator": "https://github.com/driftyco/ionic-plugins-deploy",
+      "id": "ionic-plugin-deploy"
     }
   ],
   "cordovaPlatforms": [

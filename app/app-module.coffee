@@ -2,6 +2,8 @@ require 'angular'
 require 'angular-ui-router'
 require 'angular-local-storage'
 require 'ng-cordova'
+require './ionic/ionic-core.js'
+require './ionic/ionic-deploy.js'
 require './login/login-module'
 require './verify-phone/verify-phone-module'
 require './facebook-sync/facebook-sync-module'
@@ -22,6 +24,8 @@ require './friends/friends-module'
 
 angular.module 'down', [
     'ionic'
+    'ionic.service.core'
+    'ionic.service.deploy'
     'ngCordova'
     'down.auth'
     'down.login'
@@ -55,17 +59,16 @@ angular.module 'down', [
           authHeader = "Token #{Auth.user.authtoken}"
           config.headers.Authorization = authHeader
         config
+
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
-  .run ($cordovaStatusbar, $ionicPlatform, $window, Auth, localStorageService) ->
+  .run ($cordovaStatusbar, $ionicDeploy, $ionicPlatform, $window, Auth, localStorageService) ->
     # Check local storage for currentUser and currentPhone
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
     if currentUser isnt null and currentPhone isnt null
       Auth.user = currentUser
       Auth.phone = currentPhone
-
-    Auth.redirectForAuthState()
 
     $ionicPlatform.ready ->
       # Hide the accessory bar by default (remove this to show the accessory bar
@@ -79,3 +82,16 @@ angular.module 'down', [
       # Make the status bar white.
       $cordovaStatusbar.overlaysWebView true
       $cordovaStatusbar.style 1
+
+      # Check For Updates
+      $ionicDeploy.check().then (hasUpdate) ->
+        if hasUpdate
+          # Download update
+          $ionicDeploy.update().finally ->
+            Auth.redirectForAuthState()
+        else
+          # No update availible
+          Auth.redirectForAuthState()
+      , ->
+        # Error checking update
+        Auth.redirectForAuthState()
