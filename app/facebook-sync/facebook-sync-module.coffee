@@ -1,11 +1,11 @@
 require 'angular'
 require 'angular-ui-router'
-require 'ng-cordova-oauth/dist/ng-cordova-oauth.js'
+require 'ng-cordova'
 FacebookSyncCtrl = require './facebook-sync-controller'
 
 angular.module 'down.facebookSync', [
     'ui.router'
-    'ngCordovaOauth'
+    'ngCordova'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'facebookSync',
@@ -13,4 +13,3 @@ angular.module 'down.facebookSync', [
       templateUrl: 'app/facebook-sync/facebook-sync.html'
       controller: 'FacebookSyncCtrl as fbSync'
   .controller 'FacebookSyncCtrl', FacebookSyncCtrl
-  .value 'fbClientId', '864552050271610' # staging

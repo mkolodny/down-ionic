@@ -1,56 +1,54 @@
 require 'angular'
 require 'angular-mocks'
+require 'ng-cordova'
 require '../common/auth/auth-module'
 require './facebook-sync-module'
 FacebookSyncCtrl = require './facebook-sync-controller'
 
 describe 'facebook sync controller', ->
-  $cordovaOauth = null
+  $cordovaFacebook = null
   $q = null
   $state = null
   Auth = null
   ctrl = null
-  fbClientId = null
   scope = null
 
   beforeEach angular.mock.module('down.facebookSync')
 
   beforeEach angular.mock.module('down.auth')
 
-  beforeEach angular.mock.module('ngCordovaOauth')
+  beforeEach angular.mock.module('ngCordova')
 
   beforeEach angular.mock.module('ui.router')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
-    $cordovaOauth = $injector.get '$cordovaOauth'
+    $cordovaFacebook = $injector.get '$cordovaFacebook'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     Auth = angular.copy $injector.get('Auth')
-    fbClientId = $injector.get 'fbClientId'
     scope = $rootScope.$new()
 
     ctrl = $controller FacebookSyncCtrl,
       $scope: scope
-      $cordovaOauth: $cordovaOauth
       Auth: Auth
   )
 
   describe 'syncing with facebook', ->
-    deferredOAuth = null
+    deferredFacebook = null
 
     beforeEach ->
-      deferredOAuth = $q.defer()
-      spyOn($cordovaOauth, 'facebook').and.returnValue deferredOAuth.promise
+      deferredFacebook = $q.defer()
+      spyOn($cordovaFacebook, 'login').and.returnValue deferredFacebook.promise
 
       ctrl.syncWithFacebook()
 
     it 'should try to login with Facebook', ->
       permissions = ['email', 'user_friends', 'public_profile']
-      expect($cordovaOauth.facebook).toHaveBeenCalledWith fbClientId, permissions
+      expect($cordovaFacebook.login).toHaveBeenCalledWith permissions
 
-    describe 'when oauth is successful', ->
+    describe 'when login is successful', ->
       deferredSync = null
       accessToken = null
 
@@ -59,7 +57,9 @@ describe 'facebook sync controller', ->
         spyOn(Auth, 'syncWithFacebook').and.returnValue deferredSync.promise
 
         accessToken = 'asdf1234'
-        deferredOAuth.resolve {access_token: accessToken}
+        deferredFacebook.resolve
+          authResponse:
+            accessToken: accessToken
         scope.$apply()
 
       it 'should sync the backend', ->
@@ -101,7 +101,7 @@ describe 'facebook sync controller', ->
     describe 'when oauth fails', ->
 
       beforeEach ->
-        deferredOAuth.reject()
+        deferredFacebook.reject()
         scope.$apply()
 
       it 'should show an error', ->

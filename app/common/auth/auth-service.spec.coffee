@@ -520,11 +520,9 @@ describe 'Auth service', ->
       beforeEach ->
         lat = 180.0
         long = 180.0
-
         location =
           lat: lat
           long: long
-
         position =
           coords:
             latitude: lat

@@ -116,7 +116,6 @@ class Auth
           deferred.reject()
         else
           deferred.resolve()
-
       , (position) =>
         deferred.resolve()
 

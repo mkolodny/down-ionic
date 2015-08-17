@@ -1,11 +1,11 @@
 class FacebookSyncCtrl
-  constructor: (@$cordovaOauth, @$state, @fbClientId, @Auth) ->
+  constructor: (@$cordovaFacebook, @$state, @Auth) ->
 
   syncWithFacebook: ->
     permissions = ['email', 'user_friends', 'public_profile']
-    @$cordovaOauth.facebook @fbClientId, permissions
+    @$cordovaFacebook.login permissions
       .then (response) =>
-        @Auth.syncWithFacebook response.access_token
+        @Auth.syncWithFacebook response.authResponse.accessToken
       .then (user) =>
         @Auth.setUser user
         @$state.go 'setUsername'
