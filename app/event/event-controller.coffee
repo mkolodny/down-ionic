@@ -56,36 +56,23 @@ class EventCtrl
     @invitation.response is @Invitation.maybe
 
   acceptInvitation: ->
-    response = @invitation.response
-    @invitation.response = @Invitation.accepted
-    @Invitation.update @invitation
-      .$promise.then =>
-        null
-      , =>
-        @invitation.response = response
+    @Invitation.updateResponse @invitation, @Invitation.accepted
 
   maybeInvitation: ->
-    response = @invitation.response
-    @invitation.response = @Invitation.maybe
-    @Invitation.update @invitation
-      .$promise.then =>
-        null
-      , =>
-        @invitation.response = response
+    @Invitation.updateResponse @invitation, @Invitation.maybe
 
   declineInvitation: ->
-    response = @invitation.response
-    @invitation.response = @Invitation.declined
-    @Invitation.update @invitation
-      .$promise.then =>
-        null
-      , =>
-        @invitation.response = response
+    @Invitation.updateResponse @invitation, @Invitation.declined
 
     @$state.go 'events'
 
   isActionMessage: (message) ->
-    message.type is 'action'
+    actions = [
+      @Invitation.acceptAction
+      @Invitation.maybeAction
+      @Invitation.declineAction
+    ]
+    message.type in actions
 
   isMyMessage: (message) ->
     message.creator.id is @Auth.user.id

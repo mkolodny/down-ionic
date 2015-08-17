@@ -580,9 +580,6 @@ describe 'events controller', ->
         it 'should call isNewMessage with doc _id', ->
           expect(ctrl.isNewMessage).toHaveBeenCalledWith event, changedDocId
 
-        it 'should not call setLatestMessage', ->
-          expect(ctrl.setLatestMessage).not.toHaveBeenCalled()
-
 
   describe 'is new message for event', ->
     oldMessage = null
@@ -719,6 +716,7 @@ describe 'events controller', ->
 
       it 'should update the event\'s updatedAt time', ->
         expect(event.updatedAt).toEqual new Date(actionMessage.createdAt.$date)
+
 
     describe 'when messages is an empty array', ->
 

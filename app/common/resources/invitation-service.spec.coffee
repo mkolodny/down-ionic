@@ -4,10 +4,14 @@ require './resources-module'
 
 describe 'invitation service', ->
   $httpBackend = null
+  $q = null
+  $rootScope = null
+  Asteroid = null
   Auth = null
   Event = null
   listUrl = null
   Invitation = null
+  Messages = null
   User = null
 
   beforeEach angular.mock.module('down.resources')
@@ -16,12 +20,24 @@ describe 'invitation service', ->
     Auth =
       user:
         id: 1
+        name: 'Alan Turing'
+        imageUrl: 'http://facebook.com/profile-pic/tdog'
     $provide.value 'Auth', Auth
+
+    # Mock Asteroid.
+    Messages =
+      insert: jasmine.createSpy 'Messages.insert'
+    Asteroid =
+      getCollection: jasmine.createSpy('Asteroid.getCollection').and.returnValue \
+          Messages
+    $provide.value 'Asteroid', Asteroid
     return
   )
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
+    $q = $injector.get '$q'
+    $rootScope = $injector.get '$rootScope'
     apiRoot = $injector.get 'apiRoot'
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
@@ -45,6 +61,15 @@ describe 'invitation service', ->
 
   it 'should have a maybe property', ->
     expect(Invitation.maybe).toBe 3
+
+  it 'should have an accept action property', ->
+    expect(Invitation.acceptAction).toBe 'accept_action'
+
+  it 'should have a decline action property', ->
+    expect(Invitation.declineAction).toBe 'decline_action'
+
+  it 'should have a maybe action property', ->
+    expect(Invitation.maybeAction).toBe 'maybe_action'
 
   describe 'serializing an invitation', ->
     invitation = null
@@ -257,6 +282,162 @@ describe 'invitation service', ->
         updatedAt: responseData.updated_at
         lastViewed: responseData.last_viewed
       expect(response).toAngularEqual expectedInvitation
+
+
+  describe 'updating an invitation\'s response', ->
+    invitation = null
+    invitationCopy = null
+    deferred = null
+    date = null
+    originalResponse = null
+    newResponse = null
+    resolved = null
+    rejected = null
+
+    beforeEach ->
+      invitation =
+        id: 4
+        eventId: 1
+        toUserId: 2
+        fromUserId: 3
+        response: Invitation.noResponse
+        previouslyAccepted: false
+        toUserMessaged: false
+        muted: false
+
+      deferred = $q.defer()
+      spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
+
+      # Mock the current date.
+      jasmine.clock().install()
+      date = new Date(1438195002656)
+      jasmine.clock().mockDate date
+
+      invitationCopy = angular.copy invitation
+      originalResponse = invitationCopy.response
+      newResponse = Invitation.accepted
+      Invitation.updateResponse invitationCopy, newResponse
+        .$promise.then ->
+          resolved = true
+        , ->
+          rejected = true
+
+    afterEach ->
+      jasmine.clock().uninstall()
+
+    it 'should update the invitation with the new response', ->
+      invitation.response = newResponse
+      expect(Invitation.update).toHaveBeenCalledWith invitation
+
+    describe 'successfully', ->
+
+      describe 'to accepted', ->
+
+        beforeEach ->
+          invitationCopy = angular.copy invitation
+          Invitation.updateResponse invitationCopy, Invitation.accepted
+            .$promise.then ->
+              resolved = true
+
+          invitation.response = Invitation.accepted
+          deferred.resolve invitation
+          $rootScope.$apply()
+
+        it 'should get the messages collection', ->
+          expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+
+        it 'should save the message on the meteor server', ->
+          message =
+            creator:
+              id: Auth.user.id
+              name: Auth.user.name
+              imageUrl: Auth.user.imageUrl
+            text: "#{Auth.user.name} is down"
+            eventId: invitation.eventId
+            type: Invitation.acceptAction
+            createdAt:
+              $date: date.getTime()
+          expect(Messages.insert).toHaveBeenCalledWith message
+
+        it 'should update the original invitation', ->
+          expect(invitationCopy.response).toBe Invitation.accepted
+
+
+      describe 'to maybe', ->
+
+        beforeEach ->
+          invitationCopy = angular.copy invitation
+          Invitation.updateResponse invitationCopy, Invitation.maybe
+            .$promise.then ->
+              resolved = true
+
+          invitation.response = Invitation.maybe
+          deferred.resolve invitation
+          $rootScope.$apply()
+
+        it 'should get the messages collection', ->
+          expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+
+        it 'should save the message on the meteor server', ->
+          message =
+            creator:
+              id: Auth.user.id
+              name: Auth.user.name
+              imageUrl: Auth.user.imageUrl
+            text: "#{Auth.user.name} might be down"
+            eventId: invitation.eventId
+            type: Invitation.maybeAction
+            createdAt:
+              $date: date.getTime()
+          expect(Messages.insert).toHaveBeenCalledWith message
+
+        it 'should update the original invitation', ->
+          expect(invitationCopy.response).toBe Invitation.maybe
+
+
+      describe 'from accepted to declined', ->
+
+        beforeEach ->
+          invitationCopy = angular.copy invitation
+          Invitation.updateResponse invitationCopy, Invitation.declined
+            .$promise.then ->
+              resolved = true
+
+          invitation.response = Invitation.declined
+          deferred.resolve invitation
+          $rootScope.$apply()
+
+        it 'should get the messages collection', ->
+          expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+
+        it 'should save the message on the meteor server', ->
+          message =
+            creator:
+              id: Auth.user.id
+              name: Auth.user.name
+              imageUrl: Auth.user.imageUrl
+            text: "#{Auth.user.name} can\'t make it"
+            eventId: invitation.eventId
+            type: Invitation.declineAction
+            createdAt:
+              $date: date.getTime()
+          expect(Messages.insert).toHaveBeenCalledWith message
+
+        it 'should update the original invitation', ->
+          expect(invitationCopy.response).toBe Invitation.declined
+
+
+    describe 'unsuccessfully', ->
+
+      beforeEach ->
+        deferred.reject()
+        $rootScope.$apply()
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
+
+      it 'should set the original response on the invitation', ->
+        expect(invitationCopy.response).toBe originalResponse
 
 
   describe 'fetching event members\' invitations', ->

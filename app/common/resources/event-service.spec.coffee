@@ -250,7 +250,6 @@ describe 'event service', ->
         expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
       it 'should save the message in the meteor server', ->
-
         message =
           creator:
             id: Auth.user.id

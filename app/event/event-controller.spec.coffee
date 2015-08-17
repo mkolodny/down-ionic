@@ -330,24 +330,20 @@ describe 'event controller', ->
       invitation.response = response
 
       deferred = $q.defer()
-      spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
+      spyOn(Invitation, 'updateResponse').and.returnValue
+        $promise: deferred.promise
 
       ctrl.acceptInvitation()
 
-    it 'should set the new response the invitation', ->
-      expect(invitation.response).toBe Invitation.accepted
-
     it 'should update the invitation', ->
-      expect(Invitation.update).toHaveBeenCalledWith invitation
+      expect(Invitation.updateResponse).toHaveBeenCalledWith invitation, \
+          Invitation.accepted
 
     describe 'when the update fails', ->
 
       beforeEach ->
         deferred.reject()
         scope.$apply()
-
-      it 'should revert the invitation response', ->
-        expect(invitation.response).toBe response
 
       xit 'show an error', ->
 
@@ -362,24 +358,20 @@ describe 'event controller', ->
       invitation.response = response
 
       deferred = $q.defer()
-      spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
+      spyOn(Invitation, 'updateResponse').and.returnValue
+        $promise: deferred.promise
 
       ctrl.maybeInvitation()
 
-    it 'should set the new response the invitation', ->
-      expect(invitation.response).toBe Invitation.maybe
-
     it 'should update the invitation', ->
-      expect(Invitation.update).toHaveBeenCalledWith invitation
+      expect(Invitation.updateResponse).toHaveBeenCalledWith invitation, \
+          Invitation.maybe
 
     describe 'when the update fails', ->
 
       beforeEach ->
         deferred.reject()
         scope.$apply()
-
-      it 'should revert the invitation response', ->
-        expect(invitation.response).toBe response
 
       xit 'show an error', ->
 
@@ -394,16 +386,15 @@ describe 'event controller', ->
       invitation.response = response
 
       deferred = $q.defer()
-      spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
+      spyOn(Invitation, 'updateResponse').and.returnValue
+        $promise: deferred.promise
       spyOn $state, 'go'
 
       ctrl.declineInvitation()
 
-    it 'should set the new response the invitation', ->
-      expect(invitation.response).toBe Invitation.declined
-
     it 'should update the invitation', ->
-      expect(Invitation.update).toHaveBeenCalledWith invitation
+      expect(Invitation.updateResponse).toHaveBeenCalledWith invitation, \
+          Invitation.declined
 
     it 'should go to the events view', ->
       expect($state.go).toHaveBeenCalledWith 'events'
@@ -414,9 +405,6 @@ describe 'event controller', ->
         deferred.reject()
         scope.$apply()
 
-      it 'should revert the invitation response', ->
-        expect(invitation.response).toBe response
-
       xit 'show an error', ->
 
 
@@ -426,16 +414,34 @@ describe 'event controller', ->
     beforeEach ->
       message = earlierMessage
 
-    describe 'when it is', ->
+    describe 'when it is an accept action', ->
 
       beforeEach ->
-        message.type = 'action'
+        message.type = Invitation.acceptAction
 
       it 'should return true', ->
         expect(ctrl.isActionMessage message).toBe true
 
 
-    describe 'when it isn\'t', ->
+    describe 'when it is an maybe action', ->
+
+      beforeEach ->
+        message.type = Invitation.maybeAction
+
+      it 'should return true', ->
+        expect(ctrl.isActionMessage message).toBe true
+
+
+    describe 'when it is a decline action', ->
+
+      beforeEach ->
+        message.type = Invitation.declineAction
+
+      it 'should return true', ->
+        expect(ctrl.isActionMessage message).toBe true
+
+
+    describe 'when it\'s text', ->
 
       beforeEach ->
         message.type = 'text'

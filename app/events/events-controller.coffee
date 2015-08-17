@@ -294,7 +294,7 @@ class EventsCtrl
     item.respondError = null
 
     # Eagerly update the invitation. Save the original response in case the update
-    #   failse.
+    #   fails.
     originalResponse = invitation.response
     invitation.response = response
     invitation.lastViewed = new Date()

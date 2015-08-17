@@ -1,4 +1,4 @@
-Invitation = ($http, $q, $resource, apiRoot, Event, User) ->
+Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
   listUrl = "#{apiRoot}/invitations"
   detailUrl =
   serializeInvitation = (invitation) ->
@@ -85,16 +85,18 @@ Invitation = ($http, $q, $resource, apiRoot, Event, User) ->
         (deserializeInvitation(invitation) for invitation in data)
 
   resource.serialize = serializeInvitation
-
   resource.deserialize = deserializeInvitation
 
+  # Invitation response enum values
   resource.noResponse = 0
-
   resource.accepted = 1
-
   resource.declined = 2
-
   resource.maybe = 3
+
+  # Action message enum values
+  resource.acceptAction = 'accept_action'
+  resource.declineAction = 'decline_action'
+  resource.maybeAction = 'maybe_action'
 
   resource.getMyInvitations = ->
     deferred = $q.defer()
@@ -107,6 +109,39 @@ Invitation = ($http, $q, $resource, apiRoot, Event, User) ->
         deferred.reject()
 
     deferred.promise
+
+  resource.updateResponse = (invitation, newResponse) ->
+    deferred = $q.defer()
+
+    originalResponse = invitation.response
+    invitation.response = newResponse
+    @update(invitation).$promise.then (_invitation) =>
+      # Post an action message.
+      if _invitation.response is @accepted
+        text = "#{Auth.user.name} is down"
+        type = @acceptAction
+      else if _invitation.response is @maybe
+        text = "#{Auth.user.name} might be down"
+        type = @maybeAction
+      else if _invitation.response is @declined
+        text = "#{Auth.user.name} can't make it"
+        type = @declineAction
+      Messages = Asteroid.getCollection 'messages'
+      Messages.insert
+        creator:
+          id: Auth.user.id
+          name: Auth.user.name
+          imageUrl: Auth.user.imageUrl
+        text: text
+        eventId: _invitation.eventId
+        type: type
+        createdAt:
+          $date: new Date().getTime()
+    , ->
+      invitation.response = originalResponse
+      deferred.reject()
+
+    {$promise: deferred.promise}
 
   resource
 
