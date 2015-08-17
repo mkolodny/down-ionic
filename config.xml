@@ -19,6 +19,9 @@
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>
+  <feature name="Geolocation">
+    <param name="ios-package" value="CDVLocation" />
+  </feature>
   <platform name="ios">
     <icon src="data/images/ios/icon/icon.png" width="57" height="57"/>
     <icon src="data/images/ios/icon/icon@2x.png" width="114" height="114"/>

@@ -82,6 +82,10 @@
         "APP_ID": "864552050271610",
         "APP_NAME": "DownDev"
       }
+    },
+    {
+      "locator": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-geolocation.git",
+      "id": "cordova-plugin-geolocation"
     }
   ],
   "cordovaPlatforms": [
