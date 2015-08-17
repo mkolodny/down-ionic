@@ -86,7 +86,8 @@
     {
       "locator": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-geolocation.git",
       "id": "cordova-plugin-geolocation"
-    }
+    },
+    "cordova-plugin-appavailability"
   ],
   "cordovaPlatforms": [
     "android",
