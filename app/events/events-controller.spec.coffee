@@ -739,7 +739,8 @@ describe 'events controller', ->
       jasmine.clock().mockDate date
 
       deferred = $q.defer()
-      spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
+      spyOn(Invitation, 'updateResponse').and.returnValue
+        $promise: deferred.promise
       spyOn ctrl, 'moveItem'
 
       # Mock the invitations saved on the controller.
@@ -764,33 +765,11 @@ describe 'events controller', ->
       expect($event.stopPropagation).toHaveBeenCalled()
 
     it 'should update the invitation', ->
-      originalInvitation.response = newResponse
-      originalInvitation.lastViewed = date
-      expect(Invitation.update).toHaveBeenCalledWith originalInvitation
+      expect(Invitation.updateResponse).toHaveBeenCalledWith originalInvitation, \
+          newResponse
 
     it 'should move the item in the items array', ->
-      invitation = angular.extend originalInvitation,
-        response: newResponse
-        lastViewed: date
-      invitations = originalInvitations
-      invitations[invitation.id] = invitation
-      expect(ctrl.moveItem).toHaveBeenCalledWith item, invitations
-
-    describe 'when the update succeeds', ->
-      updatedInvitation = null
-
-      beforeEach ->
-        updatedInvitation = angular.extend {}, originalInvitation,
-          response: newResponse
-          lastViewed: date
-          updatedAt: new Date(1439688265029)
-        deferred.resolve updatedInvitation
-        scope.$apply()
-
-      it 'should update the invitation\'s updatedAt date', ->
-        invitation = ctrl.invitations[item.invitation.id]
-        expect(invitation).toEqual updatedInvitation
-
+      expect(ctrl.moveItem).toHaveBeenCalledWith item, originalInvitations
 
     describe 'when the update fails', ->
 
@@ -803,16 +782,9 @@ describe 'events controller', ->
       it 'should show an error', ->
         expect(item.respondError).toBe true
 
-      it 'should revert the invitation response', ->
-        expect(item.invitation.response).toBe originalResponse
-
-      xit 'should move the item back to the original location', ->
+      it 'should move the item back to the original location', ->
         # TODO: Test this live.
-        invitation = angular.extend originalInvitation,
-          lastViewed: date
-        invitations = originalInvitations
-        invitations[invitation.id] = invitation
-        expect(ctrl.moveItem).toHaveBeenCalledWith item, invitations
+        expect(ctrl.moveItem).toHaveBeenCalledWith item, originalInvitations
 
       describe 'then trying again', ->
 

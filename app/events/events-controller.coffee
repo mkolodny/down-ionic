@@ -293,19 +293,12 @@ class EventsCtrl
     # Clear any previous errors.
     item.respondError = null
 
-    # Eagerly update the invitation. Save the original response in case the update
-    #   fails.
-    originalResponse = invitation.response
-    invitation.response = response
-    invitation.lastViewed = new Date()
-    @moveItem item, @invitations
+    @Invitation.updateResponse invitation, response
+      .$promise.then null, =>
+        @moveItem item, @invitations
+        item.respondError = true
 
-    @Invitation.update(invitation).$promise.then (_invitation) =>
-      invitation.updatedAt = _invitation.updatedAt
-    , =>
-      invitation.response = originalResponse
-      @moveItem item, @invitations
-      item.respondError = true
+    @moveItem item, @invitations
 
   itemWasDeclined: (item) ->
     item.invitation.response is @Invitation.declined
