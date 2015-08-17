@@ -1,6 +1,6 @@
 {
-  "name": "down",
-  "app_id": "",
+  "name": "Down",
+  "app_id": "e918d37e",
   "gulpStartupTasks": [
     "watch"
   ]
