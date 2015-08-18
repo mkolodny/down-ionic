@@ -30,7 +30,12 @@
           <img class="item-image" ng-src="{{item.invitation.fromUser.imageUrl}}"
                alt="{{item.invitation.fromUser.name}}">
           <h2>{{item.invitation.event.title}}</h2>
-          <p ng-if="item.wasJoined">{{item.invitation.event.latestMessage}}</p>
+          <p ng-if="item.wasJoined">
+            <span ng-if="item.invitation.event.latestMessage"
+                  >"{{item.invitation.event.latestMessage}}</span>
+            <span ng-if="!item.invitation.event.latestMessage"
+                  >Suggested by {{item.invitation.fromUser.name}}</span>
+          </p>
           <p ng-if="!item.wasJoined">Suggested by {{item.invitation.fromUser.name}}</p>
           <span class="updated-at">{{item.invitation.event.updatedAt | date:'shortTime' | lowercase}}</span>
           <i class="fa item-icon" ng-if="!item.wasJoined"
