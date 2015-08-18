@@ -33,7 +33,6 @@
     "haversine": "1.0.0",
     "jquery": "1.11.3",
     "ng-cordova": "0.1.17-alpha",
-    "ng-cordova-oauth": "git+https://github.com/nraboy/ng-cordova-oauth.git#8cf594947cd8aa52ae64be2ff9f234b85f127293",
     "q": "1.4.1",
     "serve": "1.4.0",
     "shelljs": "0.3.0",
