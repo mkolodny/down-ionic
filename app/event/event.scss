@@ -7,12 +7,12 @@
     width: 100%;
     z-index: 1;
     max-height: 0;
-    transition: max-height 0.25s ease-out;
+    transition: max-height 0.16s ease-out;
     overflow: hidden;
-    top: $bar-height;
+    top: $bar-height !important;
 
     &.expanded {
-      max-height: 500px; // higher than the element's height will ever get
+      max-height: 232px; // the element's max height
     }
   }
   #respond-buttons {

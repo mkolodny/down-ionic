@@ -202,6 +202,12 @@ Global Sass
 .back-button {
   padding-left: 3px !important;
 }
+.bar-header {
+  border-bottom-width: 0 !important;
+  border-bottom-color: transparent !important;
+  background-image: none;
+  border-bottom: none;
+}
 
 // Events
 .respond {
