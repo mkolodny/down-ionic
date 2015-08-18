@@ -39,7 +39,7 @@ describe 'viewLocation directive', ->
     span = element.find 'span'
   )
 
-  fit 'should transclude it\'s contents', ->
+  it 'should transclude it\'s contents', ->
     expect(span.html()).toBe "<span>#{text}</span>"
 
   describe 'tapping the view location link', ->
@@ -58,7 +58,7 @@ describe 'viewLocation directive', ->
 
       span.triggerHandler 'click'
 
-    fit 'should check whether google maps is available', ->
+    it 'should check whether google maps is available', ->
       expect($window.appAvailability.checkBool).toHaveBeenCalledWith \
           'comgooglemaps://', jasmine.any(Function)
 
@@ -67,7 +67,7 @@ describe 'viewLocation directive', ->
       beforeEach ->
         checkAvailabilityCallback true
 
-      fit 'should show an action sheet with google maps as an option', ->
+      it 'should show an action sheet with google maps as an option', ->
         expect($ionicActionSheet.show).toHaveBeenCalledWith
           buttons: [
             text: 'View in Google Maps'
@@ -82,7 +82,7 @@ describe 'viewLocation directive', ->
         beforeEach ->
           actionSheetOptions.buttonClicked 0
 
-        fit 'should open the location in google maps', ->
+        it 'should open the location in google maps', ->
           location = scope.location
           url = "comgooglemaps://?q=#{location.lat},#{location.long}&zoom=13"
           expect($window.open).toHaveBeenCalledWith url, '_system'
@@ -93,7 +93,7 @@ describe 'viewLocation directive', ->
         beforeEach ->
           actionSheetOptions.buttonClicked 1
 
-        fit 'should open the location in apple maps', ->
+        it 'should open the location in apple maps', ->
           location = scope.location
           url = "maps://?q=#{location.lat},#{location.long}"
           expect($window.open).toHaveBeenCalledWith url, '_system'
@@ -104,7 +104,7 @@ describe 'viewLocation directive', ->
       beforeEach ->
         checkAvailabilityCallback false
 
-      fit 'should show an action sheet with only maps as an option', ->
+      it 'should show an action sheet with only maps as an option', ->
         expect($ionicActionSheet.show).toHaveBeenCalledWith
           buttons: [
             text: 'View in Maps'
@@ -117,7 +117,7 @@ describe 'viewLocation directive', ->
         beforeEach ->
           actionSheetOptions.buttonClicked 0
 
-        fit 'should open the location in apple maps', ->
+        it 'should open the location in apple maps', ->
           location = scope.location
           url = "maps://?q=#{location.lat},#{location.long}"
           expect($window.open).toHaveBeenCalledWith url, '_system'
