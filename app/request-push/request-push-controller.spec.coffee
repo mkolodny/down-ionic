@@ -84,6 +84,7 @@ describe 'request push controller', ->
       it 'should set localStorage hasRequestedPushNotifications to true', ->
         expect(localStorage.get 'hasRequestedPushNotifications').toBe true
 
+
     describe 'permission denied', ->
       beforeEach ->
         spyOn Auth, 'redirectForAuthState'
@@ -96,6 +97,7 @@ describe 'request push controller', ->
 
       it 'should set localStorage hasRequestedPushNotifications to true', ->
         expect(localStorage.get 'hasRequestedPushNotifications').toBe true
+
 
   describe 'saving the device token', ->
     device = null
@@ -111,7 +113,7 @@ describe 'request push controller', ->
         cordova: '5.0'
         model: 'iPhone 8'
         platform: 'iOS'
-        UUID: '1234'
+        uuid: '1234'
         version: '8.1'
       spyOn($cordovaDevice, 'getDevice').and.returnValue device
 
@@ -123,14 +125,13 @@ describe 'request push controller', ->
     it 'should create a new APNSDevice and call save', ->
       name = device.model + ', ' + device.version
       apnsDevice =
-        user: Auth.user.id
-        registration_id: deviceToken
-        device_id: device.UUID
+        userId: Auth.user.id
+        registrationId: deviceToken
+        deviceId: device.uuid
         name: name
-
       expect(APNSDevice.save).toHaveBeenCalledWith apnsDevice
 
-    describe 'sucessfully', ->
+    describe 'successfully', ->
       beforeEach ->
         spyOn Auth, 'redirectForAuthState'
 
@@ -139,6 +140,7 @@ describe 'request push controller', ->
 
       it 'should redirect for auth state', ->
         expect(Auth.redirectForAuthState).toHaveBeenCalled()
+
 
     describe 'save failed', ->
 

@@ -60,15 +60,38 @@ angular.module 'down', [
           config.headers.Authorization = authHeader
         config
 
+    # Show no text by default on the back button.
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
-  .run ($cordovaStatusbar, $ionicDeploy, $ionicPlatform, $window, Auth, localStorageService) ->
+  .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicPlatform, $rootScope,
+        $window, Auth, localStorageService) ->
     # Check local storage for currentUser and currentPhone
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
     if currentUser isnt null and currentPhone isnt null
       Auth.user = currentUser
       Auth.phone = currentPhone
+
+    # If we've already asked the user for push notifications permissions,
+    #   register the `$cordovaPush` module so that we can send them in-app
+    #   notifications.
+    if localStorageService.get('hasRequestedPushNotifications')
+      iosConfig =
+        badge: true
+        sound: true
+        alert: true
+      $cordovaPush.register iosConfig
+
+    # Listen for notifications.
+    $rootScope.$on '$cordovaPush:notificationReceived', (event, notification) ->
+      if notification.alert
+        # TODO: Use https://github.com/jirikavi/AngularJS-Toaster to show a
+        #   notification.
+        null
+
+      if notification.sound
+        sound = new Media(event.sound)
+        sound.play()
 
     $ionicPlatform.ready ->
       # Hide the accessory bar by default (remove this to show the accessory bar
@@ -84,6 +107,8 @@ angular.module 'down', [
       $cordovaStatusbar.style 1
 
       # Check For Updates
+      Auth.redirectForAuthState()
+      ###
       $ionicDeploy.check().then (hasUpdate) ->
         if hasUpdate
           # Download update
@@ -95,3 +120,4 @@ angular.module 'down', [
       , ->
         # Error checking update
         Auth.redirectForAuthState()
+      ###

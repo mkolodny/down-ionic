@@ -1,5 +1,6 @@
 class RequestPushCtrl
-  constructor: (localStorageService, @$cordovaPush, @$cordovaDevice, @Auth, @APNSDevice) ->
+  constructor: (@$cordovaPush, @$cordovaDevice, @Auth, @APNSDevice,
+                localStorageService) ->
     @localStorage = localStorageService
 
   enablePush: ->
@@ -12,23 +13,23 @@ class RequestPushCtrl
       .then (deviceToken) =>
         @localStorage.set 'hasRequestedPushNotifications', true
         @saveToken deviceToken
-      , =>
+      , (error) =>
         @localStorage.set 'hasRequestedPushNotifications', true
         @Auth.redirectForAuthState()
 
   saveToken: (deviceToken)->
     device = @$cordovaDevice.getDevice()
-    name = device.model + ', ' + device.version
+    name = "#{device.model}, #{device.version}"
     apnsDevice =
-      user: @Auth.user.id
-      registration_id: deviceToken
-      device_id: device.UUID
+      userId: @Auth.user.id
+      registrationId: deviceToken
+      deviceId: device.uuid
       name: name
     @APNSDevice.save apnsDevice
       .$promise.then =>
         @Auth.redirectForAuthState()
       , =>
         # TODO : Show An Error
-        console.log "An Error"
+        console.log 'error saving the apns device'
 
 module.exports = RequestPushCtrl
