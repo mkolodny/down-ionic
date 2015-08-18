@@ -5,3 +5,13 @@ https://www.dropbox.com/s/6cokz3hb2uooqmp/Screenshot%202015-08-11%2000.14.48.png
 NSLocationWhenInUseUsageDescription: Down uses your location while you use the app to make it easy to do fun stuff with your nearby friends.
 
 TODO: Create our own Cordova plugin to set this ala http://stackoverflow.com/questions/22769111/add-entry-to-ios-plist-file-via-cordova-config-xml
+
+
+Add to iOS Info.plist to open map links in Google Maps:
+
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>comgooglemaps</string>
+</array>
+
+See https://github.com/ohh2ahh/AppAvailability#important-ios-9-url-scheme-whitelist for more info.

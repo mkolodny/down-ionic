@@ -19,8 +19,8 @@
       </div>
     </div>
     <div class="event-detail" ng-if="event.event.place">
-      <i class="fa fa-map-marker"></i>
-      {{event.event.place.name}}
+      <a href view-location location="event.event.place"
+        ><i class="fa fa-map-marker"></i> {{event.event.place.name}}</a>
     </div>
     <div id="event-comment" class="event-detail" ng-if="event.event.comment">
       <i class="fa fa-comment-o"></i>

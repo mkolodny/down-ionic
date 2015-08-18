@@ -1,7 +1,7 @@
 require '../ionic/ionic.js'
 require 'angular'
-require 'angular-mocks'
 require 'angular-animate'
+require 'angular-mocks'
 require 'angular-sanitize'
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js'

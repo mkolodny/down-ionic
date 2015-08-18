@@ -4,6 +4,7 @@ require 'angular-ui-router'
 require '../common/asteroid/asteroid-module'
 require '../common/place-autocomplete/place-autocomplete-module'
 require '../common/resources/resources-module'
+require '../common/view-location/view-location-module'
 EventsCtrl = require './events-controller'
 
 angular.module 'down.events', [
@@ -12,6 +13,7 @@ angular.module 'down.events', [
     'down.asteroid'
     'down.placeAutocomplete'
     'down.resources'
+    'down.viewLocation'
     'monospaced.elastic'
   ]
   .config ($stateProvider) ->

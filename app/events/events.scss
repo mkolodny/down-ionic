@@ -73,22 +73,27 @@
     color: $brand-color;
     font-size: 16px;
 
-    > i {
+    i {
       width: 15px;
       margin-right: 15px;
       font-size: 1.2em;
       color: $brand-color;
     }
-    > .fa-calendar-o {
+    .fa-calendar-o {
       margin-top: 10px;
     }
-    > .fa-map-marker {
+    .fa-map-marker {
       width: 12px;
       margin-left: 3px;
       margin-top: 2px;
     }
-    > .fa-comment-o {
+    .fa-comment-o {
       margin-top: 1px;
+    }
+    a {
+      color: $brand-color;
+      text-decoration: none;
+      font-weight: bold;
     }
   }
   .ng-leave-active {

@@ -4,6 +4,7 @@ require 'angular-ui-router'
 require '../common/asteroid/asteroid-module'
 require '../common/auth/auth-module'
 require '../common/resources/resources-module'
+require '../common/view-location/view-location-module'
 EventCtrl = require './event-controller'
 
 angular.module 'down.event', [
@@ -13,6 +14,7 @@ angular.module 'down.event', [
     'down.asteroid'
     'down.resources'
     'down.auth'
+    'down.viewLocation'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'event',
