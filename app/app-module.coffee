@@ -115,6 +115,7 @@ angular.module 'down', [
       # Check For Updates
       Auth.redirectForAuthState()
       ###
+      $ionicDeploy.setChannel 'dev' # 'production', 'staging'
       $ionicDeploy.check().then (hasUpdate) ->
         if hasUpdate
           # Download update
