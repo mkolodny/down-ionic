@@ -93,6 +93,12 @@ angular.module 'down', [
         sound = new Media(event.sound)
         sound.play()
 
+    # Start a Branch session.
+    # Staging
+    branch.init 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv', (err, data) ->
+    # Production
+    #branch.init 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ', (err, data) ->
+
     $ionicPlatform.ready ->
       # Hide the accessory bar by default (remove this to show the accessory bar
       # above the keyboard for form inputs)
