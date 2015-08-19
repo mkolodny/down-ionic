@@ -86,7 +86,11 @@
       "locator": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-geolocation.git",
       "id": "cordova-plugin-geolocation"
     },
-    "cordova-plugin-appavailability"
+    "cordova-plugin-appavailability",
+    {
+      "locator": "https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK",
+      "id": "io.branch.sdk"
+    }
   ],
   "cordovaPlatforms": [
     "android",

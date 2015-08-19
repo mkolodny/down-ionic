@@ -16,6 +16,7 @@ angular.module 'down.inviteFriends', [
       templateUrl: 'app/invite-friends/invite-friends.html'
       controller: 'InviteFriendsCtrl as inviteFriends'
       params:
+        ###
         event:
           title: 'bars?!?!!?'
           creator: 2
@@ -25,5 +26,6 @@ angular.module 'down.inviteFriends', [
             name: 'B Bar & Grill'
             lat: 40.7270718
             long: -73.9919324
-        #event: null
+        ###
+        event: null
   .controller 'InviteFriendsCtrl', InviteFriendsCtrl
