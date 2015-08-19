@@ -9,7 +9,7 @@
     max-height: 0;
     transition: max-height 0.16s ease-out;
     overflow: hidden;
-    top: $bar-height !important;
+    top: $bar-height + $ios-statusbar-height !important;
 
     &.expanded {
       max-height: 232px; // the element's max height
