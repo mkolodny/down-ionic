@@ -91,7 +91,7 @@ describe 'contact friendship button directive', ->
       it 'should add the new friend to the user\'s friends object', ->
         expect(Auth.user.friends[user.id]).toBe user
 
-      fit 'should set the updated user', ->
+      it 'should set the updated user', ->
         expect(Auth.setUser).toHaveBeenCalledWith Auth.user
 
 
