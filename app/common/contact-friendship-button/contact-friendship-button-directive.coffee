@@ -8,7 +8,7 @@ contactFriendshipButtonDirective = (Auth, UserPhone) ->
     <a href="" ng-click="addFriend()">
       <i class="icon fa friendship-button fa-plus-square-o"
         ng-if="!isLoading"></i>
-      <i class="icon" 
+      <i class="icon"
         ng-if="isLoading">
         <ion-spinner icon="bubbles"></ion-spinner>
       </i>
@@ -24,6 +24,7 @@ contactFriendshipButtonDirective = (Auth, UserPhone) ->
 
           friend = data.userphone.user
           Auth.user.friends[friend.id] = friend
+          Auth.setUser Auth.user
         , ->
           $scope.isLoading = false
 

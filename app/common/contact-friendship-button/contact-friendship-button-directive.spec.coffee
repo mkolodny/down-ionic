@@ -21,6 +21,7 @@ describe 'contact friendship button directive', ->
       user:
         id: 1
         friends: {}
+      setUser: jasmine.createSpy 'Auth.setUser'
     $provide.value 'Auth', Auth
     return
   )
@@ -89,6 +90,9 @@ describe 'contact friendship button directive', ->
 
       it 'should add the new friend to the user\'s friends object', ->
         expect(Auth.user.friends[user.id]).toBe user
+
+      fit 'should set the updated user', ->
+        expect(Auth.setUser).toHaveBeenCalledWith Auth.user
 
 
     describe 'when the add fails', ->

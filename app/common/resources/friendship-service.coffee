@@ -18,6 +18,7 @@ Friendship = ($http, $resource, $q, apiRoot, Auth) ->
 
         # Save the friend on Auth.
         Auth.user.friends[data.friend] = true
+        Auth.setUser Auth.user
 
         response
 
@@ -34,6 +35,7 @@ Friendship = ($http, $resource, $q, apiRoot, Auth) ->
     .success (data, status, headers, config) ->
       # Remove the friend from Auth.
       delete Auth.user.friends[friendId]
+      Auth.setUser Auth.user
 
       deferred.resolve()
     .error (data, status, headers, config) ->

@@ -15,6 +15,7 @@ describe 'friendship service', ->
       user:
         id: 1
         friends: {}
+      setUser: jasmine.createSpy 'Auth.setUser'
     $provide.value 'Auth', Auth
     return
   )
@@ -64,6 +65,9 @@ describe 'friendship service', ->
     it 'should add the friend to Auth', ->
       expect(Auth.user.friends[friendId]).toBe true
 
+    it 'should set the updated user', ->
+      expect(Auth.setUser).toHaveBeenCalledWith Auth.user
+
 
   describe 'deleting with a friend', ->
     friendId = null
@@ -98,6 +102,9 @@ describe 'friendship service', ->
 
       it 'should remove the friend from Auth', ->
         expect(Auth.user.friends[friendId]).not.toBeDefined()
+
+      it 'should set the updated user', ->
+        expect(Auth.setUser).toHaveBeenCalledWith Auth.user
 
 
     describe 'with an error', ->
