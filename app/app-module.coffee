@@ -63,8 +63,8 @@ angular.module 'down', [
     # Show no text by default on the back button.
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
-  .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicPlatform, $rootScope,
-        $window, Auth, localStorageService) ->
+  .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
+        $ionicPlatform, $rootScope, $window, Auth, localStorageService) ->
     # Check local storage for currentUser and currentPhone
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
@@ -93,12 +93,6 @@ angular.module 'down', [
         sound = new Media(event.sound)
         sound.play()
 
-    # Start a Branch session.
-    # Staging
-    branch.init 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv', (err, data) ->
-    # Production
-    #branch.init 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ', (err, data) ->
-
     $ionicPlatform.ready ->
       # Hide the accessory bar by default (remove this to show the accessory bar
       # above the keyboard for form inputs)
@@ -112,19 +106,27 @@ angular.module 'down', [
       $cordovaStatusbar.overlaysWebView true
       $cordovaStatusbar.style 1
 
+      # Start a Branch session.
+      # Staging
+      #branch.init 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv', (err, data) ->
+      # Production
+      branch.init 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ', (err, data) ->
+
       # Check For Updates
-      Auth.redirectForAuthState()
-      ###
-      $ionicDeploy.setChannel 'dev' # 'production', 'staging'
+      #Auth.redirectForAuthState()
+      $ionicDeploy.setChannel 'staging' # 'dev', 'staging', 'production'
       $ionicDeploy.check().then (hasUpdate) ->
         if hasUpdate
+          $ionicLoading.show()
+
           # Download update
           $ionicDeploy.update().finally ->
+            $ionicLoading.hide()
             Auth.redirectForAuthState()
         else
-          # No update availible
+          console.log 'no update available'
+          # No update available
           Auth.redirectForAuthState()
       , ->
         # Error checking update
         Auth.redirectForAuthState()
-      ###
