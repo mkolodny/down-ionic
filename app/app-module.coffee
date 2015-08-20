@@ -72,16 +72,6 @@ angular.module 'down', [
       Auth.user = currentUser
       Auth.phone = currentPhone
 
-    # If we've already asked the user for push notifications permissions,
-    #   register the `$cordovaPush` module so that we can send them in-app
-    #   notifications.
-    if localStorageService.get('hasRequestedPushNotifications')
-      iosConfig =
-        badge: true
-        sound: true
-        alert: true
-      $cordovaPush.register iosConfig
-
     # Listen for notifications.
     $rootScope.$on '$cordovaPush:notificationReceived', (event, notification) ->
       if notification.alert
@@ -93,7 +83,11 @@ angular.module 'down', [
         sound = new Media(event.sound)
         sound.play()
 
-    $ionicPlatform.ready ->
+    bootstrap = ->
+      ###
+      Put anything that touches Cordova in here!
+      ###
+
       # Hide the accessory bar by default (remove this to show the accessory bar
       # above the keyboard for form inputs)
       $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
@@ -112,6 +106,19 @@ angular.module 'down', [
       # Production
       branch.init 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ', (err, data) ->
 
+      # If we've already asked the user for push notifications permissions,
+      #   register the `$cordovaPush` module so that we can send them in-app
+      #   notifications.
+      if localStorageService.get('hasRequestedPushNotifications')
+        iosConfig =
+          badge: true
+          sound: true
+          alert: true
+        $cordovaPush.register iosConfig
+
+      Auth.redirectForAuthState()
+
+    $ionicPlatform.ready ->
       # Check For Updates
       #Auth.redirectForAuthState()
       $ionicDeploy.setChannel 'staging' # 'dev', 'staging', 'production'
@@ -122,11 +129,5 @@ angular.module 'down', [
           # Download update
           $ionicDeploy.update().finally ->
             $ionicLoading.hide()
-            Auth.redirectForAuthState()
-        else
-          console.log 'no update available'
-          # No update available
-          Auth.redirectForAuthState()
-      , ->
-        # Error checking update
-        Auth.redirectForAuthState()
+      .finally ->
+        bootstrap()
