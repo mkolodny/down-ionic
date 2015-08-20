@@ -37,3 +37,8 @@ Add to iOS Info.plist to allow deep linking with Branch:
         </array>
     </dict>
 </array>
+
+
+## Config
+
+Change "linfootco.Down.dev" to "linfootco.Down" as the `widget` element id.
