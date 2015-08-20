@@ -17,3 +17,6 @@ tests/
 # sublime
 down-ionic.sublime-project
 down-ionic.sublime-workspace
+
+# mac
+.DS_Store

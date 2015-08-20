@@ -22,6 +22,9 @@ $new-event-margin-left: 5px;
 // The path for our ionicons font files, relative to the built CSS in www/css
 //$ionicons-font-path: "../lib/ionic/fonts" !default;
 
+// Inlcude font awesome
+@import "./vendor/font-awesome-4.4.0/scss/font-awesome";
+
 // Include all of Ionic
 @import "./ionic/scss/ionic";
 
