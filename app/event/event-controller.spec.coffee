@@ -10,6 +10,8 @@ require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
 describe 'event controller', ->
+  $ionicActionSheet = null
+  $ionicLoading = null
   $ionicScrollDelegate = null
   $q = null
   $state = null
@@ -41,6 +43,8 @@ describe 'event controller', ->
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $ionicActionSheet = $injector.get '$ionicActionSheet'
+    $ionicLoading = $injector.get '$ionicLoading'
     $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
@@ -497,3 +501,152 @@ describe 'event controller', ->
 
     it 'should clear the message', ->
       expect(ctrl.message).toBeNull()
+
+
+  describe 'showing more options', ->
+    buttonClickedCallback = null
+    hideSheet = null
+
+    beforeEach ->
+      spyOn($ionicActionSheet, 'show').and.callFake (options) ->
+        buttonClickedCallback = options.buttonClicked
+        hideSheet = jasmine.createSpy 'hideSheet'
+        hideSheet
+
+    describe 'when notifications are turned on', ->
+
+      beforeEach ->
+        ctrl.invitation.muted = false
+
+        ctrl.showMoreOptions()
+
+      it 'should show an action sheet', ->
+        options =
+          buttons: [
+            text: 'Mute Notifications'
+          ]
+          cancelText: 'Cancel'
+          buttonClicked: jasmine.any Function
+        expect($ionicActionSheet.show).toHaveBeenCalledWith options
+
+      describe 'tapping the mute notifications button', ->
+
+        beforeEach ->
+          spyOn ctrl, 'toggleNotifications'
+
+          buttonClickedCallback 0
+
+        it 'should update the event', ->
+          expect(ctrl.toggleNotifications).toHaveBeenCalled()
+
+        it 'should hide the action sheet', ->
+          expect(hideSheet).toHaveBeenCalled()
+
+
+    describe 'when notifications are turned off', ->
+
+      beforeEach ->
+        ctrl.invitation.muted = true
+
+        ctrl.showMoreOptions()
+
+      it 'should show an action sheet', ->
+        options =
+          buttons: [
+            text: 'Turn On Notifications'
+          ]
+          cancelText: 'Cancel'
+          buttonClicked: jasmine.any Function
+        expect($ionicActionSheet.show).toHaveBeenCalledWith options
+
+
+  describe 'toggling notifications', ->
+    deferred = null
+    originalInvitation = null
+
+    beforeEach ->
+      deferred = $q.defer()
+      spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
+      spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
+
+      # Save the original invitation.
+      originalInvitation = angular.copy invitation
+
+    describe 'when notifications are turned on', ->
+
+      beforeEach ->
+        ctrl.invitation.muted = false
+
+        ctrl.toggleNotifications()
+
+      it 'should show a loading modal', ->
+        expect($ionicLoading.show).toHaveBeenCalled()
+
+      it 'should edit the muted property', ->
+        expect(ctrl.invitation.muted).toBe true
+
+      it 'should update the invitation', ->
+        originalInvitation.muted = true
+        expect(Invitation.update).toHaveBeenCalledWith originalInvitation
+
+      describe 'when the update succeeds', ->
+
+        beforeEach ->
+          deferred.resolve()
+          scope.$apply()
+
+        it 'should hide the loading modal', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
+        xit 'should show a success alert', ->
+
+
+      describe 'when the update fails', ->
+
+        beforeEach ->
+          deferred.reject()
+          scope.$apply()
+
+        it 'should reset the invitation', ->
+          expect(ctrl.invitation.muted).toBe false
+
+        xit 'should show an error', ->
+
+
+    describe 'when notifications are turned off', ->
+
+      beforeEach ->
+        ctrl.invitation.muted = true
+
+        ctrl.toggleNotifications()
+
+      xit 'should show a loading modal', ->
+
+      it 'should edit the muted property', ->
+        expect(ctrl.invitation.muted).toBe false
+
+      it 'should update the invitation', ->
+        originalInvitation.muted = false
+        expect(Invitation.update).toHaveBeenCalledWith originalInvitation
+
+      describe 'when the update succeeds', ->
+
+        beforeEach ->
+          deferred.resolve()
+          scope.$apply()
+
+        it 'should hide the loading modal', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
+        xit 'should show a success alert', ->
+
+
+      describe 'when the update fails', ->
+
+        beforeEach ->
+          deferred.reject()
+          scope.$apply()
+
+        it 'should reset the invitation', ->
+          expect(ctrl.invitation.muted).toBe true

@@ -83,11 +83,10 @@ angular.module 'down', [
         sound = new Media(event.sound)
         sound.play()
 
+    ###
+    Put anything that touches Cordova in here!
+    ###
     bootstrap = ->
-      ###
-      Put anything that touches Cordova in here!
-      ###
-
       # Hide the accessory bar by default (remove this to show the accessory bar
       # above the keyboard for form inputs)
       $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true

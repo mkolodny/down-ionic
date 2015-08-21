@@ -1,6 +1,6 @@
 class EventCtrl
-  constructor: (@$ionicScrollDelegate, @$scope, @$state, @$stateParams, @Asteroid,
-                @Auth, @Event, @Invitation) ->
+  constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicScrollDelegate, @$scope,
+                @$state, @$stateParams, @Asteroid, @Auth, @Event, @Invitation) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -80,5 +80,31 @@ class EventCtrl
   sendMessage: ->
     @Event.sendMessage @event, @message
     @message = null
+
+  showMoreOptions: ->
+    notificationText = if @invitation.muted then 'Turn On Notifications' \
+        else 'Mute Notifications'
+    hideSheet = null
+    options =
+      buttons: [
+        text: notificationText
+      ]
+      cancelText: 'Cancel'
+      buttonClicked: (index) =>
+        if index is 0
+          @toggleNotifications()
+          hideSheet()
+    hideSheet = @$ionicActionSheet.show options
+
+  toggleNotifications: ->
+    @$ionicLoading.show()
+
+    @invitation.muted = not @invitation.muted
+    @Invitation.update @invitation
+      .$promise.then null, =>
+        # Undo editing the invitation.
+        @invitation.muted = not @invitation.muted
+      .finally =>
+        @$ionicLoading.hide()
 
 module.exports = EventCtrl
