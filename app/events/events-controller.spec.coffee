@@ -14,6 +14,7 @@ describe 'events controller', ->
   $compile = null
   $cordovaDatePicker = null
   $httpBackend = null
+  $ionicHistory = null
   $ionicModal = null
   $q = null
   $state = null
@@ -49,6 +50,7 @@ describe 'events controller', ->
     $controller = $injector.get '$controller'
     $cordovaDatePicker = $injector.get '$cordovaDatePicker'
     $httpBackend = $injector.get '$httpBackend'
+    $ionicHistory = $injector.get '$ionicHistory'
     $ionicModal = $injector.get '$ionicModal'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
@@ -1041,9 +1043,14 @@ describe 'events controller', ->
       newEvent =
         title: ctrl.newEvent.title
       spyOn(ctrl, 'getNewEvent').and.returnValue newEvent
+      spyOn $ionicHistory, 'nextViewOptions'
       spyOn $state, 'go'
 
       ctrl.inviteFriends()
+
+    it 'should disable animating to the next view', ->
+      options = {disableAnimate: true}
+      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
 
     it 'should navigate to the invite friends view', ->
       expect($state.go).toHaveBeenCalledWith 'inviteFriends', {event: newEvent}
@@ -1110,9 +1117,14 @@ describe 'events controller', ->
   describe 'tapping to view my friends', ->
 
     beforeEach ->
+      spyOn $ionicHistory, 'nextViewOptions'
       spyOn $state, 'go'
 
       ctrl.myFriends()
+
+    it 'should disable animating to the next view', ->
+      options = {disableAnimate: true}
+      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
 
     it 'should go to the friends view', ->
       expect($state.go).toHaveBeenCalledWith 'friends'

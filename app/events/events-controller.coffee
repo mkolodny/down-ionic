@@ -1,7 +1,7 @@
 class EventsCtrl
-  constructor: (@$cordovaDatePicker, @$ionicModal, @$scope, @$state, @$timeout,
-                @$window, @Asteroid, @dividerHeight, @eventHeight, @Invitation,
-                @transitionDuration) ->
+  constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicModal, @$scope, @$state,
+                @$timeout, @$window, @Asteroid, @dividerHeight, @eventHeight,
+                @Invitation, @transitionDuration) ->
     # Save the section titles.
     @sections = {}
     @sections[@Invitation.noResponse] =
@@ -304,6 +304,10 @@ class EventsCtrl
     item.invitation.response is @Invitation.declined
 
   inviteFriends: ->
+    # Don't animate the transition to the invite friends view.
+    @$ionicHistory.nextViewOptions
+      disableAnimate: true
+
     newEvent = @getNewEvent()
     @$state.go 'inviteFriends', {event: newEvent}
 
@@ -318,6 +322,10 @@ class EventsCtrl
     event
 
   myFriends: ->
+    # Don't animate the transition to the invite friends view.
+    @$ionicHistory.nextViewOptions
+      disableAnimate: true
+
     @$state.go 'friends'
 
   viewEvent: (item) ->

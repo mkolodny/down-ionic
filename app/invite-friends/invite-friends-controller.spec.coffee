@@ -95,6 +95,8 @@ describe 'invite friends controller', ->
         long: -73.9919324
     $stateParams.event = event
 
+    spyOn $ionicHistory, 'nextViewOptions'
+
     spyOn(Auth, 'isNearby').and.callFake (friend) ->
       friend.id in [Auth.user.friends[2].id, Auth.user.friends[3].id]
 
@@ -112,6 +114,10 @@ describe 'invite friends controller', ->
 
   it 'should set the event on the controller', ->
     expect(ctrl.event).toBe event
+
+  it 'should disable animating the transition to the next view', ->
+    options = {disableAnimate: true}
+    expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
 
   describe 'getting the array of nearby friends', ->
 
