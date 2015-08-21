@@ -1,63 +1,23 @@
 class FriendsCtrl
-  # TODO: Handle when the user's friends aren't saved yet. We have to update the
-  #   friends' locations somehow.
-  constructor: (@$state, @Auth) ->
-    friends = angular.copy @Auth.user.friends
+  constructor: (@$ionicHistory, @$state) ->
 
-    # Build the list of alphabetically sorted nearby friends.
-    @nearbyFriends = (friend for id, friend of friends when @Auth.isNearby(friend))
-    @nearbyFriends.sort (a, b) ->
-      if a.name.toLowerCase() < b.name.toLowerCase()
-        return -1
-      else
-        return 1
+  showMyFriends: ->
+    @$state.go 'myFriends'
 
-    # Build the list of alphabetically sorted items.
-    friends = (friend for id, friend of friends)
-    friends.sort (a, b) ->
-      if a.name.toLowerCase() < b.name.toLowerCase()
-        return -1
-      else
-        return 1
-    alphabeticalItems = []
-    currentLetter = null
-    for friend in friends
-      if friend.name[0] != currentLetter
-        alphabeticalItems.push
-          isDivider: true
-          title: friend.name[0]
-        currentLetter = friend.name[0]
+  addByUsername: ->
+    @$state.go 'addByUsername'
 
-      alphabeticalItems.push
-        isDivider: false
-        friend: friend
+  addFromAddressBook: ->
+    @$state.go 'addFromAddressBook'
 
-    # Build the list of items to show in the collection.
-    @items = []
-    @items.push
-      isDivider: true
-      title: 'Nearby Friends'
-    for friend in @nearbyFriends
-      @items.push
-        isDivider: false
-        friend: friend
-    for item in alphabeticalItems
-      @items.push item
+  addFromFacebook: ->
+    @$state.go 'addFromFacebook'
 
-  addFriends: ->
-    @$state.go 'addFriends'
+  goBack: ->
+    # Don't animate the transition to the events view.
+    @$ionicHistory.nextViewOptions
+      disableAnimate: true
 
-  getInitials: (name) ->
-    words = name.split ' '
-    firstName = words[0]
-    if words.length is 1 and firstName.length > 1 # Their name is only one word.
-      initials = "#{firstName[0]}#{firstName[1]}"
-    else if words.length is 1 # Their name is only one letter.
-      initials = firstName[0]
-    else # Their name has multiple words.
-      words.reverse()
-      lastName = words[0]
-      initials = "#{firstName[0]}#{lastName[0]}"
-    initials.toUpperCase()
+    @$state.go 'events'
 
 module.exports = FriendsCtrl

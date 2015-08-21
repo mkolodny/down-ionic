@@ -1,131 +1,87 @@
+require '../ionic/ionic.js'
 require 'angular'
+require 'angular-animate'
 require 'angular-mocks'
+require 'angular-sanitize'
 require 'angular-ui-router'
-require '../common/auth/auth-module'
+require '../ionic/ionic-angular.js'
 FriendsCtrl = require './friends-controller'
 
-describe 'friends controller', ->
-  $state = null
-  Auth = null
+describe 'add friends controller', ->
+  $ionicHistory = null
   ctrl = null
   scope = null
+  $state = null
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('ui.router')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
-    $rootScope = $injector.get '$rootScope'
+    $ionicHistory = $injector.get '$ionicHistory'
     $state = $injector.get '$state'
-    Auth = angular.copy $injector.get('Auth')
-    scope = $rootScope.$new true
-
-    # Mock the logged in user.
-    Auth.user =
-      id: 1
-      email: 'aturing@gmail.com'
-      name: 'Alan Turing'
-      username: 'tdog'
-      imageUrl: 'https://facebook.com/profile-pics/tdog'
-      location:
-        lat: 40.7265834
-        long: -73.9821535
-
-    # Mock the user's friends.
-    Auth.user.friends =
-      2:
-        id: 2
-        email: 'ltorvalds@gmail.com'
-        name: 'Linus Torvalds'
-        username: 'valding'
-        imageUrl: 'https://facebook.com/profile-pics/valding'
-        location:
-          lat: 40.7265834 # just under 5 mi away
-          long: -73.9821535
-      3:
-        id: 3
-        email: 'jclarke@gmail.com'
-        name: 'Joan Clarke'
-        username: 'jnasty'
-        imageUrl: 'https://facebook.com/profile-pics/jnasty'
-        location:
-          lat: 40.7265834 # just under 5 mi away
-          long: -73.9821535
-      4:
-        id: 4
-        email: 'gvrossum@gmail.com'
-        name: 'Guido van Rossum'
-        username: 'vrawesome'
-        imageUrl: 'https://facebook.com/profile-pics/vrawesome'
-        location:
-          lat: 40.79893 # just over 5 mi away
-          long: -73.9821535
+    scope = $injector.get '$rootScope'
 
     ctrl = $controller FriendsCtrl,
       $scope: scope
-      Auth: Auth
   )
 
-  it 'should set the user\'s friends on the controller', ->
-    items = [
-      isDivider: true
-      title: 'Nearby Friends'
-    ]
-    for friend in ctrl.nearbyFriends
-      items.push
-        isDivider: false
-        friend: friend
-    friends = Auth.user.friends
-    alphabeticalItems = [
-      isDivider: true
-      title: friends[4].name[0]
-    ,
-      isDivider: false
-      friend: friends[4]
-    ,
-      isDivider: true
-      title: friends[3].name[0]
-    ,
-      isDivider: false
-      friend: friends[3]
-    ,
-      isDivider: true
-      title: friends[2].name[0]
-    ,
-      isDivider: false
-      friend: friends[2]
-    ]
-    for item in alphabeticalItems
-      items.push item
-    expect(ctrl.items).toEqual items
-
-  describe 'tapping to add friends', ->
+  describe 'tapping to add by username', ->
 
     beforeEach ->
       spyOn $state, 'go'
 
-      ctrl.addFriends()
+      ctrl.addByUsername()
 
-    it 'should go to the add friends view', ->
-      expect($state.go).toHaveBeenCalledWith 'addFriends'
-
-  describe 'getting a user\'s initials', ->
-
-    describe 'when they have multiple words in their name', ->
-
-      it 'should return the first letter of their first and last name', ->
-        expect(ctrl.getInitials 'Alan Tdog Turing').toBe 'AT'
+    it 'should go to the add by username view', ->
+      expect($state.go).toHaveBeenCalledWith 'addByUsername'
 
 
-    describe 'when they have one word in their name', ->
+  describe 'tapping to add from address book', ->
 
-      it 'should return the first two letters of their name', ->
-        expect(ctrl.getInitials 'Pele').toBe 'PE'
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.addFromAddressBook()
+
+    it 'should go to the add from address book view', ->
+      expect($state.go).toHaveBeenCalledWith 'addFromAddressBook'
 
 
-    describe 'when they have one letter in their name', ->
+  describe 'tapping to add from facebook', ->
 
-      it 'should return the first letter of their name', ->
-        expect(ctrl.getInitials 'p').toBe 'P'
+    beforeEach ->
+      spyOn $state, 'go'
 
+      ctrl.addFromFacebook()
+
+    it 'should go to the add from facebook view', ->
+      expect($state.go).toHaveBeenCalledWith 'addFromFacebook'
+
+
+  describe 'tapping to view my friends', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.showMyFriends()
+
+    it 'should go to the my friends view', ->
+      expect($state.go).toHaveBeenCalledWith 'myFriends'
+
+
+  describe 'going back', ->
+
+    beforeEach ->
+      spyOn $ionicHistory, 'nextViewOptions'
+      spyOn $state, 'go'
+
+      ctrl.goBack()
+
+    it 'should disable animating transitions', ->
+      options = {disableAnimate: true}
+      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+
+    it 'should go to the events view', ->
+      expect($state.go).toHaveBeenCalledWith 'events'

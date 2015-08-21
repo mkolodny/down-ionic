@@ -1,35 +1,38 @@
-<ion-view id="friends" view-title="My Friends">
-  <ion-nav-buttons side="secondary">
-    <button class="button button-clear icon" ng-click="friends.addFriends()"
-            ontouchstart
-            ><i class="fa fa-plus fa-lg"></i></button>
+<ion-view id="friends" view-title="Friends" hide-back-button="true">
+  <ion-nav-buttons side="left">
+    <button class="button back-button buttons button-clear header-item"
+            ng-click="friends.goBack()" ontouchstart
+            ><i class="fa fa-chevron-left fa-lg"></i></button>
   </ion-nav-buttons>
   <ion-content>
-    <ion-list class="list-avatar">
-      <ion-item collection-repeat="item in friends.items"
-                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, last: $last}"
-                item-height="item.isDivider ? '35px' : '71px'">
-        <!-- Divider -->
-        <div ng-if="item.isDivider">
-          {{item.title}}
-        </div>
-
-        <!-- User -->
-        <div ng-if="item.friend && item.friend.username">
-          <img class="item-image" ng-src="{{item.friend.imageUrl}}">
-          <h2>{{item.friend.name}}</h2>
-          <p>{{item.friend.username}}</p>
-        </div>
-
-        <!-- User Added Via SMS (no username, no picture) -->
-        <div ng-if="item.friend && !item.friend.username">
-          <span class="contact-image item-image">
-            {{friends.getInitials(item.friend.name)}}
-          </span>
-          <h2>{{item.friend.name}}</h2>
-          <p>Added Via SMS</p>
-        </div>
-      </ion-item>
     <ion-list>
+      <ion-item class="item-avatar item-icon-right"
+                ng-click="friends.showMyFriends()">
+        <img ng-src="images/My_Friends@3x.png" alt="My Friends">
+        <h2>My friends</h2>
+        <i class="fa fa-chevron-right"></i>
+      </ion-item>
+      <ion-item class="item-divider">
+        Add Friends
+      </ion-item>
+      <ion-item class="item-avatar item-icon-right"
+                ng-click="friends.addByUsername()">
+        <img ng-src="images/Add_By_Username@3x.png" alt="Username">
+        <h2>Add by username</h2>
+        <i class="fa fa-chevron-right"></i>
+      </ion-item>
+      <ion-item class="item-avatar item-icon-right"
+                ng-click="friends.addFromAddressBook()">
+        <img ng-src="images/Add_From_Address_Book@3x.png" alt="Address Book">
+        <h2>Add from address book</h2>
+        <i class="fa fa-chevron-right"></i>
+      </ion-item>
+      <ion-item class="item-avatar item-icon-right"
+                ng-click="friends.addFromFacebook()">
+        <img ng-src="images/Add_From_Facebook@3x.png" alt="Facebook">
+        <h2>Add from Facebook</h2>
+        <i class="fa fa-chevron-right"></i>
+      </ion-item>
+    </ion-list>
   </ion-content>
 </ion-view>

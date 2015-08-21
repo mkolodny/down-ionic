@@ -1,5 +1,20 @@
 #friends {
-  .fa-plus {
-    margin-left: 15px;
+  img {
+    border-radius: 4px;
+  }
+  h2 {
+    font-size: 18px;
+    padding-top: 10px;
+  }
+  .fa-chevron-right {
+    position: absolute;
+    right: 13px;
+    top: 30px;
+    color: #aaa;
+  }
+  .item-icon-right {
+    img {
+      background-color: #fff;
+    }
   }
 }
