@@ -107,4 +107,7 @@ class InviteFriendsCtrl
       , =>
         @inviteError = true
 
+  addFriends: ->
+    @$state.go 'addFriends'
+
 module.exports = InviteFriendsCtrl

@@ -357,3 +357,14 @@ describe 'invite friends controller', ->
 
       it 'should show an error', ->
         expect(ctrl.inviteError).toBe true
+
+
+  describe 'adding friends', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.addFriends()
+
+    it 'should go to the add friends view', ->
+      expect($state.go).toHaveBeenCalledWith 'addFriends'

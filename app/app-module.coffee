@@ -20,6 +20,7 @@ require './add-from-facebook/add-from-facebook-module'
 require './common/auth/auth-module'
 require './event/event-module'
 require './my-friends/my-friends-module'
+require './add-friends/add-friends-module'
 require './friends/friends-module'
 
 angular.module 'down', [
@@ -43,6 +44,7 @@ angular.module 'down', [
     'down.addFromFacebook'
     'down.event'
     'down.myFriends'
+    'down.addFriends'
     'down.friends'
     'LocalStorageModule'
   ]
