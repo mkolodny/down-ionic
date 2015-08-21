@@ -1,7 +1,8 @@
 <ion-view id="add-from-facebook" view-title="Facebook Friends">
   <ion-content>
     <ion-refresher pulling-text="Pull to refresh..."
-                   on-refresh="addFromFacebook.refresh()">
+                   on-refresh="addFromFacebook.refresh()"
+                   ng-if="!addFromFacebook.isLoading">
     </ion-refresher>
     <ion-list class="list-avatar">
       <ion-item collection-repeat="item in addFromFacebook.items"
@@ -26,8 +27,8 @@
     </div>
     <div id="load-error"
          ng-if="addFromFacebook.loadError && !addFromFacebook.items.length">
-      There was a problem loading your facebook friends. Please try again in a little
-      while.
+      There was a problem loading your facebook friends. Please try again in a
+      little while.
     </div>
   </ion-content>
 </ion-view>
