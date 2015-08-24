@@ -28,5 +28,4 @@ angular.module 'down.inviteFriends', [
             long: -73.9919324
         ###
         event: null
-      cache: false
   .controller 'InviteFriendsCtrl', InviteFriendsCtrl
