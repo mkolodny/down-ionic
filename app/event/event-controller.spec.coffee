@@ -151,6 +151,9 @@ describe 'event controller', ->
   it 'should set the event on the controller', ->
     expect(ctrl.event).toBe event
 
+  it 'should set the event title on the event', ->
+    expect(ctrl.event.titleWithLongVariableName).toBe event.title
+
   it 'should subscribe to each events\' messages', ->
     expect(Asteroid.subscribe).toHaveBeenCalledWith 'messages', event.id
 

@@ -4,6 +4,10 @@ class EventCtrl
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
+    # Give the event a long title variable name as a workaround for:
+    #   https://github.com/driftyco/ionic/issues/2881
+    @event.titleWithLongVariableName = @event.title
+
     # Get/subscribe to the messages posted in this event.
     @Asteroid.subscribe 'messages', @event.id
     @Messages = @Asteroid.getCollection 'messages'

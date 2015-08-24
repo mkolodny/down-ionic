@@ -12,8 +12,14 @@
     top: $bar-height + $ios-statusbar-height !important;
 
     &.expanded {
-      max-height: 232px; // the element's max height
+      max-height: 284px; // the element's max height
     }
+  }
+  h2 {
+    color: #fff;
+    font-size: 18px;
+    max-height: 52px;
+    overflow: auto;
   }
   #respond-buttons {
     padding-bottom: 20px;
@@ -87,8 +93,6 @@
     }
   }
   .action-message {
-    padding-top: 7px;
-    padding-bottom: 7px;
     color: #888;
     font-size: 13px;
     text-align: center;

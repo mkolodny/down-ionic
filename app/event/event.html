@@ -1,6 +1,7 @@
 <ion-view id="event">
-  <ion-nav-title ng-click="event.toggleIsHeaderExpanded()" ontouchstart>
-    <span>{{event.event.title}}</span>
+  <ion-nav-title id="event-title" ng-click="event.toggleIsHeaderExpanded()"
+                 ontouchstart>
+    {{event.event.titleWithLongVariableName}}
     <i class="fa"
        ng-class="{'fa-caret-down': !event.isHeaderExpanded, 'fa-caret-up': event.isHeaderExpanded}"
        ></i>
@@ -11,6 +12,7 @@
             ><i class="fa fa-ellipsis-h fa-2x"></i></button>
   </ion-nav-buttons>
   <div id="expanded-header" ng-class="{expanded: event.isHeaderExpanded}">
+    <h2>{{event.event.title}}</h2>
     <div class="event-detail" ng-if="event.event.datetime">
       <i class="fa fa-calendar-o"></i>
       <div>

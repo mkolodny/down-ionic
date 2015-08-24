@@ -72,5 +72,5 @@ describe 'add friends controller', ->
       options = {disableAnimate: true}
       expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
 
-    fit 'should go to the previous view', ->
+    it 'should go to the previous view', ->
       expect($ionicHistory.goBack).toHaveBeenCalled()
