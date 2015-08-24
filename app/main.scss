@@ -239,6 +239,11 @@ Global Sass
     background-color: $brand-color;
   }
 }
+#events-content {
+  bottom: 79px; // the height of the footer w/o event details
+  // TODO: Figure out how to set the bottom dynamically based on the footer's
+  //   contents.
+}
 
 // Friendship Buttons
 .friendship-button {
