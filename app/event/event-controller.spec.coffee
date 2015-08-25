@@ -530,6 +530,8 @@ describe 'event controller', ->
         options =
           buttons: [
             text: 'Mute Notifications'
+          ,
+            text: 'Send To..'
           ]
           cancelText: 'Cancel'
           buttonClicked: jasmine.any Function

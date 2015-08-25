@@ -94,6 +94,8 @@ class EventCtrl
     options =
       buttons: [
         text: notificationText
+      ,
+        text: 'Send To..'
       ]
       cancelText: 'Cancel'
       buttonClicked: (index) =>
