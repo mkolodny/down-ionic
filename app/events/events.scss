@@ -102,15 +102,22 @@
   ion-footer-bar {
     height: auto;
     display: block;
-    padding-left: 13px;
-    padding-right: 13px;
+    padding: 0;
 
     .event-detail {
       margin-left: $new-event-margin-left;
     }
     a {
       color: #fff;
-      margin-right: 23px;
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+    a,
+    button {
+      padding-top: 15px;
+      padding-bottom: 12px;
+      padding-left: 13px;
+      padding-right: 13px;
     }
     i {
       font-size: 1.5em;
@@ -119,6 +126,9 @@
     }
   }
   #new-event-details {
+    padding-left: 13px;
+    padding-right: 13px;
+
     .fa-comment-o {
       margin-top: 4px;
     }
@@ -158,10 +168,11 @@
     max-height: 64px;
   }
   #suggest {
-    float: right;
+    position: absolute;
+    right: 0;
+    bottom: 0;
     border: none;
     background-color: #fff;
-    padding: 0;
 
     & > i {
       color: #ccc !important;
