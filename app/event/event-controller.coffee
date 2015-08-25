@@ -20,6 +20,8 @@ class EventCtrl
     # Start out at the most recent message.
     @$scope.$on '$ionicView.enter', =>
       @$ionicScrollDelegate.scrollBottom true
+      # Update last viewed time
+      @Invitation.update @invitation
 
     # Watch for new messages.
     @messagesRQ.on 'change', =>

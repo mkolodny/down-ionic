@@ -182,12 +182,15 @@ describe 'event controller', ->
 
     beforeEach ->
       spyOn $ionicScrollDelegate, 'scrollBottom'
+      spyOn Invitation, 'update'
 
       scope.$emit '$ionicView.enter'
 
     it 'should scroll to the bottom of the view', ->
       expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
+    it 'should update the last viewed time', ->
+      expect(Invitation.update).toHaveBeenCalledWith invitation
 
   describe 'when new messages get posted', ->
     top = null
