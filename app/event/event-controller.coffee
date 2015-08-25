@@ -102,6 +102,10 @@ class EventCtrl
         if index is 0
           @toggleNotifications()
           hideSheet()
+        if index is 1
+          @$state.go 'inviteFriends', {event: @event}
+          hideSheet()
+
     hideSheet = @$ionicActionSheet.show options
 
   toggleNotifications: ->
