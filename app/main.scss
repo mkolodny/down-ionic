@@ -115,6 +115,11 @@ Global Sass
     left: 11px;
   }
 }
+.placeholder {
+  text-align: center;
+  color: $brand-color;
+  margin-top: 124px;
+}
 
 // Loading overlay
 .loading-text {

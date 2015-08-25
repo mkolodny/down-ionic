@@ -11,7 +11,7 @@
     <div id="spinner-container" ng-if="events.isLoading">
       <ion-spinner></ion-spinner>
     </div>
-    <div id="no-events" ng-if="!events.items.length && !events.isLoading">
+    <div class="placeholder" ng-if="!events.items.length && !events.isLoading">
       No suggestions right now.
     </div>
     <ion-list class="list-avatar" ng-class="{moving: events.moving}">
