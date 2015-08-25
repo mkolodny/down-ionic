@@ -7,17 +7,17 @@
             ontouchstart
             ><i class="fa fa-users fa-lg"></i></button>
   </ion-nav-buttons>
-  <ion-content>
+  <ion-content id="events-content">
     <div id="spinner-container" ng-if="events.isLoading">
       <ion-spinner></ion-spinner>
     </div>
-    <div id="no-events" ng-if="!events.items.length && !events.isLoading">
+    <div class="placeholder" ng-if="!events.items.length && !events.isLoading">
       No suggestions right now.
     </div>
     <ion-list class="list-avatar" ng-class="{moving: events.moving}">
       <!-- We might need to use `track by item.id` for the animations to work. -->
       <ion-item ng-repeat="item in events.items"
-                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, updated: item.wasUpdated, 'item-reordering': item.isReordering, last: $last}"
+                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, updated: item.wasUpdated, 'item-reordering': item.isReordering, expanded: item.isExpanded, last: $last}"
                 ng-click="item.isDivider ? null : (item.wasJoined ? events.viewEvent(item) : events.toggleIsExpanded(item))"
                 ng-style="{top: events.moving ? item.top+'px': none, right: item.right+'px'}">
         <!-- Divider -->
@@ -29,6 +29,7 @@
         <div ng-if="item.invitation.fromUser">
           <img class="item-image" ng-src="{{item.invitation.fromUser.imageUrl}}"
                alt="{{item.invitation.fromUser.name}}">
+          <span class="updated-at">{{item.invitation.event.updatedAt | date:'shortTime' | lowercase}}</span>
           <h2>{{item.invitation.event.title}}</h2>
           <p ng-if="item.wasJoined">
             <span ng-if="item.invitation.event.latestMessage"
@@ -37,7 +38,6 @@
                   >Suggested by {{item.invitation.fromUser.name}}</span>
           </p>
           <p ng-if="!item.wasJoined">Suggested by {{item.invitation.fromUser.name}}</p>
-          <span class="updated-at">{{item.invitation.event.updatedAt | date:'shortTime' | lowercase}}</span>
           <i class="fa item-icon" ng-if="!item.wasJoined"
              ng-class="{'fa-chevron-down': !item.isExpanded, 'fa-chevron-up': item.isExpanded}"
              ></i>

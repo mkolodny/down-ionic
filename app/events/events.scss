@@ -3,14 +3,10 @@
     text-align: center;
     margin-top: 25px;
   }
-  #no-events {
-    text-align: center;
-    color: $brand-color;
-    margin-top: 124px;
-  }
   h2 {
     color: $brand-color;
-    font-size: 20px;
+    font-size: 18px;
+    padding-right: 10px;
   }
   .moving {
     .list,
@@ -30,26 +26,31 @@
     }
   }
   .item {
-    padding-top: 13px;
+    padding-right: 8px;
     transition: top 0.5s ease-in-out, right 1s linear;
 
+    .updated-at {
+      font-size: 14px;
+      float: right;
+      padding-right: 23px;
+      padding-top: 2px;
+    }
     h2 {
       font-weight: 400px;
+
+      &.expanded {
+        white-space: normal;
+      }
     }
     p,
     .updated-at {
       color: #777;
     }
-    .updated-at {
-      position: absolute;
-      top: 17px;
-      right: 32px;
-    }
     .item-icon {
       position: absolute;
-      top: 20px;
+      top: 21px;
       right: 7px;
-      color: #999;
+      color: #ccc;
     }
     .respond-buttons {
       margin-top: 13px;
@@ -71,7 +72,7 @@
     display: flex;
     margin-top: 5px;
     color: $brand-color;
-    font-size: 16px;
+    font-size: 18px;
 
     i {
       width: 15px;
@@ -158,7 +159,7 @@
     color: $brand-color;
   }
   #suggestion {
-    font-size: 20px;
+    font-size: 18px;
     padding-left: $new-event-margin-left;
   }
   #comment {

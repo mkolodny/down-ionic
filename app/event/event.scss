@@ -12,8 +12,14 @@
     top: $bar-height + $ios-statusbar-height !important;
 
     &.expanded {
-      max-height: 232px; // the element's max height
+      max-height: 284px; // the element's max height
     }
+  }
+  h2 {
+    color: #fff;
+    font-size: 18px;
+    max-height: 52px;
+    overflow: auto;
   }
   #respond-buttons {
     padding-bottom: 20px;
@@ -87,8 +93,6 @@
     }
   }
   .action-message {
-    padding-top: 7px;
-    padding-bottom: 7px;
     color: #888;
     font-size: 13px;
     text-align: center;
@@ -160,21 +164,22 @@
     }
   }
   ion-footer-bar {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 0;
     height: auto;
     display: block;
   }
   textarea {
     border: none;
+    border-top: 1px solid #eee;
     width: 100%;
     padding-right: 50px;
     resize: none;
     line-height: 20px;
-    margin-bottom: 5px;
-    margin-top: 5px;
     max-height: 104px;
     font-size: 15px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 12px;
   }
   #send-message {
     position: absolute;

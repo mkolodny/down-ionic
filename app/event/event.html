@@ -1,6 +1,7 @@
 <ion-view id="event">
-  <ion-nav-title ng-click="event.toggleIsHeaderExpanded()" ontouchstart>
-    <span>{{event.event.title}}</span>
+  <ion-nav-title id="event-title" ng-click="event.toggleIsHeaderExpanded()"
+                 ontouchstart>
+    {{event.event.titleWithLongVariableName}}
     <i class="fa"
        ng-class="{'fa-caret-down': !event.isHeaderExpanded, 'fa-caret-up': event.isHeaderExpanded}"
        ></i>
@@ -11,6 +12,7 @@
             ><i class="fa fa-ellipsis-h fa-2x"></i></button>
   </ion-nav-buttons>
   <div id="expanded-header" ng-class="{expanded: event.isHeaderExpanded}">
+    <h2>{{event.event.title}}</h2>
     <div class="event-detail" ng-if="event.event.datetime">
       <i class="fa fa-calendar-o"></i>
       <div>
@@ -42,6 +44,9 @@
     </div>
   </div>
   <ion-content>
+    <div class="placeholder" ng-if="event.members.length < 2">
+      No one has joined, yet.
+    </div>
     <ion-list>
       <!-- We might need to use `track by item.id` to keep this quick. -->
       <ion-item ng-repeat="message in event.messages">
@@ -60,7 +65,7 @@
   </ion-content>
   <ion-footer-bar class="bar-light" keyboard-attach>
     <textarea ng-model="event.message" placeholder="Type a message..." msd-elastic
-              rows="1"></textarea>
+              rows="1" ng-disabled="event.members.length < 2"></textarea>
     <button id="send-message" class="button button-clear"
             ng-disabled="!event.message" ng-click="event.sendMessage()" ontouchstart
             >Send</button>
