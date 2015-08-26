@@ -96,7 +96,7 @@ describe 'event service', ->
           id: event.id
           creator: event.creatorId
           title: event.title
-          datetime: event.datetime.getTime()
+          datetime: event.datetime.toISOString()
           place:
             name: event.place.name
             geo:
@@ -119,8 +119,8 @@ describe 'event service', ->
           creator: 1
           title: 'bars?!?!!?'
           canceled: false
-          created_at: new Date().getTime()
-          updated_at: new Date().getTime()
+          created_at: new Date().toISOString()
+          updated_at: new Date().toISOString()
 
       it 'should return the deserialized event', ->
         expectedEvent =
@@ -139,7 +139,7 @@ describe 'event service', ->
           id: 1
           creator: 1
           title: 'bars?!?!!?'
-          datetime: new Date().getTime()
+          datetime: new Date().toISOString()
           place:
             name: 'B Bar & Grill'
             geo:
@@ -147,8 +147,8 @@ describe 'event service', ->
               coordinates: [40.7270718, -73.9919324]
           comment: 'awwww yisssss'
           canceled: false
-          created_at: new Date().getTime()
-          updated_at: new Date().getTime()
+          created_at: new Date().toISOString()
+          updated_at: new Date().toISOString()
 
       it 'should return the deserialized event', ->
         expectedEvent =

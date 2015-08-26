@@ -20,7 +20,7 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
           type: 'Point'
           coordinates: [event.place?.lat, event.place?.long]
     if event.datetime?
-      request.datetime = event.datetime.getTime()
+      request.datetime = event.datetime.toISOString()
     request
   deserializeEvent = (event) ->
     response =

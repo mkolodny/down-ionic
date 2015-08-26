@@ -16,7 +16,7 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
       if invitation[deserializedField]?
         request[serializedField] = invitation[deserializedField]
     if invitation.lastViewed?
-      request.last_viewed = invitation.lastViewed.getTime()
+      request.last_viewed = invitation.lastViewed.toISOString()
     request
   deserializeInvitation = (response) ->
     invitation =

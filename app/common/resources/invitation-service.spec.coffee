@@ -109,7 +109,7 @@ describe 'invitation service', ->
           previously_accepted: invitation.previouslyAccepted
           to_user_messaged: invitation.toUserMessaged
           muted: invitation.muted
-          last_viewed: invitation.lastViewed.getTime()
+          last_viewed: invitation.lastViewed.toISOString()
         expect(Invitation.serialize invitation).toEqual expectedInvitation
 
 
@@ -127,17 +127,17 @@ describe 'invitation service', ->
         previously_accepted: false
         to_user_messaged: false
         muted: false
-        created_at: new Date().getTime()
-        updated_at: new Date().getTime()
-        last_viewed: new Date().getTime()
+        created_at: new Date().toISOString()
+        updated_at: new Date().toISOString()
+        last_viewed: new Date().toISOString()
       event =
         id: 2
         title: 'bars?!??!'
         creator: 3
         canceled: false
-        datetime: new Date().getTime()
-        created_at: new Date().getTime()
-        updated_at: new Date().getTime()
+        datetime: new Date().toISOString()
+        created_at: new Date().toISOString()
+        updated_at: new Date().toISOString()
         place:
           name: 'Fuku'
           geo:
@@ -509,9 +509,9 @@ describe 'invitation service', ->
             title: 'bars?!??!'
             creator: 3
             canceled: false
-            datetime: new Date().getTime()
-            created_at: new Date().getTime()
-            updated_at: new Date().getTime()
+            datetime: new Date().toISOString()
+            created_at: new Date().toISOString()
+            updated_at: new Date().toISOString()
             place:
               name: 'Fuku'
               geo:
@@ -531,8 +531,8 @@ describe 'invitation service', ->
           previously_accepted: false
           to_user_messaged: false
           muted: false
-          created_at: new Date().getTime()
-          updated_at: new Date().getTime()
+          created_at: new Date().toISOString()
+          updated_at: new Date().toISOString()
         ]
 
         $httpBackend.expectGET url
