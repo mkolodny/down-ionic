@@ -14,7 +14,7 @@
           ng-class="{'fa-square-o': !inviteFriends.isAllNearbyFriendsSelected, 'fa-check-square': inviteFriends.isAllNearbyFriendsSelected}"
           ></i>
      </ion-item>
-     <ion-item collection-repeat="item in inviteFriends.items track by item.id"
+     <ion-item collection-repeat="item in inviteFriends.items"
                ng-click="inviteFriends.toggleIsSelected(item.friend)"
                ng-class="{selected: item.friend.isSelected, 'item-divider': item.isDivider, 'item-icon-right': !item.isDivider, 'last': $last}"
                item-height="item.isDivider ? '35px' : '43px'">
