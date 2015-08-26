@@ -256,7 +256,7 @@ describe 'events controller', ->
         expect(item.right).toBe 0
 
 
-  describe 'generating the items list', ->
+  xdescribe 'generating the items list', ->
     noResponseInvitation = null
     acceptedInvitation = null
     updatedAcceptedInvitation = null

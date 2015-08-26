@@ -95,11 +95,15 @@ class EventsCtrl
     for response in [@Invitation.accepted, @Invitation.maybe]
       title = @sections[response].title
       updatedInvitations = (invitation for id, invitation of invitations \
-          when invitation.response is response \
+          when invitation.response is response)
+      oldInvitations = []
+      # TODO: Check whether the user has read the event's most recent message.
+      ###
           and invitation.lastViewed < invitation.event.updatedAt)
       oldInvitations = (invitation for id, invitation of invitations \
           when invitation.response is response \
           and invitation.lastViewed >= invitation.event.updatedAt)
+      ###
       if updatedInvitations.length > 0 or oldInvitations.length > 0
         items.push
           isDivider: true
@@ -212,6 +216,8 @@ class EventsCtrl
         @moveItem item, @invitations
 
   moveItem: (item, invitations) ->
+    # TODO: If none of the items are going to move, just return.
+
     @moving = true
 
     # Make sure the item is collapsed.

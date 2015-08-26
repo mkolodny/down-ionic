@@ -41,16 +41,7 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
       response.comment = event.comment
     new resource(response)
 
-  resource = $resource "#{detailUrl}", null,
-    save:
-      method: 'post'
-      transformRequest: (data, headersGetter) ->
-        request = serializeEvent data
-        angular.toJson request
-      transformResponse: (data, headersGetter) ->
-        data = angular.fromJson data
-        deserializeEvent data
-
+  resource = $resource detailUrl, null,
     cancel:
       method: 'delete'
       url: detailUrl
@@ -58,8 +49,36 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
   resource.listUrl = listUrl
 
   resource.serialize = serializeEvent
-
   resource.deserialize = deserializeEvent
+
+  resource.save = (event) ->
+    deferred = $q.defer()
+
+    data = serializeEvent event
+    $http.post listUrl, data
+      .success (data, status) =>
+        event = deserializeEvent data
+        console.log event
+
+        # Create the first action message.
+        Messages = Asteroid.getCollection 'messages'
+        Messages.insert
+          creator:
+            id: Auth.user.id
+            name: Auth.user.name
+            imageUrl: Auth.user.imageUrl
+          text: "#{Auth.user.name} might be down"
+          eventId: event.id
+          type: 'maybe_action' # We can't use Invitation.maybeAction because it
+                               #   would create a circular dependecy.
+          createdAt:
+            $date: new Date().getTime()
+
+        deferred.resolve event
+      .error (data, status) =>
+        deferred.reject()
+
+    {$promise: deferred.promise}
 
   resource.sendMessage = (event, text) ->
     # Save the message on the meteor server.
@@ -94,8 +113,7 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
       eventDuration = oneDay
       timeRemaining = @createdAt - twentyFourHrsAgo
 
-    percentRemaining = (timeRemaining / eventDuration) * 100
-    percentRemaining
+    (timeRemaining / eventDuration) * 100
 
   resource
 

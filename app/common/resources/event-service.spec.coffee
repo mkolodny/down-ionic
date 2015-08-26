@@ -168,8 +168,12 @@ describe 'event service', ->
 
 
   describe 'creating', ->
+    event = null
+    response = null
+    responseData = null
+    requestData = null
 
-    it 'should POST the event', ->
+    beforeEach ->
       event =
         title: 'bars?!?!!?'
         creatorId: 1
@@ -179,28 +183,66 @@ describe 'event service', ->
           lat: 40.7270718
           long: -73.9919324
         comment: 'awwww yisssss'
-      postData = Event.serialize event
-      responseData = angular.extend {id: 1}, postData,
-        place:
-          name: event.place.name
-          geo:
-            type: 'Point'
-            coordinates: [event.place.lat, event.place.long]
-        canceled: false
-        created_at: new Date()
-        updated_at: new Date()
+      requestData = Event.serialize event
 
-      $httpBackend.expectPOST listUrl, postData
-        .respond 201, angular.toJson(responseData)
+    describe 'successfully', ->
 
-      response = null
-      Event.save event
-        .$promise.then (_response_) ->
-          response = _response_
-      $httpBackend.flush 1
+      beforeEach ->
+        responseData = angular.extend {id: 1}, requestData,
+          place:
+            name: event.place.name
+            geo:
+              type: 'Point'
+              coordinates: [event.place.lat, event.place.long]
+          canceled: false
+          created_at: new Date()
+          updated_at: new Date()
 
-      expectedEvent = Event.deserialize responseData
-      expect(response).toAngularEqual expectedEvent
+        $httpBackend.expectPOST listUrl, requestData
+          .respond 201, angular.toJson(responseData)
+
+        response = null
+        Event.save event
+          .$promise.then (_response_) ->
+            response = _response_
+        $httpBackend.flush 1
+
+      it 'should POST the event', ->
+        expectedEvent = Event.deserialize responseData
+        expect(response).toAngularEqual expectedEvent
+
+      it 'should get the messages collection', ->
+        expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+
+      it 'should create a maybe action message', ->
+        message =
+          creator:
+            id: Auth.user.id
+            name: Auth.user.name
+            imageUrl: Auth.user.imageUrl
+          text: "#{Auth.user.name} might be down"
+          eventId: responseData.id
+          type: Invitation.maybeAction
+          createdAt:
+            $date: new Date().getTime()
+        expect(Messages.insert).toHaveBeenCalledWith message
+
+
+    describe 'unsuccessfully', ->
+      rejected = null
+
+      beforeEach ->
+        $httpBackend.expectPOST listUrl, requestData
+          .respond 500, ''
+
+        rejected = false
+        Event.save event
+          .$promise.then null, ->
+            rejected = true
+        $httpBackend.flush 1
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
 
 
   describe 'sending a message', ->
