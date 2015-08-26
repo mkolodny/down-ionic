@@ -30,8 +30,15 @@ angular.module 'down.inviteFriends', [
         event: null
         ###
         members: [
-          userId1
-          userId2
+          email: "jayybob16@aol.com"
+          friends: Object
+          id: 87
+          imageUrl: "https://graph.facebook.com/v2.2/4776901015485/picture"
+          location: Object
+          name: "Michael Kolodny"
+          username: "m"
+        ,
+          ...
         ]
         ###
         members: null

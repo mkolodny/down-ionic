@@ -7,7 +7,7 @@ class InviteFriendsCtrl
     friends = angular.copy @Auth.user.friends
 
     @event = @$stateParams.event
-    @members = @$stateParams.members
+    @members = @$stateParams.members or []
     @selectedFriends = []
     @selectedFriendIds = {}
 
@@ -18,6 +18,10 @@ class InviteFriendsCtrl
         return -1
       else
         return 1
+
+    # Set isMember for all friends who are already members of the event
+    for friend in @members
+      friends[friend.id].isMember = true if friends[friend.id]?
 
     # Build the list of alphabetically sorted items.
     friends = (friend for id, friend of friends)
@@ -75,11 +79,17 @@ class InviteFriendsCtrl
         @deselectFriend friend
 
   selectFriend: (friend) ->
+    # Ignore if friend in @members
+    if friend.isMember then return null
+  
     friend.isSelected = true
     @selectedFriends.push friend
     @selectedFriendIds[friend.id] = true
 
   deselectFriend: (friend) ->
+    # Ignore if friend in @members
+    if friend.isMember then return null
+    
     # Deselect the all nearby friends toggle if the friend is nearby.
     if @isAllNearbyFriendsSelected
       isNearby = false

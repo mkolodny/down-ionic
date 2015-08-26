@@ -17,7 +17,6 @@ describe 'invite friends controller', ->
   Auth = null
   ctrl = null
   event = null
-  members = null
   Event = null
   Invitation = null
   scope = null
@@ -36,7 +35,7 @@ describe 'invite friends controller', ->
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
-    $stateParams = $injector.get '$stateParams'
+    $stateParams = angular.copy $injector.get('$stateParams')
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
@@ -98,9 +97,6 @@ describe 'invite friends controller', ->
         long: -73.9919324
     $stateParams.event = event
 
-    members = [2]
-    $stateParams.members = members
-
     spyOn $ionicHistory, 'nextViewOptions'
 
     spyOn(Auth, 'isNearby').and.callFake (friend) ->
@@ -121,9 +117,6 @@ describe 'invite friends controller', ->
   it 'should set the event on the controller', ->
     expect(ctrl.event).toBe event
 
-  it 'should set the members on the controller', ->
-    expect(ctrl.members).toBe members
-
   describe 'when event is null', ->
 
     beforeEach ->
@@ -136,6 +129,28 @@ describe 'invite friends controller', ->
     it 'should disable animating the transition to the next view', ->
       options = {disableAnimate: true}
       expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+
+
+  describe 'when event has members', ->
+    members = null
+
+    beforeEach ->
+      # Set friend with id 2 as a member
+      members = [
+        id: 2
+      ]
+      $stateParams.members = members
+      ctrl = $controller InviteFriendsCtrl,
+        $scope: scope
+        Auth: Auth
+        $stateParams: $stateParams
+
+    it 'should set the members on the controller', ->
+      expect(ctrl.members).toBe members
+
+    it 'should flag any friend that is a member of the event', ->
+      # Index 1 is friend number 2 after sorting
+      expect(ctrl.nearbyFriends[1].isMember).toBe true
 
 
   describe 'getting the array of nearby friends', ->
@@ -263,6 +278,15 @@ describe 'invite friends controller', ->
       friend = Auth.user.friends[2]
       ctrl.selectFriend friend
 
+    describe 'when friend is in members', ->
+
+      beforeEach ->
+        friend.isMember = true
+
+      it 'should return null', ->
+        expect(ctrl.selectFriend friend).toBeNull()
+
+
     it 'should set the friend to selected', ->
       expect(friend.isSelected).toBe true
 
@@ -284,6 +308,14 @@ describe 'invite friends controller', ->
       ctrl.selectedFriendIds = {}
       ctrl.selectedFriendIds[friend.id] = true
       friend.isSelected = true
+
+    describe 'when friend is in members', ->
+
+      beforeEach ->
+        friend.isMember = true
+
+      it 'should return null', ->
+        expect(ctrl.deselectFriend friend).toBeNull()
 
     describe 'when the friend is a nearby friend', ->
 
@@ -314,7 +346,6 @@ describe 'invite friends controller', ->
 
         it 'should deselect all nearby friends', ->
           expect(ctrl.isAllNearbyFriendsSelected).toBe false
-
 
   describe 'sending the invitations', ->
     deferredEventSave = null
