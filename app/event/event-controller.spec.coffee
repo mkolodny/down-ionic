@@ -179,18 +179,30 @@ describe 'event controller', ->
     expect(Invitation.getEventInvitations).toHaveBeenCalledWith {id: event.id}
 
   describe 'once the view loads', ->
+    currentDate = null
 
     beforeEach ->
+      jasmine.clock().install()
+      currentDate = new Date(1438014089235)
+      jasmine.clock().mockDate currentDate
+
       spyOn $ionicScrollDelegate, 'scrollBottom'
       spyOn Invitation, 'update'
 
       scope.$emit '$ionicView.enter'
 
+    afterEach ->
+      jasmine.clock().uninstall()
+
     it 'should scroll to the bottom of the view', ->
       expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
     it 'should update the last viewed time', ->
+      expect(invitation.lastViewed).toEqual currentDate
+
+    it 'should update the invitation', ->
       expect(Invitation.update).toHaveBeenCalledWith invitation
+
 
   describe 'when new messages get posted', ->
     top = null
