@@ -1,6 +1,14 @@
 <ion-view id="my-friends" view-title="My Friends">
   <ion-content>
-    <ion-list class="list-avatar">
+    <div class="placeholder" ng-if="myFriends.items.length === 0">
+      <div>You don't have any friends on Down yet...</div>
+      <div>
+        <button id="add-friends" class="button"
+                ng-click="myFriends.addFriends()" ontouchstart
+                >Add Friends</button>
+      </div>
+    </div>
+    <ion-list class="list-avatar" ng-if="myFriends.items.length > 0">
       <ion-item collection-repeat="item in myFriends.items"
                 ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, last: $last}"
                 item-height="item.isDivider ? '35px' : '71px'">

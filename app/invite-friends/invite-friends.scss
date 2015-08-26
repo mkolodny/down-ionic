@@ -43,4 +43,12 @@
     white-space: nowrap;
     max-width: 85%;
   }
+  #add-friends {
+    background-color: $brand-color;
+    border-color: $brand-color;
+    color: #fff;
+    margin-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }

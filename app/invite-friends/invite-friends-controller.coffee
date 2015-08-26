@@ -45,9 +45,10 @@ class InviteFriendsCtrl
 
     # Build the list of items to show in the collection.
     @items = []
-    @items.push
-      isDivider: true
-      title: 'Nearby Friends'
+    if @nearbyFriends.length > 0
+      @items.push
+        isDivider: true
+        title: 'Nearby Friends'
     for friend in @nearbyFriends
       @items.push
         isDivider: false
@@ -55,8 +56,7 @@ class InviteFriendsCtrl
     for item in alphabeticalItems
       @items.push item
 
-    # Don't animate the transition back when 
-    #   creating an event
+    # Don't animate the transition back when creating an event.
     if @event is null
       @$ionicHistory.nextViewOptions
         disableAnimate: true
@@ -81,7 +81,7 @@ class InviteFriendsCtrl
   selectFriend: (friend) ->
     # Ignore if friend in @members
     if friend.isMember then return null
-  
+
     friend.isSelected = true
     @selectedFriends.push friend
     @selectedFriendIds[friend.id] = true
@@ -89,7 +89,7 @@ class InviteFriendsCtrl
   deselectFriend: (friend) ->
     # Ignore if friend in @members
     if friend.isMember then return null
-    
+
     # Deselect the all nearby friends toggle if the friend is nearby.
     if @isAllNearbyFriendsSelected
       isNearby = false

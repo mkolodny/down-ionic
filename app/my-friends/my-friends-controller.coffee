@@ -1,7 +1,7 @@
 class MyFriendsCtrl
   # TODO: Handle when the user's friends aren't saved yet. We have to update the
   #   friends' locations somehow.
-  constructor: (@$state, @Auth) ->
+  constructor: (@$ionicHistory, @$state, @Auth) ->
     friends = angular.copy @Auth.user.friends
 
     # Build the list of alphabetically sorted nearby friends.
@@ -34,9 +34,10 @@ class MyFriendsCtrl
 
     # Build the list of items to show in the collection.
     @items = []
-    @items.push
-      isDivider: true
-      title: 'Nearby Friends'
+    if @nearbyFriends.length > 0
+      @items.push
+        isDivider: true
+        title: 'Nearby Friends'
     for friend in @nearbyFriends
       @items.push
         isDivider: false
@@ -56,5 +57,10 @@ class MyFriendsCtrl
       lastName = words[0]
       initials = "#{firstName[0]}#{lastName[0]}"
     initials.toUpperCase()
+
+  addFriends: ->
+    @$ionicHistory.nextViewOptions
+      disableAnimate: true
+    @$state.go 'addFriends'
 
 module.exports = MyFriendsCtrl

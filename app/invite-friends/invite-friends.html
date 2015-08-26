@@ -5,7 +5,15 @@
             ><i class="fa fa-plus fa-lg"></i></button>
   </ion-nav-buttons>
   <ion-content>
-    <ion-list>
+    <div class="placeholder" ng-if="inviteFriends.items.length === 0">
+      <div>You don't have any friends on Down yet...</div>
+      <div>
+        <button id="add-friends" class="button"
+                ng-click="inviteFriends.addFriends()" ontouchstart
+                >Add Friends</button>
+      </div>
+    </div>
+    <ion-list ng-if="inviteFriends.items.length > 0">
      <ion-item class="item-icon-right last"
                ng-click="inviteFriends.toggleAllNearbyFriends()"
                ng-class="{selected: inviteFriends.isAllNearbyFriendsSelected}">

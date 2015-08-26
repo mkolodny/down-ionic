@@ -1,14 +1,20 @@
+require '../ionic/ionic.js'
 require 'angular'
 require 'angular-mocks'
+require 'angular-sanitize'
 require 'angular-ui-router'
+require '../ionic/ionic-angular.js'
 require '../common/auth/auth-module'
 MyFriendsCtrl = require './my-friends-controller'
 
 describe 'MyFriends controller', ->
+  $ionicHistory = null
   $state = null
   Auth = null
   ctrl = null
   scope = null
+
+  beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('down.auth')
 
@@ -16,6 +22,7 @@ describe 'MyFriends controller', ->
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $ionicHistory = $injector.get '$ionicHistory'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     Auth = angular.copy $injector.get('Auth')
@@ -119,3 +126,18 @@ describe 'MyFriends controller', ->
       it 'should return the first letter of their name', ->
         expect(ctrl.getInitials 'p').toBe 'P'
 
+
+  describe 'adding friends', ->
+
+    beforeEach ->
+      spyOn $ionicHistory, 'nextViewOptions'
+      spyOn $state, 'go'
+
+      ctrl.addFriends()
+
+    it 'should disable animating the transition to the next view', ->
+      options = {disableAnimate: true}
+      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+
+    it 'should go to the add friends view', ->
+      expect($state.go).toHaveBeenCalledWith 'addFriends'
