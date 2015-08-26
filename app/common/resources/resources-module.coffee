@@ -3,7 +3,6 @@ require 'angular-local-storage'
 require 'angular-resource'
 require '../asteroid/asteroid-module'
 require '../auth/auth-module'
-AllFriendsInvitation = require './allfriendsinvitation-service'
 APNSDevice = require './apnsdevice-service'
 Event = require './event-service'
 Friendship = require './friendship-service'
@@ -24,7 +23,6 @@ angular.module 'down.resources', [
   .factory 'Event', Event
   .factory 'Friendship', Friendship
   .factory 'Invitation', Invitation
-  .factory 'AllFriendsInvitation', AllFriendsInvitation
   .factory 'LinkInvitation', LinkInvitation
   .factory 'User', User
   .factory 'UserPhone', UserPhone
