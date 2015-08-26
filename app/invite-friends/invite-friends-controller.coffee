@@ -50,9 +50,11 @@ class InviteFriendsCtrl
     for item in alphabeticalItems
       @items.push item
 
-    # Don't animate the transition to any views the user visits from here.
-    @$ionicHistory.nextViewOptions
-      disableAnimate: true
+    # Don't animate the transition to any views 
+    # the user visits from here when event is null.
+    if @event is null
+      @$ionicHistory.nextViewOptions
+        disableAnimate: true
 
   toggleIsSelected: (friend) ->
     if not friend.isSelected

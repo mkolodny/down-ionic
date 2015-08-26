@@ -115,9 +115,17 @@ describe 'invite friends controller', ->
   it 'should set the event on the controller', ->
     expect(ctrl.event).toBe event
 
-  it 'should disable animating the transition to the next view', ->
-    options = {disableAnimate: true}
-    expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+  describe 'when event is null', ->
+    beforeEach ->
+      $stateParams.event = null
+      ctrl = $controller InviteFriendsCtrl,
+        $scope: scope
+        Auth: Auth
+        $stateParams: $stateParams
+
+    fit 'should disable animating the transition to the next view', ->
+      options = {disableAnimate: true}
+      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
 
   describe 'getting the array of nearby friends', ->
 
