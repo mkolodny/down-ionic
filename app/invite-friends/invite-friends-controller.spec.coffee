@@ -17,6 +17,7 @@ describe 'invite friends controller', ->
   Auth = null
   ctrl = null
   event = null
+  members = null
   Event = null
   Invitation = null
   scope = null
@@ -97,6 +98,9 @@ describe 'invite friends controller', ->
         long: -73.9919324
     $stateParams.event = event
 
+    members = [2]
+    $stateParams.members = members
+
     spyOn $ionicHistory, 'nextViewOptions'
 
     spyOn(Auth, 'isNearby').and.callFake (friend) ->
@@ -116,6 +120,9 @@ describe 'invite friends controller', ->
 
   it 'should set the event on the controller', ->
     expect(ctrl.event).toBe event
+
+  it 'should set the members on the controller', ->
+    expect(ctrl.members).toBe members
 
   describe 'when event is null', ->
 

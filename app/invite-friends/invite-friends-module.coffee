@@ -28,4 +28,11 @@ angular.module 'down.inviteFriends', [
             long: -73.9919324
         ###
         event: null
+        ###
+        members: [
+          userId1
+          userId2
+        ]
+        ###
+        members: null
   .controller 'InviteFriendsCtrl', InviteFriendsCtrl

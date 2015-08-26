@@ -7,6 +7,7 @@ class InviteFriendsCtrl
     friends = angular.copy @Auth.user.friends
 
     @event = @$stateParams.event
+    @members = @$stateParams.members
     @selectedFriends = []
     @selectedFriendIds = {}
 
@@ -50,8 +51,8 @@ class InviteFriendsCtrl
     for item in alphabeticalItems
       @items.push item
 
-    # Don't animate the transition to any views 
-    # the user visits from here when event is null.
+    # Don't animate the transition back when 
+    #   creating an event
     if @event is null
       @$ionicHistory.nextViewOptions
         disableAnimate: true

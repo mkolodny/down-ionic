@@ -519,7 +519,7 @@ describe 'event controller', ->
         hideSheet = jasmine.createSpy 'hideSheet'
         hideSheet
 
-    describe 'tapping send to button', ->
+    describe 'tapping Send To.. button', ->
 
       beforeEach ->
         spyOn $state, 'go'
@@ -527,7 +527,10 @@ describe 'event controller', ->
         buttonClickedCallback 1
 
       it 'should go to the invite friends view', ->
-        expect($state.go).toHaveBeenCalledWith 'inviteFriends', {event: ctrl.event}
+        stateParams =
+          event: ctrl.event
+          members: ctrl.members
+        expect($state.go).toHaveBeenCalledWith 'inviteFriends', stateParams
 
       it 'should hide the action sheet', ->
         expect(hideSheet).toHaveBeenCalled()
