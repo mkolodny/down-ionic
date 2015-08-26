@@ -17,7 +17,8 @@
      <ion-item collection-repeat="item in inviteFriends.items"
                ng-click="inviteFriends.toggleIsSelected(item.friend)"
                ng-class="{selected: item.friend.isSelected, 'item-divider': item.isDivider, 'item-icon-right': !item.isDivider, 'last': $last}"
-               item-height="item.isDivider ? '35px' : '43px'">
+               item-height="item.isDivider ? '35px' : '43px'"
+               item-width="100%">
        <div class="divider" ng-if="item.isDivider">
          {{item.title}}
        </div>
