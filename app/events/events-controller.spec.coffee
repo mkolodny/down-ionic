@@ -137,6 +137,14 @@ describe 'events controller', ->
     expect(ctrl.isLoading).toBe true
 
   describe 'when the events request returns', ->
+    refreshComplete = null
+
+    beforeEach ->
+      # Listen to the refresh complete event to check whether we've broadcasted
+      # the event.
+      refreshComplete = false
+      scope.$on 'scroll.refreshComplete', ->
+        refreshComplete = true
 
     describe 'successfully', ->
       items = null
@@ -144,7 +152,7 @@ describe 'events controller', ->
       response = null
 
       beforeEach ->
-        items = 'items'
+        items = []
         spyOn(ctrl, 'buildItems').and.returnValue items
         spyOn ctrl, 'eventsMessagesSubscribe'
         percentRemaining = 16
@@ -175,6 +183,9 @@ describe 'events controller', ->
       it 'should set the percent remaining on the event', ->
         expect(invitation.event.percentRemaining).toBe percentRemaining
 
+      it 'should stop the spinner', ->
+        expect(refreshComplete).toBe true
+
 
     describe 'with an error', ->
 
@@ -187,6 +198,9 @@ describe 'events controller', ->
 
       it 'should clear a loading flag', ->
         expect(ctrl.isLoading).toBe false
+
+      it 'should stop the spinner', ->
+        expect(refreshComplete).toBe true
 
 
   describe 'when the modal loads', ->
@@ -1150,3 +1164,14 @@ describe 'events controller', ->
       expect($state.go).toHaveBeenCalledWith 'event',
         invitation: item.invitation
         id: item.invitation.event.id
+
+
+  describe 'pulling to refresh', ->
+
+    beforeEach ->
+      spyOn ctrl, 'getInvitations'
+
+      ctrl.refresh()
+
+    it 'should get an updated list of items', ->
+      expect(ctrl.getInvitations).toHaveBeenCalled()

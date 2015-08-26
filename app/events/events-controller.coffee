@@ -38,30 +38,9 @@ class EventsCtrl
     @$scope.$on '$destroy', =>
       @setPlaceModal.remove()
 
+    # Fetch the invitations to show on the view.
     @isLoading = true
-    @Invitation.getMyInvitations()
-      .then (invitations) =>
-        # Save the invitations on the controller.
-        @invitations = {}
-        for invitation in invitations
-          @invitations[invitation.id] = invitation
-
-        # Build the list of items to show in the view.
-        @items = @buildItems @invitations
-
-        # Subscribe to the messages for each event.
-        events = (invitation.event for invitation in invitations)
-        @eventsMessagesSubscribe events
-
-        # Set `percentRemaining` as a property on each event as a workaround for
-        #   stopping angular-chart.js from calling `getPercentRemaining` too many
-        #   times.
-        for event in events
-          event.percentRemaining = event.getPercentRemaining()
-      , =>
-        @getInvitationsError = true
-      .finally =>
-        @isLoading = false
+    @getInvitations()
 
     @newEvent = {}
 
@@ -338,5 +317,34 @@ class EventsCtrl
     @$state.go 'event',
       invitation: item.invitation
       id: item.invitation.event.id
+
+  getInvitations: ->
+    @Invitation.getMyInvitations()
+      .then (invitations) =>
+        # Save the invitations on the controller.
+        @invitations = {}
+        for invitation in invitations
+          @invitations[invitation.id] = invitation
+
+        # Build the list of items to show in the view.
+        @items = @buildItems @invitations
+
+        # Subscribe to the messages for each event.
+        events = (invitation.event for invitation in invitations)
+        @eventsMessagesSubscribe events
+
+        # Set `percentRemaining` as a property on each event as a workaround for
+        #   stopping angular-chart.js from calling `getPercentRemaining` too many
+        #   times.
+        for event in events
+          event.percentRemaining = event.getPercentRemaining()
+      , =>
+        @getInvitationsError = true
+      .finally =>
+        @$scope.$broadcast 'scroll.refreshComplete'
+        @isLoading = false
+
+  refresh: ->
+    @getInvitations()
 
 module.exports = EventsCtrl

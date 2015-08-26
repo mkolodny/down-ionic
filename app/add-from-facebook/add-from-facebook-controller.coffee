@@ -30,15 +30,13 @@ class AddFromFacebookCtrl
         user: user
 
   refresh: ->
-    refreshCompleteEvent = 'scroll.refreshComplete'
     @User.getFacebookFriends().$promise.then (facebookFriends) =>
       @showFacebookFriends facebookFriends
-      @$scope.$broadcast refreshCompleteEvent
       @loadError = false
     , =>
-      @$scope.$broadcast refreshCompleteEvent
       @loadError = true
     .finally =>
+      @$scope.$broadcast 'scroll.refreshComplete'
       @isLoading = false
 
 module.exports = AddFromFacebookCtrl
