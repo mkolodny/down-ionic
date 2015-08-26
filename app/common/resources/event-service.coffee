@@ -58,7 +58,6 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
     $http.post listUrl, data
       .success (data, status) =>
         event = deserializeEvent data
-        console.log event
 
         # Create the first action message.
         Messages = Asteroid.getCollection 'messages'

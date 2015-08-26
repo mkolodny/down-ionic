@@ -1,11 +1,8 @@
 class AddFromFacebookCtrl
-  constructor: (@$scope, localStorageService, @User) ->
-    @localStorage = localStorageService
-
+  constructor: (@$scope, @Auth, @User) ->
     # Build the array of items to show in the view.
-    facebookFriends = @localStorage.get 'facebookFriends'
-    if facebookFriends isnt null
-      @showFacebookFriends facebookFriends
+    if @Auth.user.facebookFriends?
+      @showFacebookFriends @Auth.user.facebookFriends
     else
       @isLoading = true
       @refresh()
@@ -30,13 +27,14 @@ class AddFromFacebookCtrl
         user: user
 
   refresh: ->
-    @User.getFacebookFriends().$promise.then (facebookFriends) =>
-      @showFacebookFriends facebookFriends
-      @loadError = false
-    , =>
-      @loadError = true
-    .finally =>
-      @$scope.$broadcast 'scroll.refreshComplete'
-      @isLoading = false
+    @User.getFacebookFriends()
+      .$promise.then (facebookFriends) =>
+        @showFacebookFriends facebookFriends
+        @loadError = false
+      , =>
+        @loadError = true
+      .finally =>
+        @$scope.$broadcast 'scroll.refreshComplete'
+        @isLoading = false
 
 module.exports = AddFromFacebookCtrl

@@ -1,21 +1,20 @@
 require 'angular'
-require 'angular-local-storage'
 require 'angular-mocks'
+require '../common/auth/auth-module'
 require '../common/resources/resources-module'
 AddFromFacebookCtrl = require './add-from-facebook-controller'
 
 describe 'add from facebook controller', ->
   $controller = null
   $q = null
+  Auth = null
   ctrl = null
   deferred = null
-  facebookFriends = null
   friend = null
-  localStorage = null
   scope = null
   User = null
 
-  beforeEach angular.mock.module('LocalStorageModule')
+  beforeEach angular.mock.module('down.auth')
 
   beforeEach angular.mock.module('down.resources')
 
@@ -23,7 +22,7 @@ describe 'add from facebook controller', ->
     $controller = $injector.get '$controller'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
-    localStorage = $injector.get 'localStorageService'
+    Auth = $injector.get 'Auth'
     scope = $rootScope.$new true
     User = $injector.get 'User'
 
@@ -37,15 +36,12 @@ describe 'add from facebook controller', ->
       location:
         lat: 40.7265834
         long: -73.9821535
-    facebookFriends = [friend]
-    localStorage.set 'facebookFriends', facebookFriends
+    Auth.user.facebookFriends = [friend]
 
     ctrl = $controller AddFromFacebookCtrl,
       $scope: scope
+      Auth: Auth
   )
-
-  afterEach ->
-    localStorage.clearAll()
 
   it 'should set the user\'s facebook friends on the controller', ->
     items = [
@@ -84,8 +80,7 @@ describe 'add from facebook controller', ->
       newFacebookFriends = null
 
       beforeEach ->
-        newFacebookFriends = angular.copy facebookFriends
-        newFacebookFriends.push
+        Auth.user.facebookFriends.push
           id: 3
           email: 'jclarke@gmail.com'
           name: 'Joan Clarke'
@@ -94,11 +89,12 @@ describe 'add from facebook controller', ->
           location:
             lat: 40.7265834 # just under 5 mi away
             long: -73.9821535
-        deferred.resolve newFacebookFriends
+        deferred.resolve Auth.user.facebookFriends
         scope.$apply()
 
       it 'should show the facebookFriends', ->
-        expect(ctrl.showFacebookFriends).toHaveBeenCalledWith newFacebookFriends
+        expect(ctrl.showFacebookFriends).toHaveBeenCalledWith \
+            Auth.user.facebookFriends
 
       it 'should stop the spinner', ->
         expect(refreshComplete).toBe true
@@ -127,15 +123,19 @@ describe 'add from facebook controller', ->
 
 
   describe 'when the user\'s facebook friends haven\'t been saved yet', ->
+    facebookFriends = null
 
     beforeEach ->
-      localStorage.clearAll()
-
       deferred = $q.defer()
       spyOn(User, 'getFacebookFriends').and.returnValue {$promise: deferred.promise}
 
+      # Mock the user's facebook friends not being set.
+      facebookFriends = Auth.user.facebookFriends
+      delete Auth.user.facebookFriends
+
       ctrl = $controller AddFromFacebookCtrl,
         $scope: scope
+        Auth: Auth
 
     it 'should show the loading spinner', ->
       expect(ctrl.isLoading).toBe true
@@ -143,7 +143,7 @@ describe 'add from facebook controller', ->
     it 'should request the user\'s facebook friends', ->
       expect(User.getFacebookFriends).toHaveBeenCalled()
 
-    describe 'when the load succeeds', ->
+    describe 'when the fetch succeeds', ->
 
       beforeEach ->
         spyOn ctrl, 'showFacebookFriends'
@@ -158,7 +158,7 @@ describe 'add from facebook controller', ->
         expect(ctrl.isLoading).toBe false
 
 
-    describe 'when the load fails', ->
+    describe 'when the fetch fails', ->
 
       beforeEach ->
         deferred.reject()

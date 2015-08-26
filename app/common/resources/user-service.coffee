@@ -71,6 +71,7 @@ User = ($http, $q, $resource, apiRoot) ->
       isArray: true
       transformResponse: (data, headersGetter) ->
         data = angular.fromJson data
+        # TODO: Save the friends on the user.
         (deserializeUser(user) for user in data)
 
     getFacebookFriends:
@@ -79,6 +80,7 @@ User = ($http, $q, $resource, apiRoot) ->
       isArray: true
       transformResponse: (data, headersGetter) ->
         data = angular.fromJson data
+        # TODO: Save the facebook friends on the user.
         (deserializeUser(user) for user in data)
 
   resource.listUrl = listUrl
