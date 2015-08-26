@@ -182,12 +182,15 @@ describe 'event controller', ->
 
     beforeEach ->
       spyOn $ionicScrollDelegate, 'scrollBottom'
+      spyOn Invitation, 'update'
 
       scope.$emit '$ionicView.enter'
 
     it 'should scroll to the bottom of the view', ->
       expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
+    it 'should update the last viewed time', ->
+      expect(Invitation.update).toHaveBeenCalledWith invitation
 
   describe 'when new messages get posted', ->
     top = null
@@ -516,6 +519,19 @@ describe 'event controller', ->
         hideSheet = jasmine.createSpy 'hideSheet'
         hideSheet
 
+    describe 'tapping send to button', ->
+
+      beforeEach ->
+        spyOn $state, 'go'
+        ctrl.showMoreOptions()
+        buttonClickedCallback 1
+
+      it 'should go to the invite friends view', ->
+        expect($state.go).toHaveBeenCalledWith 'inviteFriends', {event: ctrl.event}
+
+      it 'should hide the action sheet', ->
+        expect(hideSheet).toHaveBeenCalled()
+
     describe 'when notifications are turned on', ->
 
       beforeEach ->
@@ -527,6 +543,8 @@ describe 'event controller', ->
         options =
           buttons: [
             text: 'Mute Notifications'
+          ,
+            text: 'Send To..'
           ]
           cancelText: 'Cancel'
           buttonClicked: jasmine.any Function
@@ -557,6 +575,8 @@ describe 'event controller', ->
         options =
           buttons: [
             text: 'Turn On Notifications'
+          ,
+            text: 'Send To..'
           ]
           cancelText: 'Cancel'
           buttonClicked: jasmine.any Function

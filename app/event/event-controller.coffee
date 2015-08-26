@@ -20,6 +20,8 @@ class EventCtrl
     # Start out at the most recent message.
     @$scope.$on '$ionicView.enter', =>
       @$ionicScrollDelegate.scrollBottom true
+      # Update last viewed time
+      @Invitation.update @invitation
 
     # Watch for new messages.
     @messagesRQ.on 'change', =>
@@ -92,12 +94,18 @@ class EventCtrl
     options =
       buttons: [
         text: notificationText
+      ,
+        text: 'Send To..'
       ]
       cancelText: 'Cancel'
       buttonClicked: (index) =>
         if index is 0
           @toggleNotifications()
           hideSheet()
+        if index is 1
+          @$state.go 'inviteFriends', {event: @event}
+          hideSheet()
+
     hideSheet = @$ionicActionSheet.show options
 
   toggleNotifications: ->
