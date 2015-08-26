@@ -216,16 +216,14 @@ Global Sass
 }
 #event-title {
   display: inline-block;
-  padding-right: 20px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   width: 100%;
 
   i {
-    position: absolute;
-    right: 0;
-    top: 10px;
+    position: relative;
+    padding-left: 2px;
   }
 }
 
