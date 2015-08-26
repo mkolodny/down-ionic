@@ -9,9 +9,11 @@ require '../common/resources/resources-module'
 InviteFriendsCtrl = require './invite-friends-controller'
 
 describe 'invite friends controller', ->
+  $controller = null
   $ionicHistory = null
   $q = null
   $state = null
+  $stateParams = null
   Auth = null
   ctrl = null
   event = null
@@ -116,6 +118,7 @@ describe 'invite friends controller', ->
     expect(ctrl.event).toBe event
 
   describe 'when event is null', ->
+
     beforeEach ->
       $stateParams.event = null
       ctrl = $controller InviteFriendsCtrl,
@@ -123,9 +126,10 @@ describe 'invite friends controller', ->
         Auth: Auth
         $stateParams: $stateParams
 
-    fit 'should disable animating the transition to the next view', ->
+    it 'should disable animating the transition to the next view', ->
       options = {disableAnimate: true}
       expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+
 
   describe 'getting the array of nearby friends', ->
 
