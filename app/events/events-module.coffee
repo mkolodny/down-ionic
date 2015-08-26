@@ -1,4 +1,5 @@
 require 'angular'
+require 'angular-chart.js'
 require 'angular-elastic'
 require 'angular-ui-router'
 require '../common/asteroid/asteroid-module'
@@ -8,13 +9,14 @@ require '../common/view-location/view-location-module'
 EventsCtrl = require './events-controller'
 
 angular.module 'down.events', [
-    'ionic'
-    'ui.router'
+    'chart.js'
     'down.asteroid'
     'down.placeAutocomplete'
     'down.resources'
     'down.viewLocation'
+    'ionic'
     'monospaced.elastic'
+    'ui.router'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'events',

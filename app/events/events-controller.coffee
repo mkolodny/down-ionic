@@ -52,6 +52,12 @@ class EventsCtrl
         # Subscribe to the messages for each event.
         events = (invitation.event for invitation in invitations)
         @eventsMessagesSubscribe events
+
+        # Set `percentRemaining` as a property on each event as a workaround for
+        #   stopping angular-chart.js from calling `getPercentRemaining` too many
+        #   times.
+        for event in events
+          event.percentRemaining = event.getPercentRemaining()
       , =>
         @getInvitationsError = true
       .finally =>

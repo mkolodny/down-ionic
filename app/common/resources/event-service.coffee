@@ -39,7 +39,7 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
         long: event.place.geo.coordinates[1]
     if event.comment?
       response.comment = event.comment
-    response
+    new resource(response)
 
   resource = $resource "#{detailUrl}", null,
     save:
@@ -79,6 +79,23 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
     url = "#{listUrl}/#{event.id}/messages"
     requestData = {text: text}
     $http.post url, requestData
+
+  resource::getPercentRemaining = ->
+    currentDate = new Date()
+    twentyFourHrsAgo = new Date()
+    twentyFourHrsAgo.setDate currentDate.getDate()-1
+    oneDay = currentDate - twentyFourHrsAgo
+
+    if @datetime?
+      oneDayAfterEvent = @datetime.getTime() + oneDay
+      eventDuration = oneDayAfterEvent - @createdAt.getTime()
+      timeRemaining = oneDayAfterEvent - currentDate.getTime()
+    else
+      eventDuration = oneDay
+      timeRemaining = @createdAt - twentyFourHrsAgo
+
+    percentRemaining = (timeRemaining / eventDuration) * 100
+    percentRemaining
 
   resource
 

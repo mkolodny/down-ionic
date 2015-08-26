@@ -130,7 +130,7 @@ describe 'event service', ->
           canceled: response.canceled
           createdAt: new Date(response.created_at)
           updatedAt: new Date(response.updated_at)
-        expect(Event.deserialize response).toEqual expectedEvent
+        expect(Event.deserialize response).toAngularEqual expectedEvent
 
     describe 'with the max amount of data', ->
 
@@ -164,7 +164,7 @@ describe 'event service', ->
           canceled: response.canceled
           createdAt: new Date(response.created_at)
           updatedAt: new Date(response.updated_at)
-        expect(Event.deserialize response).toEqual expectedEvent
+        expect(Event.deserialize response).toAngularEqual expectedEvent
 
 
   describe 'creating', ->
@@ -297,3 +297,51 @@ describe 'event service', ->
       # can just call `Event.cancel event`.
       Event.cancel {id: event.id}
       $httpBackend.flush 1
+
+
+  describe 'getting the percent remaining for an event', ->
+    currentDate = null
+    event = null
+    result = null
+
+    beforeEach ->
+      jasmine.clock().install()
+      currentDate = new Date(1438014089235)
+      jasmine.clock().mockDate currentDate
+
+      event = new Event
+        id: 1
+        creatorId: 1
+        title: 'bars?!?!!?'
+        canceled: false
+        createdAt: new Date()
+        updatedAt: new Date()
+
+    afterEach ->
+      jasmine.clock().uninstall()
+
+    describe 'when the event has no datetime', ->
+
+      beforeEach ->
+        event.datetime = null
+        currentHours = currentDate.getHours()
+        event.createdAt = new Date().setHours(currentHours-6)
+
+        result = event.getPercentRemaining()
+
+      it 'should return the percentage', ->
+        expect(result).toBe 75
+
+
+    describe 'when the event has a datetime', ->
+
+      beforeEach ->
+        event.createdAt = new Date()
+        event.createdAt.setDate currentDate.getDate()-2
+        event.datetime = new Date()
+        event.datetime.setDate currentDate.getDate()+1
+
+        result = event.getPercentRemaining()
+
+      it 'should return the percentage', ->
+        expect(result).toBe 50

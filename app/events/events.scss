@@ -29,6 +29,34 @@
     padding-right: 8px;
     transition: top 0.5s ease-in-out, right 1s linear;
 
+    &.updated {
+      h2,
+      p,
+      .updated-at {
+        font-weight: 500;
+      }
+      p,
+      .updated-at {
+        color: #111;
+      }
+    }
+    &.activated {
+      .white {
+        display: none;
+      }
+      .gray {
+        display: block !important;
+      }
+    }
+    .chart-pie {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+
+      &.gray {
+        display: none;
+      }
+    }
     .updated-at {
       font-size: 14px;
       float: right;
@@ -37,6 +65,7 @@
     }
     h2 {
       font-weight: 400px;
+      margin-bottom: 2px;
 
       &.expanded {
         white-space: normal;
@@ -54,18 +83,6 @@
     }
     .respond-buttons {
       margin-top: 13px;
-    }
-  }
-  .item.updated {
-    h2 {
-      font-weight: 500;
-    }
-    p {
-      color: #111;
-      font-weight: 500;
-    }
-    .updated-at {
-      color: #111;
     }
   }
   .event-detail {

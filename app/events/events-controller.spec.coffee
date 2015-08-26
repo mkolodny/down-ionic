@@ -26,6 +26,7 @@ describe 'events controller', ->
   deferredTemplate = null
   dividerHeight = null
   earlier = null
+  Event = null
   eventHeight = null
   item = null
   invitation = null
@@ -59,6 +60,7 @@ describe 'events controller', ->
     $window = $injector.get '$window'
     Asteroid = $injector.get 'Asteroid'
     dividerHeight = $injector.get 'dividerHeight'
+    Event = $injector.get 'Event'
     eventHeight = $injector.get 'eventHeight'
     Invitation = $injector.get 'Invitation'
     scope = $rootScope.$new()
@@ -67,9 +69,9 @@ describe 'events controller', ->
 
     earlier = new Date()
     later = new Date(earlier.getTime()+1)
-    invitation =
+    invitation = new Invitation
       id: 1
-      event:
+      event: new Event
         id: 1
         title: 'bars?!?!!?'
         creator: 2
@@ -81,7 +83,7 @@ describe 'events controller', ->
           name: 'B Bar & Grill'
           lat: 40.7270718
           long: -73.9919324
-      fromUser:
+      fromUser: new User
         id: 3
         email: 'aturing@gmail.com'
         name: 'Alan Turing'
@@ -138,12 +140,16 @@ describe 'events controller', ->
 
     describe 'successfully', ->
       items = null
+      percentRemaining = null
       response = null
 
       beforeEach ->
         items = 'items'
         spyOn(ctrl, 'buildItems').and.returnValue items
         spyOn ctrl, 'eventsMessagesSubscribe'
+        percentRemaining = 16
+        spyOn(invitation.event, 'getPercentRemaining').and.returnValue \
+            percentRemaining
 
         response = [invitation]
         deferredGetInvitations.resolve response
@@ -165,6 +171,9 @@ describe 'events controller', ->
 
       it 'should clear a loading flag', ->
         expect(ctrl.isLoading).toBe false
+
+      it 'should set the percent remaining on the event', ->
+        expect(invitation.event.percentRemaining).toBe percentRemaining
 
 
     describe 'with an error', ->

@@ -17,7 +17,15 @@
     <ion-list class="list-avatar" ng-class="{moving: events.moving}">
       <!-- We might need to use `track by item.id` for the animations to work. -->
       <ion-item ng-repeat="item in events.items"
-                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, updated: item.wasUpdated, 'item-reordering': item.isReordering, expanded: item.isExpanded, last: $last}"
+                ng-class="{
+                  'item-divider': item.isDivider,
+                  'item-avatar': !item.isDivider,
+                  'item-icon-right': !item.isDivider,
+                  updated: item.wasUpdated,
+                  'item-reordering': item.isReordering,
+                  expanded: item.isExpanded,
+                  last: $last
+                }"
                 ng-click="item.isDivider ? null : (item.wasJoined ? events.viewEvent(item) : events.toggleIsExpanded(item))"
                 ng-style="{top: events.moving ? item.top+'px': none, right: item.right+'px'}">
         <!-- Divider -->
@@ -25,10 +33,23 @@
           {{item.title}}
         </div>
 
-        <!-- Facebook Friend -->
+        <!-- Event -->
         <div ng-if="item.invitation.fromUser">
-          <img class="item-image" ng-src="{{item.invitation.fromUser.imageUrl}}"
-               alt="{{item.invitation.fromUser.name}}">
+          <img class="item-image" ng-src="{{item.invitation.fromUser.imageUrl}}">
+          <canvas class="chart chart-pie"
+                  ng-repeat="color in ['#ffffff', 'rgb(217,217,217)']"
+                  data="[
+                    (100 - item.invitation.event.percentRemaining),
+                    item.invitation.event.percentRemaining
+                  ]"
+                  ng-class="{
+                    'white': (color==='#ffffff'),
+                    'gray': (color==='rgb(217,217,217)')
+                  }"
+                  labels="['', ' ']"
+                  colours="[color, 'rgba(0,0,0,0)']" width="53" height="53"
+                  options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
+                  ></canvas>
           <span class="updated-at">{{item.invitation.event.updatedAt | date:'shortTime' | lowercase}}</span>
           <h2>{{item.invitation.event.title}}</h2>
           <p ng-if="item.wasJoined">
