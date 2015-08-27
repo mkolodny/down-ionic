@@ -5,6 +5,8 @@ User = ($http, $q, $resource, apiRoot) ->
       id: user.id
       email: user.email
       name: user.name
+      first_name: user.firstName
+      last_name: user.lastName
       username: user.username
       image_url: user.imageUrl
     if user.location?
@@ -17,6 +19,8 @@ User = ($http, $q, $resource, apiRoot) ->
       id: data.id
       email: data.email
       name: data.name
+      firstName: data.first_name
+      lastName: data.last_name
       username: data.username
       imageUrl: data.image_url
     if data.location?

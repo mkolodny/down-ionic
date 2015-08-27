@@ -3,7 +3,7 @@ require 'angular-mocks'
 require '../auth/auth-module'
 require './resources-module'
 
-describe 'event service', ->
+fdescribe 'event service', ->
   $httpBackend = null
   Asteroid = null
   Auth = null
@@ -23,6 +23,8 @@ describe 'event service', ->
       user:
         id: 1
         name: 'Alan Turing'
+        firstName: 'Alan'
+        lastName: 'Turing'
         imageUrl: 'http://facebook.com/profile-pic/tdog'
     $provide.value 'Auth', Auth
 
@@ -226,6 +228,8 @@ describe 'event service', ->
           creator:
             id: Auth.user.id
             name: Auth.user.name
+            firstName: Auth.user.firstName
+            lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: "#{Auth.user.name} might be down"
           eventId: responseData.id
@@ -303,6 +307,8 @@ describe 'event service', ->
           creator:
             id: Auth.user.id
             name: Auth.user.name
+            firstName: Auth.user.firstName
+            lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: text
           eventId: event.id

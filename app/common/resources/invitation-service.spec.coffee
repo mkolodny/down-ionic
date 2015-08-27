@@ -21,6 +21,8 @@ describe 'invitation service', ->
       user:
         id: 1
         name: 'Alan Turing'
+        firstName: 'Alan'
+        lastName: 'Turing'
         imageUrl: 'http://facebook.com/profile-pic/tdog'
     $provide.value 'Auth', Auth
 
@@ -147,6 +149,8 @@ describe 'invitation service', ->
         id: 1
         email: 'aturing@gmail.com'
         name: 'Alan Turing'
+        firstName: 'Alan'
+        lastName: 'Turing'
         username: 'tdog'
         image_url: 'https://facebook.com/profile-pic/tdog'
         location:
@@ -156,6 +160,8 @@ describe 'invitation service', ->
         id: 2
         email: 'jclarke@gmail.com'
         name: 'Joan Clarke'
+        firstName: 'Joan'
+        lastName: 'Clarke'
         username: 'jmamba'
         image_url: 'http://imgur.com/jcke'
         location:
@@ -291,8 +297,6 @@ describe 'invitation service', ->
     date = null
     originalResponse = null
     newResponse = null
-    resolved = null
-    rejected = null
 
     beforeEach ->
       invitation =
@@ -316,20 +320,12 @@ describe 'invitation service', ->
       invitationCopy = angular.copy invitation
       originalResponse = invitationCopy.response
       newResponse = Invitation.accepted
-      Invitation.updateResponse invitationCopy, newResponse
-        .$promise.then ->
-          resolved = true
-        , ->
-          rejected = true
 
     afterEach ->
       jasmine.clock().uninstall()
 
-    it 'should update the invitation with the new response', ->
-      invitation.response = newResponse
-      expect(Invitation.update).toHaveBeenCalledWith invitation
-
     describe 'successfully', ->
+      resolved = null
 
       describe 'to accepted', ->
 
@@ -343,6 +339,10 @@ describe 'invitation service', ->
           deferred.resolve invitation
           $rootScope.$apply()
 
+        it 'should update the invitation with the new response', ->
+          invitation.response = newResponse
+          expect(Invitation.update).toHaveBeenCalledWith invitation
+
         it 'should get the messages collection', ->
           expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
@@ -351,6 +351,8 @@ describe 'invitation service', ->
             creator:
               id: Auth.user.id
               name: Auth.user.name
+              firstName: Auth.user.firstName
+              lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} is down"
             eventId: invitation.eventId
@@ -383,6 +385,8 @@ describe 'invitation service', ->
             creator:
               id: Auth.user.id
               name: Auth.user.name
+              firstName: Auth.user.firstName
+              lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} might be down"
             eventId: invitation.eventId
@@ -415,6 +419,8 @@ describe 'invitation service', ->
             creator:
               id: Auth.user.id
               name: Auth.user.name
+              firstName: Auth.user.firstName
+              lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} can\'t make it"
             eventId: invitation.eventId
@@ -428,8 +434,13 @@ describe 'invitation service', ->
 
 
     describe 'unsuccessfully', ->
+      rejected = null
 
       beforeEach ->
+        Invitation.updateResponse invitationCopy, newResponse
+          .$promise.then null, ->
+            rejected = true
+
         deferred.reject()
         $rootScope.$apply()
 

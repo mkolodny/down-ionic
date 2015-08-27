@@ -685,6 +685,8 @@ describe 'events controller', ->
       creator =
         id: 2
         name: 'Guido van Rossum'
+        firstName: 'Guido'
+        lastName: 'van Rossum'
         imageUrl: 'http://facebook.com/profile-pics/vrawesome'
       textMessage =
         _id: 1
@@ -717,8 +719,8 @@ describe 'events controller', ->
 
         ctrl.setLatestMessage event, messages
 
-      it 'should set the most recent message on the event', ->
-        message = "#{textMessage.creator.name}: #{textMessage.text}"
+      fit 'should set the most recent message on the event', ->
+        message = "#{textMessage.creator.firstName}: #{textMessage.text}"
         expect(event.latestMessage).toBe message
 
       it 'should update the event\'s updatedAt time', ->

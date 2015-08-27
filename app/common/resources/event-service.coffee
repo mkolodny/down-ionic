@@ -65,6 +65,8 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
           creator:
             id: Auth.user.id
             name: Auth.user.name
+            firstName: Auth.user.firstName
+            lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: "#{Auth.user.name} might be down"
           eventId: event.id
@@ -86,6 +88,8 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
       creator:
         id: Auth.user.id
         name: Auth.user.name
+        firstName: Auth.user.firstName
+        lastName: Auth.user.lastName
         imageUrl: Auth.user.imageUrl
       text: text
       eventId: event.id

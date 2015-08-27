@@ -163,6 +163,7 @@ class EventsCtrl
       do (event, messagesRQ) =>
         # Set the latest message on the event.
         messages = angular.copy messagesRQ.result
+        console.log messages
         @setLatestMessage event, messages
 
         # Whenever a new message gets posted on the event, set the latest message
@@ -198,7 +199,8 @@ class EventsCtrl
     # Set the latest message on the event.
     latestMessage = messages[0]
     if latestMessage.type is 'text'
-      event.latestMessage = "#{latestMessage.creator.name}: #{latestMessage.text}"
+      firstName = latestMessage.creator.firstName
+      event.latestMessage = "#{firstName}: #{latestMessage.text}"
     else
       event.latestMessage = latestMessage.text
 

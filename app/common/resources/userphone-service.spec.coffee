@@ -79,8 +79,10 @@ describe 'userphone service', ->
     beforeEach ->
       contact =
         id: 1
-        name: 
+        name:
           formatted: 'Alan Turing'
+          givenName: 'Alan'
+          familyName: 'Turing'
         phoneNumbers: [
           type: 'mobile'
           value: '2036227310'
@@ -89,6 +91,8 @@ describe 'userphone service', ->
       intlPhone = '+12036227310'
       requestData =
         name: contact.name.formatted
+        first_name: contact.name.givenName
+        last_name: contact.name.familyName
         phone: intlPhone
       url = "#{listUrl}/contact"
 
@@ -105,6 +109,8 @@ describe 'userphone service', ->
           id: 1
           email: 'aturing@gmail.com'
           name: contact.name.formatted
+          first_name: contact.name.givenName
+          last_name: contact.name.familyName
           username: 'tdog'
           image_url: 'https://facebook.com/profile-pic/tdog'
           location:

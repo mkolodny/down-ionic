@@ -131,6 +131,8 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
         creator:
           id: Auth.user.id
           name: Auth.user.name
+          firstName: Auth.user.firstName
+          lastName: Auth.user.lastName
           imageUrl: Auth.user.imageUrl
         text: text
         eventId: _invitation.eventId

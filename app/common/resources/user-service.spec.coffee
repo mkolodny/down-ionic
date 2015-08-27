@@ -32,6 +32,8 @@ describe 'user service', ->
         id: 1
         email: 'aturing@gmail.com'
         name: 'Alan Turing'
+        firstName: 'Alan'
+        lastName: 'Turing'
         username: 'tdog'
         imageUrl: 'https://facebook.com/profile-pic/tdog'
         location:
@@ -45,6 +47,8 @@ describe 'user service', ->
           id: user.id
           email: user.email
           name: user.name
+          first_name: user.firstName
+          last_name: user.lastName
           username: user.username
           image_url: user.imageUrl
           location:
@@ -63,6 +67,8 @@ describe 'user service', ->
           id: user.id
           email: user.email
           name: user.name
+          first_name: user.firstName
+          last_name: user.lastName
           username: user.username
           image_url: user.imageUrl
         expect(User.serialize user).toEqual expectedUser
@@ -76,6 +82,8 @@ describe 'user service', ->
         id: 1
         email: 'aturing@gmail.com'
         name: 'Alan Turing'
+        first_name: 'Alan'
+        last_name: 'Turing'
         username: 'tdog'
         image_url: 'https://facebook.com/profile-pic/tdog'
         location:
@@ -89,6 +97,8 @@ describe 'user service', ->
           id: response.id
           email: response.email
           name: response.name
+          firstName: response.first_name
+          lastName: response.last_name
           username: response.username
           imageUrl: response.image_url
           location:
@@ -107,6 +117,8 @@ describe 'user service', ->
           id: response.id
           email: response.email
           name: response.name
+          firstName: response.first_name
+          lastName: response.last_name
           username: response.username
           imageUrl: response.image_url
         expect(User.deserialize response).toEqual expectedUser
@@ -120,6 +132,8 @@ describe 'user service', ->
           id: 2
           email: 'jclarke@gmail.com'
           name: 'Joan Clarke'
+          first_name: 'Joan'
+          last_name: 'Clarke'
           username: 'jmamba'
           image_url: 'http://imgur.com/jcke'
           location:
@@ -133,6 +147,8 @@ describe 'user service', ->
           id: friend.id
           email: friend.email
           name: friend.name
+          firstName: friend.first_name
+          lastName: friend.last_name
           username: friend.username
           imageUrl: friend.image_url
           location:
@@ -142,6 +158,8 @@ describe 'user service', ->
           id: response.id
           email: response.email
           name: response.name
+          firstName: response.first_name
+          lastName: response.last_name
           username: response.username
           imageUrl: response.image_url
           location:
