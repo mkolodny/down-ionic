@@ -96,7 +96,6 @@ describe 'events controller', ->
       response: Invitation.noResponse
       previouslyAccepted: false
       open: false
-      toUserMessaged: false
       muted: false
       lastViewed: later
       createdAt: new Date()
@@ -719,7 +718,7 @@ describe 'events controller', ->
 
         ctrl.setLatestMessage event, messages
 
-      fit 'should set the most recent message on the event', ->
+      it 'should set the most recent message on the event', ->
         message = "#{textMessage.creator.firstName}: #{textMessage.text}"
         expect(event.latestMessage).toBe message
 

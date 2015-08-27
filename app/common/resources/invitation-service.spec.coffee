@@ -97,7 +97,6 @@ describe 'invitation service', ->
           fromUserId: 4
           response: Invitation.accepted
           previouslyAccepted: false
-          toUserMessaged: false
           muted: false
           lastViewed: new Date()
 
@@ -109,7 +108,6 @@ describe 'invitation service', ->
           from_user: invitation.fromUserId
           response: invitation.response
           previously_accepted: invitation.previouslyAccepted
-          to_user_messaged: invitation.toUserMessaged
           muted: invitation.muted
           last_viewed: invitation.lastViewed.toISOString()
         expect(Invitation.serialize invitation).toEqual expectedInvitation
@@ -174,7 +172,6 @@ describe 'invitation service', ->
         fromUserId: fromUser.id
         response: response.response
         previouslyAccepted: response.previously_accepted
-        toUserMessaged: response.to_user_messaged
         muted: response.muted
         createdAt: new Date(response.created_at)
         updatedAt: new Date(response.updated_at)
@@ -266,7 +263,6 @@ describe 'invitation service', ->
         fromUserId: 3
         response: Invitation.noResponse
         previouslyAccepted: false
-        toUserMessaged: false
         muted: false
       putData = Invitation.serialize invitation
       responseData = angular.extend {}, putData,
@@ -306,7 +302,6 @@ describe 'invitation service', ->
         fromUserId: 3
         response: Invitation.noResponse
         previouslyAccepted: false
-        toUserMessaged: false
         muted: false
 
       deferred = $q.defer()

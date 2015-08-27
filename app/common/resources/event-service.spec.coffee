@@ -3,7 +3,7 @@ require 'angular-mocks'
 require '../auth/auth-module'
 require './resources-module'
 
-fdescribe 'event service', ->
+describe 'event service', ->
   $httpBackend = null
   Asteroid = null
   Auth = null

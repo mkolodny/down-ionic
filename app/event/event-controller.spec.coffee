@@ -85,7 +85,6 @@ describe 'event controller', ->
           long: -73.9821535
       response: Invitation.Accepted
       previouslyAccepted: false
-      toUserMessaged: false
       muted: false
       lastViewed: new Date()
       createdAt: new Date()
