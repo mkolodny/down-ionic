@@ -2,7 +2,6 @@ require '../ionic/ionic.js'
 require 'angular'
 require 'angular-animate'
 require 'angular-mocks'
-require 'angular-local-storage'
 require 'angular-sanitize'
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js'
@@ -17,19 +16,13 @@ describe 'verify phone controller', ->
   ctrl = null
   Auth = null
   Asteroid = null
-  localStorage = null
   scope = null
-  User = null
 
   beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('LocalStorageModule')
-
   beforeEach angular.mock.module('down.auth')
-
-  beforeEach angular.mock.module('down.resources')
 
   beforeEach angular.mock.module('down.asteroid')
 
@@ -41,9 +34,7 @@ describe 'verify phone controller', ->
     $state = $injector.get '$state'
     Auth = angular.copy $injector.get('Auth')
     Asteroid = $injector.get 'Asteroid'
-    localStorage = $injector.get 'localStorageService'
     scope = $rootScope.$new()
-    User = $injector.get 'User'
 
     Auth.phone = '+15555555555'
 
@@ -51,9 +42,6 @@ describe 'verify phone controller', ->
       Auth: Auth
       $scope: scope
   )
-
-  afterEach ->
-    localStorage.clearAll()
 
   describe 'when form is submitted', ->
     deferred = null
@@ -95,7 +83,7 @@ describe 'verify phone controller', ->
           scope.$apply()
 
         # Don't use Auth.setUser so that use is not
-        # saved to localstorage until after meteor 
+        # saved to localstorage until after meteor
         # successfully authenticates
         it 'should set auth on the user', ->
           expect(Auth.user).toBe user
@@ -203,12 +191,12 @@ describe 'verify phone controller', ->
 
     beforeEach ->
       deferred = $q.defer()
-      spyOn(User, 'getFacebookFriends').and.returnValue {$promise: deferred.promise}
+      spyOn(Auth, 'getFacebookFriends').and.returnValue {$promise: deferred.promise}
 
       ctrl.getFacebookFriends()
 
     it 'should call User.getFacebookFriends', ->
-      expect(User.getFacebookFriends).toHaveBeenCalled()
+      expect(Auth.getFacebookFriends).toHaveBeenCalled()
 
     describe 'successfully', ->
       friends = null

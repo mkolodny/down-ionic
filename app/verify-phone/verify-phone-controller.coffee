@@ -1,7 +1,5 @@
 class VerifyPhoneCtrl
-  constructor: (@$ionicLoading, @$scope, @$state, @Asteroid, @Auth,
-                localStorageService, @User) ->
-    @localStorage = localStorageService
+  constructor: (@$ionicLoading, @$scope, @$state, @Asteroid, @Auth) ->
 
   authenticate: ->
     if not @validate()
@@ -39,7 +37,7 @@ class VerifyPhoneCtrl
       @error = 'Oops, something went wrong.'
 
   getFacebookFriends: ->
-    @User.getFacebookFriends()
+    @Auth.getFacebookFriends()
       .$promise.then (friends) =>
         @Auth.user.facebookFriends = friends
         # To persist to localstorage

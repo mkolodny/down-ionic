@@ -65,28 +65,9 @@ User = ($http, $q, $resource, apiRoot) ->
         data = angular.fromJson data
         (deserializeUser(user) for user in data)
 
-    getFriends:
-      method: 'get'
-      url: "#{listUrl}/friends"
-      isArray: true
-      transformResponse: (data, headersGetter) ->
-        data = angular.fromJson data
-        # TODO: Save the friends on the user.
-        (deserializeUser(user) for user in data)
-
-    getFacebookFriends:
-      method: 'get'
-      url: "#{listUrl}/facebook_friends"
-      isArray: true
-      transformResponse: (data, headersGetter) ->
-        data = angular.fromJson data
-        # TODO: Save the facebook friends on the user.
-        (deserializeUser(user) for user in data)
-
   resource.listUrl = listUrl
 
   resource.serialize = serializeUser
-
   resource.deserialize = deserializeUser
 
   resource.isUsernameAvailable = (username) ->

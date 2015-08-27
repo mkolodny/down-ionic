@@ -47,9 +47,6 @@ describe 'find friends controller', ->
     User = $injector.get 'User'
     localStorage = $injector.get 'localStorageService'
 
-    deferred = $q.defer()
-    spyOn(User, 'getFacebookFriends').and.returnValue {$promise: deferred.promise}
-
     contactsDeferred = $q.defer()
     spyOn(Contacts, 'getContacts').and.returnValue contactsDeferred.promise
 

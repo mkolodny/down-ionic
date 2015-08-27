@@ -12,11 +12,8 @@ describe 'add from facebook controller', ->
   deferred = null
   friend = null
   scope = null
-  User = null
 
   beforeEach angular.mock.module('down.auth')
-
-  beforeEach angular.mock.module('down.resources')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
@@ -24,7 +21,6 @@ describe 'add from facebook controller', ->
     $q = $injector.get '$q'
     Auth = $injector.get 'Auth'
     scope = $rootScope.$new true
-    User = $injector.get 'User'
 
     # Mock facebook friends that were saved in local storage.
     friend =
@@ -68,13 +64,13 @@ describe 'add from facebook controller', ->
         refreshComplete = true
 
       deferred = $q.defer()
-      spyOn(User, 'getFacebookFriends').and.returnValue {$promise: deferred.promise}
+      spyOn(Auth, 'getFacebookFriends').and.returnValue {$promise: deferred.promise}
       spyOn ctrl, 'showFacebookFriends'
 
       ctrl.refresh()
 
     it 'should fetch the user\'s facebook friends', ->
-      expect(User.getFacebookFriends).toHaveBeenCalled()
+      expect(Auth.getFacebookFriends).toHaveBeenCalled()
 
     describe 'when the request succeeds', ->
       newFacebookFriends = null
@@ -127,7 +123,7 @@ describe 'add from facebook controller', ->
 
     beforeEach ->
       deferred = $q.defer()
-      spyOn(User, 'getFacebookFriends').and.returnValue {$promise: deferred.promise}
+      spyOn(Auth, 'getFacebookFriends').and.returnValue {$promise: deferred.promise}
 
       # Mock the user's facebook friends not being set.
       facebookFriends = Auth.user.facebookFriends
@@ -141,7 +137,7 @@ describe 'add from facebook controller', ->
       expect(ctrl.isLoading).toBe true
 
     it 'should request the user\'s facebook friends', ->
-      expect(User.getFacebookFriends).toHaveBeenCalled()
+      expect(Auth.getFacebookFriends).toHaveBeenCalled()
 
     describe 'when the fetch succeeds', ->
 

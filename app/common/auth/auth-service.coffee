@@ -132,4 +132,32 @@ class Auth
     @User.update(user).$promise.then (user) =>
       @setUser user
 
+  getFriends: ->
+    deferred = @$q.defer()
+
+    @$http.get "#{@User.listUrl}/friends"
+      .success (data, status) =>
+        friends = (@User.deserialize(user) for user in data)
+        @user.friends = friends
+        @setUser @user
+        deferred.resolve friends
+      .error (data, status) =>
+        deferred.reject()
+
+    {$promise: deferred.promise}
+
+  getFacebookFriends: ->
+    deferred = @$q.defer()
+
+    @$http.get "#{@User.listUrl}/facebook_friends"
+      .success (data, status) =>
+        facebookFriends = (@User.deserialize(user) for user in data)
+        @user.facebookFriends = facebookFriends
+        @setUser @user
+        deferred.resolve facebookFriends
+      .error (data, status) =>
+        deferred.reject()
+
+    {$promise: deferred.promise}
+
 module.exports = Auth

@@ -1,5 +1,5 @@
 class AddFromFacebookCtrl
-  constructor: (@$scope, @Auth, @User) ->
+  constructor: (@$scope, @Auth) ->
     # Build the array of items to show in the view.
     if @Auth.user.facebookFriends?
       @showFacebookFriends @Auth.user.facebookFriends
@@ -27,7 +27,7 @@ class AddFromFacebookCtrl
         user: user
 
   refresh: ->
-    @User.getFacebookFriends()
+    @Auth.getFacebookFriends()
       .$promise.then (facebookFriends) =>
         @showFacebookFriends facebookFriends
         @loadError = false
