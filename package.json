@@ -13,6 +13,7 @@
     "angular-resource": "1.3.13",
     "angular-sanitize": "1.3.13",
     "angular-ui-router": "0.2.13",
+    "angularjs-toaster": "^0.4.15",
     "asteroid": "0.6.1",
     "browserify": "10.2.6",
     "chart.js": "^1.0.2",
@@ -80,8 +81,8 @@
       "locator": "https://github.com/Wizcorp/phonegap-facebook-plugin.git",
       "id": "com.phonegap.plugins.facebookconnect",
       "variables": {
-        "APP_ID": "864552050271610",
-        "APP_NAME": "DownDev"
+        "APP_ID": "1466791860252976",
+        "APP_NAME": "Down"
       }
     },
     {
