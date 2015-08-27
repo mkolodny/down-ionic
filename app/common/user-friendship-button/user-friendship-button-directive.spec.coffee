@@ -13,7 +13,6 @@ describe 'user friendship button directive', ->
   Friendship = null
   scope = null
   User = null
-  userId = null
 
   beforeEach angular.mock.module('down.userFriendshipButton')
 
@@ -26,23 +25,24 @@ describe 'user friendship button directive', ->
     Auth =
       user:
         id: 1
+      setUser: jasmine.createSpy 'Auth.setUser'
     $provide.value 'Auth', Auth
     return
   )
 
   beforeEach inject(($injector) ->
     $compile = $injector.get '$compile'
-    $rootScope = $injector.get '$rootScope'
+    scope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     Friendship = $injector.get 'Friendship'
-    scope = $rootScope.$new()
     User = $injector.get 'User'
 
     Auth.isFriend = jasmine.createSpy 'isFriend'
 
-    userId = 1
+    scope.friend =
+      id: 2
     element = angular.element """
-      <user-friendship-button user-id="#{userId}">
+      <user-friendship-button user="friend">
       """
   )
 
@@ -50,6 +50,7 @@ describe 'user friendship button directive', ->
 
     beforeEach ->
       Auth.isFriend.and.returnValue true
+      Auth.user.friends = [scope.friend]
 
       $compile(element) scope
       scope.$digest()
@@ -67,7 +68,8 @@ describe 'user friendship button directive', ->
 
       beforeEach ->
         deferred = $q.defer()
-        spyOn(Friendship, 'deleteWithFriendId').and.returnValue deferred.promise
+        spyOn(Friendship, 'deleteWithFriendId').and.returnValue
+          $promise: deferred.promise
 
         anchor = element.find 'a'
         anchor.triggerHandler 'click'
@@ -78,7 +80,7 @@ describe 'user friendship button directive', ->
         expect(icon).toHaveClass 'fa-pulse'
 
       it 'should delete the friendship', ->
-        expect(Friendship.deleteWithFriendId).toHaveBeenCalled()
+        expect(Friendship.deleteWithFriendId).toHaveBeenCalledWith scope.friend.id
 
       describe 'when it\'s removed successfully', ->
 
@@ -91,6 +93,12 @@ describe 'user friendship button directive', ->
         it 'should show an add friend button', ->
           icon = element.find 'i'
           expect(icon).toHaveClass 'fa-plus-square-o'
+
+        it 'should remove the friend from the user\'s friends', ->
+          expect(Auth.user.friends).toEqual []
+
+        it 'should set the user on auth', ->
+          expect(Auth.setUser).toHaveBeenCalledWith Auth.user
 
 
       describe 'when the remove fails', ->
@@ -108,6 +116,7 @@ describe 'user friendship button directive', ->
 
     beforeEach ->
       Auth.isFriend.and.returnValue false
+      Auth.user.friends = []
 
       $compile(element) scope
       scope.$digest()
@@ -138,7 +147,7 @@ describe 'user friendship button directive', ->
       it 'should create a friendship', ->
         friendship =
           userId: Auth.user.id
-          friendId: userId
+          friendId: scope.friend.id
         expect(Friendship.save).toHaveBeenCalledWith friendship
 
       describe 'when it\'s added successfully', ->
@@ -152,6 +161,12 @@ describe 'user friendship button directive', ->
         it 'should show a remove friend button', ->
           icon = element.find 'i'
           expect(icon).toHaveClass 'fa-check-square'
+
+        it 'should add the friend to the user\'s friends', ->
+          expect(Auth.user.friends).toEqual [scope.friend]
+
+        it 'should set the user on auth', ->
+          expect(Auth.setUser).toHaveBeenCalledWith Auth.user
 
 
       describe 'when the add fails', ->

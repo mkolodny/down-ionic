@@ -332,8 +332,7 @@ describe 'Auth service', ->
     describe 'when the user is a friend', ->
 
       beforeEach ->
-        Auth.user.friends =
-          "#{user.id}": true
+        Auth.user.friends = [user]
 
       it 'should return true', ->
         expect(Auth.isFriend user.id).toBe true
@@ -342,7 +341,7 @@ describe 'Auth service', ->
     describe 'when the user isn\'t a friend', ->
 
       beforeEach ->
-        Auth.user.friends = {}
+        Auth.user.friends = []
 
       it 'should return true', ->
         expect(Auth.isFriend user.id).toBe false

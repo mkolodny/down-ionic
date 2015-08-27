@@ -23,7 +23,7 @@
           <img class="item-image" ng-src="{{item.user.imageUrl}}" alt="Profile Pic">
           <h2>{{item.user.name}}</h2>
           <p>{{item.user.username}}</p>
-          <user-friendship-button user-id="item.user.id">
+          <user-friendship-button user="item.user">
         </div>
 
         <!-- Contact with a user object -->
@@ -32,7 +32,7 @@
                 >{{findFriends.getInitials(item.contact.name.formatted)}}</span>
           <h2>{{item.contact.name.formatted}}</h2>
           <p>Add by SMS</p>
-          <user-friendship-button user-id="item.contact.user.id">
+          <user-friendship-button user="item.contact.user">
         </div>
 
         <!-- Contact without a user object -->

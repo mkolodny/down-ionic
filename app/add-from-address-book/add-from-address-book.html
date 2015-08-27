@@ -2,7 +2,12 @@
   <ion-content>
     <ion-list class="list-avatar">
       <ion-item collection-repeat="item in addFromAddressBook.items"
-                ng-class="{'item-divider': item.isDivider, 'item-avatar': !item.isDivider, 'item-icon-right': !item.isDivider, last: $last}"
+                ng-class="{
+                  'item-divider': item.isDivider,
+                  'item-avatar': !item.isDivider,
+                  'item-icon-right': !item.isDivider,
+                  last: $last
+                }"
                 item-height="item.isDivider ? '35px' : '71px'">
         <!-- Divider -->
         <div ng-if="item.isDivider">
@@ -15,7 +20,7 @@
                alt="Profile Pic">
           <h2>{{item.user.name}}</h2>
           <p>{{item.user.username}}</p>
-          <user-friendship-button user-id="item.id">
+          <user-friendship-button user="item.user">
         </div>
 
         <!-- Contact with a user object -->
@@ -25,7 +30,7 @@
                 >{{addFromAddressBook.getInitials(item.contact.name.formatted)}}</span>
           <h2>{{item.contact.name.formatted}}</h2>
           <p>Add by SMS</p>
-          <user-friendship-button user-id="item.contact.user.id">
+          <user-friendship-button user="item.contact.user">
         </div>
 
         <!-- Contact without a user object -->

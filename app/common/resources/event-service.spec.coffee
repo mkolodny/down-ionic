@@ -188,6 +188,10 @@ describe 'event service', ->
     describe 'successfully', ->
 
       beforeEach ->
+        jasmine.clock().install()
+        date = new Date(1438195002656)
+        jasmine.clock().mockDate date
+
         responseData = angular.extend {id: 1}, requestData,
           place:
             name: event.place.name
@@ -206,6 +210,9 @@ describe 'event service', ->
           .$promise.then (_response_) ->
             response = _response_
         $httpBackend.flush 1
+
+      afterEach ->
+        jasmine.clock().uninstall()
 
       it 'should POST the event', ->
         expectedEvent = Event.deserialize responseData

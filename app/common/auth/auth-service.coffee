@@ -42,7 +42,6 @@ class Auth
     params =
       phone: phone
       code: code
-
     @$http.post "#{@apiRoot}/sessions", params
       .success (data, status) =>
         @user = @User.deserialize data
@@ -72,7 +71,10 @@ class Auth
         @phone = phone
 
   isFriend: (userId) ->
-    @user.friends[userId]?
+    for friend in @user.friends
+      if friend.id is userId
+        return true
+    false
 
   isNearby: (user) ->
     if not user.location?

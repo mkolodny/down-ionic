@@ -62,60 +62,47 @@ describe 'friendship service', ->
       expectedFriendship = new Friendship(expectedFriendshipData)
       expect(response).toAngularEqual expectedFriendship
 
-    it 'should add the friend to Auth', ->
-      expect(Auth.user.friends[friendId]).toBe true
-
-    it 'should set the updated user', ->
-      expect(Auth.setUser).toHaveBeenCalledWith Auth.user
-
 
   describe 'deleting with a friend', ->
     friendId = null
     url = null
-    deleteData = null
+    requestData = null
     checkHeaders = null
 
     beforeEach ->
       friendId = 1
       url = "#{listUrl}/friend"
-      deleteData = friend: friendId
+      requestData = {friend: friendId}
       checkHeaders = (headers) ->
         headers['Content-Type'] is 'application/json;charset=utf-8'
 
     describe 'successfully', ->
-      deleted = false
+      deleted = null
 
       beforeEach ->
-        $httpBackend.expect 'DELETE', url, deleteData, checkHeaders
+        $httpBackend.expect 'DELETE', url, requestData, checkHeaders
           .respond 200, null
 
-        # Set the user as a friend on Auth.
-        Auth.user.friends[friendId] = true
-
+        deleted = false
         Friendship.deleteWithFriendId friendId
-          .then ->
+          .$promise.then ->
             deleted = true
         $httpBackend.flush 1
 
       it 'should DELETE the friendship', ->
         expect(deleted).toBe true
 
-      it 'should remove the friend from Auth', ->
-        expect(Auth.user.friends[friendId]).not.toBeDefined()
-
-      it 'should set the updated user', ->
-        expect(Auth.setUser).toHaveBeenCalledWith Auth.user
-
 
     describe 'with an error', ->
-      rejected = false
+      rejected = null
 
       beforeEach ->
-        $httpBackend.expect 'DELETE', url, deleteData, checkHeaders
+        $httpBackend.expect 'DELETE', url, requestData, checkHeaders
           .respond 500, null
 
+        rejected = false
         Friendship.deleteWithFriendId friendId
-          .then null, ->
+          .$promise.then null, ->
             rejected = true
         $httpBackend.flush 1
 

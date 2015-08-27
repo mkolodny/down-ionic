@@ -18,6 +18,7 @@ describe 'event controller', ->
   Asteroid = null
   Auth = null
   ctrl = null
+  currentDate = null
   deferred = null
   earlierMessage = null
   Event = null
@@ -102,6 +103,11 @@ describe 'event controller', ->
         lat: 40.7265834
         long: -73.9821535
 
+    # Mock the current date.
+    jasmine.clock().install()
+    currentDate = new Date(1438195002656)
+    jasmine.clock().mockDate currentDate
+
     # Create mocks/spies for getting the messages for this event.
     spyOn Asteroid, 'subscribe'
     earlier = new Date()
@@ -145,6 +151,9 @@ describe 'event controller', ->
       Auth: Auth
   )
 
+  afterEach ->
+    jasmine.clock().uninstall()
+
   it 'should set the user\'s invitation on the controller', ->
     expect(ctrl.invitation).toBe invitation
 
@@ -179,20 +188,12 @@ describe 'event controller', ->
     expect(Invitation.getEventInvitations).toHaveBeenCalledWith {id: event.id}
 
   describe 'once the view loads', ->
-    currentDate = null
 
     beforeEach ->
-      jasmine.clock().install()
-      currentDate = new Date(1438014089235)
-      jasmine.clock().mockDate currentDate
-
       spyOn $ionicScrollDelegate, 'scrollBottom'
       spyOn Invitation, 'update'
 
       scope.$emit '$ionicView.enter'
-
-    afterEach ->
-      jasmine.clock().uninstall()
 
     it 'should scroll to the bottom of the view', ->
       expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
