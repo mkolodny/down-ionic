@@ -20,7 +20,7 @@ describe 'contact friendship button directive', ->
     Auth =
       user:
         id: 1
-        friends: {}
+        friends: []
       setUser: jasmine.createSpy 'Auth.setUser'
     $provide.value 'Auth', Auth
     return
@@ -60,10 +60,9 @@ describe 'contact friendship button directive', ->
       anchor = element.find 'a'
       anchor.triggerHandler 'click'
 
-    xit 'should show a spinner', ->
-      icon = element.find 'i'
-      expect(icon).toHaveClass 'fa-spinner'
-      expect(icon).toHaveClass 'fa-pulse'
+    it 'should show a spinner', ->
+      icon = element.find 'ion-spinner'
+      expect(icon.length).toBe 1
 
     it 'should create the userphone', ->
       expect(UserPhone.create).toHaveBeenCalledWith scope.contact
@@ -89,7 +88,7 @@ describe 'contact friendship button directive', ->
         expect(scope.contact).toEqual contact
 
       it 'should add the new friend to the user\'s friends object', ->
-        expect(Auth.user.friends[user.id]).toBe user
+        expect(Auth.user.friends).toEqual [user]
 
       it 'should set the updated user', ->
         expect(Auth.setUser).toHaveBeenCalledWith Auth.user
