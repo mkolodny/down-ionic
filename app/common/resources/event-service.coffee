@@ -63,13 +63,13 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
         Messages = Asteroid.getCollection 'messages'
         Messages.insert
           creator:
-            id: Auth.user.id
+            id: "#{Auth.user.id}" # Meteor likes strings
             name: Auth.user.name
             firstName: Auth.user.firstName
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: "#{Auth.user.name} might be down"
-          eventId: event.id
+          eventId: "#{event.id}" # Meteor likes strings
           type: 'maybe_action' # We can't use Invitation.maybeAction because it
                                #   would create a circular dependecy.
           createdAt:

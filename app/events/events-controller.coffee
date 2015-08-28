@@ -156,7 +156,7 @@ class EventsCtrl
 
     Messages = @Asteroid.getCollection 'messages'
     for event in events
-      messagesRQ = Messages.reactiveQuery {eventId: event.id}
+      messagesRQ = Messages.reactiveQuery {eventId: "#{event.id}" } # Meteor likes strings
 
       # Keep the same value of `messagesRQ` even after the variable changes
       #   next time through the loop.
