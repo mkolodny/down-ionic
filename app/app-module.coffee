@@ -132,15 +132,21 @@ angular.module 'down', [
       Auth.redirectForAuthState()
 
     $ionicPlatform.ready ->
+      #bootstrap()
+      #return
+
       # Check For Updates
-      #Auth.redirectForAuthState()
       $ionicDeploy.setChannel 'staging' # 'dev', 'staging', 'production'
-      $ionicDeploy.check().then (hasUpdate) ->
-        if hasUpdate
+      $ionicDeploy.check()
+        .then (hasUpdate) ->
+          if not hasUpdate
+            return
+
           $ionicLoading.show()
 
           # Download update
-          $ionicDeploy.update().finally ->
-            $ionicLoading.hide()
-      .finally ->
-        bootstrap()
+          $ionicDeploy.update()
+            .finally ->
+              $ionicLoading.hide()
+        .finally ->
+          bootstrap()
