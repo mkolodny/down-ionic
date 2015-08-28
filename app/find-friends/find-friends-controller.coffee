@@ -35,33 +35,39 @@ class FindFriendsCtrl
     users = facebookFriends.concat users
 
     items = []
-    items.push
-      isDivider: true
-      title: 'Friends Using Down'
-    users.sort (a, b) ->
-      if a.name.toLowerCase() < b.name.toLowerCase()
-        return -1
-      else
-        return 1
-    for user in users
+
+    # Only show the "Friends Using Down" divider when the user has friends using
+    #   Down.
+    if users.length > 0
       items.push
-        isDivider: false
-        user: user
-    if contacts.length is 0
-      # Don't show the "Contacts" divider when there are no contacts yet.
-      return items
-    items.push
-      isDivider: true
-      title: 'Contacts'
-    contacts.sort (a, b) ->
-      if a.name.formatted.toLowerCase() < b.name.formatted.toLowerCase()
-        return -1
-      else
-        return 1
-    for contact in contacts
+        isDivider: true
+        title: 'Friends Using Down'
+      users.sort (a, b) ->
+        if a.name.toLowerCase() < b.name.toLowerCase()
+          return -1
+        else
+          return 1
+      for user in users
+        items.push
+          isDivider: false
+          user: user
+
+    # Only show the "Contacts" divider when the user's contacts have been
+    #   returned.
+    if contacts.length > 0
       items.push
-        isDivider: false
-        contact: contact
+        isDivider: true
+        title: 'Contacts'
+      contacts.sort (a, b) ->
+        if a.name.formatted.toLowerCase() < b.name.formatted.toLowerCase()
+          return -1
+        else
+          return 1
+      for contact in contacts
+        items.push
+          isDivider: false
+          contact: contact
+
     items
 
   getInitials: (name) ->
