@@ -57,18 +57,18 @@ describe 'user service', ->
         expect(User.serialize user).toEqual expectedUser
 
 
-    describe 'when the user doesn\'t have a location', ->
+    describe 'when the user has the min attributes', ->
 
       beforeEach ->
         delete user.location
+        delete user.firstName
+        delete user.lastName
 
       it 'should return the serialized user', ->
         expectedUser =
           id: user.id
           email: user.email
           name: user.name
-          first_name: user.firstName
-          last_name: user.lastName
           username: user.username
           image_url: user.imageUrl
         expect(User.serialize user).toEqual expectedUser
@@ -107,18 +107,18 @@ describe 'user service', ->
         expect(User.deserialize response).toEqual expectedUser
 
 
-    describe 'when the user doesn\'t have a location yet', ->
+    describe 'when the user has the min attributes', ->
 
       beforeEach ->
         response.location = null
+        response.first_name = null
+        response.last_name = null
 
       it 'should return the deserialized user', ->
         expectedUser =
           id: response.id
           email: response.email
           name: response.name
-          firstName: response.first_name
-          lastName: response.last_name
           username: response.username
           imageUrl: response.image_url
         expect(User.deserialize response).toEqual expectedUser

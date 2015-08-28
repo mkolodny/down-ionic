@@ -48,8 +48,6 @@ UserPhone = ($http, $q, $resource, apiRoot, Auth, localStorageService, User) ->
 
     requestData =
       name: contact.name.formatted
-      first_name: contact.name.givenName
-      last_name: contact.name.familyName
       phone: intlPhone
     $http.post "#{listUrl}/contact", requestData
       .success (data, status) ->

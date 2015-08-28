@@ -5,24 +5,28 @@ User = ($http, $q, $resource, apiRoot) ->
       id: user.id
       email: user.email
       name: user.name
-      first_name: user.firstName
-      last_name: user.lastName
       username: user.username
       image_url: user.imageUrl
     if user.location?
       data.location =
         type: 'Point'
         coordinates: [user.location.lat, user.location.long]
+    if user.firstName?
+      data.first_name = user.firstName
+    if user.lastName?
+      data.last_name = user.lastName
     data
   deserializeUser = (data) ->
     user =
       id: data.id
       email: data.email
       name: data.name
-      firstName: data.first_name
-      lastName: data.last_name
       username: data.username
       imageUrl: data.image_url
+    if data.first_name?
+      user.firstName = data.first_name
+    if data.last_name?
+      user.lastName = data.last_name
     if data.location?
       user.location =
         lat: data.location.coordinates[0]
