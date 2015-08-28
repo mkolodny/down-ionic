@@ -225,11 +225,12 @@ describe 'verify phone controller', ->
         beforeEach ->
           spyOn $state, 'go'
 
-          deferred.reject {status: 400}
+          deferred.reject 'MISSING_SOCIAL_ACCOUNT'
           scope.$apply()
 
         it 'should send user to sync with facebook', ->
           expect($state.go).toHaveBeenCalledWith 'facebookSync'
+
 
       describe 'other error', ->
         beforeEach ->

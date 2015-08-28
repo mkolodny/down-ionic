@@ -44,7 +44,7 @@ class VerifyPhoneCtrl
         @Auth.setUser @Auth.user
         @Auth.redirectForAuthState()
       , (error) =>
-        if error?.status is 400
+        if error is 'MISSING_SOCIAL_ACCOUNT'
           @$state.go 'facebookSync'
         else
           @error = 'Oops, something went wrong.'

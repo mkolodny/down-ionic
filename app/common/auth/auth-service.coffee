@@ -56,9 +56,9 @@ class Auth
 
     @$http.post "#{@apiRoot}/social-account", {access_token: accessToken}
       .success (data, status) =>
-        @user.email = data.email
-        @user.name = data.name
-        @user.imageUrl = data.image_url
+        user = @User.deserialize data
+        angular.extend @user, user
+        @setUser @user
         deferred.resolve @user
       .error (data, status) ->
         deferred.reject status
@@ -158,6 +158,8 @@ class Auth
         @setUser @user
         deferred.resolve facebookFriends
       .error (data, status) =>
+        if status is 400
+          deferred.reject 'MISSING_SOCIAL_ACCOUNT'
         deferred.reject()
 
     {$promise: deferred.promise}

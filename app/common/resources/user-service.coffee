@@ -35,6 +35,9 @@ User = ($http, $q, $resource, apiRoot) ->
       user.authtoken = data.authtoken
     if data.friends?
       user.friends = (deserializeUser(friend) for friend in data.friends)
+    if data.facebook_friends?
+      user.facebookFriends = (deserializeUser(friend) \
+          for friend in data.facebook_friends)
     user
 
   resource = $resource "#{listUrl}/:id", null,

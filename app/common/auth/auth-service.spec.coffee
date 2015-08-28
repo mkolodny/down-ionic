@@ -231,10 +231,13 @@ describe 'Auth service', ->
       postData = access_token: accessToken
 
     describe 'on success', ->
+      friend = null
       responseData = null
       response = null
 
       beforeEach ->
+        spyOn Auth, 'setUser'
+
         Auth.user =
           id: 1
           location:
@@ -242,6 +245,12 @@ describe 'Auth service', ->
             long: -73.9821535
           authtoken: 'fdsa4321'
           firebaseToken: 'qwer6789'
+        friend =
+          id: 2
+          email: 'jclarke@gmail.com'
+          name: 'Joan Clarke'
+          username: 'jnasty'
+          image_url: 'https://facebook.com/profile-pics/jnasty'
         responseData =
           id: Auth.user.id
           email: 'aturing@gmail.com'
@@ -249,24 +258,35 @@ describe 'Auth service', ->
           image_url: 'https://facebook.com/profile-pic/tdog'
           location:
             type: 'Point'
-            coordinates: [Auth.user.lat, Auth.user.long]
+            coordinates: [Auth.user.location.lat, Auth.user.location.long]
+          facebook_friends: [friend]
         $httpBackend.expectPOST fbSyncUrl, postData
           .respond 201, responseData
+
+        deserializedUser =
+          id: responseData.id
+          email: responseData.email
+          name: responseData.name
+          imageUrl: responseData.image_url
+          location:
+            lat: responseData.location.coordinates[0]
+            long: responseData.location.coordinates[1]
+          facebookFriends: [friend]
+        User.deserialize.and.returnValue deserializedUser
 
         Auth.syncWithFacebook(accessToken).then (_response_) ->
           response = _response_
         $httpBackend.flush 1
 
       it 'should return the user', ->
-        expectedUserData = angular.extend
-          email: responseData.email
-          name: responseData.name
-          imageUrl: responseData.image_url
-        , Auth.user
-        expect(response).toAngularEqual expectedUserData
+        expect(response).toAngularEqual Auth.user
 
       it 'should update the logged in user', ->
-        expect(Auth.user).toBe response
+        expectedUserData = angular.extend {}, Auth.user, deserializedUser
+        expect(Auth.user).toEqual expectedUserData
+
+      it 'should save the user in local storage', ->
+        expect(Auth.setUser).toHaveBeenCalledWith Auth.user
 
 
     describe 'on error', ->
@@ -758,7 +778,7 @@ describe 'Auth service', ->
         expect(Auth.setUser).toHaveBeenCalledWith user
 
 
-    describe 'unsuccessfully', ->
+    describe 'with a random error', ->
       rejected = null
 
       beforeEach ->
@@ -773,3 +793,19 @@ describe 'Auth service', ->
 
       it 'should reject the promise', ->
         expect(rejected).toBe true
+
+
+    describe 'with a missing social account error', ->
+      error = null
+
+      beforeEach ->
+        $httpBackend.expectGET url
+          .respond 400, ''
+
+        Auth.getFacebookFriends()
+          .$promise.then null, (_error_) ->
+            error = _error_
+        $httpBackend.flush 1
+
+      it 'should reject the promise', ->
+        expect(error).toBe 'MISSING_SOCIAL_ACCOUNT'
