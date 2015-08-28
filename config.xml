@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="linfootco.Down" version="2.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="linfootco.Down.dev" version="2.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>Down.</name>
   <description>
-        Emphemeral group chats for events.
-    </description>
+    Emphemeral group chats for events.
+  </description>
   <author email="contact@down.life" href="http://down.life/">
-      Down. Inc.
-    </author>
+    Down. Inc.
+  </author>
   <content src="index.html"/>
   <access origin="*"/>
   <preference name="webviewbounce" value="false"/>
