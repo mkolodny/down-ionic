@@ -98,6 +98,8 @@ class EventCtrl
         text: notificationText
       ,
         text: 'Send To..'
+      ,
+        text: 'Report'
       ]
       cancelText: 'Cancel'
       buttonClicked: (index) =>
@@ -108,6 +110,8 @@ class EventCtrl
           @$state.go 'inviteFriends',
             event: @event
             members: @members
+          hideSheet()
+        if index is 2
           hideSheet()
 
     hideSheet = @$ionicActionSheet.show options
