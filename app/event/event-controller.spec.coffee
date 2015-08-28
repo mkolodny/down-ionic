@@ -172,7 +172,7 @@ describe 'event controller', ->
     expect(ctrl.Messages).toBe Messages
 
   it 'should ask for the messages for the event', ->
-    expect(Messages.reactiveQuery).toHaveBeenCalledWith {eventId: event.id}
+    expect(Messages.reactiveQuery).toHaveBeenCalledWith {eventId: "#{event.id}"}
 
   it 'should set the messages reactive query on the controller', ->
     expect(ctrl.messagesRQ).toBe messagesRQ

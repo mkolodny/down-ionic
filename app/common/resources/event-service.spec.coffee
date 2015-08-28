@@ -226,13 +226,13 @@ describe 'event service', ->
       it 'should create a maybe action message', ->
         message =
           creator:
-            id: Auth.user.id
+            id: "#{Auth.user.id}" # meteor likes strings
             name: Auth.user.name
             firstName: Auth.user.firstName
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: "#{Auth.user.name} might be down"
-          eventId: responseData.id
+          eventId: "#{responseData.id}" # meteor likes strings
           type: Invitation.maybeAction
           createdAt:
             $date: new Date().getTime()
