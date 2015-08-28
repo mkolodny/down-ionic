@@ -12,12 +12,13 @@ class LoginCtrl
         '''
 
     @Auth.phone = @phone
-    @Auth.sendVerificationText(@phone).then =>
-      @Auth.redirectForAuthState()
-    , =>
-      @error = 'For some reason, that didn\'t work'
-    .finally =>
-      @$ionicLoading.hide()
+    @Auth.sendVerificationText @phone
+      .then =>
+        @Auth.redirectForAuthState()
+      , =>
+        @error = 'For some reason, that didn\'t work'
+      .finally =>
+        @$ionicLoading.hide()
 
   validate: ->
     @$scope.loginForm.$valid

@@ -15,6 +15,9 @@ intlPhone = ->
       phone
 
     model.$validators.validNumber = (modelValue, viewValue) ->
+      if modelValue is '+15555555555'
+        # Let the Apple test user through.
+        return true
       element.intlTelInput 'isValidNumber'
 
     return

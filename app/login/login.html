@@ -3,7 +3,7 @@
   <h1>Down.</h1>
   <form role="form" novalidate name="loginForm" >
     <input id="phone" intl-phone ng-model="login.phone" name="phone" required
-           ng-class="{'has-error': loginForm.$submitted && loginForm.phone.$invalid }">
+           ng-class="{'has-error': loginForm.$submitted && loginForm.phone.$invalid}">
     <div class="form-errors" ng-if="loginForm.$submitted">
       <div class="form-error" ng-if="loginForm.phone.$error.required">
         Please enter your phone number.
