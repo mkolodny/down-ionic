@@ -11,7 +11,7 @@ class EventCtrl
     # Get/subscribe to the messages posted in this event.
     @Asteroid.subscribe 'messages', @event.id
     @Messages = @Asteroid.getCollection 'messages'
-    @messagesRQ = @Messages.reactiveQuery {eventId: @event.id}
+    @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}" } # Meteor likes strings
     @messages = angular.copy @messagesRQ.result
 
     # Sort the messages from oldest to newest.

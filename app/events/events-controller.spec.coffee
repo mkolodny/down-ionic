@@ -565,7 +565,7 @@ describe 'events controller', ->
 
     it 'should ask for the messages for each event', ->
       for event in events
-        expect(messages.reactiveQuery).toHaveBeenCalledWith {eventId: event.id}
+        expect(messages.reactiveQuery).toHaveBeenCalledWith {eventId: "#{event.id}"}
 
     it 'should show each event\'s latest message on the event', ->
       expect(ctrl.setLatestMessage).toHaveBeenCalledWith event, messagesRQ.result

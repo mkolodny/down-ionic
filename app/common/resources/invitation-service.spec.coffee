@@ -344,13 +344,13 @@ describe 'invitation service', ->
         it 'should save the message on the meteor server', ->
           message =
             creator:
-              id: Auth.user.id
+              id: "#{Auth.user.id}"
               name: Auth.user.name
               firstName: Auth.user.firstName
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} is down"
-            eventId: invitation.eventId
+            eventId: "#{invitation.eventId}"
             type: Invitation.acceptAction
             createdAt:
               $date: date.getTime()
@@ -378,13 +378,13 @@ describe 'invitation service', ->
         it 'should save the message on the meteor server', ->
           message =
             creator:
-              id: Auth.user.id
+              id: "#{Auth.user.id}"
               name: Auth.user.name
               firstName: Auth.user.firstName
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} might be down"
-            eventId: invitation.eventId
+            eventId: "#{invitation.eventId}"
             type: Invitation.maybeAction
             createdAt:
               $date: date.getTime()
@@ -412,13 +412,13 @@ describe 'invitation service', ->
         it 'should save the message on the meteor server', ->
           message =
             creator:
-              id: Auth.user.id
+              id: "#{Auth.user.id}"
               name: Auth.user.name
               firstName: Auth.user.firstName
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} can\'t make it"
-            eventId: invitation.eventId
+            eventId: "#{invitation.eventId}"
             type: Invitation.declineAction
             createdAt:
               $date: date.getTime()

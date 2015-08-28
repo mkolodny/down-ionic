@@ -127,13 +127,13 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
       Messages = Asteroid.getCollection 'messages'
       Messages.insert
         creator:
-          id: Auth.user.id
+          id: "#{Auth.user.id}" # Meteor likes strings
           name: Auth.user.name
           firstName: Auth.user.firstName
           lastName: Auth.user.lastName
           imageUrl: Auth.user.imageUrl
         text: text
-        eventId: _invitation.eventId
+        eventId: "#{_invitation.eventId}" # Meteor likes strings
         type: type
         createdAt:
           $date: new Date().getTime()
