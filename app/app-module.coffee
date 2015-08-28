@@ -1,6 +1,9 @@
 require 'angular'
-require 'angular-ui-router'
+require 'angular-animate' # for ngToast
 require 'angular-local-storage'
+require 'angular-sanitize' # for ngToast
+require 'angular-ui-router'
+require 'ng-toast'
 require 'ng-cordova'
 require './ionic/ionic-core.js'
 require './ionic/ionic-deploy.js'
@@ -28,6 +31,7 @@ angular.module 'down', [
     'ionic.service.core'
     'ionic.service.deploy'
     'ngCordova'
+    'ngToast'
     'down.auth'
     'down.login'
     'down.verifyPhone'
@@ -48,7 +52,8 @@ angular.module 'down', [
     'down.friends'
     'LocalStorageModule'
   ]
-  .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider) ->
+  .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider,
+           ngToastProvider) ->
     acceptHeader = 'application/json; version=1.2'
     $httpProvider.defaults.headers.common['Accept'] = acceptHeader
     $httpProvider.interceptors.push ($injector) ->
@@ -65,8 +70,16 @@ angular.module 'down', [
     # Show no text by default on the back button.
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
+
+    # Toasts
+    ngToastProvider.configure
+      horizontalPosition: 'center'
+      animation: 'slide'
+      maxNumber: 1
+      dismissButton: true
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
-        $ionicPlatform, $rootScope, $window, Auth, localStorageService) ->
+        $ionicPlatform, ngToast, $rootScope, $window, Auth,
+        localStorageService) ->
     # Check local storage for currentUser and currentPhone
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
@@ -77,9 +90,8 @@ angular.module 'down', [
     # Listen for notifications.
     $rootScope.$on '$cordovaPush:notificationReceived', (event, notification) ->
       if notification.alert
-        # TODO: Use https://github.com/jirikavi/AngularJS-Toaster to show a
-        #   notification.
-        null
+        ngToast.create
+          content: notification.alert
 
       if notification.sound
         sound = new Media(event.sound)

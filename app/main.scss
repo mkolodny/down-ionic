@@ -259,3 +259,27 @@ Global Sass
     color: $brand-color;
   }
 }
+
+// Alerts
+.ng-toast {
+  position: absolute;
+  width: 100%;
+  margin-top: 15px;
+  z-index: 12;
+}
+.alert {
+  background-color: $brand-color;
+  color: #fff;
+  padding: 15px;
+}
+.close {
+  position: relative;
+  top: -5px;
+  right: -21px;
+  color: #fff;
+  float: right;
+  font-weight: bold;
+  font-size: 21px;
+  background: transparent;
+  border: 0;
+}
