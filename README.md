@@ -46,8 +46,13 @@ Add to iOS Info.plist to allow deep linking with Branch:
     <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-            <string>down</string> <-----
+            <!-- Production -->
+            <string>down</string>
             <string>fb1466791860252976</string>
+
+            <!-- Staging -->
+            <string>down.dev</string>
+            <string>fb864552050271610</string>
         </array>
     </dict>
 </array>
