@@ -560,6 +560,8 @@ describe 'event controller', ->
             text: 'Mute Notifications'
           ,
             text: 'Send To..'
+          ,
+            text: 'Report'
           ]
           cancelText: 'Cancel'
           buttonClicked: jasmine.any Function
@@ -592,6 +594,8 @@ describe 'event controller', ->
             text: 'Turn On Notifications'
           ,
             text: 'Send To..'
+          ,
+            text: 'Report'
           ]
           cancelText: 'Cancel'
           buttonClicked: jasmine.any Function
