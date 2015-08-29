@@ -11,7 +11,8 @@ class EventCtrl
     # Get/subscribe to the messages posted in this event.
     @Asteroid.subscribe 'messages', @event.id
     @Messages = @Asteroid.getCollection 'messages'
-    @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}" } # Meteor likes strings
+    # Meteor likes strings
+    @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}"}
     @messages = angular.copy @messagesRQ.result
 
     # Sort the messages from oldest to newest.
@@ -20,10 +21,6 @@ class EventCtrl
     # Start out at the most recent message.
     @$scope.$on '$ionicView.enter', =>
       @$ionicScrollDelegate.scrollBottom true
-
-      # Update the last viewed time.
-      @invitation.lastViewed = new Date()
-      @Invitation.update @invitation
 
     # Watch for new messages.
     @messagesRQ.on 'change', =>

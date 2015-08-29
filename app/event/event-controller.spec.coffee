@@ -86,7 +86,6 @@ describe 'event controller', ->
       response: Invitation.Accepted
       previouslyAccepted: false
       muted: false
-      lastViewed: new Date()
       createdAt: new Date()
       updatedAt: new Date()
     $stateParams.invitation = invitation
@@ -190,18 +189,11 @@ describe 'event controller', ->
 
     beforeEach ->
       spyOn $ionicScrollDelegate, 'scrollBottom'
-      spyOn Invitation, 'update'
 
       scope.$emit '$ionicView.enter'
 
     it 'should scroll to the bottom of the view', ->
       expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
-
-    it 'should update the last viewed time', ->
-      expect(invitation.lastViewed).toEqual currentDate
-
-    it 'should update the invitation', ->
-      expect(Invitation.update).toHaveBeenCalledWith invitation
 
 
   describe 'when new messages get posted', ->
