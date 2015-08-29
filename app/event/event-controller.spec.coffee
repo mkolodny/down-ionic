@@ -531,10 +531,7 @@ describe 'event controller', ->
         buttonClickedCallback 1
 
       it 'should go to the invite friends view', ->
-        stateParams =
-          event: ctrl.event
-          members: ctrl.members
-        expect($state.go).toHaveBeenCalledWith 'inviteFriends', stateParams
+        expect($state.go).toHaveBeenCalledWith 'inviteFriends', {event: ctrl.event}
 
       it 'should hide the action sheet', ->
         expect(hideSheet).toHaveBeenCalled()
