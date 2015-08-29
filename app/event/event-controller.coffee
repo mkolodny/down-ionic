@@ -80,7 +80,7 @@ class EventCtrl
     message.type in actions
 
   isMyMessage: (message) ->
-    message.creator.id is @Auth.user.id
+    message.creator.id is "#{@Auth.user.id}" # Meteor likes strings
 
   sendMessage: ->
     @Event.sendMessage @event, @message

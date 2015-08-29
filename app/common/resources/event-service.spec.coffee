@@ -305,13 +305,13 @@ describe 'event service', ->
       it 'should save the message in the meteor server', ->
         message =
           creator:
-            id: Auth.user.id
+            id: "#{Auth.user.id}"
             name: Auth.user.name
             firstName: Auth.user.firstName
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: text
-          eventId: event.id
+          eventId: "#{event.id}"
           type: 'text'
           createdAt:
             $date: new Date().getTime()

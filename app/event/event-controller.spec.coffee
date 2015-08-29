@@ -481,7 +481,7 @@ describe 'event controller', ->
     describe 'when it is', ->
 
       beforeEach ->
-        message.creator.id = Auth.user.id
+        message.creator.id = "#{Auth.user.id}" # Meteor likes strings
 
       it 'should return true', ->
         expect(ctrl.isMyMessage message).toBe true
@@ -490,7 +490,7 @@ describe 'event controller', ->
     describe 'when it isn\'t', ->
 
       beforeEach ->
-        message.creator.id = Auth.user.id + 1
+        message.creator.id = "#{Auth.user.id + 1}" # Meteor likes strings
 
       it 'should return false', ->
         expect(ctrl.isMyMessage message).toBe false
