@@ -33,8 +33,8 @@
          <h2>{{item.friend.name}}</h2>
          <i class="icon fa"
             ng-class="{
-              'fa-square-o': !item.friend.isSelected && !item.friend.isMember,
-              'fa-check-square': item.friend.isSelected || item.friend.isMember
+              'fa-square-o': !item.friend.isSelected && !item.friend.isInvited,
+              'fa-check-square': item.friend.isSelected || item.friend.isInvited
             }"
             ></i>
        </div>
