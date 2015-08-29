@@ -400,3 +400,42 @@ describe 'event service', ->
 
       it 'should return the percentage', ->
         expect(result).toBe 50
+
+
+  describe 'getting invited ids', ->
+    event = null
+    url = null
+
+    beforeEach ->
+      event =
+        id: 1
+      url = "#{listUrl}/#{event.id}/invited-ids"
+
+    describe 'when successful', ->
+
+      it 'should resolve the promise with user ids', ->
+        invitedIds = [1, 2, 3]
+
+        $httpBackend.expectGET url
+          .respond 200, invitedIds
+
+        result = null
+        Event.getInvitedIds(event).then (_result_) ->
+          result = _result_
+        $httpBackend.flush 1
+
+        expect(result).toEqual invitedIds
+
+
+    describe 'when error', ->
+
+      it 'should reject the promise', ->
+        $httpBackend.expectGET url
+          .respond 400
+
+        rejected = null
+        Event.getInvitedIds(event).then null, ->
+          rejected = true
+        $httpBackend.flush 1
+
+        expect(rejected).toBe true

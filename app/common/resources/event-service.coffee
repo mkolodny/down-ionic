@@ -118,6 +118,17 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
 
     (timeRemaining / eventDuration) * 100
 
+  resource.getInvitedIds = (event) ->
+    deferred = $q.defer()
+
+    $http.get "#{listUrl}/#{event.id}/invited-ids"
+      .success (data, status) -> 
+        deferred.resolve data
+      .error (data, status) ->
+        deferred.reject()
+
+    deferred.promise
+
   resource
 
 module.exports = Event
