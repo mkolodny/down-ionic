@@ -106,6 +106,7 @@ class EventCtrl
         if index is 1
           @$state.go 'inviteFriends',
             event: @event
+            memberIds: (member.id for member in @members)
           hideSheet()
         if index is 2
           hideSheet()

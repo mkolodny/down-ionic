@@ -2,6 +2,7 @@ class InviteFriendsCtrl
   constructor: (@$ionicHistory, @$ionicLoading, @$state, @$stateParams,
                  @Auth, @Event, @Invitation) ->
     @event = @$stateParams.event
+    @memberIds = @$stateParams.memberIds or []
     @selectedFriends = []
     @selectedFriendIds = {}
     @invitedIds = []
@@ -13,7 +14,9 @@ class InviteFriendsCtrl
           <ion-spinner icon="bubbles"></ion-spinner>
         '''
       @Event.getInvitedIds(@event).then (invitedIds) =>
-        @invitedIds = invitedIds
+        # Member ids are for friends that were invited by another
+        #   friend and have already responded down or maybe
+        @invitedIds = invitedIds.concat @memberIds
         @buildItems()
       .finally =>
         @$ionicLoading.hide()

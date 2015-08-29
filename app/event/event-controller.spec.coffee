@@ -526,12 +526,18 @@ describe 'event controller', ->
     describe 'tapping Send To.. button', ->
 
       beforeEach ->
+        ctrl.members = [
+          id: 1
+        ]
         spyOn $state, 'go'
         ctrl.showMoreOptions()
         buttonClickedCallback 1
 
       it 'should go to the invite friends view', ->
-        expect($state.go).toHaveBeenCalledWith 'inviteFriends', {event: ctrl.event}
+        stateParams =
+          event: ctrl.event
+          memberIds: (member.id for member in ctrl.members)
+        expect($state.go).toHaveBeenCalledWith 'inviteFriends', stateParams
 
       it 'should hide the action sheet', ->
         expect(hideSheet).toHaveBeenCalled()

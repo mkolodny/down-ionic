@@ -129,6 +129,7 @@ describe 'invite friends controller', ->
   # Inviting users to existing event
   describe 'when event has an id', ->
     deferred = null
+    memberIds = null
 
     beforeEach ->
       # Mock event with id
@@ -146,6 +147,9 @@ describe 'invite friends controller', ->
           long: -73.9919324
       $stateParams.event = event
 
+      memberIds = [999]
+      $stateParams.memberIds = memberIds
+
       deferred = $q.defer()
       spyOn(Event, 'getInvitedIds').and.returnValue deferred.promise
 
@@ -156,6 +160,9 @@ describe 'invite friends controller', ->
         $scope: scope
         Auth: Auth
         $stateParams: $stateParams
+
+    it 'should set the member ids on the controller', ->
+      expect(ctrl.memberIds).toEqual memberIds
 
     it 'should get invited ids', ->
       expect(Event.getInvitedIds).toHaveBeenCalledWith event
@@ -182,8 +189,8 @@ describe 'invite friends controller', ->
         it 'should hide the loading indicator', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
-        it 'should set invited ids on controller', ->
-          expect(ctrl.invitedIds).toEqual invitedIds
+        it 'should set invited ids merged with memberIds on controller', ->
+          expect(ctrl.invitedIds).toEqual invitedIds.concat memberIds
 
         it 'should call build items', ->
           expect(ctrl.buildItems).toHaveBeenCalled()
