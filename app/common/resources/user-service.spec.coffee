@@ -166,7 +166,8 @@ describe 'user service', ->
           location:
             lat: response.location.coordinates[0]
             long: response.location.coordinates[1]
-          friends: [expectedFriend]
+          friends: 
+            2: expectedFriend
           facebookFriends: [expectedFriend]
         expect(User.deserialize response).toEqual expectedUser
 
