@@ -25,9 +25,8 @@ userFriendshipButtonDirective = (Auth, Friendship) ->
       if Auth.isFriend user.id
         Friendship.deleteWithFriendId user.id
           .$promise.then ->
-            # Remove the user from the current user's array of friends.
-            Auth.user.friends = (friend for friend in Auth.user.friends \
-                when friend.id isnt user.id)
+            # Remove the user from the current user's dictionary of friends.
+            delete Auth.user.friends[user.id]
             Auth.setUser Auth.user
           .finally ->
             $scope.isLoading = false
@@ -37,7 +36,7 @@ userFriendshipButtonDirective = (Auth, Friendship) ->
           friendId: user.id
         Friendship.save friendship
           .$promise.then ->
-            Auth.user.friends.push user
+            Auth.user.friends[user.id] = user
             Auth.setUser Auth.user
           .finally ->
             $scope.isLoading = false

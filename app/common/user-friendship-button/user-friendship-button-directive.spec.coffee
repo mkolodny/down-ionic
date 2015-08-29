@@ -50,8 +50,9 @@ describe 'user friendship button directive', ->
 
     beforeEach ->
       Auth.isFriend.and.returnValue true
-      Auth.user.friends = [scope.friend]
-
+      Auth.user.friends = {}
+      Auth.user.friends[scope.friend.id] = scope.friend
+    
       $compile(element) scope
       scope.$digest()
 
@@ -95,7 +96,7 @@ describe 'user friendship button directive', ->
           expect(icon).toHaveClass 'fa-plus-square-o'
 
         it 'should remove the friend from the user\'s friends', ->
-          expect(Auth.user.friends).toEqual []
+          expect(Auth.user.friends).toEqual {}
 
         it 'should set the user on auth', ->
           expect(Auth.setUser).toHaveBeenCalledWith Auth.user
@@ -116,7 +117,7 @@ describe 'user friendship button directive', ->
 
     beforeEach ->
       Auth.isFriend.and.returnValue false
-      Auth.user.friends = []
+      Auth.user.friends = {}
 
       $compile(element) scope
       scope.$digest()
@@ -163,7 +164,7 @@ describe 'user friendship button directive', ->
           expect(icon).toHaveClass 'fa-check-square'
 
         it 'should add the friend to the user\'s friends', ->
-          expect(Auth.user.friends).toEqual [scope.friend]
+          expect(Auth.user.friends[scope.friend.id]).toEqual scope.friend
 
         it 'should set the user on auth', ->
           expect(Auth.setUser).toHaveBeenCalledWith Auth.user
