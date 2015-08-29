@@ -7,6 +7,7 @@ require 'angular-ui-router'
 require '../ionic/ionic-angular.js'
 require 'ng-cordova'
 require '../common/asteroid/asteroid-module'
+require '../common/auth/auth-module'
 require './events-module'
 EventsCtrl = require './events-controller'
 
@@ -21,6 +22,7 @@ describe 'events controller', ->
   $timeout = null
   $window = null
   Asteroid = null
+  Auth = null
   ctrl = null
   deferredGetInvitations = null
   deferredTemplate = null
@@ -39,6 +41,8 @@ describe 'events controller', ->
   beforeEach angular.mock.module('ui.router')
 
   beforeEach angular.mock.module('down.asteroid')
+
+  beforeEach angular.mock.module('down.auth')
 
   beforeEach angular.mock.module('down.events')
 
@@ -59,6 +63,7 @@ describe 'events controller', ->
     $timeout = $injector.get '$timeout'
     $window = $injector.get '$window'
     Asteroid = $injector.get 'Asteroid'
+    Auth = angular.copy $injector.get 'Auth'
     dividerHeight = $injector.get 'dividerHeight'
     Event = $injector.get 'Event'
     eventHeight = $injector.get 'eventHeight'
@@ -121,6 +126,7 @@ describe 'events controller', ->
 
     ctrl = $controller EventsCtrl,
       $scope: scope
+      Auth: Auth
   )
 
   it 'should init a new event', ->
@@ -709,6 +715,7 @@ describe 'events controller', ->
       ctrl.items = [item]
 
       spyOn ctrl, 'moveItem'
+      spyOn(ctrl, 'isUnreadMessage').and.returnValue true
 
     describe 'when the latest message is a text', ->
 
@@ -716,11 +723,16 @@ describe 'events controller', ->
         textMessage.createdAt.$date = later.getTime()
         actionMessage.createdAt.$date = earlier.getTime()
 
+
         ctrl.setLatestMessage event, messages
 
       it 'should set the most recent message on the event', ->
         message = "#{textMessage.creator.firstName}: #{textMessage.text}"
-        expect(event.latestMessage).toBe message
+        expect(event.latestMessageText).toBe message
+
+      it 'should set unread or read for latest message', ->
+        expect(event.latestMessageIsUnread).toBe true
+        expect(ctrl.isUnreadMessage).toHaveBeenCalledWith textMessage
 
       it 'should update the event\'s updatedAt time', ->
         expect(event.updatedAt).toEqual new Date(textMessage.createdAt.$date)
@@ -738,16 +750,73 @@ describe 'events controller', ->
         ctrl.setLatestMessage event, messages
 
       it 'should set the most recent message on the event', ->
-        expect(event.latestMessage).toBe actionMessage.text
+        expect(event.latestMessageText).toBe actionMessage.text
 
       it 'should update the event\'s updatedAt time', ->
         expect(event.updatedAt).toEqual new Date(actionMessage.createdAt.$date)
+
+      it 'should set unread or read for latest message', ->
+        expect(event.latestMessageIsUnread).toBe true
+        expect(ctrl.isUnreadMessage).toHaveBeenCalledWith actionMessage
 
 
     describe 'when messages is an empty array', ->
 
       it 'should return null', ->
         expect(ctrl.setLatestMessage event, []).toBeUndefined()
+
+
+  describe 'checking is a message is unread', ->
+    message = null
+    eventsRQ = null
+
+    beforeEach ->
+      Auth.user =
+        id: 1
+      message =
+        createdAt:
+          $date: 10
+
+      eventsRQ =
+        result: 'eventsRQ.result'
+      events =
+        reactiveQuery: jasmine.createSpy('events.reactiveQuery') \
+            .and.returnValue eventsRQ
+      spyOn(Asteroid, 'getCollection').and.returnValue events
+
+    describe 'when the message is unread', ->
+      response = null
+
+      beforeEach ->
+        event =
+          members: [
+            userId: 1
+            lastRead:
+              $date: 1
+          ]
+        eventsRQ.result = [event]
+
+        response = ctrl.isUnreadMessage message
+
+      it 'should return true', ->
+        expect(response).toBe true
+
+    describe 'when the message has been read', ->
+      response = null
+
+      beforeEach ->
+        event =
+          members: [
+            userId: 1
+            lastRead:
+              $date: 100
+          ]
+        eventsRQ.result = [event]
+
+        response = ctrl.isUnreadMessage message
+
+      it 'should return false', ->
+        expect(response).toBe false
 
 
   describe 'responding to an invitation', ->

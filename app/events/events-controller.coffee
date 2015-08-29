@@ -1,7 +1,7 @@
 class EventsCtrl
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicModal, @$scope, @$state,
                 @$timeout, @$window, @Asteroid, @dividerHeight, @eventHeight,
-                @Invitation, @transitionDuration) ->
+                @Invitation, @transitionDuration, @Auth) ->
     # Save the section titles.
     @sections = {}
     @sections[@Invitation.noResponse] =
@@ -195,13 +195,16 @@ class EventsCtrl
       else
         return 1
 
-    # Set the latest message on the event.
+    # Set the latest message text on the event.
     latestMessage = messages[0]
     if latestMessage.type is 'text'
       firstName = latestMessage.creator.firstName
-      event.latestMessage = "#{firstName}: #{latestMessage.text}"
+      event.latestMessageText = "#{firstName}: #{latestMessage.text}"
     else
-      event.latestMessage = latestMessage.text
+      event.latestMessageText = latestMessage.text
+
+    # Set unread or not for message
+    event.latestMessageIsUnread = @isUnreadMessage latestMessage
 
     # Only update the event if the latest message is newer than the updatedAt.
     if latestMessage.createdAt.$date <= event.updatedAt.getTime()
@@ -215,6 +218,21 @@ class EventsCtrl
     for item in @items
       if item.invitation?.event.id is event.id
         @moveItem item, @invitations
+
+  isUnreadMessage: (message) ->
+    Events = @Asteroid.getCollection 'events'
+    eventsRQ = Events.reactiveQuery {_id: message.eventId}
+    event = eventsRQ.result[0]
+    # Have to check if event exists in case the 
+    # subscribe hasn't returned the event yet
+    if event?
+      member = (member for member in event.members \
+        when member.userId is @Auth.user.id)
+      lastRead = member[0].lastRead
+
+      if lastRead.$date < message.createdAt.$date
+        return true
+    return false
 
   moveItem: (item, invitations) ->
     # TODO: If none of the items are going to move, just return.
