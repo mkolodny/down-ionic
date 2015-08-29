@@ -151,7 +151,7 @@ class Auth
   getFacebookFriends: ->
     deferred = @$q.defer()
 
-    @$http.get "#{@User.listUrl}/facebook_friends"
+    @$http.get "#{@User.listUrl}/facebook-friends"
       .success (data, status) =>
         facebookFriends = (@User.deserialize(user) for user in data)
         @user.facebookFriends = facebookFriends

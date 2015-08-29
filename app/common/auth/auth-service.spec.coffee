@@ -740,7 +740,7 @@ describe 'Auth service', ->
     url = null
 
     beforeEach ->
-      url = "#{User.listUrl}/facebook_friends"
+      url = "#{User.listUrl}/facebook-friends"
 
     describe 'successfully', ->
       response = null
