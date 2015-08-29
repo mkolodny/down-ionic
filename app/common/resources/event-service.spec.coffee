@@ -430,6 +430,7 @@ describe 'event service', ->
     describe 'when error', ->
 
       it 'should reject the promise', ->
+        # TODO : Is this the right status code?
         $httpBackend.expectGET url
           .respond 400
 
