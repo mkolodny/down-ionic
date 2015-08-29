@@ -1,6 +1,6 @@
 class InviteFriendsCtrl
-  constructor: (@$ionicHistory, @$state, @$stateParams, @Auth, @Event,
-                @Invitation) ->
+  constructor: (@$ionicHistory, @$ionicLoading, @$state, @$stateParams,
+                 @Auth, @Event, @Invitation) ->
     @event = @$stateParams.event
     @selectedFriends = []
     @selectedFriendIds = {}
@@ -8,9 +8,15 @@ class InviteFriendsCtrl
 
     if @event.id?
       # Inviting to an existing event
+      @$ionicLoading.show
+        template: '''
+          <ion-spinner icon="bubbles"></ion-spinner>
+        '''
       @Event.getInvitedIds(@event).then (invitedIds) =>
         @invitedIds = invitedIds
         @buildItems()
+      .finally =>
+        @$ionicLoading.hide()
     else
       # Creating a new event
       @$ionicHistory.nextViewOptions

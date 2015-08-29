@@ -11,6 +11,7 @@ InviteFriendsCtrl = require './invite-friends-controller'
 describe 'invite friends controller', ->
   $controller = null
   $ionicHistory = null
+  $ionicLoading = null
   $q = null
   $state = null
   $stateParams = null
@@ -32,6 +33,7 @@ describe 'invite friends controller', ->
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $ionicHistory = $injector.get '$ionicHistory'
+    $ionicLoading = $injector.get '$ionicLoading'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
@@ -147,6 +149,9 @@ describe 'invite friends controller', ->
       deferred = $q.defer()
       spyOn(Event, 'getInvitedIds').and.returnValue deferred.promise
 
+      spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
+
       ctrl = $controller InviteFriendsCtrl,
         $scope: scope
         Auth: Auth
@@ -154,6 +159,13 @@ describe 'invite friends controller', ->
 
     it 'should get invited ids', ->
       expect(Event.getInvitedIds).toHaveBeenCalledWith event
+
+    it 'should show a loading indicator', ->
+      ionicShowOptions =
+        template: '''
+          <ion-spinner icon="bubbles"></ion-spinner>
+        '''
+      expect($ionicLoading.show).toHaveBeenCalledWith ionicShowOptions
 
     describe 'getting invited ids', ->
 
@@ -167,6 +179,9 @@ describe 'invite friends controller', ->
           deferred.resolve invitedIds
           scope.$apply()
 
+        it 'should hide the loading indicator', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
         it 'should set invited ids on controller', ->
           expect(ctrl.invitedIds).toEqual invitedIds
 
@@ -179,7 +194,14 @@ describe 'invite friends controller', ->
 
       describe 'when there is an error', ->
 
+        beforeEach ->
+          deferred.reject()
+          scope.$apply()
+
         xit 'should show an error', ->
+
+        it 'should hide the loading indicator', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
   describe 'getting the array of nearby friends', ->
