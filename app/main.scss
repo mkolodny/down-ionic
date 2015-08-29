@@ -118,7 +118,8 @@ Global Sass
 .placeholder {
   text-align: center;
   color: $brand-color;
-  margin: 124px auto 0;
+  margin: auto;
+  padding-top: 124px;
   max-width: 216px;
 }
 
