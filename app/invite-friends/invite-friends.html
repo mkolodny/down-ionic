@@ -24,7 +24,13 @@
      </ion-item>
      <ion-item collection-repeat="item in inviteFriends.items"
                ng-click="inviteFriends.toggleIsSelected(item.friend)"
-               ng-class="{selected: item.friend.isSelected, 'item-divider': item.isDivider, 'item-icon-right': !item.isDivider, 'last': $last}"
+               ng-class="{
+                selected: item.friend.isSelected,
+                'item-divider': item.isDivider,
+                'item-icon-right': !item.isDivider,
+                'last': $last,
+                disabled: item.friend.isInvited
+              }"
                item-height="item.isDivider ? '35px' : '43px'">
        <div class="divider" ng-if="item.isDivider">
          {{item.title}}
@@ -34,7 +40,8 @@
          <i class="icon fa"
             ng-class="{
               'fa-square-o': !item.friend.isSelected && !item.friend.isInvited,
-              'fa-check-square': item.friend.isSelected || item.friend.isInvited
+              'fa-check-square': item.friend.isSelected || item.friend.isInvited,
+              disabled: item.friend.isInvited
             }"
             ></i>
        </div>
