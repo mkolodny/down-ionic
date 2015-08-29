@@ -98,7 +98,6 @@ describe 'invitation service', ->
           response: Invitation.accepted
           previouslyAccepted: false
           muted: false
-          lastViewed: new Date()
 
       it 'should return the serialized invitation', ->
         expectedInvitation =
@@ -109,7 +108,6 @@ describe 'invitation service', ->
           response: invitation.response
           previously_accepted: invitation.previouslyAccepted
           muted: invitation.muted
-          last_viewed: invitation.lastViewed.toISOString()
         expect(Invitation.serialize invitation).toEqual expectedInvitation
 
 

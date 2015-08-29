@@ -14,8 +14,6 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
     for serializedField, deserializedField of optionalFields
       if invitation[deserializedField]?
         request[serializedField] = invitation[deserializedField]
-    if invitation.lastViewed?
-      request.last_viewed = invitation.lastViewed.toISOString()
     request
   deserializeInvitation = (response) ->
     invitation =
@@ -25,7 +23,6 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
       muted: response.muted
       createdAt: new Date(response.created_at)
       updatedAt: new Date(response.updated_at)
-      lastViewed: new Date(response.last_viewed)
 
     # Always set a `<relation>Id` attribute on the invitation. If the relation is
     # an object, also set the relation on the invitation.
