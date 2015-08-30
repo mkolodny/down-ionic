@@ -74,25 +74,17 @@ describe 'verify phone controller', ->
 
         beforeEach ->
           spyOn ctrl, 'meteorLogin'
-
-          user = {}
-
           spyOn Auth, 'setPhone'
 
+          user = {}
           deferred.resolve user
           scope.$apply()
-
-        # Don't use Auth.setUser so that use is not
-        # saved to localstorage until after meteor
-        # successfully authenticates
-        it 'should set auth on the user', ->
-          expect(Auth.user).toBe user
 
         it 'should set the phone to store in localStorage', ->
           expect(Auth.setPhone).toHaveBeenCalledWith Auth.phone
 
         it 'should login to the meteor server', ->
-          expect(ctrl.meteorLogin).toHaveBeenCalled()
+          expect(ctrl.meteorLogin).toHaveBeenCalledWith user
 
         it 'should show the loading indicator', ->
           template = '''
@@ -155,12 +147,16 @@ describe 'verify phone controller', ->
 
   describe 'logging into the meteor server', ->
     deferred = null
+    user = null
 
     beforeEach ->
       deferred = $q.defer()
       spyOn(Asteroid, 'login').and.returnValue deferred.promise
 
-      ctrl.meteorLogin()
+      user =
+        id: 1
+        email: 'aturing@gmail.com'
+      ctrl.meteorLogin user
 
     it 'should attempt to login', ->
       expect(Asteroid.login).toHaveBeenCalled()
@@ -169,12 +165,35 @@ describe 'verify phone controller', ->
 
       beforeEach ->
         spyOn ctrl, 'getFacebookFriends'
+        spyOn Auth, 'setUser'
 
-        deferred.resolve()
-        scope.$apply()
+      describe 'when the user doesn\'t have a social account yet', ->
 
-      it 'should redirect for the auth state', ->
-        expect(ctrl.getFacebookFriends).toHaveBeenCalled()
+        beforeEach ->
+          delete user.email
+          spyOn $state, 'go'
+
+          deferred.resolve()
+          scope.$apply()
+
+        it 'should save the user', ->
+          expect(Auth.setUser).toHaveBeenCalledWith user
+
+        it 'should go to the sync with facebook view', ->
+          expect($state.go).toHaveBeenCalledWith 'facebookSync'
+
+
+      describe 'when the user has a social account', ->
+
+        beforeEach ->
+          deferred.resolve()
+          scope.$apply()
+
+        it 'should save the user', ->
+          expect(Auth.setUser).toHaveBeenCalledWith user
+
+        it 'should get the user\'s facebook friends', ->
+          expect(ctrl.getFacebookFriends).toHaveBeenCalled()
 
 
     describe 'unsuccessfully', ->
