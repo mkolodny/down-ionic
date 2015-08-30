@@ -30,6 +30,10 @@ class EventCtrl
         @$scope.$digest()
       if @maxTop is @$ionicScrollDelegate.getScrollPosition().top
         @$ionicScrollDelegate.scrollBottom true
+      # Mark newest message as read
+      newestMessage = @messages[@messages.length - 1]
+      if @isUnreadMessage newestMessage
+        @Asteroid.call 'readMessage', newestMessage.id
 
     @Invitation.getEventInvitations {id: @event.id}
       .$promise.then (invitations) =>
@@ -123,5 +127,20 @@ class EventCtrl
         @invitation.muted = not @invitation.muted
       .finally =>
         @$ionicLoading.hide()
+
+  isUnreadMessage: (message) ->
+    Events = @Asteroid.getCollection 'events'
+    eventsRQ = Events.reactiveQuery {_id: message.eventId}
+    event = eventsRQ.result[0]
+    # Have to check if event exists in case the 
+    # subscribe hasn't returned the event yet
+    if event?
+      member = (member for member in event.members \
+        when member.userId is @Auth.user.id)
+      lastRead = member[0].lastRead
+
+      if lastRead.$date > message.createdAt.$date
+        return false
+    return true
 
 module.exports = EventCtrl
