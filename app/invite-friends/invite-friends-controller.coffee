@@ -128,7 +128,7 @@ class InviteFriendsCtrl
     invitations = (@Invitation.serialize {toUserId: friend.id} \
         for friend in @selectedFriends)
 
-    # NOTE : if event is not null, bulk create invitations
+    # TODO : if event has an id, bulk create invitations
 
     # Create the user's invitation.
     invitations.push @Invitation.serialize
