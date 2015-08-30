@@ -32,7 +32,8 @@ describe 'add from facebook controller', ->
       location:
         lat: 40.7265834
         long: -73.9821535
-    Auth.user.facebookFriends = [friend]
+    Auth.user.facebookFriends = {}
+    Auth.user.facebookFriends[friend.id] = friend
 
     ctrl = $controller AddFromFacebookCtrl,
       $scope: scope
@@ -76,8 +77,9 @@ describe 'add from facebook controller', ->
       newFacebookFriends = null
 
       beforeEach ->
-        Auth.user.facebookFriends.push
-          id: 3
+        userId = 3
+        Auth.user.facebookFriends[userId] =
+          id: userId
           email: 'jclarke@gmail.com'
           name: 'Joan Clarke'
           username: 'jnasty'

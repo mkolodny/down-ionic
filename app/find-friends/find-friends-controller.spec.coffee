@@ -56,7 +56,8 @@ describe 'find friends controller', ->
       name: 'Chris Pleb'
       username: 'm'
       imageUrl: 'thatImage.com'
-    Auth.user.facebookFriends = [facebookFriend]
+    Auth.user.facebookFriends = {}
+    Auth.user.facebookFriends[facebookFriend.id] = facebookFriend
 
     ctrl = $controller FindFriendsCtrl,
       $scope: scope

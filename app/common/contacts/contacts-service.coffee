@@ -18,9 +18,7 @@ class Contacts
       ]
     @$cordovaContacts.find options
       .then (contactsArray) =>
-        console.log 1
         for contact in contactsArray
-          console.log contact.phoneNumbers
           contact.phoneNumbers = @filterNumbers contact.phoneNumbers
           contact.phoneNumbers = @formatNumbers contact.phoneNumbers
         contactsArray = @filterContacts contactsArray

@@ -153,10 +153,12 @@ class Auth
 
     @$http.get "#{@User.listUrl}/facebook-friends"
       .success (data, status) =>
-        facebookFriends = (@User.deserialize(user) for user in data)
-        @user.facebookFriends = facebookFriends
+        facebookFriendsArray = (@User.deserialize(user) for user in data)
+        @user.facebookFriends = {}
+        for friend in facebookFriendsArray
+          @user.facebookFriends[friend.id] = friend
         @setUser @user
-        deferred.resolve facebookFriends
+        deferred.resolve @user.facebookFriends
       .error (data, status) =>
         if status is 400
           deferred.reject 'MISSING_SOCIAL_ACCOUNT'

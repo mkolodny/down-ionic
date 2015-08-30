@@ -32,7 +32,8 @@ class FindFriendsCtrl
 
     # Merge the user's facebook friends with the user's contacts who are Down
     #   users.
-    users = facebookFriends.concat users
+    facebookFriendsArray = (friend for id, friend of facebookFriends)
+    users = facebookFriendsArray.concat users
 
     items = []
 
