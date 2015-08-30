@@ -104,7 +104,7 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
 
   resource::getPercentRemaining = ->
     currentDate = new Date()
-    twentyFourHrsAgo = new Date()
+    twentyFourHrsAgo = angular.copy currentDate
     twentyFourHrsAgo.setDate currentDate.getDate()-1
     oneDay = currentDate - twentyFourHrsAgo
 

@@ -12,10 +12,10 @@ class FindFriendsCtrl
           <ion-spinner icon="bubbles"></ion-spinner>
           '''
 
-      @Contacts.getContacts().then null, =>
-        @contactsRequestError = true
-      , (contacts) =>
+      @Contacts.getContacts().then (contacts) =>
         @items = @buildItems @Auth.user.facebookFriends, contacts
+      , =>
+        @contactsRequestError = true
       .finally =>
         @isLoading = false
         @$ionicLoading.hide()
