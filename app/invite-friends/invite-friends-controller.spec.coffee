@@ -168,11 +168,7 @@ describe 'invite friends controller', ->
       expect(Event.getInvitedIds).toHaveBeenCalledWith event
 
     it 'should show a loading indicator', ->
-      ionicShowOptions =
-        template: '''
-          <ion-spinner icon="bubbles"></ion-spinner>
-        '''
-      expect($ionicLoading.show).toHaveBeenCalledWith ionicShowOptions
+      expect($ionicLoading.show).toHaveBeenCalled()
 
     describe 'getting invited ids', ->
 
@@ -415,6 +411,9 @@ describe 'invite friends controller', ->
       spyOn($ionicHistory, 'clearCache').and.returnValue \
           deferredCacheClear.promise
 
+      spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
+
     describe 'when inviting to an existing event', ->
       deferredBulkCreate = null
 
@@ -425,6 +424,9 @@ describe 'invite friends controller', ->
         ctrl.event.id = 1 # event id used to determine if new or existing
 
         ctrl.sendInvitations()
+
+      it 'should show a loading spinner', ->
+        expect($ionicLoading.show).toHaveBeenCalled()
 
       it 'should bulk create invitations', ->
         invitations = (Invitation.serialize {toUserId: friend.id} \
@@ -451,6 +453,8 @@ describe 'invite friends controller', ->
           it 'should go back to the event', ->
             expect($ionicHistory.goBack).toHaveBeenCalled()
 
+          it 'should hide the loading indicator', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
 
       describe 'unsuccessfully', ->
 
@@ -460,6 +464,9 @@ describe 'invite friends controller', ->
 
         it 'should show an error', ->
           expect(ctrl.inviteError).toBe true
+
+        it 'should hide the loading indicator', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
     describe 'when creating a new event', ->
@@ -474,6 +481,9 @@ describe 'invite friends controller', ->
         newEvent = angular.copy event
 
         ctrl.sendInvitations()
+
+      it 'should show a loading spinner', ->
+        expect($ionicLoading.show).toHaveBeenCalled()
 
       it 'should save the event', ->
         # Friend invitations
@@ -506,6 +516,9 @@ describe 'invite friends controller', ->
             # TODO: Go to the events view before the save finishes.
             expect($state.go).toHaveBeenCalledWith 'events'
 
+          it 'should hide the loading indicator', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
+
 
       describe 'unsuccessfully', ->
 
@@ -515,6 +528,9 @@ describe 'invite friends controller', ->
 
         it 'should show an error', ->
           expect(ctrl.inviteError).toBe true
+
+        it 'should hide the loading indicator', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
   describe 'adding friends', ->

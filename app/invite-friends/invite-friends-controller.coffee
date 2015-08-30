@@ -128,6 +128,11 @@ class InviteFriendsCtrl
     invitations = (@Invitation.serialize {toUserId: friend.id} \
         for friend in @selectedFriends)
 
+    @$ionicLoading.show
+      template: '''
+        <ion-spinner icon="bubbles"></ion-spinner>
+      '''
+
     if @event.id?
       # Invite to existing event
       @Invitation.bulkCreate invitations
@@ -137,6 +142,8 @@ class InviteFriendsCtrl
           @$ionicHistory.goBack()
         , =>
           @inviteError = true
+        .finally =>
+          @$ionicLoading.hide()
     else
       # Create new event
       # Create the user's invitation.
@@ -151,6 +158,8 @@ class InviteFriendsCtrl
           @$state.go 'events'
         , =>
           @inviteError = true
+        .finally =>
+          @$ionicLoading.hide()
 
   addFriends: ->
     @$state.go 'addFriends'
