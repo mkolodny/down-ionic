@@ -698,6 +698,11 @@ describe 'event controller', ->
         it 'should reset the invitation', ->
           expect(ctrl.invitation.muted).toBe true
 
+
+  # TODO : create messages resource
+  #   Test will fail because Asteroid.getCollection is already 
+  #   being spied on in the contstrutor. Tests copied 
+  #   from events-controller.spec
   xdescribe 'checking is a message is unread', ->
     message = null
     eventsRQ = null
