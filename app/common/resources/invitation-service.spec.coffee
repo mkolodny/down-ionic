@@ -98,7 +98,6 @@ describe 'invitation service', ->
           response: Invitation.accepted
           previouslyAccepted: false
           muted: false
-          lastViewed: new Date()
 
       it 'should return the serialized invitation', ->
         expectedInvitation =
@@ -109,7 +108,6 @@ describe 'invitation service', ->
           response: invitation.response
           previously_accepted: invitation.previouslyAccepted
           muted: invitation.muted
-          last_viewed: invitation.lastViewed.toISOString()
         expect(Invitation.serialize invitation).toEqual expectedInvitation
 
 
@@ -175,7 +173,6 @@ describe 'invitation service', ->
         muted: response.muted
         createdAt: new Date(response.created_at)
         updatedAt: new Date(response.updated_at)
-        lastViewed: new Date(response.last_viewed)
 
     describe 'when the relations are ids', ->
 
@@ -268,7 +265,6 @@ describe 'invitation service', ->
       responseData = angular.extend {}, putData,
         created_at: new Date()
         updated_at: new Date()
-        last_viewed: new Date()
       url = "#{listUrl}/#{invitation.id}"
       $httpBackend.expectPUT url, putData
         .respond 201, angular.toJson(responseData)
@@ -282,7 +278,6 @@ describe 'invitation service', ->
       expectedInvitation = angular.extend {}, invitation,
         createdAt: responseData.created_at
         updatedAt: responseData.updated_at
-        lastViewed: responseData.last_viewed
       expect(response).toAngularEqual expectedInvitation
 
 

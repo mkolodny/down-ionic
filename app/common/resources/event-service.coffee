@@ -86,13 +86,13 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
     Messages = Asteroid.getCollection 'messages'
     Messages.insert
       creator:
-        id: Auth.user.id
+        id: "#{Auth.user.id}" # Meteor likes strings
         name: Auth.user.name
         firstName: Auth.user.firstName
         lastName: Auth.user.lastName
         imageUrl: Auth.user.imageUrl
       text: text
-      eventId: event.id
+      eventId: "#{event.id}" # Meteor likes strings
       type: 'text'
       createdAt:
         $date: new Date().getTime()
@@ -117,6 +117,17 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
       timeRemaining = @createdAt - twentyFourHrsAgo
 
     (timeRemaining / eventDuration) * 100
+
+  resource.getInvitedIds = (event) ->
+    deferred = $q.defer()
+
+    $http.get "#{listUrl}/#{event.id}/invited-ids"
+      .success (data, status) -> 
+        deferred.resolve data
+      .error (data, status) ->
+        deferred.reject()
+
+    deferred.promise
 
   resource
 

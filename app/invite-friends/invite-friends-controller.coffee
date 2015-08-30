@@ -1,15 +1,36 @@
 class InviteFriendsCtrl
-  constructor: (@$ionicHistory, @$state, @$stateParams, @Auth, @Event,
-                @Invitation) ->
+  constructor: (@$ionicHistory, @$ionicLoading, @$state, @$stateParams,
+                 @Auth, @Event, @Invitation) ->
+    @event = @$stateParams.event
+    @memberIds = @$stateParams.memberIds or []
+    @selectedFriends = []
+    @selectedFriendIds = {}
+    @invitedIds = []
+
+    if @event.id?
+      # Inviting to an existing event
+      @$ionicLoading.show
+        template: '''
+          <ion-spinner icon="bubbles"></ion-spinner>
+        '''
+      @Event.getInvitedIds(@event).then (invitedIds) =>
+        # Member ids are for friends that were invited by another
+        #   friend and have already responded down or maybe
+        @invitedIds = invitedIds.concat @memberIds
+        @buildItems()
+      .finally =>
+        @$ionicLoading.hide()
+    else
+      # Creating a new event
+      @$ionicHistory.nextViewOptions
+        disableAnimate: true
+      @buildItems()
+
+  buildItems: ->
     # Make a copy of the user's friends so that when the user selects the friend in
     #   one section, they get selected in every section.
     # TODO: Handle when the user's friends aren't set on auth yet.
     friends = angular.copy @Auth.user.friends
-
-    @event = @$stateParams.event
-    @members = @$stateParams.members or []
-    @selectedFriends = []
-    @selectedFriendIds = {}
 
     # Build the list of alphabetically sorted nearby friends.
     @nearbyFriends = (friend for id, friend of friends when @Auth.isNearby(friend))
@@ -19,9 +40,11 @@ class InviteFriendsCtrl
       else
         return 1
 
-    # Set isMember for all friends who are already members of the event
-    for friend in @members
-      friends[friend.id].isMember = true if friends[friend.id]?
+    # Set isInvited for all friends who are already members of the event
+    for userId in @invitedIds
+      friend = friends[userId]
+      if friend?
+        friend.isInvited = true
 
     # Build the list of alphabetically sorted items.
     friends = (friend for id, friend of friends)
@@ -56,10 +79,6 @@ class InviteFriendsCtrl
     for item in alphabeticalItems
       @items.push item
 
-    # Don't animate the transition back when creating an event.
-    if @event is null
-      @$ionicHistory.nextViewOptions
-        disableAnimate: true
 
   toggleIsSelected: (friend) ->
     if not friend.isSelected
@@ -79,16 +98,16 @@ class InviteFriendsCtrl
         @deselectFriend friend
 
   selectFriend: (friend) ->
-    # Ignore if friend in @members
-    if friend.isMember then return null
+    # Ignore if friend in @invitedIds
+    if friend.isInvited then return null
 
     friend.isSelected = true
     @selectedFriends.push friend
     @selectedFriendIds[friend.id] = true
 
   deselectFriend: (friend) ->
-    # Ignore if friend in @members
-    if friend.isMember then return null
+    # Ignore if friend in @invitedIds
+    if friend.isInvited then return null
 
     # Deselect the all nearby friends toggle if the friend is nearby.
     if @isAllNearbyFriendsSelected

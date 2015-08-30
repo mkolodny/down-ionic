@@ -481,7 +481,7 @@ describe 'event controller', ->
     describe 'when it is', ->
 
       beforeEach ->
-        message.creator.id = Auth.user.id
+        message.creator.id = "#{Auth.user.id}" # Meteor likes strings
 
       it 'should return true', ->
         expect(ctrl.isMyMessage message).toBe true
@@ -490,7 +490,7 @@ describe 'event controller', ->
     describe 'when it isn\'t', ->
 
       beforeEach ->
-        message.creator.id = Auth.user.id + 1
+        message.creator.id = "#{Auth.user.id + 1}" # Meteor likes strings
 
       it 'should return false', ->
         expect(ctrl.isMyMessage message).toBe false
@@ -526,6 +526,9 @@ describe 'event controller', ->
     describe 'tapping Send To.. button', ->
 
       beforeEach ->
+        ctrl.members = [
+          id: 1
+        ]
         spyOn $state, 'go'
         ctrl.showMoreOptions()
         buttonClickedCallback 1
@@ -533,7 +536,7 @@ describe 'event controller', ->
       it 'should go to the invite friends view', ->
         stateParams =
           event: ctrl.event
-          members: ctrl.members
+          memberIds: (member.id for member in ctrl.members)
         expect($state.go).toHaveBeenCalledWith 'inviteFriends', stateParams
 
       it 'should hide the action sheet', ->

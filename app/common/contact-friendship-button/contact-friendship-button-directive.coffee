@@ -22,7 +22,7 @@ contactFriendshipButtonDirective = (Auth, UserPhone) ->
 
           # Save the friend in local storage.
           friend = data.userphone.user
-          Auth.user.friends.push friend
+          Auth.user.friends[friend.id] = friend
           Auth.setUser Auth.user
         , ->
           $scope.isLoading = false

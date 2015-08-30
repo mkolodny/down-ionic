@@ -29,17 +29,7 @@ angular.module 'down.inviteFriends', [
         ###
         event: null
         ###
-        members: [
-          email: "jayybob16@aol.com"
-          friends: Object
-          id: 87
-          imageUrl: "https://graph.facebook.com/v2.2/4776901015485/picture"
-          location: Object
-          name: "Michael Kolodny"
-          username: "m"
-        ,
-          ...
-        ]
+        memberIds: [1, 2, 3] Array of user ids
         ###
-        members: null
+        memberIds: null
   .controller 'InviteFriendsCtrl', InviteFriendsCtrl

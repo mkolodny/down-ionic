@@ -11,6 +11,7 @@ InviteFriendsCtrl = require './invite-friends-controller'
 describe 'invite friends controller', ->
   $controller = null
   $ionicHistory = null
+  $ionicLoading = null
   $q = null
   $state = null
   $stateParams = null
@@ -32,6 +33,7 @@ describe 'invite friends controller', ->
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $ionicHistory = $injector.get '$ionicHistory'
+    $ionicLoading = $injector.get '$ionicLoading'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
@@ -84,7 +86,6 @@ describe 'invite friends controller', ->
 
     # Mock the event being created.
     event =
-      id: 1
       title: 'bars?!?!!?'
       creator: 2
       canceled: false
@@ -114,43 +115,100 @@ describe 'invite friends controller', ->
   it 'should init the dictionary of selected friend ids', ->
     expect(ctrl.selectedFriendIds).toEqual {}
 
+  it 'should init the array of invited ids', ->
+    expect(ctrl.invitedIds).toEqual []
+
   it 'should set the event on the controller', ->
     expect(ctrl.event).toBe event
 
-  describe 'when event is null', ->
+  it 'should disable animating the transition to the next view', ->
+    options = {disableAnimate: true}
+    expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+
+
+  # Inviting users to existing event
+  describe 'when event has an id', ->
+    deferred = null
+    memberIds = null
 
     beforeEach ->
-      $stateParams.event = null
+      # Mock event with id
+      event =
+        id: 1
+        title: 'bars?!?!!?'
+        creator: 2
+        canceled: false
+        datetime: new Date()
+        createdAt: new Date()
+        updatedAt: new Date()
+        place:
+          name: 'B Bar & Grill'
+          lat: 40.7270718
+          long: -73.9919324
+      $stateParams.event = event
+
+      memberIds = [999]
+      $stateParams.memberIds = memberIds
+
+      deferred = $q.defer()
+      spyOn(Event, 'getInvitedIds').and.returnValue deferred.promise
+
+      spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
+
       ctrl = $controller InviteFriendsCtrl,
         $scope: scope
         Auth: Auth
         $stateParams: $stateParams
 
-    it 'should disable animating the transition to the next view', ->
-      options = {disableAnimate: true}
-      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+    it 'should set the member ids on the controller', ->
+      expect(ctrl.memberIds).toEqual memberIds
 
+    it 'should get invited ids', ->
+      expect(Event.getInvitedIds).toHaveBeenCalledWith event
 
-  describe 'when event has members', ->
-    members = null
+    it 'should show a loading indicator', ->
+      ionicShowOptions =
+        template: '''
+          <ion-spinner icon="bubbles"></ion-spinner>
+        '''
+      expect($ionicLoading.show).toHaveBeenCalledWith ionicShowOptions
 
-    beforeEach ->
-      # Set friend with id 2 as a member
-      members = [
-        id: 2
-      ]
-      $stateParams.members = members
-      ctrl = $controller InviteFriendsCtrl,
-        $scope: scope
-        Auth: Auth
-        $stateParams: $stateParams
+    describe 'getting invited ids', ->
 
-    it 'should set the members on the controller', ->
-      expect(ctrl.members).toBe members
+      describe 'when successful', ->
+        invitedIds = null
 
-    it 'should flag any friend that is a member of the event', ->
-      # Index 1 is friend number 2 after sorting
-      expect(ctrl.nearbyFriends[1].isMember).toBe true
+        beforeEach ->
+          spyOn(ctrl, 'buildItems').and.callThrough()
+
+          invitedIds = [2]
+          deferred.resolve invitedIds
+          scope.$apply()
+
+        it 'should hide the loading indicator', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
+        it 'should set invited ids merged with memberIds on controller', ->
+          expect(ctrl.invitedIds).toEqual invitedIds.concat memberIds
+
+        it 'should call build items', ->
+          expect(ctrl.buildItems).toHaveBeenCalled()
+
+        it 'should flag any friend that is a member of the event', ->
+          # Index 1 is friend with id=2 after sorting
+          expect(ctrl.nearbyFriends[1].isInvited).toBe true
+
+      describe 'when there is an error', ->
+
+        beforeEach ->
+          deferred.reject()
+          scope.$apply()
+
+        xit 'should show an error', ->
+
+        it 'should hide the loading indicator', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
   describe 'getting the array of nearby friends', ->
@@ -281,7 +339,7 @@ describe 'invite friends controller', ->
     describe 'when friend is in members', ->
 
       beforeEach ->
-        friend.isMember = true
+        friend.isInvited = true
 
       it 'should return null', ->
         expect(ctrl.selectFriend friend).toBeNull()
@@ -312,7 +370,7 @@ describe 'invite friends controller', ->
     describe 'when friend is in members', ->
 
       beforeEach ->
-        friend.isMember = true
+        friend.isInvited = true
 
       it 'should return null', ->
         expect(ctrl.deselectFriend friend).toBeNull()
