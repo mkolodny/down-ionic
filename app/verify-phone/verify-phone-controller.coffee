@@ -31,6 +31,7 @@ class VerifyPhoneCtrl
     @$scope.verifyPhoneForm.$valid
 
   meteorLogin: ->
+    # TODO: Pass the user into this function and persist the auth user.
     @Asteroid.login().then =>
       @getFacebookFriends()
     , =>
@@ -38,8 +39,8 @@ class VerifyPhoneCtrl
 
   getFacebookFriends: ->
     @Auth.getFacebookFriends()
-      .$promise.then (friends) =>
-        @Auth.user.facebookFriends = friends
+      .$promise.then (facebookFriends) =>
+        @Auth.user.facebookFriends = facebookFriends
         # To persist to localstorage
         @Auth.setUser @Auth.user
         @Auth.redirectForAuthState()

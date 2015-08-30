@@ -7,7 +7,8 @@ class AddFromFacebookCtrl
       @isLoading = true
       @refresh()
 
-  showFacebookFriends: (facebookFriends) ->
+  showFacebookFriends: (facebookFriendsDict) ->
+    facebookFriends = (friend for id, friend of facebookFriendsDict)
     facebookFriends.sort (a, b) ->
       if a.name.toLowerCase() < b.name.toLowerCase()
         return -1

@@ -38,7 +38,7 @@ describe 'add from address book controller', ->
         long: -73.9821535
     contacts =
       1:
-        name: 
+        name:
           formatted: 'Bruce Lee'
         phoneNumbers: [
           type: 'home'
@@ -47,7 +47,7 @@ describe 'add from address book controller', ->
         ]
       2:
         user: user
-        name: 
+        name:
           formatted: 'Alan Turing'
         phoneNumbers: [
           type: 'mobile'
@@ -130,9 +130,6 @@ describe 'add from address book controller', ->
     refreshComplete = null
 
     beforeEach ->
-      # Reset the contacts saved on the controller.
-      ctrl.facebookFriends = []
-
       # Listen to the refresh complete event to check whether we've broadcasted
       # the event.
       refreshComplete = false
@@ -154,7 +151,7 @@ describe 'add from address book controller', ->
       beforeEach ->
         newContacts = angular.copy contacts
         newContacts[3] =
-          name: 
+          name:
             formatted: 'Marie Curie'
           phoneNumbers: [
             type: 'home'

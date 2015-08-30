@@ -155,6 +155,10 @@ describe 'user service', ->
           location:
             lat: friend.location.coordinates[0]
             long: friend.location.coordinates[1]
+        friends = {}
+        friends[expectedFriend.id] = expectedFriend
+        facebookFriends = {}
+        facebookFriends[expectedFriend.id] = expectedFriend
         expectedUser =
           id: response.id
           email: response.email
@@ -166,9 +170,8 @@ describe 'user service', ->
           location:
             lat: response.location.coordinates[0]
             long: response.location.coordinates[1]
-          friends: 
-            2: expectedFriend
-          facebookFriends: [expectedFriend]
+          friends: friends
+          facebookFriends: facebookFriends
         expect(User.deserialize response).toEqual expectedUser
 
 

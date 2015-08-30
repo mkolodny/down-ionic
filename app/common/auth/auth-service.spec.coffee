@@ -71,7 +71,11 @@ describe 'Auth service', ->
 
     beforeEach ->
       Auth.user =
-        facebookFriends: ['Jim', 'Bob']
+        facebookFriends:
+          2:
+            id: 2
+          3:
+            id: 3
       user =
         id: 1
       expectedUser = angular.extend({}, Auth.user, user)
@@ -263,6 +267,8 @@ describe 'Auth service', ->
         $httpBackend.expectPOST fbSyncUrl, postData
           .respond 201, responseData
 
+        facebookFriends = {}
+        facebookFriends[friend.id] = friend
         deserializedUser =
           id: responseData.id
           email: responseData.email
@@ -271,7 +277,7 @@ describe 'Auth service', ->
           location:
             lat: responseData.location.coordinates[0]
             long: responseData.location.coordinates[1]
-          facebookFriends: [friend]
+          facebookFriends: facebookFriends
         User.deserialize.and.returnValue deserializedUser
 
         Auth.syncWithFacebook(accessToken).then (_response_) ->
@@ -769,12 +775,16 @@ describe 'Auth service', ->
         $httpBackend.flush 1
 
       it 'should GET the users', ->
-        expectedUsers = [User.deserialize responseData[0]]
-        expect(response).toAngularEqual expectedUsers
+        friend = User.deserialize responseData[0]
+        facebookFriends = {}
+        facebookFriends[friend.id] = friend
+        expect(response).toAngularEqual facebookFriends
 
       it 'should save the friends on the user', ->
         user = angular.copy Auth.user
-        user.facebookFriends = [User.deserialize responseData[0]]
+        friend = User.deserialize responseData[0]
+        user.facebookFriends = {}
+        user.facebookFriends[friend.id] = friend
         expect(Auth.setUser).toHaveBeenCalledWith user
 
 

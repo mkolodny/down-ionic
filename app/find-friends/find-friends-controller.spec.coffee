@@ -56,7 +56,8 @@ describe 'find friends controller', ->
       name: 'Chris Pleb'
       username: 'm'
       imageUrl: 'thatImage.com'
-    Auth.user.facebookFriends = [facebookFriend]
+    Auth.user.facebookFriends = {}
+    Auth.user.facebookFriends[facebookFriend.id] = facebookFriend
 
     ctrl = $controller FindFriendsCtrl,
       $scope: scope
@@ -89,7 +90,7 @@ describe 'find friends controller', ->
 
     describe 'when get contacts returns', ->
 
-      describe 'partially', ->
+      describe 'successfully', ->
         contacts = null
         items = null
 
@@ -117,7 +118,7 @@ describe 'find friends controller', ->
 
           contacts =
             1234: contact
-          contactsDeferred.notify contacts
+          contactsDeferred.resolve contacts
           scope.$apply()
 
         it 'should build the items list', ->
@@ -126,13 +127,6 @@ describe 'find friends controller', ->
 
         it 'should set the items on the controller', ->
           expect(ctrl.items).toBe items
-
-
-      describe 'completely', ->
-
-        beforeEach ->
-          contactsDeferred.resolve()
-          scope.$apply()
 
         it 'should stop the loading indicator', ->
           expect(ctrl.isLoading).toBe false

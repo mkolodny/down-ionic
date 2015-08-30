@@ -50,20 +50,17 @@ describe 'Contacts service', ->
 
   describe 'getting contacts', ->
     cordovaDeferred = null
-    resolved = false
+    response = null
     error = null
-    notification = null
 
     beforeEach ->
       cordovaDeferred = $q.defer()
       $cordovaContacts.find.and.returnValue cordovaDeferred.promise
 
-      Contacts.getContacts().then ->
-        resolved = true
+      Contacts.getContacts().then (_response_) ->
+        response = _response_
       , (_error_) ->
         error = _error_
-      , (_notification_) ->
-        notification = _notification_
 
     it 'should get contacts name and phone numbers', ->
       options =
@@ -76,7 +73,7 @@ describe 'Contacts service', ->
         ]
       expect($cordovaContacts.find).toHaveBeenCalledWith options
 
-    describe 'then contacts are read successfully', ->
+    describe 'when contacts are read successfully', ->
       contact = null
       contactId = null
       contacts = null
@@ -96,8 +93,9 @@ describe 'Contacts service', ->
         contacts = [contact]
         contactsDict = Contacts.contactArrayToDict contacts
 
-        spyOn Contacts, 'saveContacts'
         spyOn(Contacts, 'filterContacts').and.returnValue contacts
+        spyOn(Contacts, 'filterNumbers').and.returnValue phoneNumbers
+        spyOn(Contacts, 'formatNumbers').and.returnValue phoneNumbers
 
         identifyDeferred = $q.defer()
         spyOn(Contacts, 'identifyContacts').and.returnValue \
@@ -109,23 +107,21 @@ describe 'Contacts service', ->
       it 'should filter contacts', ->
         expect(Contacts.filterContacts).toHaveBeenCalledWith contacts
 
+      it 'should filter numbers', ->
+        expect(Contacts.filterNumbers).toHaveBeenCalledWith phoneNumbers
+
+      it 'should format numbers', ->
+        expect(Contacts.formatNumbers).toHaveBeenCalledWith phoneNumbers
+
       it 'should identify contacts', ->
         expect(Contacts.identifyContacts).toHaveBeenCalledWith contactsDict
-
-      it 'should set hasRequestedContacts to true', ->
-        expect(localStorage.get 'hasRequestedContacts').toEqual true
-
-      it 'should send a notification with the contacts', ->
-        expect(notification).toEqual contactsDict
-
-      it 'should save the contacts', ->
-        expect(Contacts.saveContacts).toHaveBeenCalledWith contactsDict
 
       describe 'and contacts are identified successfully', ->
         contactsDict = null
 
         beforeEach ->
           contactsDict = {"#{contactId}": contact}
+          spyOn Contacts, 'saveContacts'
 
           # Since this method is called after we get the contacts from Cordova, we
           #   need to reset the spy.
@@ -141,11 +137,8 @@ describe 'Contacts service', ->
         it 'should save the contacts', ->
           expect(Contacts.saveContacts).toHaveBeenCalledWith contactsDict
 
-        it 'should send a notification with the contacts', ->
-          expect(notification).toEqual contactsDict
-
-        it 'should resolve the promise', ->
-          expect(resolved).toBe true
+        it 'should resolve the promise with the contacts', ->
+          expect(response).toEqual contactsDict
 
 
       describe 'identify error', ->
@@ -277,13 +270,15 @@ describe 'Contacts service', ->
       deferred = $q.defer()
       spyOn(UserPhone, 'getFromPhones').and.returnValue {$promise: deferred.promise}
 
-      contacts = [contact1, contact2]
-      contactsCopy = angular.copy contacts
+      contactsDict = {}
+      contactsDict[contact1.id] = contact1
+      contactsDict[contact2.id] = contact2
+      contactsDictCopy = angular.copy contactsDict
 
-      promise = Contacts.getContactUsers contactsCopy
+      promise = Contacts.getContactUsers contactsDictCopy
 
     it 'should check contacts to see if a users exist for every number', ->
-      allPhones = [phone1, phone2, phone3]
+      allPhones = [phone2, phone3, phone1]
       expect(UserPhone.getFromPhones).toHaveBeenCalledWith allPhones
 
     it 'should return a promise', ->
@@ -291,31 +286,9 @@ describe 'Contacts service', ->
 
 
   describe 'filtering contacts', ->
-    contacts = null
-    formattedContacts = null
-    contact1 = null
-
-    beforeEach ->
-      # Mock the user's phone number.
-      Auth.user =
-        phone: '+19178699626'
-
-    describe 'when a contact doesn\'t have phoneNumbers', ->
-      filteredContacts = null
-
-      beforeEach ->
-        contact =
-          name:
-            formatted: 'Jim Bob' # NOTE: formatted may not be an empty string,
-                          #   test on devices.
-          phoneNumbers: null
-        filteredContacts = Contacts.filterContacts [contact]
-
-      it 'should remove contacts with no names', ->
-        expect(filteredContacts).toEqual []
+    filteredContacts = null
 
     describe 'when a contact doesn\'t have a name', ->
-      filteredContacts = null
 
       beforeEach ->
         contact =
@@ -323,7 +296,7 @@ describe 'Contacts service', ->
             formatted: '' # NOTE: formatted may not be an empty string,
                           #   test on devices.
           phoneNumbers: [
-            value: '2036227310'
+            value: '+19252852230'
           ]
         filteredContacts = Contacts.filterContacts [contact]
 
@@ -331,31 +304,15 @@ describe 'Contacts service', ->
         expect(filteredContacts).toEqual []
 
 
-    describe 'when the phone number is invalid', ->
-      filteredContacts = null
+    describe 'when a contact has a name and phone numbers', ->
+      contacts = null
 
       beforeEach ->
         contact =
           name:
             formatted: 'Jimbo Walker'
           phoneNumbers: [
-            value: '203622731'
-          ]
-        filteredContacts = Contacts.filterContacts [contact]
-
-      it 'should remove the contact', ->
-        expect(filteredContacts).toEqual []
-
-
-    describe 'when a contact does have a name', ->
-      filteredContacts = null
-
-      beforeEach ->
-        contact =
-          name:
-            formatted: 'Jimbo Walker'
-          phoneNumbers: [
-            value: '2036227310'
+            value: '+19252852230'
           ]
         contacts = [contact]
         contactsCopy = angular.copy contacts
@@ -363,6 +320,84 @@ describe 'Contacts service', ->
 
       it 'should return contacts with names', ->
         expect(filteredContacts).toEqual contacts
+
+
+    describe 'when a contact has null phone numbers', ->
+
+      beforeEach ->
+        contact =
+          name:
+            formatted: 'Jimbo Walker'
+          phoneNumbers: null
+        filteredContacts = Contacts.filterContacts [contact]
+
+      it 'should remove contacts with null phone numbers', ->
+        expect(filteredContacts).toEqual []
+
+
+    describe 'when a contact has no phone numbers', ->
+
+      beforeEach ->
+        contact =
+          name:
+            formatted: 'Jimbo Walker'
+          phoneNumbers: []
+        filteredContacts = Contacts.filterContacts [contact]
+
+      it 'should remove contacts with no phone numbers', ->
+        expect(filteredContacts).toEqual []
+
+
+  describe 'filtering numbers', ->
+    phoneNumbers = null
+    filteredNumbers = null
+
+    describe 'with valid numbers', ->
+
+      beforeEach ->
+        phone =
+          value: '+19252852230'
+        phoneNumbers = [phone]
+        phoneNumbersCopy = angular.copy phoneNumbers
+        filteredNumbers = Contacts.filterNumbers phoneNumbersCopy
+
+      it 'should return the numbers', ->
+        expect(filteredNumbers).toEqual phoneNumbers
+
+
+    describe 'with invalid numbers', ->
+
+      beforeEach ->
+        phone =
+          value: ''
+        filteredNumbers = Contacts.filterNumbers [phone]
+
+      it 'should remove invalid numbers', ->
+        expect(filteredNumbers).toEqual []
+
+
+    describe 'with null numbers', ->
+
+      beforeEach ->
+        filteredNumbers = Contacts.filterNumbers null
+
+      it 'should return an empty array', ->
+        expect(filteredNumbers).toEqual []
+
+
+  describe 'formatting numbers', ->
+    phoneNumbers = null
+    formattedNumbers = null
+
+    beforeEach ->
+      phone =
+        value: '9252852230'
+      formattedNumbers = Contacts.formatNumbers [phone]
+
+    it 'should convert numbers to E164 format', ->
+      expectedPhoneFormat =
+        value: '+19252852230'
+      expect(formattedNumbers).toEqual [expectedPhoneFormat]
 
 
   describe 'saving contacts', ->

@@ -205,7 +205,11 @@ describe 'verify phone controller', ->
         spyOn(Auth, 'redirectForAuthState')
         spyOn(Auth, 'setUser')
 
-        friends = ['Jim', 'Bob']
+        friends =
+          1:
+            id: 1
+          2:
+            id: 2
         deferred.resolve friends
         scope.$apply()
 

@@ -17,23 +17,20 @@ class Contacts
         'phoneNumbers'
       ]
     @$cordovaContacts.find options
-      .then (contacts) =>
-        contacts = @filterContacts contacts
-        contacts = @contactArrayToDict contacts
-        @saveContacts contacts
-        @localStorage.set 'hasRequestedContacts', true
-        deferred.notify contacts
+      .then (contactsArray) =>
+        for contact in contactsArray
+          contact.phoneNumbers = @filterNumbers contact.phoneNumbers
+          contact.phoneNumbers = @formatNumbers contact.phoneNumbers
+        contactsArray = @filterContacts contactsArray
+        contactsDict = @contactArrayToDict contactsArray
 
-        @identifyContacts contacts
+        @identifyContacts contactsDict
       , (error) =>
         @localStorage.set 'hasRequestedContacts', true
         deferred.reject error
-      .then (contacts) =>
-        # The contacts were just identified. `contacts` is a dictionary with
-        #   contact ids mapped to Cordova contact objects.
-        @saveContacts contacts
-        deferred.notify contacts
-        deferred.resolve()
+      .then (contactsDict) =>
+        @saveContacts contactsDict
+        deferred.resolve contactsDict
       , ->
         error =
           code: 'IDENTIFY_FAILED'
@@ -63,22 +60,22 @@ class Contacts
    *                     }
   ###
   identifyContacts: (contacts) ->
-    # Create an dictionary in the format: {phone: contactId, ...}
-    contactsIdMap = {}
+    # Create a dictionary in the format: {phone: contactId, ...}
+    contactIdsDict = {}
     for id, contact of contacts
       for phoneNumber in contact.phoneNumbers
         phone = phoneNumber.value
-        contactsIdMap[phone] = contact.id
-    contactsIdMap
+        contactIdsDict[phone] = contact.id
 
     deferred = @$q.defer()
-    @getContactUsers(contacts).then (userPhones) =>
-      for userPhone in userPhones
-        contactId = contactsIdMap[userPhone.phone]
-        contacts[contactId].user = userPhone.user
-      deferred.resolve contacts
-    , ->
-      deferred.reject()
+    @getContactUsers contacts
+      .then (userPhones) =>
+        for userPhone in userPhones
+          contactId = contactIdsDict[userPhone.phone]
+          contacts[contactId].user = userPhone.user
+        deferred.resolve contacts
+      , ->
+        deferred.reject()
     deferred.promise
 
   contactArrayToDict: (contacts) ->
@@ -89,7 +86,7 @@ class Contacts
 
   getContactUsers: (contacts) ->
     phones = []
-    for contact in contacts
+    for id, contact of contacts
       for phoneNumber in contact.phoneNumbers
         phones.push phoneNumber.value
     @UserPhone.getFromPhones(phones).$promise
@@ -97,13 +94,27 @@ class Contacts
   filterContacts: (contacts) ->
     filteredContacts = []
     for contact in contacts
-      if contact.phoneNumbers is null then continue
-      phone = contact.phoneNumbers[0].value
-      countryCode = intlTelInputUtils.getCountryCode @Auth.phone
-      isValidNumber = intlTelInputUtils.isValidNumber phone, countryCode
-      if contact.name.formatted.length > 0 and isValidNumber
+      if contact.name.formatted and contact.phoneNumbers?.length > 0
         filteredContacts.push contact
     filteredContacts
+
+  filterNumbers: (numbers) ->
+    if numbers is null
+      return []
+
+    filteredNumbers = []
+    for number in numbers
+      if intlTelInputUtils.isValidNumber number.value
+        filteredNumbers.push number
+    filteredNumbers
+
+  formatNumbers: (numbers) ->
+    E164 = intlTelInputUtils.numberFormat.E164
+    countryCode = intlTelInputUtils.getCountryCode @Auth.phone
+    for number in numbers
+      number.value = intlTelInputUtils.formatNumberByType number.value,
+          countryCode, E164
+    return numbers
 
   saveContacts: (contacts) ->
     @localStorage.set 'contacts', contacts

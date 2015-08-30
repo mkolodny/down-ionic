@@ -12,10 +12,10 @@ class FindFriendsCtrl
           <ion-spinner icon="bubbles"></ion-spinner>
           '''
 
-      @Contacts.getContacts().then null, =>
-        @contactsRequestError = true
-      , (contacts) =>
+      @Contacts.getContacts().then (contacts) =>
         @items = @buildItems @Auth.user.facebookFriends, contacts
+      , =>
+        @contactsRequestError = true
       .finally =>
         @isLoading = false
         @$ionicLoading.hide()
@@ -32,7 +32,8 @@ class FindFriendsCtrl
 
     # Merge the user's facebook friends with the user's contacts who are Down
     #   users.
-    users = facebookFriends.concat users
+    facebookFriendsArray = (friend for id, friend of facebookFriends)
+    users = facebookFriendsArray.concat users
 
     items = []
 
