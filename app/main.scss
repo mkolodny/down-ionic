@@ -131,6 +131,12 @@ Global Sass
 #loading-contacts {
   max-width: none;
 }
+.loading {
+  .spinner {
+    stroke: #fff;
+    fill: #fff;
+  }
+}
 
 // Onboarding
 .onboard-view {
