@@ -89,36 +89,28 @@ class EventsCtrl
         items.push angular.extend
           isDivider: false
           wasJoined: false
-          wasUpdated: true
           invitation: invitation
 
     for response in [@Invitation.accepted, @Invitation.maybe]
       title = @sections[response].title
-      updatedInvitations = (invitation for id, invitation of invitations \
+      sectionInvitations = (invitation for id, invitation of invitations \
           when invitation.response is response)
-      oldInvitations = []
-      # TODO: Check whether the user has read the event's most recent message.
-      ###
-          and invitation.lastViewed < invitation.event.updatedAt)
-      oldInvitations = (invitation for id, invitation of invitations \
-          when invitation.response is response \
-          and invitation.lastViewed >= invitation.event.updatedAt)
-      ###
-      if updatedInvitations.length > 0 or oldInvitations.length > 0
+
+      # Sort by latestMessage time
+      sectionInvitations.sort (a, b) ->
+        if a.event.latestMessage?.createdAt > b.event.latestMessage?.createdAt
+          return -1
+        else
+          return 1
+
+      if sectionInvitations.length > 0
         items.push
           isDivider: true
           title: title
-        for invitation in updatedInvitations
+        for invitation in sectionInvitations
           items.push angular.extend
             isDivider: false
             wasJoined: true
-            wasUpdated: true
-            invitation: invitation
-        for invitation in oldInvitations
-          items.push angular.extend
-            isDivider: false
-            wasJoined: true
-            wasUpdated: false
             invitation: invitation
 
     declinedInvitations = (invitation for id, invitation of invitations \
@@ -131,7 +123,6 @@ class EventsCtrl
         items.push angular.extend
           isDivider: false
           wasJoined: false
-          wasUpdated: false
           invitation: invitation
 
     # Give every item a top and a right property to allow for transitions.
@@ -183,7 +174,7 @@ class EventsCtrl
     Messages = @Asteroid.getCollection 'messages'
     messagesRQ = Messages.reactiveQuery {_id: messageId}
     message = messagesRQ.result[0]
-    message.createdAt.$date > event.updatedAt.getTime()
+    message.createdAt.$date > event.latestMessage?.createdAt?.getTime()
 
   setLatestMessage: (event, messages) ->
     if messages.length is 0 then return
@@ -195,23 +186,25 @@ class EventsCtrl
       else
         return 1
 
-    # Set the latest message text on the event.
     latestMessage = messages[0]
-    if latestMessage.type is 'text'
-      firstName = latestMessage.creator.firstName
-      event.latestMessageText = "#{firstName}: #{latestMessage.text}"
-    else
-      event.latestMessageText = latestMessage.text
-
-    # Set unread or not for message
-    event.latestMessageIsUnread = @isUnreadMessage latestMessage
 
     # Only update the event if the latest message is newer than the updatedAt.
-    if latestMessage.createdAt.$date <= event.updatedAt.getTime()
+    if latestMessage.createdAt.$date <= event.latestMessage?.createdAt?.getTime()
       return
 
-    # Update the event's updatedAt date.
-    event.updatedAt = new Date(latestMessage.createdAt.$date)
+    # Update the latest message text
+    event.latestMessage = {}
+    if latestMessage.type is 'text'
+      firstName = latestMessage.creator.firstName
+      event.latestMessage.text = "#{firstName}: #{latestMessage.text}"
+    else
+      event.latestMessage.text = latestMessage.text
+
+    # Set unread or not for message
+    event.latestMessage.isUnread = @isUnreadMessage latestMessage
+
+    # Update the latest message createdAt date.
+    event.latestMessage.createdAt = new Date(latestMessage.createdAt.$date)
 
     # Move the event's updated item.
     item = null
@@ -227,12 +220,12 @@ class EventsCtrl
     # subscribe hasn't returned the event yet
     if event?
       member = (member for member in event.members \
-        when member.userId is @Auth.user.id)
-      lastRead = member[0].lastRead
+        when member.userId is "#{@Auth.user.id}")
 
-      if lastRead.$date < message.createdAt.$date
-        return true
-    return false
+      lastRead = member[0].lastRead
+      if lastRead.$date > message.createdAt.$date
+        return false
+    return true
 
   moveItem: (item, invitations) ->
     # TODO: If none of the items are going to move, just return.

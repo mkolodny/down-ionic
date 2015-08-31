@@ -108,7 +108,6 @@ describe 'events controller', ->
     item =
       isDivider: false
       wasJoined: true
-      wasUpdated: false
       invitation: invitation
 
     # This is necessary because for some reason ionic is requesting this file
@@ -236,14 +235,12 @@ describe 'events controller', ->
       ,
         isDivider: false
         wasJoined: true
-        wasUpdated: false
       ,
         isDivider: true
         title: 'Maybe'
       ,
         isDivider: false
         wasJoined: true
-        wasUpdated: true
       ]
       ctrl.setPositions items
 
@@ -261,12 +258,12 @@ describe 'events controller', ->
         expect(item.right).toBe 0
 
 
-  xdescribe 'generating the items list', ->
+  describe 'generating the items list', ->
     noResponseInvitation = null
-    acceptedInvitation = null
-    updatedAcceptedInvitation = null
-    maybeInvitation = null
-    updatedMaybeInvitation = null
+    newAcceptedInvitation = null
+    oldAcceptedInvitation = null
+    newMaybeInvitation = null
+    oldMaybeInvitation = null
     declinedInvitation = null
     invitations = null
 
@@ -277,30 +274,34 @@ describe 'events controller', ->
         response: Invitation.noResponse
         event: angular.extend event,
           id: 2
-      updatedAcceptedInvitation = angular.extend {}, invitation,
+      newAcceptedInvitation = angular.extend {}, invitation,
         id: 4
         response: Invitation.accepted
-        lastViewed: earlier
         event: angular.extend event,
           id: 4
-          updatedAt: later
-      acceptedInvitation = angular.extend {}, invitation,
+          latestMessage:
+            createdAt: 10
+      oldAcceptedInvitation = angular.extend {}, invitation,
         id: 3
         response: Invitation.accepted
         event: angular.extend event,
           id: 3
-      updatedMaybeInvitation = angular.extend {}, invitation,
+          latestMessage:
+            createdAt: 1
+      newMaybeInvitation = angular.extend {}, invitation,
         id: 6
         response: Invitation.maybe
-        lastViewed: earlier
         event: angular.extend event,
           id: 6
-          updatedAt: later
-      maybeInvitation = angular.extend {}, invitation,
+          latestMessage:
+            createdAt: 10
+      oldMaybeInvitation = angular.extend {}, invitation,
         id: 5
         response: Invitation.maybe
         event: angular.extend event,
           id: 5
+          latestMessage:
+            createdAt: 1
       declinedInvitation = angular.extend {}, invitation,
         id: 7
         response: Invitation.declined
@@ -308,10 +309,10 @@ describe 'events controller', ->
           id: 7
       invitations = [
         noResponseInvitation
-        updatedAcceptedInvitation
-        acceptedInvitation
-        updatedMaybeInvitation
-        maybeInvitation
+        newAcceptedInvitation
+        oldAcceptedInvitation
+        newMaybeInvitation
+        oldMaybeInvitation
         declinedInvitation
       ]
       ctrl.invitations = {}
@@ -326,15 +327,14 @@ describe 'events controller', ->
       items.push angular.extend
         isDivider: false
         wasJoined: false
-        wasUpdated: true
         invitation: noResponseInvitation
       joinedInvitations =
         'Down':
-          updatedInvitation: updatedAcceptedInvitation
-          oldInvitation: acceptedInvitation
+          newInvitation: newAcceptedInvitation
+          oldInvitation: oldAcceptedInvitation
         'Maybe':
-          updatedInvitation: updatedMaybeInvitation
-          oldInvitation: maybeInvitation
+          newInvitation: newMaybeInvitation
+          oldInvitation: oldMaybeInvitation
       for title, _invitations of joinedInvitations
         items.push
           isDivider: true
@@ -342,12 +342,10 @@ describe 'events controller', ->
         items.push angular.extend
           isDivider: false
           wasJoined: true
-          wasUpdated: true
-          invitation: _invitations.updatedInvitation
+          invitation: _invitations.newInvitation
         items.push angular.extend
           isDivider: false
           wasJoined: true
-          wasUpdated: false
           invitation: _invitations.oldInvitation
       items.push
         isDivider: true
@@ -355,7 +353,6 @@ describe 'events controller', ->
       items.push angular.extend
         isDivider: false
         wasJoined: false
-        wasUpdated: false
         invitation: declinedInvitation
       ctrl.setPositions items
       expect(ctrl.buildItems(ctrl.invitations)).toEqual items
@@ -384,7 +381,6 @@ describe 'events controller', ->
       ctrl.items.push angular.extend
         isDivider: false
         wasJoined: false
-        wasUpdated: true
         isExpanded: true
         invitation: noResponseInvitation
       ctrl.items.push
@@ -393,7 +389,6 @@ describe 'events controller', ->
       ctrl.items.push angular.extend
         isDivider: false
         wasJoined: true
-        wasUpdated: false
         isExpanded: false
         invitation: acceptedInvitation
       ctrl.setPositions ctrl.items
@@ -640,8 +635,9 @@ describe 'events controller', ->
       beforeEach ->
         messagesRQ.result = [newMessage]
         event =
-          updatedAt: new Date(oldMessage.createdAt.$date)
-          latestMessage: 'asdf'
+          latestMessage: 
+            text: 'asdf'
+            createdAt: new Date(oldMessage.createdAt.$date)
         isNewMessage = ctrl.isNewMessage event, newMessage._id
 
       it 'should query for message object by _id', ->
@@ -656,8 +652,9 @@ describe 'events controller', ->
       beforeEach ->
         messagesRQ.result = [oldMessage]
         event =
-          updatedAt: new Date(newMessage.createdAt.$date)
-          latestMessage: 'asdf'
+          latestMessage: 
+            createdAt: new Date(newMessage.createdAt.$date)
+            text: 'asdf'
         isNewMessage = ctrl.isNewMessage event, oldMessage._id
 
       it 'should query for message object by _id', ->
@@ -728,14 +725,14 @@ describe 'events controller', ->
 
       it 'should set the most recent message on the event', ->
         message = "#{textMessage.creator.firstName}: #{textMessage.text}"
-        expect(event.latestMessageText).toBe message
+        expect(event.latestMessage.text).toBe message
 
       it 'should set unread or read for latest message', ->
-        expect(event.latestMessageIsUnread).toBe true
+        expect(event.latestMessage.isUnread).toBe true
         expect(ctrl.isUnreadMessage).toHaveBeenCalledWith textMessage
 
-      it 'should update the event\'s updatedAt time', ->
-        expect(event.updatedAt).toEqual new Date(textMessage.createdAt.$date)
+      it 'should update the messages createdAt time', ->
+        expect(event.latestMessage.createdAt).toEqual new Date(textMessage.createdAt.$date)
 
       it 'should move the updated item', ->
         expect(ctrl.moveItem).toHaveBeenCalledWith item, ctrl.invitations
@@ -750,13 +747,13 @@ describe 'events controller', ->
         ctrl.setLatestMessage event, messages
 
       it 'should set the most recent message on the event', ->
-        expect(event.latestMessageText).toBe actionMessage.text
+        expect(event.latestMessage.text).toBe actionMessage.text
 
-      it 'should update the event\'s updatedAt time', ->
-        expect(event.updatedAt).toEqual new Date(actionMessage.createdAt.$date)
+      it 'should update the messages createdAt time', ->
+        expect(event.latestMessage.createdAt).toEqual new Date(actionMessage.createdAt.$date)
 
       it 'should set unread or read for latest message', ->
-        expect(event.latestMessageIsUnread).toBe true
+        expect(event.latestMessage.isUnread).toBe true
         expect(ctrl.isUnreadMessage).toHaveBeenCalledWith actionMessage
 
 

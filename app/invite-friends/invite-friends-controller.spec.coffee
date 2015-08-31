@@ -168,11 +168,7 @@ describe 'invite friends controller', ->
       expect(Event.getInvitedIds).toHaveBeenCalledWith event
 
     it 'should show a loading indicator', ->
-      ionicShowOptions =
-        template: '''
-          <ion-spinner icon="bubbles"></ion-spinner>
-        '''
-      expect($ionicLoading.show).toHaveBeenCalledWith ionicShowOptions
+      expect($ionicLoading.show).toHaveBeenCalled()
 
     describe 'getting invited ids', ->
 
@@ -406,65 +402,135 @@ describe 'invite friends controller', ->
           expect(ctrl.isAllNearbyFriendsSelected).toBe false
 
   describe 'sending the invitations', ->
-    deferredEventSave = null
-    newEvent = null
+    deferredCacheClear = null
 
     beforeEach ->
       ctrl.selectedFriends = [Auth.user.friends[2], Auth.user.friends[3]]
 
-      deferredEventSave = $q.defer()
-      spyOn(Event, 'save').and.returnValue {$promise: deferredEventSave.promise}
+      deferredCacheClear = $q.defer()
+      spyOn($ionicHistory, 'clearCache').and.returnValue \
+          deferredCacheClear.promise
 
-      # Save the current version of the event.
-      newEvent = angular.copy event
+      spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
 
-      ctrl.sendInvitations()
-
-    it 'should save the event', ->
-      # Friend invitations
-      invitations = (Invitation.serialize {toUserId: friend.id} \
-          for friend in ctrl.selectedFriends)
-      # The logged in user's invitation
-      invitations.push Invitation.serialize
-        toUserId: Auth.user.id
-      newEvent.invitations = invitations
-      expect(Event.save).toHaveBeenCalledWith newEvent
-
-    describe 'successfully', ->
-      deferredCacheClear = null
+    describe 'when inviting to an existing event', ->
+      deferredBulkCreate = null
 
       beforeEach ->
-        deferredCacheClear = $q.defer()
-        spyOn($ionicHistory, 'clearCache').and.returnValue \
-            deferredCacheClear.promise
+        deferredBulkCreate = $q.defer()
+        spyOn(Invitation, 'bulkCreate').and.returnValue {$promise: deferredBulkCreate.promise}
 
-        deferredEventSave.resolve()
-        scope.$apply()
+        ctrl.event.id = 1 # event id used to determine if new or existing
 
-      it 'should clear the cache', ->
-        expect($ionicHistory.clearCache).toHaveBeenCalled()
+        ctrl.sendInvitations()
 
-      describe 'when the cache is cleared', ->
+      it 'should show a loading spinner', ->
+        expect($ionicLoading.show).toHaveBeenCalled()
+
+      it 'should bulk create invitations', ->
+        invitations = (Invitation.serialize {toUserId: friend.id} \
+            for friend in ctrl.selectedFriends)
+        expect(Invitation.bulkCreate).toHaveBeenCalledWith invitations
+
+      describe 'successfully', ->
 
         beforeEach ->
-          spyOn $state, 'go'
-
-          deferredCacheClear.resolve()
+          deferredBulkCreate.resolve()
           scope.$apply()
 
-        it 'should go to the events view', ->
-          # TODO: Go to the events view before the save finishes.
-          expect($state.go).toHaveBeenCalledWith 'events'
+        it 'should clear the cache', ->
+          expect($ionicHistory.clearCache).toHaveBeenCalled()
+
+        describe 'when the cache is cleared', ->
+
+          beforeEach ->
+            spyOn $ionicHistory, 'goBack'
+
+            deferredCacheClear.resolve()
+            scope.$apply()
+
+          it 'should go back to the event', ->
+            expect($ionicHistory.goBack).toHaveBeenCalled()
+
+          it 'should hide the loading indicator', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
+
+      describe 'unsuccessfully', ->
+
+        beforeEach ->
+          deferredBulkCreate.reject()
+          scope.$apply()
+
+        it 'should show an error', ->
+          expect(ctrl.inviteError).toBe true
+
+        it 'should hide the loading indicator', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
-    describe 'unsuccessfully', ->
+    describe 'when creating a new event', ->
+      deferredEventSave = null
+      newEvent = null
 
       beforeEach ->
-        deferredEventSave.reject()
-        scope.$apply()
+        deferredEventSave = $q.defer()
+        spyOn(Event, 'save').and.returnValue {$promise: deferredEventSave.promise}
 
-      it 'should show an error', ->
-        expect(ctrl.inviteError).toBe true
+        # Save the current version of the event.
+        newEvent = angular.copy event
+
+        ctrl.sendInvitations()
+
+      it 'should show a loading spinner', ->
+        expect($ionicLoading.show).toHaveBeenCalled()
+
+      it 'should save the event', ->
+        # Friend invitations
+        invitations = (Invitation.serialize {toUserId: friend.id} \
+            for friend in ctrl.selectedFriends)
+        # The logged in user's invitation
+        invitations.push Invitation.serialize
+          toUserId: Auth.user.id
+        newEvent.invitations = invitations
+        expect(Event.save).toHaveBeenCalledWith newEvent
+
+      describe 'successfully', ->
+
+        beforeEach ->
+          deferredEventSave.resolve()
+          scope.$apply()
+
+        it 'should clear the cache', ->
+          expect($ionicHistory.clearCache).toHaveBeenCalled()
+
+        describe 'when the cache is cleared', ->
+
+          beforeEach ->
+            spyOn $state, 'go'
+
+            deferredCacheClear.resolve()
+            scope.$apply()
+
+          it 'should go to the events view', ->
+            # TODO: Go to the events view before the save finishes.
+            expect($state.go).toHaveBeenCalledWith 'events'
+
+          it 'should hide the loading indicator', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
+
+
+      describe 'unsuccessfully', ->
+
+        beforeEach ->
+          deferredEventSave.reject()
+          scope.$apply()
+
+        it 'should show an error', ->
+          expect(ctrl.inviteError).toBe true
+
+        it 'should hide the loading indicator', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
   describe 'adding friends', ->

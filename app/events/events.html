@@ -24,7 +24,7 @@
                   'item-divider': item.isDivider,
                   'item-avatar': !item.isDivider,
                   'item-icon-right': !item.isDivider,
-                  updated: item.wasUpdated,
+                  updated: item.invitation.event.latestMessage.isUnread,
                   'item-reordering': item.isReordering,
                   expanded: item.isExpanded,
                   last: $last
@@ -53,12 +53,12 @@
                   colours="[color, 'rgba(0,0,0,0)']" width="53" height="53"
                   options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
                   ></canvas>
-          <span class="updated-at">{{item.invitation.event.updatedAt | date:'shortTime' | lowercase}}</span>
+          <span class="updated-at">{{item.invitation.event.latestMessage.createdAt | date:'shortTime' | lowercase}}</span>
           <h2>{{item.invitation.event.title}}</h2>
           <p ng-if="item.wasJoined">
-            <span ng-if="item.invitation.event.latestMessageText"
-                  >{{item.invitation.event.latestMessageText}}</span>
-            <span ng-if="!item.invitation.event.latestMessageText"
+            <span ng-if="item.invitation.event.latestMessage.text"
+                  >{{item.invitation.event.latestMessage.text}}</span>
+            <span ng-if="!item.invitation.event.latestMessage.text"
                   >Suggested by {{item.invitation.fromUser.name}}</span>
           </p>
           <p ng-if="!item.wasJoined">Suggested by {{item.invitation.fromUser.name}}</p>

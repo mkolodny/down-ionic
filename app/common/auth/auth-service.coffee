@@ -71,10 +71,10 @@ class Auth
         @phone = phone
 
   isFriend: (userId) ->
-    for friend in @user.friends
-      if friend.id is userId
-        return true
-    false
+    if @user.friends[userId]?
+      return true
+    else
+      return false
 
   isNearby: (user) ->
     if not user.location?

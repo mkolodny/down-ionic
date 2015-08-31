@@ -85,3 +85,27 @@ describe 'Asteroid service', ->
 
     it 'should return the collection', ->
       expect(result).toBe collection
+
+
+  describe 'calling a method', ->
+    promise = null
+    name = null
+    param1 = null
+    param2 = null
+    result = null
+
+    beforeEach ->
+      promise = 'promise'
+      spyOn(Asteroid._instance, 'call').and.returnValue promise
+
+      name = 'name'
+      param1 = 'param1'
+      param2 = 'param2'
+      result = Asteroid.call name, param1, param2
+
+    it 'should subscribe to the name', ->
+      expect(Asteroid._instance.call).toHaveBeenCalledWith name, param1, \
+            param2
+
+    it 'should return the promise', ->
+      expect(result).toBe promise

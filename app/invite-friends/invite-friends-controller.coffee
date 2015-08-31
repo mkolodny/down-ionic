@@ -128,19 +128,38 @@ class InviteFriendsCtrl
     invitations = (@Invitation.serialize {toUserId: friend.id} \
         for friend in @selectedFriends)
 
-    # NOTE : if event is not null, bulk create invitations
+    @$ionicLoading.show
+      template: '''
+        <ion-spinner icon="bubbles"></ion-spinner>
+      '''
 
-    # Create the user's invitation.
-    invitations.push @Invitation.serialize
-      toUserId: @Auth.user.id
-    @event.invitations = invitations
-    @Event.save @event
-      .$promise.then =>
-        @$ionicHistory.clearCache()
-      .then =>
-        @$state.go 'events'
-      , =>
-        @inviteError = true
+    if @event.id?
+      # Invite to existing event
+      @Invitation.bulkCreate invitations
+        .$promise.then =>
+          @$ionicHistory.clearCache()
+        .then =>
+          @$ionicHistory.goBack()
+        , =>
+          @inviteError = true
+        .finally =>
+          @$ionicLoading.hide()
+    else
+      # Create new event
+      # Create the user's invitation.
+      invitations.push @Invitation.serialize
+        toUserId: @Auth.user.id
+
+      @event.invitations = invitations
+      @Event.save @event
+        .$promise.then =>
+          @$ionicHistory.clearCache()
+        .then =>
+          @$state.go 'events'
+        , =>
+          @inviteError = true
+        .finally =>
+          @$ionicLoading.hide()
 
   addFriends: ->
     @$state.go 'addFriends'

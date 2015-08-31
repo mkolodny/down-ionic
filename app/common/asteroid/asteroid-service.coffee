@@ -16,4 +16,9 @@ class Asteroid
   getCollection: (name) ->
     @_instance.getCollection name
 
+  call: (name, params...) ->
+    args = params
+    args.unshift name
+    @_instance.call.apply @_instance, args
+
 module.exports = Asteroid
