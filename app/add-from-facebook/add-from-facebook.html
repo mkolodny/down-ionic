@@ -4,6 +4,18 @@
                    on-refresh="addFromFacebook.refresh()"
                    ng-if="!addFromFacebook.isLoading">
     </ion-refresher>
+    <div id="spinner-container" ng-if="addFromFacebook.isLoading">
+      <ion-spinner></ion-spinner>
+    </div>
+    <div id="load-error"
+         ng-if="addFromFacebook.loadError && !addFromFacebook.items.length">
+      There was a problem loading your facebook friends. Please try again in a
+      little while.
+    </div>
+    <div class="placeholder"
+         ng-if="!addFromFacebook.items.length && !addFromFacebook.isLoading && !addFromFacebook.loadError">
+      None of your Facebook friends are using Down, yet.
+    </div>
     <ion-list class="list-avatar">
       <ion-item collection-repeat="item in addFromFacebook.items"
                 ng-class="{
@@ -27,13 +39,5 @@
         </div>
       </ion-item>
     </ion-list>
-    <div id="spinner-container" ng-if="addFromFacebook.isLoading">
-      <ion-spinner></ion-spinner>
-    </div>
-    <div id="load-error"
-         ng-if="addFromFacebook.loadError && !addFromFacebook.items.length">
-      There was a problem loading your facebook friends. Please try again in a
-      little while.
-    </div>
   </ion-content>
 </ion-view>
