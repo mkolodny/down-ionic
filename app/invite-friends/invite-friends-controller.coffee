@@ -130,8 +130,9 @@ class InviteFriendsCtrl
 
     @$ionicLoading.show
       template: '''
+        <div class="loading-text">Sending suggestion...</div>
         <ion-spinner icon="bubbles"></ion-spinner>
-      '''
+        '''
 
     if @event.id?
       # Invite to existing event

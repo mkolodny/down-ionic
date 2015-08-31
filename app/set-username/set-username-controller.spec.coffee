@@ -1,16 +1,23 @@
+require '../ionic/ionic.js'
 require 'angular'
+require 'angular-animate'
 require 'angular-mocks'
+require 'angular-sanitize'
 require 'angular-ui-router'
+require '../ionic/ionic-angular.js'
 require '../common/resources/resources-module'
 SetUsernameCtrl = require './set-username-controller'
 
 describe 'set username controller', ->
+  $ionicLoading = null
   $q = null
   $state = null
   ctrl = null
   Auth = null
   scope = null
   User = null
+
+  beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('ui.router')
 
@@ -20,6 +27,7 @@ describe 'set username controller', ->
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $ionicLoading = $injector.get '$ionicLoading'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
@@ -50,6 +58,8 @@ describe 'set username controller', ->
 
       beforeEach ->
         ctrl.validate.and.returnValue true
+        spyOn $ionicLoading, 'show'
+        spyOn $ionicLoading, 'hide'
         Auth.user =
           id: 1
           name: 'Alan Turing'
@@ -58,6 +68,13 @@ describe 'set username controller', ->
         user = angular.extend {username: ctrl.username}, Auth.user
 
         ctrl.setUsername()
+
+      it 'should show the loading overlay', ->
+        template = '''
+          <div class="loading-text">Saving...</div>
+          <ion-spinner icon="bubbles"></ion-spinner>
+          '''
+        expect($ionicLoading.show).toHaveBeenCalledWith {template: template}
 
       it 'should update the user', ->
         expect(User.update).toHaveBeenCalledWith user
@@ -71,17 +88,24 @@ describe 'set username controller', ->
           deferred.resolve user
           scope.$apply()
 
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
         it 'should set the user on Auth', ->
           expect(Auth.setUser).toHaveBeenCalledWith user
 
         it 'should redirect for auth state', ->
           expect(Auth.redirectForAuthState).toHaveBeenCalled()
 
+
       describe 'when the update fails', ->
 
         beforeEach ->
           deferred.reject()
           scope.$apply()
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
         it 'should show an error', ->
           expect(ctrl.error).toBe 'For some reason, that didn\'t work.'

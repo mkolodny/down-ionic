@@ -419,14 +419,20 @@ describe 'invite friends controller', ->
 
       beforeEach ->
         deferredBulkCreate = $q.defer()
-        spyOn(Invitation, 'bulkCreate').and.returnValue {$promise: deferredBulkCreate.promise}
+        spyOn(Invitation, 'bulkCreate').and.returnValue
+          $promise: deferredBulkCreate.promise
 
-        ctrl.event.id = 1 # event id used to determine if new or existing
+        # The event id is set if we're inviting people to an existing event.
+        ctrl.event.id = 1
 
         ctrl.sendInvitations()
 
       it 'should show a loading spinner', ->
-        expect($ionicLoading.show).toHaveBeenCalled()
+        template = '''
+          <div class="loading-text">Sending suggestion...</div>
+          <ion-spinner icon="bubbles"></ion-spinner>
+          '''
+        expect($ionicLoading.show).toHaveBeenCalledWith {template: template}
 
       it 'should bulk create invitations', ->
         invitations = (Invitation.serialize {toUserId: friend.id} \

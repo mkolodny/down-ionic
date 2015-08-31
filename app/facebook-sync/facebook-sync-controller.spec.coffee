@@ -1,5 +1,9 @@
+require '../ionic/ionic.js'
 require 'angular'
+require 'angular-animate'
 require 'angular-mocks'
+require 'angular-sanitize'
+require '../ionic/ionic-angular.js'
 require 'ng-cordova'
 require '../common/auth/auth-module'
 require './facebook-sync-module'
@@ -7,11 +11,15 @@ FacebookSyncCtrl = require './facebook-sync-controller'
 
 describe 'facebook sync controller', ->
   $cordovaFacebook = null
+  $httpBackend = null
+  $ionicLoading = null
   $q = null
   $state = null
   Auth = null
   ctrl = null
   scope = null
+
+  beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('down.facebookSync')
 
@@ -24,11 +32,19 @@ describe 'facebook sync controller', ->
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $cordovaFacebook = $injector.get '$cordovaFacebook'
+    $httpBackend = $injector.get '$httpBackend'
+    $ionicLoading = $injector.get '$ionicLoading'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     Auth = angular.copy $injector.get('Auth')
     scope = $rootScope.$new()
+
+    # This is necessary because for some reason ionic is requesting this file
+    # when the promise gets resolved.
+    # TODO: Figure out why, and remove this.
+    $httpBackend.whenGET 'app/facebook-sync/facebook-sync.html'
+      .respond ''
 
     ctrl = $controller FacebookSyncCtrl,
       $scope: scope
@@ -53,6 +69,8 @@ describe 'facebook sync controller', ->
       accessToken = null
 
       beforeEach ->
+        spyOn $ionicLoading, 'show'
+        spyOn $ionicLoading, 'hide'
         deferredSync = $q.defer()
         spyOn(Auth, 'syncWithFacebook').and.returnValue deferredSync.promise
 
@@ -61,6 +79,13 @@ describe 'facebook sync controller', ->
           authResponse:
             accessToken: accessToken
         scope.$apply()
+
+      it 'should show the loading overlay', ->
+        template = '''
+          <div class="loading-text">Syncing...</div>
+          <ion-spinner icon="bubbles"></ion-spinner>
+          '''
+        expect($ionicLoading.show).toHaveBeenCalledWith {template: template}
 
       it 'should sync the backend', ->
         expect(Auth.syncWithFacebook).toHaveBeenCalledWith accessToken
@@ -87,6 +112,9 @@ describe 'facebook sync controller', ->
         it 'should go to the set username view', ->
           expect($state.go).toHaveBeenCalledWith 'setUsername'
 
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
 
       describe 'when sync fails', ->
 
@@ -96,6 +124,9 @@ describe 'facebook sync controller', ->
 
         it 'should show an error', ->
           expect(ctrl.error).toBe 'Oops, something went wrong. Please try again.'
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
     describe 'when oauth fails', ->

@@ -1,5 +1,5 @@
 class EventsCtrl
-  constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicModal, @$scope, @$state,
+  constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading, @$ionicModal, @$scope, @$state,
                 @$timeout, @$window, @Asteroid, @dividerHeight, @eventHeight,
                 @Invitation, @transitionDuration, @Auth) ->
     # Save the section titles.
@@ -225,7 +225,7 @@ class EventsCtrl
     Events = @Asteroid.getCollection 'events'
     eventsRQ = Events.reactiveQuery {_id: message.eventId}
     event = eventsRQ.result[0]
-    # Have to check if event exists in case the 
+    # Have to check if event exists in case the
     # subscribe hasn't returned the event yet
     if event?
       member = (member for member in event.members \

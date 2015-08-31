@@ -86,12 +86,12 @@ describe 'verify phone controller', ->
         it 'should login to the meteor server', ->
           expect(ctrl.meteorLogin).toHaveBeenCalledWith user
 
-        it 'should show the loading indicator', ->
+        it 'should show the loading overlay', ->
           template = '''
             <div class="loading-text">Logging you in...</div>
             <ion-spinner icon="bubbles"></ion-spinner>
             '''
-          expect($ionicLoading.show).toHaveBeenCalledWith template: template
+          expect($ionicLoading.show).toHaveBeenCalledWith {template: template}
 
 
       describe 'when authentication fails', ->
@@ -105,7 +105,7 @@ describe 'verify phone controller', ->
           it 'should show an error', ->
             expect(ctrl.error).toBe 'Oops, something went wrong.'
 
-          it 'should hide the loading indicator', ->
+          it 'should hide the loading overlay', ->
             expect($ionicLoading.hide).toHaveBeenCalled()
 
 

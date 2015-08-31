@@ -1,5 +1,5 @@
 class RequestPushCtrl
-  constructor: (@$cordovaPush, @$cordovaDevice, @Auth, @APNSDevice,
+  constructor: (@$cordovaPush, @$cordovaDevice, @$ionicLoading, @Auth, @APNSDevice,
                 localStorageService) ->
     @localStorage = localStorageService
 
@@ -18,6 +18,12 @@ class RequestPushCtrl
         @Auth.redirectForAuthState()
 
   saveToken: (deviceToken)->
+    @$ionicLoading.show
+      template: '''
+        <div class="loading-text">Enabling push notifications...</div>
+        <ion-spinner icon="bubbles"></ion-spinner>
+        '''
+
     device = @$cordovaDevice.getDevice()
     name = "#{device.model}, #{device.version}"
     apnsDevice =
@@ -28,8 +34,7 @@ class RequestPushCtrl
     @APNSDevice.save apnsDevice
       .$promise.then =>
         @Auth.redirectForAuthState()
-      , =>
-        # TODO : Show An Error
-        console.log 'error saving the apns device'
+      .finally =>
+        @$ionicLoading.hide()
 
 module.exports = RequestPushCtrl
