@@ -33,7 +33,7 @@ class EventCtrl
       # Mark newest message as read
       newestMessage = @messages[@messages.length - 1]
       if @isUnreadMessage newestMessage
-        @Asteroid.call 'readMessage', newestMessage.id
+        @Asteroid.call 'readMessage', newestMessage._id
 
     @Invitation.getEventInvitations {id: @event.id}
       .$promise.then (invitations) =>

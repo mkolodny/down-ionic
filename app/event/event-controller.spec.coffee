@@ -233,7 +233,7 @@ describe 'event controller', ->
 
       it 'should mark message as read', ->
         newestMessage = messages[messages.length - 1]
-        expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', newestMessage.id
+        expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', newestMessage._id
 
 
   describe 'when the user hits the bottom of the view', ->
