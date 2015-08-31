@@ -22,7 +22,17 @@ class EventCtrl
     @$scope.$on '$ionicView.enter', =>
       @$ionicScrollDelegate.scrollBottom true
 
+    # Mark newest message as read
+    # NOTE : need to make sure this is being called 
+    #   when entering the view if message
+    #   was loaded while user was in the events view
+    newestMessage = @messages[@messages.length - 1]
+    if @isUnreadMessage newestMessage
+      @Asteroid.call 'readMessage', newestMessage._id
+
     # Watch for new messages.
+    # NOTE : need to remove listening to new 
+    #   messages when leaving view
     @messagesRQ.on 'change', =>
       @messages = angular.copy @messagesRQ.result
       @sortMessages()
@@ -33,7 +43,7 @@ class EventCtrl
       # Mark newest message as read
       newestMessage = @messages[@messages.length - 1]
       if @isUnreadMessage newestMessage
-        @Asteroid.call 'readMessage', newestMessage.id
+        @Asteroid.call 'readMessage', newestMessage._id
 
     @Invitation.getEventInvitations {id: @event.id}
       .$promise.then (invitations) =>
@@ -139,7 +149,7 @@ class EventCtrl
         when member.userId is "#{@Auth.user.id}")
       lastRead = member[0].lastRead
 
-      if lastRead.$date > message.createdAt.$date
+      if lastRead.$date >= message.createdAt.$date
         return false
     return true
 
