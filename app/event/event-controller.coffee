@@ -136,7 +136,7 @@ class EventCtrl
     # subscribe hasn't returned the event yet
     if event?
       member = (member for member in event.members \
-        when member.userId is @Auth.user.id)
+        when member.userId is "#{@Auth.user.id}")
       lastRead = member[0].lastRead
 
       if lastRead.$date > message.createdAt.$date
