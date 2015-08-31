@@ -7,7 +7,7 @@ class InviteFriendsCtrl
     @selectedFriendIds = {}
     @invitedIds = []
 
-    if @event.id?
+    if 'id' of @event
       # Inviting to an existing event
       @$ionicLoading.show
         template: '''

@@ -26,9 +26,9 @@ class FindFriendsCtrl
   buildItems: (facebookFriends, contacts = {}) ->
     # Create a separate array of contacts who aren't users, and contacts who are
     #   users. Ignore any contacts who are also facebook friends.
-    users = (contact.user for id, contact of contacts when contact.user \
-        and contact.user.username \
-        and facebookFriends[contact.user.id] is undefined)
+    users = (contact.user for id, contact of contacts when 'user' of contact \
+        and 'username' of contact.user \
+        and contact.user.id not of facebookFriends)
     contacts = (contact for id, contact of contacts when not contact.user?.username)
 
     # Merge the user's facebook friends with the user's contacts who are Down
