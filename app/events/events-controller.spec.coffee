@@ -787,7 +787,7 @@ describe 'events controller', ->
       beforeEach ->
         event =
           members: [
-            userId: 1
+            userId: "1"
             lastRead:
               $date: 1
           ]
@@ -804,7 +804,7 @@ describe 'events controller', ->
       beforeEach ->
         event =
           members: [
-            userId: 1
+            userId: "1"
             lastRead:
               $date: 100
           ]
