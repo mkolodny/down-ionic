@@ -3,8 +3,8 @@ userFriendshipButtonDirective = (Auth, Friendship) ->
   scope:
     user: '='
   template: """
-    <a href="" ng-click="toggleFriendship(user)">
-      <i class="icon fa friendship-button"
+    <a class="friendship-button" href="" ng-click="toggleFriendship(user)">
+      <i class="icon fa"
          ng-if="!isLoading"
          ng-class="{
           'fa-plus-square-o': !isFriend(user),

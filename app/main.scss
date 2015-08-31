@@ -252,12 +252,15 @@ Global Sass
 
 // Friendship Buttons
 .friendship-button {
-  &.fa-plus-square-o,
-  &.fa-spinner {
+  .fa-plus-square-o {
     color: #aaa;
   }
-  &.fa-check-square {
+  .fa-check-square {
     color: $brand-color;
+  }
+  .spinner {
+    fill: #aaa;
+    stroke: #aaa;
   }
 }
 
