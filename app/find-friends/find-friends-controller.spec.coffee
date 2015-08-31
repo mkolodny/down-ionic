@@ -53,7 +53,7 @@ describe 'find friends controller', ->
     # Need dis in the constructor
     facebookFriend =
       id: '1234'
-      name: 'Chris Pleb'
+      name: 'Chris MacPleb'
       username: 'm'
       imageUrl: 'thatImage.com'
     Auth.user.facebookFriends = {}
@@ -169,6 +169,7 @@ describe 'find friends controller', ->
 
   describe 'building the items list', ->
     contactWithoutUser = null
+    contactWithFbFriend = null
     contactWithUser = null
     result = null
 
@@ -180,10 +181,6 @@ describe 'find friends controller', ->
         phoneNumbers: [
           value: '+1952852230'
         ]
-      contactUser =
-        id: 3
-        name: 'Andrew Plebfoot'
-        username: 'a'
       contactWithUser =
         id: 2
         name:
@@ -191,16 +188,26 @@ describe 'find friends controller', ->
         phoneNumbers: [
           value: '+1952852231'
         ]
-        user: contactUser
-      contacts =
-        "#{contactWithoutUser.id}": contactWithoutUser
-        "#{contactWithUser.id}": contactWithUser
+        user:
+          id: 3
+          name: 'Andrew Plebfoot'
+          username: 'a'
+      contactWithFbFriend =
+        id: 3
+        name:
+          formatted: 'Chris MacPleb'
+        phoneNumbers: [
+          value: '+1952852231'
+        ]
+        user:
+          id: facebookFriend.id
+          name: 'Chris MacPleb'
+          username: 'cmac9889'
+      contacts = {}
+      for contact in [contactWithoutUser, contactWithUser, contactWithFbFriend]
+        contacts[contact.id] = contact
 
-      # Mock the contact also being a facebook friend.
-      facebookFriends = Auth.user.facebookFriends
-      facebookFriends[contactUser.id] = contactUser
-
-      result = ctrl.buildItems facebookFriends, contacts
+      result = ctrl.buildItems Auth.user.facebookFriends, contacts
 
     it 'should return the built items', ->
       items = [
