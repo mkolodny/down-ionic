@@ -16,8 +16,7 @@ class VerifyPhoneCtrl
     @Auth.authenticate phone, @code
       .then (user) =>
         @Auth.setPhone phone
-        @Auth.user = user # Don't use Auth.setUser
-        @meteorLogin()
+        @meteorLogin user
       , (status) =>
         # Auth failed
         if status is 500
@@ -30,10 +29,15 @@ class VerifyPhoneCtrl
   validate: ->
     @$scope.verifyPhoneForm.$valid
 
-  meteorLogin: ->
-    # TODO: Pass the user into this function and persist the auth user.
+  meteorLogin: (user) ->
     @Asteroid.login().then =>
-      @getFacebookFriends()
+      # Persist the user to local storage.
+      @Auth.setUser user
+      if user.email?
+        # The user has synced with Facebook.
+        @getFacebookFriends()
+      else
+        @$state.go 'facebookSync'
     , =>
       @error = 'Oops, something went wrong.'
 
@@ -41,7 +45,7 @@ class VerifyPhoneCtrl
     @Auth.getFacebookFriends()
       .$promise.then (facebookFriends) =>
         @Auth.user.facebookFriends = facebookFriends
-        # To persist to localstorage
+        # Persist the user to local storage.
         @Auth.setUser @Auth.user
         @Auth.redirectForAuthState()
       , (error) =>

@@ -389,15 +389,26 @@ describe 'Contacts service', ->
     phoneNumbers = null
     formattedNumbers = null
 
-    beforeEach ->
-      phone =
-        value: '9252852230'
-      formattedNumbers = Contacts.formatNumbers [phone]
+    describe 'when numbers is defined', ->
 
-    it 'should convert numbers to E164 format', ->
-      expectedPhoneFormat =
-        value: '+19252852230'
-      expect(formattedNumbers).toEqual [expectedPhoneFormat]
+      beforeEach ->
+        phone =
+          value: '9252852230'
+        formattedNumbers = Contacts.formatNumbers [phone]
+
+      it 'should convert numbers to E164 format', ->
+        expectedPhoneFormat =
+          value: '+19252852230'
+        expect(formattedNumbers).toEqual [expectedPhoneFormat]
+
+
+    describe 'when numbers is null', ->
+
+      beforeEach ->
+        formattedNumbers = Contacts.formatNumbers null
+
+      it 'should return null', ->
+        expect(formattedNumbers).toEqual null
 
 
   describe 'saving contacts', ->

@@ -816,4 +816,4 @@ describe 'Auth service', ->
         $httpBackend.flush 1
 
       it 'should reject the promise', ->
-        expect(error).toBe 'MISSING_SOCIAL_ACCOUNT'
+        expect(error).toBe 'TOKEN_EXPIRED'
