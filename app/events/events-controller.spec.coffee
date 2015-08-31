@@ -537,12 +537,16 @@ describe 'events controller', ->
   describe 'subscribing to events\' messages', ->
     onChange = null
     messagesRQ = null
+    eventsOnChange = null
+    eventsRQ = null
+    Events = null
     messages = null
     event = null
     events = null
 
     beforeEach ->
       spyOn Asteroid, 'subscribe'
+
       messagesRQ =
         result: 'messagesRQ.result'
         on: jasmine.createSpy('messagesRQ.on').and.callFake (name, _onChange_) ->
@@ -550,7 +554,19 @@ describe 'events controller', ->
       messages =
         reactiveQuery: jasmine.createSpy('messages.reactiveQuery') \
             .and.returnValue messagesRQ
-      spyOn(Asteroid, 'getCollection').and.returnValue messages
+
+      eventsRQ =
+        result: 'eventsRQ.result'
+        on: jasmine.createSpy('eventsRQ.on').and.callFake (name, _onChange_) ->
+          eventsOnChange = _onChange_
+      Events =
+        reactiveQuery: jasmine.createSpy('events.reactiveQuery') \
+            .and.returnValue eventsRQ
+
+      spyOn(Asteroid, 'getCollection').and.callFake (collectionName) ->
+        if collectionName is 'messages' then return messages
+        if collectionName is 'events' then return Events
+
       spyOn ctrl, 'setLatestMessage'
 
       event = invitation.event
@@ -605,6 +621,19 @@ describe 'events controller', ->
         it 'should call isNewMessage with doc _id', ->
           expect(ctrl.isNewMessage).toHaveBeenCalledWith event, changedDocId
 
+
+    describe 'when a meteor event changes', ->
+
+      beforeEach ->
+        spyOn(ctrl, 'isUnreadMessage').and.returnValue true
+
+        event.latestMessage = {}
+        event.latestMessage.isUnread = false
+
+        eventsOnChange()
+
+      it 'should set isUnread for the latest message', ->
+        expect(event.latestMessage.isUnread).toBe true
 
   describe 'is new message for event', ->
     oldMessage = null

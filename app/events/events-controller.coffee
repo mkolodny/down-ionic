@@ -146,12 +146,14 @@ class EventsCtrl
       @Asteroid.subscribe 'messages', event.id
 
     Messages = @Asteroid.getCollection 'messages'
+    Events = @Asteroid.getCollection 'events'
     for event in events
       messagesRQ = Messages.reactiveQuery {eventId: "#{event.id}" } # Meteor likes strings
+      eventsRQ = Events.reactiveQuery {_id: "#{event.id}" } # Meteor likes strings
 
       # Keep the same value of `messagesRQ` even after the variable changes
       #   next time through the loop.
-      do (event, messagesRQ) =>
+      do (event, messagesRQ, eventsRQ) =>
         # Set the latest message on the event.
         messages = angular.copy messagesRQ.result
         @setLatestMessage event, messages
@@ -162,6 +164,13 @@ class EventsCtrl
           messages = angular.copy messagesRQ.result
           if @isNewMessage event, _id
             @setLatestMessage event, messages
+
+        # Whenever an event changes, check is the lastest message has been read
+        eventsRQ.on 'change', =>
+          latestMessage = messages[0]
+          if event.latestMessage? and latestMessage?
+            event.latestMessage.isUnread = @isUnreadMessage latestMessage
+
 
   # mongo _id's are randomly generated client side via
   # Asteroid and therefore are not chronological
