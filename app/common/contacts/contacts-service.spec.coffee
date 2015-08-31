@@ -137,6 +137,9 @@ describe 'Contacts service', ->
         it 'should save the contacts', ->
           expect(Contacts.saveContacts).toHaveBeenCalledWith contactsDict
 
+        it 'should set hasRequestedContacts to true', ->
+          expect(localStorage.get 'hasRequestedContacts').toEqual true
+
         it 'should resolve the promise with the contacts', ->
           expect(response).toEqual contactsDict
 
@@ -162,9 +165,6 @@ describe 'Contacts service', ->
 
       it 'should reject the promise', ->
         expect(error.code).toEqual 'PERMISSION_DENIED_ERROR'
-
-      it 'should set hasRequestedContacts to true', ->
-        expect(localStorage.get 'hasRequestedContacts').toEqual true
 
 
   describe 'identifying contacts', ->

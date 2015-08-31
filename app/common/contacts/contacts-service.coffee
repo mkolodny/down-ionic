@@ -26,10 +26,10 @@ class Contacts
 
         @identifyContacts contactsDict
       , (error) =>
-        @localStorage.set 'hasRequestedContacts', true
         deferred.reject error
       .then (contactsDict) =>
         @saveContacts contactsDict
+        @localStorage.set 'hasRequestedContacts', true
         deferred.resolve contactsDict
       , ->
         error =
