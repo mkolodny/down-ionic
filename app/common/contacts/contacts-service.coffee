@@ -19,8 +19,8 @@ class Contacts
     @$cordovaContacts.find options
       .then (contactsArray) =>
         for contact in contactsArray
-          contact.phoneNumbers = @filterNumbers contact.phoneNumbers
           contact.phoneNumbers = @formatNumbers contact.phoneNumbers
+          contact.phoneNumbers = @filterNumbers contact.phoneNumbers
         contactsArray = @filterContacts contactsArray
         contactsDict = @contactArrayToDict contactsArray
 
@@ -98,6 +98,17 @@ class Contacts
         filteredContacts.push contact
     filteredContacts
 
+  formatNumbers: (numbers) ->
+    if numbers is null
+      return null
+
+    E164 = intlTelInputUtils.numberFormat.E164
+    countryCode = intlTelInputUtils.getCountryCode @Auth.phone
+    for number in numbers
+      number.value = intlTelInputUtils.formatNumberByType number.value,
+          countryCode, E164
+    numbers
+
   filterNumbers: (numbers) ->
     if numbers is null
       return []
@@ -107,14 +118,6 @@ class Contacts
       if intlTelInputUtils.isValidNumber number.value
         filteredNumbers.push number
     filteredNumbers
-
-  formatNumbers: (numbers) ->
-    E164 = intlTelInputUtils.numberFormat.E164
-    countryCode = intlTelInputUtils.getCountryCode @Auth.phone
-    for number in numbers
-      number.value = intlTelInputUtils.formatNumberByType number.value,
-          countryCode, E164
-    return numbers
 
   saveContacts: (contacts) ->
     @localStorage.set 'contacts', contacts
