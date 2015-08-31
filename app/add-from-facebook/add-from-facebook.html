@@ -1,11 +1,11 @@
 <ion-view id="add-from-facebook" view-title="Facebook Friends">
   <ion-content>
-    <ion-refresher pulling-text="Pull to refresh..."
+    <ion-refresher pulling-text="Pull to refresh..." spinner="bubbles"
                    on-refresh="addFromFacebook.refresh()"
                    ng-if="!addFromFacebook.isLoading">
     </ion-refresher>
     <div id="spinner-container" ng-if="addFromFacebook.isLoading">
-      <ion-spinner></ion-spinner>
+      <ion-spinner icon="bubbles"></ion-spinner>
     </div>
     <div id="load-error"
          ng-if="addFromFacebook.loadError && !addFromFacebook.items.length">

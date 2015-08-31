@@ -287,3 +287,12 @@ Global Sass
   background: transparent;
   border: 0;
 }
+
+// Spinner
+.scroll-refresher,
+#spinner-container {
+  .spinner {
+    stroke: #666666;
+    fill: #666666;
+  }
+}

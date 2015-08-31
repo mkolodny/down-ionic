@@ -9,10 +9,10 @@
   </ion-nav-buttons>
   <ion-content id="events-content">
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="events.refresh()"
-                   ng-if="!events.isLoading">
+                   ng-if="!events.isLoading" spinner="bubbles">
     </ion-refresher>
     <div id="spinner-container" ng-if="events.isLoading">
-      <ion-spinner></ion-spinner>
+      <ion-spinner icon="bubbles"></ion-spinner>
     </div>
     <div class="placeholder" ng-if="!events.items.length && !events.isLoading">
       No suggestions right now.

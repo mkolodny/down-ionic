@@ -29,7 +29,6 @@ class InviteFriendsCtrl
   buildItems: ->
     # Make a copy of the user's friends so that when the user selects the friend in
     #   one section, they get selected in every section.
-    # TODO: Handle when the user's friends aren't set on auth yet.
     friends = angular.copy @Auth.user.friends
 
     # Build the list of alphabetically sorted nearby friends.
