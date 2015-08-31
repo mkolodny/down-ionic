@@ -139,7 +139,7 @@ class EventCtrl
         when member.userId is "#{@Auth.user.id}")
       lastRead = member[0].lastRead
 
-      if lastRead.$date > message.createdAt.$date
+      if lastRead.$date >= message.createdAt.$date
         return false
     return true
 
