@@ -168,12 +168,12 @@ describe 'find friends controller', ->
 
 
   describe 'building the items list', ->
-    contactNoUser = null
-    contactUser = null
+    contactWithoutUser = null
+    contactWithUser = null
     result = null
 
     beforeEach ->
-      contactNoUser =
+      contactWithoutUser =
         id: 1
         name:
           formatted: 'Mike Pleb'
@@ -181,21 +181,26 @@ describe 'find friends controller', ->
           value: '+1952852230'
         ]
       contactUser =
+        id: 3
+        name: 'Andrew Plebfoot'
+        username: 'a'
+      contactWithUser =
         id: 2
         name:
           formatted: 'Andrew Plebfoot'
         phoneNumbers: [
           value: '+1952852231'
         ]
-        user:
-          id: 3
-          name: 'Andrew Plebfoot'
-          username: 'a'
+        user: contactUser
       contacts =
-        "#{contactNoUser.id}": contactNoUser
-        "#{contactUser.id}": contactUser
+        "#{contactWithoutUser.id}": contactWithoutUser
+        "#{contactWithUser.id}": contactWithUser
 
-      result = ctrl.buildItems Auth.user.facebookFriends, contacts
+      # Mock the contact also being a facebook friend.
+      facebookFriends = Auth.user.facebookFriends
+      facebookFriends[contactUser.id] = contactUser
+
+      result = ctrl.buildItems facebookFriends, contacts
 
     it 'should return the built items', ->
       items = [
@@ -203,7 +208,7 @@ describe 'find friends controller', ->
         title: 'Friends Using Down'
       ,
         isDivider: false
-        user: contactUser.user
+        user: contactWithUser.user
       ,
         isDivider: false
         user: facebookFriend
@@ -212,7 +217,7 @@ describe 'find friends controller', ->
         title: 'Contacts'
       ,
         isDivider: false
-        contact: contactNoUser
+        contact: contactWithoutUser
       ]
       expect(result).toEqual items
 
