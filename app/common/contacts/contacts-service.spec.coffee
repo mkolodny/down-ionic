@@ -30,7 +30,7 @@ describe 'Contacts service', ->
     $provide.value '$cordovaContacts', $cordovaContacts
 
     Auth =
-      phone: '+19252852230'
+      phone: '+19252852235'
     $provide.value 'Auth', Auth
     return
   )
@@ -318,7 +318,7 @@ describe 'Contacts service', ->
         contactsCopy = angular.copy contacts
         filteredContacts = Contacts.filterContacts contactsCopy
 
-      it 'should return contacts with names', ->
+      it 'should return the contact', ->
         expect(filteredContacts).toEqual contacts
 
 
@@ -331,7 +331,7 @@ describe 'Contacts service', ->
           phoneNumbers: null
         filteredContacts = Contacts.filterContacts [contact]
 
-      it 'should remove contacts with null phone numbers', ->
+      it 'should remove the contact', ->
         expect(filteredContacts).toEqual []
 
 
@@ -344,7 +344,24 @@ describe 'Contacts service', ->
           phoneNumbers: []
         filteredContacts = Contacts.filterContacts [contact]
 
-      it 'should remove contacts with no phone numbers', ->
+      it 'should remove the contact', ->
+        expect(filteredContacts).toEqual []
+
+
+    describe 'when a contact is the logged in user', ->
+
+      beforeEach ->
+        contact =
+          name:
+            formatted: 'Jimbo Walker'
+          phoneNumbers: [
+            value: Auth.phone
+          ,
+            value: '+12036227310'
+          ]
+        filteredContacts = Contacts.filterContacts [contact]
+
+      it 'should remove the contact', ->
         expect(filteredContacts).toEqual []
 
 

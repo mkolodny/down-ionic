@@ -26,7 +26,8 @@ class FindFriendsCtrl
   buildItems: (facebookFriends, contacts = {}) ->
     # Create a separate array of contacts who aren't users, and contacts who are
     #   users. Ignore any contacts who are also facebook friends.
-    users = (contact.user for id, contact of contacts when contact.user?.username \
+    users = (contact.user for id, contact of contacts when contact.user \
+        and contact.user.username \
         and facebookFriends[contact.user.id] is undefined)
     contacts = (contact for id, contact of contacts when not contact.user?.username)
 

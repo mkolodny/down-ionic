@@ -95,6 +95,11 @@ class Contacts
     filteredContacts = []
     for contact in contacts
       if contact.name.formatted and contact.phoneNumbers?.length > 0
+        # Make sure the contact isn't the current user.
+        phones = (phoneNumber.value for phoneNumber in contact.phoneNumbers)
+        if @Auth.phone in phones
+          continue
+
         filteredContacts.push contact
     filteredContacts
 

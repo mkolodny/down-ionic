@@ -203,11 +203,16 @@ describe 'find friends controller', ->
           id: facebookFriend.id
           name: 'Chris MacPleb'
           username: 'cmac9889'
-      contacts = {}
-      for contact in [contactWithoutUser, contactWithUser, contactWithFbFriend]
-        contacts[contact.id] = contact
+      contacts = [
+        contactWithoutUser
+        contactWithUser
+        contactWithFbFriend
+      ]
+      contactsDict = {}
+      for contact in contacts
+        contactsDict[contact.id] = contact
 
-      result = ctrl.buildItems Auth.user.facebookFriends, contacts
+      result = ctrl.buildItems Auth.user.facebookFriends, contactsDict
 
     it 'should return the built items', ->
       items = [
