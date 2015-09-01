@@ -2,10 +2,10 @@ class InviteFriendsCtrl
   constructor: (@$ionicHistory, @$ionicLoading, @$scope, @$state, @$stateParams,
                  @Auth, @Event, @Invitation) ->
     @event = @$stateParams.event
-    @memberIds = @$stateParams.memberIds or []
+    @respondedUserIds = @$stateParams.respondedUserIds or []
     @selectedFriends = []
     @selectedFriendIds = {}
-    @invitedIds = {}
+    @invitedUserIds = {}
 
     @$scope.$on '$ionicView.enter', =>
       # Don't animate the transition to the next view.
@@ -18,11 +18,11 @@ class InviteFriendsCtrl
           template: '''
             <ion-spinner icon="bubbles"></ion-spinner>
           '''
-        @Event.getInvitedIds(@event).then (invitedIds) =>
+        @Event.getInvitedIds(@event).then (invitedUserIds) =>
           # Member ids are friends who were invited by someone else, and have
           #   already responded down or maybe.
-          for id in (invitedIds.concat @memberIds)
-            @invitedIds[id] = true
+          for id in (invitedUserIds.concat @respondedUserIds)
+            @invitedUserIds[id] = true
 
           @buildItems()
         .finally =>
@@ -167,6 +167,6 @@ class InviteFriendsCtrl
     @selectedFriendIds[friend.id] is true
 
   getWasInvited: (friend) ->
-    @invitedIds[friend.id] is true
+    @invitedUserIds[friend.id] is true
 
 module.exports = InviteFriendsCtrl

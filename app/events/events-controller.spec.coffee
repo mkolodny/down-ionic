@@ -842,7 +842,7 @@ describe 'events controller', ->
 
         wasRead = ctrl.getWasRead message
 
-      fit 'should return false', ->
+      it 'should return false', ->
         expect(wasRead).toBe false
 
 

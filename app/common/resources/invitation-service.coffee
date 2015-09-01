@@ -69,6 +69,9 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
         data = angular.fromJson data
         deserializeInvitation data
 
+    ###
+    Get an array of invitations with responses.
+    ###
     getEventInvitations:
       method: 'get'
       url: "#{Event.listUrl}/:id/invitations"

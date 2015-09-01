@@ -119,7 +119,7 @@ describe 'invite friends controller', ->
     expect(ctrl.selectedFriendIds).toEqual {}
 
   it 'should init the array of invited ids', ->
-    expect(ctrl.invitedIds).toEqual {}
+    expect(ctrl.invitedUserIds).toEqual {}
 
   describe 'when we\'re creating a new event', ->
 
@@ -139,7 +139,7 @@ describe 'invite friends controller', ->
 
   describe 'when we\'re inviting users to an existing event', ->
     deferred = null
-    memberIds = null
+    respondedUserIds = null
 
     beforeEach ->
       # Mock event with an id.
@@ -157,8 +157,8 @@ describe 'invite friends controller', ->
           long: -73.9919324
       $stateParams.event = event
 
-      memberIds = [999]
-      $stateParams.memberIds = memberIds
+      respondedUserIds = [999]
+      $stateParams.respondedUserIds = respondedUserIds
 
       deferred = $q.defer()
       spyOn(Event, 'getInvitedIds').and.returnValue deferred.promise
@@ -174,7 +174,7 @@ describe 'invite friends controller', ->
       scope.$apply()
 
     it 'should set the member ids on the controller', ->
-      expect(ctrl.memberIds).toEqual memberIds
+      expect(ctrl.respondedUserIds).toEqual respondedUserIds
 
     it 'should get invited ids', ->
       expect(Event.getInvitedIds).toHaveBeenCalledWith event
@@ -185,24 +185,24 @@ describe 'invite friends controller', ->
     describe 'getting invited ids', ->
 
       describe 'when successful', ->
-        invitedIds = null
+        invitedUserIds = null
 
         beforeEach ->
           spyOn(ctrl, 'buildItems').and.callThrough()
 
-          invitedIds = [2]
-          deferred.resolve invitedIds
+          invitedUserIds = [2]
+          deferred.resolve invitedUserIds
           scope.$apply()
 
         it 'should hide the loading indicator', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
-        it 'should set invited ids merged with memberIds on controller', ->
-          disabledIdsArray = invitedIds.concat memberIds
+        it 'should set invited ids merged with respondedUserIds on controller', ->
+          disabledIdsArray = invitedUserIds.concat respondedUserIds
           disabledIdsDict = {}
           for id in disabledIdsArray
             disabledIdsDict[id] = true
-          expect(ctrl.invitedIds).toEqual disabledIdsDict
+          expect(ctrl.invitedUserIds).toEqual disabledIdsDict
 
         it 'should call build items', ->
           expect(ctrl.buildItems).toHaveBeenCalled()
@@ -594,8 +594,8 @@ describe 'invite friends controller', ->
     describe 'when they were invited', ->
 
       beforeEach ->
-        ctrl.invitedIds = {}
-        ctrl.invitedIds[friend.id] = true
+        ctrl.invitedUserIds = {}
+        ctrl.invitedUserIds[friend.id] = true
 
         result = ctrl.getWasInvited friend
 
@@ -606,7 +606,7 @@ describe 'invite friends controller', ->
     describe 'when they weren\'t invited', ->
 
       beforeEach ->
-        ctrl.invitedIds = {}
+        ctrl.invitedUserIds = {}
 
         result = ctrl.getWasInvited friend
 

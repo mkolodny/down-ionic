@@ -48,7 +48,9 @@ class EventCtrl
 
     @Invitation.getEventInvitations {id: @event.id}
       .$promise.then (invitations) =>
-        @members = (invitation.toUser for invitation in invitations)
+        @members = (invitation.toUser for invitation in invitations \
+          when invitation.response in [@Invitation.accepted, @Invitation.maybe])
+        @respondedUsers = (invitation.toUser for invitation in invitations)
       , =>
         @membersError = true
 
@@ -121,7 +123,7 @@ class EventCtrl
         if index is 1
           @$state.go 'inviteFriends',
             event: @event
-            memberIds: (member.id for member in @members)
+            respondedUserIds: (user.id for user in @respondedUsers)
           hideSheet()
         if index is 2
           hideSheet()

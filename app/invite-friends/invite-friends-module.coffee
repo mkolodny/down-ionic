@@ -29,7 +29,7 @@ angular.module 'down.inviteFriends', [
         ###
         event: null
         ###
-        memberIds: [1, 2, 3] Array of user ids
+        respondedUserIds: [1, 2, 3] Array of user ids
         ###
-        memberIds: null
+        respondedUserIds: null
   .controller 'InviteFriendsCtrl', InviteFriendsCtrl

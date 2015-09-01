@@ -9,7 +9,7 @@ require '../common/asteroid/asteroid-module'
 require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
-fdescribe 'event controller', ->
+describe 'event controller', ->
   $ionicActionSheet = null
   $ionicLoading = null
   $ionicScrollDelegate = null
@@ -247,16 +247,30 @@ fdescribe 'event controller', ->
 
 
   describe 'when the invitations return successfully', ->
+    acceptedInvitation = null
+    maybeInvitation = null
+    declinedInvitation = null
     invitations = null
 
     beforeEach ->
-      invitations = [invitation]
+      acceptedInvitation = angular.extend {}, invitation,
+        response: Invitation.accepted
+      maybeInvitation = angular.extend {}, invitation,
+        response: Invitation.maybe
+      declinedInvitation = angular.extend {}, invitation,
+        response: Invitation.declined
+      invitations = [acceptedInvitation, maybeInvitation, declinedInvitation]
       deferred.resolve invitations
       scope.$apply()
 
-    it 'should set the invitations on the controller', ->
-      members = (invitation.toUser for invitation in invitations)
+    it 'should set the accepted/maybe invitations on the controller', ->
+      memberInvitations = [acceptedInvitation, declinedInvitation]
+      members = (invitation.toUser for invitation in memberInvitations)
       expect(ctrl.members).toEqual members
+
+    it 'should set all of the invitations on the controller', ->
+      members = (invitation.toUser for invitation in invitations)
+      expect(ctrl.respondedUsers).toEqual members
 
 
   describe 'when the invitations return unsuccessfully', ->
@@ -532,7 +546,7 @@ fdescribe 'event controller', ->
     describe 'tapping Send To.. button', ->
 
       beforeEach ->
-        ctrl.members = [
+        ctrl.respondedUsers = [
           id: 1
         ]
         spyOn $state, 'go'
@@ -542,7 +556,7 @@ fdescribe 'event controller', ->
       it 'should go to the invite friends view', ->
         stateParams =
           event: ctrl.event
-          memberIds: (member.id for member in ctrl.members)
+          respondedUserIds: (user.id for user in ctrl.respondedUsers)
         expect($state.go).toHaveBeenCalledWith 'inviteFriends', stateParams
 
       it 'should hide the action sheet', ->
