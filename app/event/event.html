@@ -52,7 +52,7 @@
         </div>
         <div class="text-message" ng-if="!event.isActionMessage(message)"
              ng-class="{'mine': event.isMyMessage(message)}">
-          <img class="avatar" ng-src="{{message.creator.getImageUrl()}}">
+          <img class="avatar" ng-src="{{message.creator.getImageUrl(72)}}">
           <div class="text">{{message.text}}</div>
         </div>
       </ion-item>

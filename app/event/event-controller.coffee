@@ -1,6 +1,7 @@
 class EventCtrl
   constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicScrollDelegate, @$scope,
-                @$state, @$stateParams, @Asteroid, @Auth, @Event, @Invitation) ->
+                @$state, @$stateParams, @Asteroid, @Auth, @Event, @Invitation,
+                @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -13,8 +14,8 @@ class EventCtrl
     @Messages = @Asteroid.getCollection 'messages'
     @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}"}
     @messages = angular.copy @messagesRQ.result
-
-    # Sort the messages from oldest to newest.
+    for message in @messages
+      message.creator = new @User(message.creator)
     @sortMessages()
 
     # Start out at the most recent message.
@@ -31,6 +32,8 @@ class EventCtrl
     #   messages when we leave and come back.
     @messagesRQ.on 'change', =>
       @messages = angular.copy @messagesRQ.result
+      for message in @messages
+        message.creator = new @User(message.creator)
       @sortMessages()
       if not @$scope.$$phase
         @$scope.$digest()

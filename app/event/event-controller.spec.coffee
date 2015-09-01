@@ -31,6 +31,7 @@ describe 'event controller', ->
   messages = null
   messagesRQ = null
   scope = null
+  User = null
 
   beforeEach angular.mock.module('ionic')
 
@@ -48,14 +49,14 @@ describe 'event controller', ->
     $ionicLoading = $injector.get '$ionicLoading'
     $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
     $q = $injector.get '$q'
-    $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     $stateParams = $injector.get '$stateParams'
     Asteroid = $injector.get 'Asteroid'
     Auth = angular.copy $injector.get('Asteroid')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
-    scope = $rootScope.$new true
+    scope = $injector.get '$rootScope'
+    User = $injector.get 'User'
 
     # Mock the current event.
     event =
@@ -91,7 +92,7 @@ describe 'event controller', ->
     $stateParams.invitation = invitation
 
     # Mock the current user.
-    Auth.user =
+    Auth.user = new User
       id: 3
       email: 'aturing@gmail.com'
       name: 'Alan Turing'
@@ -176,7 +177,9 @@ describe 'event controller', ->
   it 'should set the messages reactive query on the controller', ->
     expect(ctrl.messagesRQ).toBe messagesRQ
 
-  it 'should set the messages on the event from oldest to newest', ->
+  fit 'should set the messages on the event from oldest to newest', ->
+    laterMessage.creator = new User(laterMessage.creator)
+    earlierMessage.creator = new User(earlierMessage.creator)
     expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
 
   it 'should listen for new messages', ->
@@ -286,7 +289,9 @@ describe 'event controller', ->
 
   describe 'sorting messages', ->
 
-    it 'should sort the messages from oldest to newest', ->
+    fit 'should sort the messages from oldest to newest', ->
+      laterMessage.creator = new User(laterMessage.creator)
+      earlierMessage.creator = new User(earlierMessage.creator)
       expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
 
 
