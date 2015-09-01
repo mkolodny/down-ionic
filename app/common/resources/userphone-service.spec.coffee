@@ -140,7 +140,7 @@ describe 'userphone service', ->
           user: User.deserialize user
         updatedContacts =
           "#{contact.id}": updatedContact
-        expect(contacts).toEqual updatedContacts
+        expect(contacts).toAngularEqual updatedContacts
 
 
     describe 'unsuccessfully', ->

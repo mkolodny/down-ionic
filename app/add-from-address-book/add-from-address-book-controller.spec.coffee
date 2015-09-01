@@ -2,6 +2,7 @@ require 'angular'
 require 'angular-local-storage'
 require 'angular-mocks'
 require '../common/contacts/contacts-module'
+require '../common/resources/resources-module'
 AddFromAddressBookCtrl = require './add-from-address-book-controller'
 
 describe 'add from address book controller', ->
@@ -13,18 +14,21 @@ describe 'add from address book controller', ->
   localStorage = null
   scope = null
   user = null
+  User = null
 
   beforeEach angular.mock.module('LocalStorageModule')
 
   beforeEach angular.mock.module('down.contacts')
 
+  beforeEach angular.mock.module('down.resources')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $q = $injector.get '$q'
-    $rootScope = $injector.get '$rootScope'
+    scope = $injector.get '$rootScope'
     Contacts = $injector.get 'Contacts'
     localStorage = $injector.get 'localStorageService'
-    scope = $rootScope.$new true
+    User = $injector.get 'User'
 
     # Mock contacts being saved in local storage.
     user = # One of the contacts is a Down user.
@@ -69,7 +73,7 @@ describe 'add from address book controller', ->
       title: 'A'
     ,
       isDivider: false
-      user: user
+      user: new User(user)
     ,
       isDivider: true
       title: 'B'

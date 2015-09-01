@@ -21,6 +21,7 @@ require './add-by-username/add-by-username-module'
 require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
 require './common/auth/auth-module'
+require './common/resources/resources-module'
 require './event/event-module'
 require './my-friends/my-friends-module'
 require './add-friends/add-friends-module'
@@ -33,6 +34,7 @@ angular.module 'down', [
     'ngCordova'
     'ngToast'
     'down.auth'
+    'down.resources'
     'down.login'
     'down.verifyPhone'
     'down.facebookSync'
@@ -79,12 +81,16 @@ angular.module 'down', [
       dismissButton: true
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, ngToast, $rootScope, $window, Auth,
-        localStorageService) ->
+        localStorageService, User) ->
     # Check local storage for currentUser and currentPhone
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
     if currentUser isnt null and currentPhone isnt null
-      Auth.user = currentUser
+      Auth.user = new User(currentUser)
+      for id, friend of Auth.user.friends
+        Auth.user.friends[id] = new User(friend)
+      for id, friend of Auth.user.facebookFriends
+        Auth.user.facebookFriends[id] = new User(friend)
       Auth.phone = currentPhone
 
     # Listen for notifications.

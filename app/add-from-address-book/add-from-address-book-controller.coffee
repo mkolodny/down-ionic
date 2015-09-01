@@ -1,5 +1,5 @@
 class AddFromAddressBookCtrl
-  constructor: (@$scope, @Contacts, localStorageService) ->
+  constructor: (@$scope, @Contacts, localStorageService, @User) ->
     @localStorage = localStorageService
 
     contacts = @localStorage.get 'contacts'
@@ -29,7 +29,7 @@ class AddFromAddressBookCtrl
       if contact.user?.username
         @items.push
           isDivider: false
-          user: contact.user
+          user: new @User(contact.user)
       else
         @items.push
           isDivider: false

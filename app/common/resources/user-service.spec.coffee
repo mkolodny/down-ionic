@@ -93,7 +93,7 @@ describe 'user service', ->
     describe 'when the user is a friend', ->
 
       it 'should return the deserialized user', ->
-        expectedUser =
+        expectedUser = new User
           id: response.id
           email: response.email
           name: response.name
@@ -115,7 +115,7 @@ describe 'user service', ->
         response.last_name = null
 
       it 'should return the deserialized user', ->
-        expectedUser =
+        expectedUser = new User
           id: response.id
           email: response.email
           name: response.name
@@ -144,7 +144,7 @@ describe 'user service', ->
           facebook_friends: [friend]
 
       it 'should return the deserialized user', ->
-        expectedFriend =
+        expectedFriend = new User
           id: friend.id
           email: friend.email
           name: friend.name
@@ -159,7 +159,7 @@ describe 'user service', ->
         friends[expectedFriend.id] = expectedFriend
         facebookFriends = {}
         facebookFriends[expectedFriend.id] = expectedFriend
-        expectedUser =
+        expectedUser = new User
           id: response.id
           email: response.email
           name: response.name
