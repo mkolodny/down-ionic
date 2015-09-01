@@ -1,30 +1,35 @@
 class InviteFriendsCtrl
-  constructor: (@$ionicHistory, @$ionicLoading, @$state, @$stateParams,
+  constructor: (@$ionicHistory, @$ionicLoading, @$scope, @$state, @$stateParams,
                  @Auth, @Event, @Invitation) ->
     @event = @$stateParams.event
     @memberIds = @$stateParams.memberIds or []
     @selectedFriends = []
     @selectedFriendIds = {}
-    @invitedIds = []
+    @invitedIds = {}
 
-    if 'id' of @event
-      # Inviting to an existing event
-      @$ionicLoading.show
-        template: '''
-          <ion-spinner icon="bubbles"></ion-spinner>
-        '''
-      @Event.getInvitedIds(@event).then (invitedIds) =>
-        # Member ids are for friends that were invited by another
-        #   friend and have already responded down or maybe
-        @invitedIds = invitedIds.concat @memberIds
-        @buildItems()
-      .finally =>
-        @$ionicLoading.hide()
-    else
-      # Creating a new event
+    @$scope.$on '$ionicView.enter', =>
+      # Don't animate the transition to the next view.
       @$ionicHistory.nextViewOptions
         disableAnimate: true
-      @buildItems()
+
+      if 'id' of @event
+        # We're inviting more people to an existing event.
+        @$ionicLoading.show
+          template: '''
+            <ion-spinner icon="bubbles"></ion-spinner>
+          '''
+        @Event.getInvitedIds(@event).then (invitedIds) =>
+          # Member ids are friends who were invited by someone else, and have
+          #   already responded down or maybe.
+          for id in (invitedIds.concat @memberIds)
+            @invitedIds[id] = true
+
+          @buildItems()
+        .finally =>
+          @$ionicLoading.hide()
+      else
+        # We're creating a new event.
+        @buildItems()
 
   buildItems: ->
     # Make a copy of the user's friends so that when the user selects the friend in
@@ -39,11 +44,10 @@ class InviteFriendsCtrl
       else
         return 1
 
-    # Set isInvited for all friends who are already members of the event
-    for userId in @invitedIds
-      friend = friends[userId]
-      if friend?
-        friend.isInvited = true
+    # Save nearby friends' ids.
+    @nearbyFriendIds = {}
+    for nearbyFriend in @nearbyFriends
+      @nearbyFriendIds[nearbyFriend.id] = true
 
     # Build the list of alphabetically sorted items.
     friends = (friend for id, friend of friends)
@@ -78,12 +82,11 @@ class InviteFriendsCtrl
     for item in alphabeticalItems
       @items.push item
 
-
-  toggleIsSelected: (friend) ->
-    if not friend.isSelected
-      @selectFriend friend
-    else
+  toggleSelected: (friend) ->
+    if @getWasSelected friend
       @deselectFriend friend
+    else
+      @selectFriend friend
 
   toggleAllNearbyFriends: ->
     if not @isAllNearbyFriendsSelected
@@ -97,27 +100,23 @@ class InviteFriendsCtrl
         @deselectFriend friend
 
   selectFriend: (friend) ->
-    # Ignore if friend in @invitedIds
-    if friend.isInvited then return null
+    # Don't do anything if the friend was already invited.
+    if @getWasInvited friend
+      return
 
-    friend.isSelected = true
     @selectedFriends.push friend
     @selectedFriendIds[friend.id] = true
 
   deselectFriend: (friend) ->
-    # Ignore if friend in @invitedIds
-    if friend.isInvited then return null
+    # Don't do anything if the friend was already invited.
+    if @getWasInvited friend
+      return
 
     # Deselect the all nearby friends toggle if the friend is nearby.
     if @isAllNearbyFriendsSelected
-      isNearby = false
-      for friend in @selectedFriends
-        if friend is friend
-          isNearby = true
-      if isNearby
+      if @nearbyFriendIds[friend.id]
         @isAllNearbyFriendsSelected = false
 
-    friend.isSelected = false
     @selectedFriends = (_friend for _friend in @selectedFriends \
         when _friend isnt friend)
     delete @selectedFriendIds[friend.id]
@@ -133,8 +132,8 @@ class InviteFriendsCtrl
         <ion-spinner icon="bubbles"></ion-spinner>
         '''
 
-    if @event.id?
-      # Invite to existing event
+    if 'id' of @event
+      # Invite more people to an existing event.
       @Invitation.bulkCreate invitations
         .$promise.then =>
           @$ionicHistory.clearCache()
@@ -145,8 +144,8 @@ class InviteFriendsCtrl
         .finally =>
           @$ionicLoading.hide()
     else
-      # Create new event
-      # Create the user's invitation.
+      # Create a new event.
+      # Create the current user's invitation.
       invitations.push @Invitation.serialize
         toUserId: @Auth.user.id
 
@@ -163,5 +162,11 @@ class InviteFriendsCtrl
 
   addFriends: ->
     @$state.go 'addFriends'
+
+  getWasSelected: (friend) ->
+    @selectedFriendIds[friend.id] is true
+
+  getWasInvited: (friend) ->
+    @invitedIds[friend.id] is true
 
 module.exports = InviteFriendsCtrl

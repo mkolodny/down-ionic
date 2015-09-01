@@ -109,6 +109,9 @@ describe 'invite friends controller', ->
       $stateParams: $stateParams
   )
 
+  it 'should set the event on the controller', ->
+    expect(ctrl.event).toBe event
+
   it 'should init the array of selected friends', ->
     expect(ctrl.selectedFriends).toEqual []
 
@@ -116,23 +119,30 @@ describe 'invite friends controller', ->
     expect(ctrl.selectedFriendIds).toEqual {}
 
   it 'should init the array of invited ids', ->
-    expect(ctrl.invitedIds).toEqual []
+    expect(ctrl.invitedIds).toEqual {}
 
-  it 'should set the event on the controller', ->
-    expect(ctrl.event).toBe event
+  describe 'when we\'re creating a new event', ->
 
-  it 'should disable animating the transition to the next view', ->
-    options = {disableAnimate: true}
-    expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+    beforeEach ->
+      # The event set on $stateParams doesn't have an id.
+      ctrl = $controller InviteFriendsCtrl,
+        $scope: scope
+        Auth: Auth
+        $stateParams: $stateParams
+      scope.$broadcast '$ionicView.enter'
+      scope.$apply()
+
+    it 'should disable animating the transition to the next view', ->
+      options = {disableAnimate: true}
+      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
 
 
-  # Inviting users to existing event
-  describe 'when event has an id', ->
+  describe 'when we\'re inviting users to an existing event', ->
     deferred = null
     memberIds = null
 
     beforeEach ->
-      # Mock event with id
+      # Mock event with an id.
       event =
         id: 1
         title: 'bars?!?!!?'
@@ -160,6 +170,8 @@ describe 'invite friends controller', ->
         $scope: scope
         Auth: Auth
         $stateParams: $stateParams
+      scope.$broadcast '$ionicView.enter'
+      scope.$apply()
 
     it 'should set the member ids on the controller', ->
       expect(ctrl.memberIds).toEqual memberIds
@@ -186,14 +198,15 @@ describe 'invite friends controller', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
         it 'should set invited ids merged with memberIds on controller', ->
-          expect(ctrl.invitedIds).toEqual invitedIds.concat memberIds
+          disabledIdsArray = invitedIds.concat memberIds
+          disabledIdsDict = {}
+          for id in disabledIdsArray
+            disabledIdsDict[id] = true
+          expect(ctrl.invitedIds).toEqual disabledIdsDict
 
         it 'should call build items', ->
           expect(ctrl.buildItems).toHaveBeenCalled()
 
-        it 'should flag any friend that is a member of the event', ->
-          # Index 1 is friend with id=2 after sorting
-          expect(ctrl.nearbyFriends[1].isInvited).toBe true
 
       describe 'when there is an error', ->
 
@@ -207,16 +220,10 @@ describe 'invite friends controller', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
 
-  describe 'getting the array of nearby friends', ->
+  describe 'building the items array', ->
 
-    it 'should be a sorted array of nearby friends', ->
-      expect(ctrl.nearbyFriends).toEqual  [ # Alphabetical
-        Auth.user.friends[3]
-        Auth.user.friends[2]
-      ]
-
-
-  describe 'getting the array of items', ->
+    beforeEach ->
+      ctrl.buildItems()
 
     it 'should be an array of nearby friends then alphabetical friends', ->
       items = [
@@ -250,6 +257,18 @@ describe 'invite friends controller', ->
         items.push item
       expect(ctrl.items).toEqual items
 
+    it 'should save a sorted array of nearby friends', ->
+      expect(ctrl.nearbyFriends).toEqual  [ # Alphabetical
+        Auth.user.friends[3]
+        Auth.user.friends[2]
+      ]
+
+    it 'should save nearby friend ids', ->
+      nearbyFriendIds = {}
+      nearbyFriendIds[2] = true
+      nearbyFriendIds[3] = true
+      expect(ctrl.nearbyFriendIds).toEqual nearbyFriendIds
+
 
   describe 'toggling whether a friend is selected', ->
     friend = null
@@ -257,12 +276,13 @@ describe 'invite friends controller', ->
     beforeEach ->
       friend = Auth.user.friends[2]
 
-    describe 'when the friend isn\'t selected', ->
+    describe 'when the friend wasn\'t selected', ->
 
       beforeEach ->
+        spyOn(ctrl, 'getWasSelected').and.returnValue false
         spyOn ctrl, 'selectFriend'
 
-        ctrl.toggleIsSelected friend
+        ctrl.toggleSelected friend
 
       it 'should select the friend', ->
         expect(ctrl.selectFriend).toHaveBeenCalledWith friend
@@ -271,14 +291,14 @@ describe 'invite friends controller', ->
     describe 'when the friend has been selected', ->
 
       beforeEach ->
-        friend.isSelected = true
+        spyOn(ctrl, 'getWasSelected').and.returnValue true
         ctrl.selectedFriends = [friend]
         ctrl.selectedFriendIds = {}
         ctrl.selectedFriendIds[friend.id] = true
 
         spyOn ctrl, 'deselectFriend'
 
-        ctrl.toggleIsSelected friend
+        ctrl.toggleSelected friend
 
       it 'should deselect the friend', ->
         expect(ctrl.deselectFriend).toHaveBeenCalledWith friend
@@ -328,21 +348,10 @@ describe 'invite friends controller', ->
     beforeEach ->
       ctrl.selectedFriends = []
       ctrl.selectedFriendIds = {}
+      spyOn(ctrl, 'getWasInvited').and.returnValue false
 
       friend = Auth.user.friends[2]
       ctrl.selectFriend friend
-
-    describe 'when friend is in members', ->
-
-      beforeEach ->
-        friend.isInvited = true
-
-      it 'should return null', ->
-        expect(ctrl.selectFriend friend).toBeNull()
-
-
-    it 'should set the friend to selected', ->
-      expect(friend.isSelected).toBe true
 
     it 'should add the friend to the array of selected friends', ->
       expect(ctrl.selectedFriends).toEqual [friend]
@@ -351,6 +360,9 @@ describe 'invite friends controller', ->
       selectedFriendIds = {}
       selectedFriendIds[friend.id] = true
       expect(ctrl.selectedFriendIds).toEqual selectedFriendIds
+
+    it 'should check whether the friend was invited', ->
+      expect(ctrl.getWasInvited).toHaveBeenCalledWith friend
 
 
   describe 'deselecting a friend', ->
@@ -361,23 +373,15 @@ describe 'invite friends controller', ->
       ctrl.selectedFriends = [friend, Auth.user.friends[3]]
       ctrl.selectedFriendIds = {}
       ctrl.selectedFriendIds[friend.id] = true
-      friend.isSelected = true
-
-    describe 'when friend is in members', ->
-
-      beforeEach ->
-        friend.isInvited = true
-
-      it 'should return null', ->
-        expect(ctrl.deselectFriend friend).toBeNull()
+      spyOn(ctrl, 'getWasInvited').and.returnValue false
 
     describe 'when the friend is a nearby friend', ->
 
       beforeEach ->
-        ctrl.deselectFriend friend
+        ctrl.nearbyFriendIds = {}
+        ctrl.nearbyFriendIds[friend.id] = true
 
-      it 'should set the friend to not selected', ->
-        expect(friend.isSelected).toBe false
+        ctrl.deselectFriend friend
 
       it 'should remove the friend from the list of selected friends', ->
         expect(ctrl.selectedFriends).toEqual [Auth.user.friends[3]]
@@ -385,11 +389,8 @@ describe 'invite friends controller', ->
       it 'should remove the friend from the dictionary of selected friend ids', ->
         expect(ctrl.selectedFriendIds).toEqual {}
 
-
-    describe 'when the friend is a nearby friend', ->
-
-      beforeEach ->
-        ctrl.nearbyFriends = [friend]
+      it 'should check whether the friend was invited', ->
+        expect(ctrl.getWasInvited).toHaveBeenCalledWith friend
 
       describe 'and all nearby friends is selected', ->
 
@@ -400,6 +401,7 @@ describe 'invite friends controller', ->
 
         it 'should deselect all nearby friends', ->
           expect(ctrl.isAllNearbyFriendsSelected).toBe false
+
 
   describe 'sending the invitations', ->
     deferredCacheClear = null
@@ -439,6 +441,7 @@ describe 'invite friends controller', ->
             for friend in ctrl.selectedFriends)
         expect(Invitation.bulkCreate).toHaveBeenCalledWith invitations
 
+
       describe 'successfully', ->
 
         beforeEach ->
@@ -461,6 +464,7 @@ describe 'invite friends controller', ->
 
           it 'should hide the loading indicator', ->
             expect($ionicLoading.hide).toHaveBeenCalled()
+
 
       describe 'unsuccessfully', ->
 
@@ -548,3 +552,63 @@ describe 'invite friends controller', ->
 
     it 'should go to the add friends view', ->
       expect($state.go).toHaveBeenCalledWith 'addFriends'
+
+
+  describe 'checking whether a user was selected', ->
+    friend = null
+    result = null
+
+    beforeEach ->
+      friend = Auth.user.friends[2]
+
+    describe 'when the user was selected', ->
+
+      beforeEach ->
+        ctrl.selectedFriendIds = {}
+        ctrl.selectedFriendIds[friend.id] = true
+
+        result = ctrl.getWasSelected friend
+
+      it 'should return true', ->
+        expect(result).toBe true
+
+
+    describe 'when the user wasn\'t selected', ->
+
+      beforeEach ->
+        ctrl.selectedFriendIds = {}
+
+        result = ctrl.getWasSelected friend
+
+      it 'should return false', ->
+        expect(result).toBe false
+
+
+  describe 'checking whether a user was invited', ->
+    friend = null
+    result = null
+
+    beforeEach ->
+      friend = Auth.user.friends[2]
+
+    describe 'when they were invited', ->
+
+      beforeEach ->
+        ctrl.invitedIds = {}
+        ctrl.invitedIds[friend.id] = true
+
+        result = ctrl.getWasInvited friend
+
+      it 'should return true', ->
+        expect(result).toBe true
+
+
+    describe 'when they weren\'t invited', ->
+
+      beforeEach ->
+        ctrl.invitedIds = {}
+
+        result = ctrl.getWasInvited friend
+
+      it 'should return false', ->
+        expect(result).toBe false
