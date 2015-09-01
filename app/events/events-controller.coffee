@@ -169,7 +169,7 @@ class EventsCtrl
         eventsRQ.on 'change', =>
           latestMessage = messages[0]
           if event.latestMessage? and latestMessage?
-            event.latestMessage.isUnread = @isUnreadMessage latestMessage
+            event.latestMessage.wasRead = @getWasRead latestMessage
 
 
   # mongo _id's are randomly generated client side via
@@ -210,7 +210,7 @@ class EventsCtrl
       event.latestMessage.text = latestMessage.text
 
     # Set unread or not for message
-    event.latestMessage.isUnread = @isUnreadMessage latestMessage
+    event.latestMessage.wasRead = @getWasRead latestMessage
 
     # Update the latest message createdAt date.
     event.latestMessage.createdAt = new Date(latestMessage.createdAt.$date)
@@ -221,20 +221,19 @@ class EventsCtrl
       if item.invitation?.event.id is event.id
         @moveItem item, @invitations
 
-  isUnreadMessage: (message) ->
+  getWasRead: (message) ->
     Events = @Asteroid.getCollection 'events'
     eventsRQ = Events.reactiveQuery {_id: message.eventId}
     event = eventsRQ.result[0]
+
     # Have to check if event exists in case the
     # subscribe hasn't returned the event yet
-    if event?
-      member = (member for member in event.members \
-        when member.userId is "#{@Auth.user.id}")
+    if event is undefined
+      return true
 
-      lastRead = member[0].lastRead
-      if lastRead.$date >= message.createdAt.$date
-        return false
-    return true
+    members = (member for member in event.members \
+      when member.userId is "#{@Auth.user.id}")
+    members[0].lastRead.$date >= message.createdAt.$date
 
   moveItem: (item, invitations) ->
     # TODO: If none of the items are going to move, just return.

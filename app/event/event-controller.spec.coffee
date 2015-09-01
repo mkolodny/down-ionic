@@ -9,9 +9,7 @@ require '../common/asteroid/asteroid-module'
 require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
-# TODO : refactor isUnread into messages services so
-#   it can be spied on in the constructor
-xdescribe 'event controller', ->
+fdescribe 'event controller', ->
   $ionicActionSheet = null
   $ionicLoading = null
   $ionicScrollDelegate = null
@@ -211,13 +209,16 @@ xdescribe 'event controller', ->
       # Mock the messages being in the wrong order.
       ctrl.messages = [earlierMessage, laterMessage]
 
-      spyOn(ctrl, 'isUnreadMessage').and.returnValue true
       spyOn Asteroid, 'call'
 
       onChange()
 
     it 'should sort the messages', ->
       expect(ctrl.sortMessages).toHaveBeenCalled()
+
+    it 'should mark the latest message as read', ->
+      newestMessage = messages[messages.length - 1]
+      expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', newestMessage._id
 
     describe 'and the user was at the bottom of the view', ->
 
@@ -229,13 +230,6 @@ xdescribe 'event controller', ->
 
       it 'should scroll to the new bottom of the view', ->
         expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
-
-
-    describe 'when message is unread', ->
-
-      it 'should mark message as read', ->
-        newestMessage = messages[messages.length - 1]
-        expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', newestMessage._id
 
 
   describe 'when the user hits the bottom of the view', ->
@@ -699,60 +693,3 @@ xdescribe 'event controller', ->
 
         it 'should reset the invitation', ->
           expect(ctrl.invitation.muted).toBe true
-
-
-  # TODO : create messages resource
-  #   Test will fail because Asteroid.getCollection is already 
-  #   being spied on in the contstrutor. Tests copied 
-  #   from events-controller.spec
-  xdescribe 'checking is a message is unread', ->
-    message = null
-    eventsRQ = null
-
-    beforeEach ->
-      Auth.user =
-        id: 1
-      message =
-        createdAt:
-          $date: 10
-
-      eventsRQ =
-        result: 'eventsRQ.result'
-      events =
-        reactiveQuery: jasmine.createSpy('events.reactiveQuery') \
-            .and.returnValue eventsRQ
-      spyOn(Asteroid, 'getCollection').and.returnValue events
-
-    describe 'when the message is unread', ->
-      response = null
-
-      beforeEach ->
-        event =
-          members: [
-            userId: 1
-            lastRead:
-              $date: 1
-          ]
-        eventsRQ.result = [event]
-
-        response = ctrl.isUnreadMessage message
-
-      it 'should return true', ->
-        expect(response).toBe true
-
-    describe 'when the message has been read', ->
-      response = null
-
-      beforeEach ->
-        event =
-          members: [
-            userId: 1
-            lastRead:
-              $date: 100
-          ]
-        eventsRQ.result = [event]
-
-        response = ctrl.isUnreadMessage message
-
-      it 'should return false', ->
-        expect(response).toBe false

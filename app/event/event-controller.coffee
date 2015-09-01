@@ -11,7 +11,6 @@ class EventCtrl
     # Get/subscribe to the messages posted in this event.
     @Asteroid.subscribe 'messages', @event.id
     @Messages = @Asteroid.getCollection 'messages'
-    # Meteor likes strings
     @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}"}
     @messages = angular.copy @messagesRQ.result
 
@@ -23,16 +22,13 @@ class EventCtrl
       @$ionicScrollDelegate.scrollBottom true
 
     # Mark newest message as read
-    # NOTE : need to make sure this is being called 
-    #   when entering the view if message
-    #   was loaded while user was in the events view
+    # TODO: Handle when no messages have come in yet.
     newestMessage = @messages[@messages.length - 1]
-    if @isUnreadMessage newestMessage
-      @Asteroid.call 'readMessage', newestMessage._id
+    @Asteroid.call 'readMessage', newestMessage._id
 
     # Watch for new messages.
-    # NOTE : need to remove listening to new 
-    #   messages when leaving view
+    # TODO: Put this in a $ionicView.enter so that we re-start listening for new
+    #   messages when we leave and come back.
     @messagesRQ.on 'change', =>
       @messages = angular.copy @messagesRQ.result
       @sortMessages()
@@ -40,10 +36,15 @@ class EventCtrl
         @$scope.$digest()
       if @maxTop is @$ionicScrollDelegate.getScrollPosition().top
         @$ionicScrollDelegate.scrollBottom true
+
       # Mark newest message as read
       newestMessage = @messages[@messages.length - 1]
-      if @isUnreadMessage newestMessage
-        @Asteroid.call 'readMessage', newestMessage._id
+      @Asteroid.call 'readMessage', newestMessage._id
+
+    # TODO: Stop listening for new messages. Then start again event if the view was
+    #   cached.
+    #@$scope.$on '$ionicView.leave', =>
+    #  delete @messagesRQ
 
     @Invitation.getEventInvitations {id: @event.id}
       .$promise.then (invitations) =>
@@ -137,20 +138,5 @@ class EventCtrl
         @invitation.muted = not @invitation.muted
       .finally =>
         @$ionicLoading.hide()
-
-  isUnreadMessage: (message) ->
-    Events = @Asteroid.getCollection 'events'
-    eventsRQ = Events.reactiveQuery {_id: message.eventId}
-    event = eventsRQ.result[0]
-    # Have to check if event exists in case the 
-    # subscribe hasn't returned the event yet
-    if event?
-      member = (member for member in event.members \
-        when member.userId is "#{@Auth.user.id}")
-      lastRead = member[0].lastRead
-
-      if lastRead.$date >= message.createdAt.$date
-        return false
-    return true
 
 module.exports = EventCtrl

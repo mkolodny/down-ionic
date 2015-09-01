@@ -625,15 +625,15 @@ describe 'events controller', ->
     describe 'when a meteor event changes', ->
 
       beforeEach ->
-        spyOn(ctrl, 'isUnreadMessage').and.returnValue true
+        spyOn(ctrl, 'getWasRead').and.returnValue true
 
         event.latestMessage = {}
-        event.latestMessage.isUnread = false
+        event.latestMessage.wasRead = false
 
         eventsOnChange()
 
-      it 'should set isUnread for the latest message', ->
-        expect(event.latestMessage.isUnread).toBe true
+      it 'should set wasRead for the latest message', ->
+        expect(event.latestMessage.wasRead).toBe true
 
   describe 'is new message for event', ->
     oldMessage = null
@@ -664,7 +664,7 @@ describe 'events controller', ->
       beforeEach ->
         messagesRQ.result = [newMessage]
         event =
-          latestMessage: 
+          latestMessage:
             text: 'asdf'
             createdAt: new Date(oldMessage.createdAt.$date)
         isNewMessage = ctrl.isNewMessage event, newMessage._id
@@ -681,7 +681,7 @@ describe 'events controller', ->
       beforeEach ->
         messagesRQ.result = [oldMessage]
         event =
-          latestMessage: 
+          latestMessage:
             createdAt: new Date(newMessage.createdAt.$date)
             text: 'asdf'
         isNewMessage = ctrl.isNewMessage event, oldMessage._id
@@ -741,14 +741,13 @@ describe 'events controller', ->
       ctrl.items = [item]
 
       spyOn ctrl, 'moveItem'
-      spyOn(ctrl, 'isUnreadMessage').and.returnValue true
+      spyOn(ctrl, 'getWasRead').and.returnValue true
 
     describe 'when the latest message is a text', ->
 
       beforeEach ->
         textMessage.createdAt.$date = later.getTime()
         actionMessage.createdAt.$date = earlier.getTime()
-
 
         ctrl.setLatestMessage event, messages
 
@@ -757,11 +756,12 @@ describe 'events controller', ->
         expect(event.latestMessage.text).toBe message
 
       it 'should set unread or read for latest message', ->
-        expect(event.latestMessage.isUnread).toBe true
-        expect(ctrl.isUnreadMessage).toHaveBeenCalledWith textMessage
+        expect(event.latestMessage.wasRead).toBe true
+        expect(ctrl.getWasRead).toHaveBeenCalledWith textMessage
 
       it 'should update the messages createdAt time', ->
-        expect(event.latestMessage.createdAt).toEqual new Date(textMessage.createdAt.$date)
+        createdAt = new Date(textMessage.createdAt.$date)
+        expect(event.latestMessage.createdAt).toEqual createdAt
 
       it 'should move the updated item', ->
         expect(ctrl.moveItem).toHaveBeenCalledWith item, ctrl.invitations
@@ -779,11 +779,12 @@ describe 'events controller', ->
         expect(event.latestMessage.text).toBe actionMessage.text
 
       it 'should update the messages createdAt time', ->
-        expect(event.latestMessage.createdAt).toEqual new Date(actionMessage.createdAt.$date)
+        createdAt = new Date(actionMessage.createdAt.$date)
+        expect(event.latestMessage.createdAt).toEqual createdAt
 
       it 'should set unread or read for latest message', ->
-        expect(event.latestMessage.isUnread).toBe true
-        expect(ctrl.isUnreadMessage).toHaveBeenCalledWith actionMessage
+        expect(event.latestMessage.wasRead).toBe true
+        expect(ctrl.getWasRead).toHaveBeenCalledWith actionMessage
 
 
     describe 'when messages is an empty array', ->
@@ -795,6 +796,7 @@ describe 'events controller', ->
   describe 'checking is a message is unread', ->
     message = null
     eventsRQ = null
+    wasRead = null
 
     beforeEach ->
       Auth.user =
@@ -810,39 +812,49 @@ describe 'events controller', ->
             .and.returnValue eventsRQ
       spyOn(Asteroid, 'getCollection').and.returnValue events
 
-    describe 'when the message is unread', ->
-      response = null
+    describe 'when the message has been read', ->
 
       beforeEach ->
         event =
           members: [
             userId: "1"
             lastRead:
-              $date: 1
+              $date: message.createdAt.$date + 1
           ]
         eventsRQ.result = [event]
 
-        response = ctrl.isUnreadMessage message
+        wasRead = ctrl.getWasRead message
 
       it 'should return true', ->
-        expect(response).toBe true
+        expect(wasRead).toBe true
 
-    describe 'when the message has been read', ->
-      response = null
+
+    describe 'when the message hasn\'t been read', ->
 
       beforeEach ->
         event =
           members: [
-            userId: "1"
+            userId: '1'
             lastRead:
-              $date: 100
+              $date: message.createdAt.$date - 1
           ]
         eventsRQ.result = [event]
 
-        response = ctrl.isUnreadMessage message
+        wasRead = ctrl.getWasRead message
 
-      it 'should return false', ->
-        expect(response).toBe false
+      fit 'should return false', ->
+        expect(wasRead).toBe false
+
+
+    describe 'when the event hasn\'t been returned yet', ->
+
+      beforeEach ->
+        eventsRQ.result = [undefined]
+
+        wasRead = ctrl.getWasRead message
+
+      it 'should return true', ->
+        expect(wasRead).toBe true
 
 
   describe 'responding to an invitation', ->
