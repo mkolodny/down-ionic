@@ -19,7 +19,7 @@
 
         <!-- User -->
         <div ng-if="item.friend && item.friend.username">
-          <img class="item-image" ng-src="{{item.friend.imageUrl}}">
+          <img class="item-image" ng-src="{{item.friend.getImageUrl()}}">
           <h2>{{item.friend.name}}</h2>
           <p>{{item.friend.username}}</p>
         </div>

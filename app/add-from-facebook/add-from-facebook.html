@@ -32,7 +32,7 @@
 
         <!-- User -->
         <div ng-if="item.user">
-          <img class="item-image" ng-src="{{item.user.imageUrl}}">
+          <img class="item-image" ng-src="{{item.user.getImageUrl()}}">
           <h2>{{item.user.name}}</h2>
           <p>{{item.user.username}}</p>
           <user-friendship-button user="item.user">

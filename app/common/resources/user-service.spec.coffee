@@ -345,3 +345,35 @@ describe 'user service', ->
         $httpBackend.flush 1
 
         expect(rejected).toBe true
+
+
+  describe 'getting a user\'s imageUrl', ->
+    user = null
+    imageUrl = null
+
+    beforeEach ->
+      user = new User
+        id: 1
+        imageUrl: 'https://facebook.com/profile-pic/tdog'
+
+    describe 'without a size', ->
+
+      beforeEach ->
+        imageUrl = user.getImageUrl()
+
+      it 'should return the default size', ->
+        defaultSize = 100
+        expected = "#{user.imageUrl}?width=#{defaultSize}&height=#{defaultSize}"
+        expect(imageUrl).toBe expected
+
+
+    describe 'with a size', ->
+      size = null
+
+      beforeEach ->
+        size = 30
+        imageUrl = user.getImageUrl size
+
+      it 'should return the default size', ->
+        expected = "#{user.imageUrl}?width=#{size}&height=#{size}"
+        expect(imageUrl).toBe expected

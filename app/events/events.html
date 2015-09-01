@@ -38,7 +38,7 @@
 
         <!-- Event -->
         <div ng-if="item.invitation.fromUser">
-          <img class="item-image" ng-src="{{item.invitation.fromUser.imageUrl}}">
+          <img class="item-image" ng-src="{{item.invitation.fromUser.getImageUrl()}}">
           <canvas class="chart chart-pie white"
                   data="[
                     (100 - item.invitation.event.percentRemaining),

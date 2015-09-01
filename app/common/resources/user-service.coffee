@@ -98,6 +98,9 @@ User = ($http, $q, $resource, apiRoot) ->
 
     deferred.promise
 
+  resource::getImageUrl = (size = 100) ->
+    "#{@imageUrl}?width=#{size}&height=#{size}"
+
   resource
 
 module.exports = User
