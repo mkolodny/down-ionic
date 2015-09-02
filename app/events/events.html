@@ -57,7 +57,8 @@
                   colours="['rgb(217,217,217)', 'rgba(0,0,0,0)']" width="53" height="53"
                   options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
                   ></canvas>
-          <span class="updated-at">{{item.invitation.event.latestMessage.createdAt | date:'shortTime' | lowercase}}</span>
+          <span class="updated-at" ng-if="item.invitation.event.latestMessage">{{item.invitation.event.latestMessage.createdAt | date:'shortTime' | lowercase}}</span>
+          <span class="updated-at" ng-if="!item.invitation.event.latestMessage">{{item.invitation.createdAt | date:'shortTime' | lowercase}}</span>
           <h2>{{item.invitation.event.title}}</h2>
           <p ng-if="item.wasJoined">
             <span ng-if="item.invitation.event.latestMessage.text"
