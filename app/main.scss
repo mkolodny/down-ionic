@@ -92,11 +92,8 @@ Global Sass
   border-top: none;
   border-left: none;
   border-right: none;
-  border-bottom-width: 2px;
+  margin-bottom: 1px;
 
-  &.last {
-    border-bottom-width: 1px;
-  }
   .contact-image {
     background-color: #ccc;
     color: #fff;
@@ -243,7 +240,7 @@ Global Sass
   background-color: #fff;
   border-radius: 16px;
   height: 26px;
-  width: 67px;
+  width: 76px;
   line-height: 20px;
 
   &.activated {

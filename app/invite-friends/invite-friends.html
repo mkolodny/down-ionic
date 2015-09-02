@@ -14,7 +14,7 @@
       </div>
     </div>
     <ion-list ng-if="inviteFriends.items.length > 0">
-     <ion-item class="item-icon-right last"
+     <ion-item class="item-icon-right"
                ng-click="inviteFriends.toggleAllNearbyFriends()"
                ng-class="{selected: inviteFriends.isAllNearbyFriendsSelected}">
        <h2>All Nearby Friends</h2>
@@ -28,7 +28,6 @@
                 selected: item.friend && inviteFriends.getWasSelected(item.friend),
                 'item-divider': item.isDivider,
                 'item-icon-right': !item.isDivider,
-                'last': $last,
                 disabled: item.friend && inviteFriends.getWasInvited(item.friend)
               }"
                item-height="item.isDivider ? '35px' : '43px'">
