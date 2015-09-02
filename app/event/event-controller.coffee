@@ -9,45 +9,30 @@ class EventCtrl
     #   https://github.com/driftyco/ionic/issues/2881
     @event.titleWithLongVariableName = @event.title
 
-    # Get/subscribe to the messages posted in this event.
-    @Asteroid.subscribe 'messages', @event.id
-    @Messages = @Asteroid.getCollection 'messages'
-    @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}"}
-    @messages = angular.copy @messagesRQ.result
-    for message in @messages
-      message.creator = new @User(message.creator)
-    @sortMessages()
-
     # Start out at the most recent message.
     @$scope.$on '$ionicView.enter', =>
       @$ionicScrollDelegate.scrollBottom true
 
-    # Mark newest message as read
-    # TODO: Handle when no messages have come in yet.
-    newestMessage = @messages[@messages.length - 1]
-    @Asteroid.call 'readMessage', newestMessage._id
+      # Get/subscribe to the messages posted in this event.
+      @Asteroid.subscribe 'messages', @event.id
+      @Messages = @Asteroid.getCollection 'messages'
+      @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}"}
+      @prepareMessages()
 
-    # Watch for new messages.
-    # TODO: Put this in a $ionicView.enter so that we re-start listening for new
-    #   messages when we leave and come back.
-    @messagesRQ.on 'change', =>
-      @messages = angular.copy @messagesRQ.result
-      for message in @messages
-        message.creator = new @User(message.creator)
-      @sortMessages()
-      if not @$scope.$$phase
-        @$scope.$digest()
-      if @maxTop is @$ionicScrollDelegate.getScrollPosition().top
-        @$ionicScrollDelegate.scrollBottom true
-
-      # Mark newest message as read
-      newestMessage = @messages[@messages.length - 1]
-      @Asteroid.call 'readMessage', newestMessage._id
+      # Watch for new messages.
+      # TODO: Put this in a $ionicView.enter so that we re-start listening for new
+      #   messages when we leave and come back.
+      @messagesRQ.on 'change', =>
+        @prepareMessages()
+        if not @$scope.$$phase
+          @$scope.$digest()
+        if @maxTop is @$ionicScrollDelegate.getScrollPosition().top
+          @$ionicScrollDelegate.scrollBottom true
 
     # TODO: Stop listening for new messages. Then start again event if the view was
     #   cached.
-    #@$scope.$on '$ionicView.leave', =>
-    #  delete @messagesRQ
+    @$scope.$on '$ionicView.leave', =>
+      delete @messagesRQ
 
     @Invitation.getEventInvitations {id: @event.id}
       .$promise.then (invitations) =>
@@ -57,13 +42,21 @@ class EventCtrl
       , =>
         @membersError = true
 
-  sortMessages: ->
+  prepareMessages: ->
+    @messages = angular.copy @messagesRQ.result
+    for message in @messages
+      message.creator = new @User(message.creator)
+
     # Sort the messages from oldest to newest.
     @messages.sort (a, b) ->
       if a.createdAt.$date < b.createdAt.$date
         return -1
       else
         return 1
+
+    # Mark newest message as read
+    newestMessage = @messages[@messages.length - 1]
+    @Asteroid.call 'readMessage', newestMessage._id
 
   saveMaxTop: ->
     @maxTop = @$ionicScrollDelegate.getScrollPosition().top
