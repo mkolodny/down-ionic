@@ -102,45 +102,6 @@ describe 'event controller', ->
         lat: 40.7265834
         long: -73.9821535
 
-    # Mock the current date.
-    jasmine.clock().install()
-    currentDate = new Date(1438195002656)
-    jasmine.clock().mockDate currentDate
-
-    # Create mocks/spies for getting the messages for this event.
-    spyOn Asteroid, 'subscribe'
-    earlier = new Date()
-    later = new Date(earlier.getTime() + 1)
-    creator =
-      id: 2
-      name: 'Guido van Rossum'
-      imageUrl: 'http://facebook.com/profile-pics/vrawesome'
-    earlierMessage =
-      _id: 1
-      creator: creator
-      createdAt:
-        $date: new Date().getTime()
-      text: 'I\'m in love with a robot.'
-      eventId: event.id
-      type: 'text'
-    laterMessage =
-      _id: 1
-      creator: creator
-      createdAt:
-        $date: new Date().getTime()
-      text: 'Michael Jordan is down'
-      eventId: event.id
-      type: 'action'
-    messages = [earlierMessage, laterMessage]
-    messagesRQ =
-      result: messages
-      on: jasmine.createSpy('messagesRQ.on').and.callFake (name, _onChange_) ->
-        onChange = _onChange_
-    Messages =
-      reactiveQuery: jasmine.createSpy('Messages.reactiveQuery') \
-          .and.returnValue messagesRQ
-    spyOn(Asteroid, 'getCollection').and.returnValue Messages
-
     deferred = $q.defer()
     spyOn(Invitation, 'getMemberInvitations').and.returnValue
       $promise: deferred.promise
@@ -162,29 +123,6 @@ describe 'event controller', ->
   it 'should set the event title on the event', ->
     expect(ctrl.event.titleWithLongVariableName).toBe event.title
 
-  it 'should subscribe to each events\' messages', ->
-    expect(Asteroid.subscribe).toHaveBeenCalledWith 'messages', event.id
-
-  it 'should get the messages collection', ->
-    expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
-
-  it 'should set the messages collection on the controller', ->
-    expect(ctrl.Messages).toBe Messages
-
-  it 'should ask for the messages for the event', ->
-    expect(Messages.reactiveQuery).toHaveBeenCalledWith {eventId: "#{event.id}"}
-
-  it 'should set the messages reactive query on the controller', ->
-    expect(ctrl.messagesRQ).toBe messagesRQ
-
-  it 'should set the messages on the event from oldest to newest', ->
-    laterMessage.creator = new User(laterMessage.creator)
-    earlierMessage.creator = new User(earlierMessage.creator)
-    expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
-
-  it 'should listen for new messages', ->
-    expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)
-
   it 'should request the event members\' invitations', ->
     expect(Invitation.getMemberInvitations).toHaveBeenCalledWith {id: event.id}
 
@@ -192,47 +130,125 @@ describe 'event controller', ->
 
     beforeEach ->
       spyOn $ionicScrollDelegate, 'scrollBottom'
+      spyOn ctrl, 'prepareMessages'
+
+      spyOn Asteroid, 'subscribe'
+      # Create mocks/spies for getting the messages for this event.
+      messagesRQ =
+        on: jasmine.createSpy('messagesRQ.on').and.callFake (name, _onChange_) ->
+          onChange = _onChange_
+      Messages =
+        reactiveQuery: jasmine.createSpy('Messages.reactiveQuery') \
+            .and.returnValue messagesRQ
+      spyOn(Asteroid, 'getCollection').and.returnValue Messages
 
       scope.$emit '$ionicView.enter'
+      scope.$apply()
 
     it 'should scroll to the bottom of the view', ->
       expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
+    it 'should call prepare messages', ->
+      expect(ctrl.prepareMessages).toHaveBeenCalled()
 
-  describe 'when new messages get posted', ->
-    top = null
+    it 'should subscribe to the events messages', ->
+      expect(Asteroid.subscribe).toHaveBeenCalledWith 'messages', event.id
 
-    beforeEach ->
-      spyOn ctrl, 'sortMessages'
-      top = 20
-      ctrl.maxTop = top + 40
-      spyOn($ionicScrollDelegate, 'getScrollPosition').and.returnValue
-        top: top
+    it 'should get the messages collection', ->
+      expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
-      # Mock the messages being in the wrong order.
-      ctrl.messages = [earlierMessage, laterMessage]
+    it 'should set the messages collection on the controller', ->
+      expect(ctrl.Messages).toBe Messages
 
-      spyOn Asteroid, 'call'
+    it 'should ask for the messages for the event', ->
+      expect(Messages.reactiveQuery).toHaveBeenCalledWith {eventId: "#{event.id}"}
 
-      onChange()
+    it 'should set the messages reactive query on the controller', ->
+      expect(ctrl.messagesRQ).toBe messagesRQ
 
-    it 'should sort the messages', ->
-      expect(ctrl.sortMessages).toHaveBeenCalled()
+    it 'should listen for new messages', ->
+      expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)
 
-    it 'should mark the latest message as read', ->
-      newestMessage = messages[messages.length - 1]
-      expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', newestMessage._id
-
-    describe 'and the user was at the bottom of the view', ->
+    describe 'when new messages get posted', ->
+      top = null
 
       beforeEach ->
-        ctrl.maxTop = top
-        spyOn $ionicScrollDelegate, 'scrollBottom'
+        top = 20
+        ctrl.maxTop = top + 40
+        spyOn($ionicScrollDelegate, 'getScrollPosition').and.returnValue
+          top: top
 
         onChange()
 
-      it 'should scroll to the new bottom of the view', ->
-        expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
+      it 'should prepare messages', ->
+        expect(ctrl.prepareMessages).toHaveBeenCalled()
+
+      describe 'and the user was at the bottom of the view', ->
+
+        beforeEach ->
+          ctrl.maxTop = top
+
+          onChange()
+
+        it 'should scroll to the new bottom of the view', ->
+          expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
+
+
+  describe 'when leaving the view', ->
+
+    beforeEach ->
+      ctrl.messagesRQ = true
+
+      scope.$broadcast '$ionicView.leave'
+      scope.$apply()
+
+    it 'should stop listening for new messages', ->
+      expect(ctrl.messagesRQ).toBeUndefined()
+
+
+  describe 'prepare messages', ->
+
+    beforeEach ->
+      # Mock the current date.
+      jasmine.clock().install()
+      currentDate = new Date(1438195002656)
+      jasmine.clock().mockDate currentDate
+
+      earlier = new Date()
+      later = new Date(earlier.getTime() + 1)
+      creator =
+        id: 2
+        name: 'Guido van Rossum'
+        imageUrl: 'http://facebook.com/profile-pics/vrawesome'
+      earlierMessage =
+        _id: 1
+        creator: creator
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        eventId: event.id
+        type: 'text'
+      laterMessage =
+        _id: 1
+        creator: creator
+        createdAt:
+          $date: new Date().getTime()
+        text: 'Michael Jordan is down'
+        eventId: event.id
+        type: 'action'
+      messages = [earlierMessage, laterMessage]
+
+      messagesRQ =
+        result: messages
+      ctrl.messagesRQ = messagesRQ
+
+      ctrl.messagesRQ
+      ctrl.prepareMessages()
+
+    it 'should set the messages on the event from oldest to newest', ->
+      laterMessage.creator = new User(laterMessage.creator)
+      earlierMessage.creator = new User(earlierMessage.creator)
+      expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
 
 
   describe 'when the user hits the bottom of the view', ->
@@ -278,14 +294,6 @@ describe 'event controller', ->
     it 'should show an error', ->
       # TODO: Show the error in the view.
       expect(ctrl.membersError).toBe true
-
-
-  describe 'sorting messages', ->
-
-    it 'should sort the messages from oldest to newest', ->
-      laterMessage.creator = new User(laterMessage.creator)
-      earlierMessage.creator = new User(earlierMessage.creator)
-      expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
 
 
   describe 'toggling whether the header is expanded', ->
