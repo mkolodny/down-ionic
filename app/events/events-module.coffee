@@ -26,6 +26,6 @@ angular.module 'down.events', [
       templateUrl: 'app/events/events.html'
       controller: 'EventsCtrl as events'
   .controller 'EventsCtrl', EventsCtrl
-  .value 'dividerHeight', 41 # px
-  .value 'eventHeight', 78 # px
+  .value 'dividerHeight', 36 # px
+  .value 'eventHeight', 79 # px
   .value 'transitionDuration', 450 # ms
