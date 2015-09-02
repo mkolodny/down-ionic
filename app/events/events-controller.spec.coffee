@@ -258,7 +258,7 @@ describe 'events controller', ->
         expect(item.right).toBe 0
 
 
-  describe 'generating the items list', ->
+  describe 'building the items list', ->
     noResponseInvitation = null
     newAcceptedInvitation = null
     oldAcceptedInvitation = null
@@ -266,6 +266,7 @@ describe 'events controller', ->
     oldMaybeInvitation = null
     declinedInvitation = null
     invitations = null
+    builtItems = null
 
     beforeEach ->
       event = invitation.event
@@ -307,7 +308,7 @@ describe 'events controller', ->
         response: Invitation.declined
         event: angular.extend event,
           id: 7
-      invitations = [
+      invitationsArray = [
         noResponseInvitation
         newAcceptedInvitation
         oldAcceptedInvitation
@@ -315,9 +316,11 @@ describe 'events controller', ->
         oldMaybeInvitation
         declinedInvitation
       ]
-      ctrl.invitations = {}
-      for invitation in invitations
-        ctrl.invitations[invitation.id] = invitation
+      invitations = {}
+      for invitation in invitationsArray
+        invitations[invitation.id] = invitation
+
+      builtItems = ctrl.buildItems invitations
 
     it 'should return the items', ->
       items = []
@@ -355,7 +358,7 @@ describe 'events controller', ->
         wasJoined: false
         invitation: declinedInvitation
       ctrl.setPositions items
-      expect(ctrl.buildItems(ctrl.invitations)).toEqual items
+      expect(items).toEqual items
 
 
   describe 'moving an item', ->

@@ -24,7 +24,7 @@ class EventCtrl
 
     # Mark newest message as read
     # TODO: Handle when no messages have come in yet.
-    newestMessage = @messages[@messages.length - 1]
+    newestMessage = @messages[@messages.length-1]
     @Asteroid.call 'readMessage', newestMessage._id
 
     # Watch for new messages.
@@ -41,7 +41,7 @@ class EventCtrl
         @$ionicScrollDelegate.scrollBottom true
 
       # Mark newest message as read
-      newestMessage = @messages[@messages.length - 1]
+      newestMessage = @messages[@messages.length-1]
       @Asteroid.call 'readMessage', newestMessage._id
 
     # TODO: Stop listening for new messages. Then start again event if the view was
@@ -49,11 +49,9 @@ class EventCtrl
     #@$scope.$on '$ionicView.leave', =>
     #  delete @messagesRQ
 
-    @Invitation.getEventInvitations {id: @event.id}
+    @Invitation.getMemberInvitations {id: @event.id}
       .$promise.then (invitations) =>
-        @members = (invitation.toUser for invitation in invitations \
-          when invitation.response in [@Invitation.accepted, @Invitation.maybe])
-        @respondedUsers = (invitation.toUser for invitation in invitations)
+        @members = (invitation.toUser for invitation in invitations)
       , =>
         @membersError = true
 
@@ -126,7 +124,6 @@ class EventCtrl
         if index is 1
           @$state.go 'inviteFriends',
             event: @event
-            respondedUserIds: (user.id for user in @respondedUsers)
           hideSheet()
         if index is 2
           hideSheet()

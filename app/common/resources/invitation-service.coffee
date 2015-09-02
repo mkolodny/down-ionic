@@ -72,9 +72,9 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
     ###
     Get an array of invitations with responses.
     ###
-    getEventInvitations:
+    getMemberInvitations:
       method: 'get'
-      url: "#{Event.listUrl}/:id/invitations"
+      url: "#{Event.listUrl}/:id/member-invitations"
       params:
         id: '@id'
       isArray: true

@@ -477,12 +477,12 @@ describe 'invitation service', ->
         muted: false
         created_at: new Date()
         updated_at: new Date()
-      url = "#{Event.listUrl}/#{event.id}/invitations"
+      url = "#{Event.listUrl}/#{event.id}/member-invitations"
       responseData = [invitation]
       $httpBackend.expectGET url
         .respond 200, angular.toJson(responseData)
 
-      Invitation.getEventInvitations {id: event.id}
+      Invitation.getMemberInvitations {id: event.id}
         .$promise.then (_response_) ->
           response = _response_
       $httpBackend.flush 1

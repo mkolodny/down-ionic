@@ -142,7 +142,7 @@ describe 'event controller', ->
     spyOn(Asteroid, 'getCollection').and.returnValue Messages
 
     deferred = $q.defer()
-    spyOn(Invitation, 'getEventInvitations').and.returnValue
+    spyOn(Invitation, 'getMemberInvitations').and.returnValue
       $promise: deferred.promise
 
     ctrl = $controller EventCtrl,
@@ -177,7 +177,7 @@ describe 'event controller', ->
   it 'should set the messages reactive query on the controller', ->
     expect(ctrl.messagesRQ).toBe messagesRQ
 
-  fit 'should set the messages on the event from oldest to newest', ->
+  it 'should set the messages on the event from oldest to newest', ->
     laterMessage.creator = new User(laterMessage.creator)
     earlierMessage.creator = new User(earlierMessage.creator)
     expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
@@ -186,7 +186,7 @@ describe 'event controller', ->
     expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)
 
   it 'should request the event members\' invitations', ->
-    expect(Invitation.getEventInvitations).toHaveBeenCalledWith {id: event.id}
+    expect(Invitation.getMemberInvitations).toHaveBeenCalledWith {id: event.id}
 
   describe 'once the view loads', ->
 
@@ -252,7 +252,6 @@ describe 'event controller', ->
   describe 'when the invitations return successfully', ->
     acceptedInvitation = null
     maybeInvitation = null
-    declinedInvitation = null
     invitations = null
 
     beforeEach ->
@@ -260,20 +259,14 @@ describe 'event controller', ->
         response: Invitation.accepted
       maybeInvitation = angular.extend {}, invitation,
         response: Invitation.maybe
-      declinedInvitation = angular.extend {}, invitation,
-        response: Invitation.declined
-      invitations = [acceptedInvitation, maybeInvitation, declinedInvitation]
+      invitations = [acceptedInvitation, maybeInvitation]
       deferred.resolve invitations
       scope.$apply()
 
     it 'should set the accepted/maybe invitations on the controller', ->
-      memberInvitations = [acceptedInvitation, declinedInvitation]
+      memberInvitations = [acceptedInvitation, maybeInvitation]
       members = (invitation.toUser for invitation in memberInvitations)
       expect(ctrl.members).toEqual members
-
-    it 'should set all of the invitations on the controller', ->
-      members = (invitation.toUser for invitation in invitations)
-      expect(ctrl.respondedUsers).toEqual members
 
 
   describe 'when the invitations return unsuccessfully', ->
@@ -289,7 +282,7 @@ describe 'event controller', ->
 
   describe 'sorting messages', ->
 
-    fit 'should sort the messages from oldest to newest', ->
+    it 'should sort the messages from oldest to newest', ->
       laterMessage.creator = new User(laterMessage.creator)
       earlierMessage.creator = new User(earlierMessage.creator)
       expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
@@ -551,9 +544,6 @@ describe 'event controller', ->
     describe 'tapping Send To.. button', ->
 
       beforeEach ->
-        ctrl.respondedUsers = [
-          id: 1
-        ]
         spyOn $state, 'go'
         ctrl.showMoreOptions()
         buttonClickedCallback 1
@@ -561,7 +551,6 @@ describe 'event controller', ->
       it 'should go to the invite friends view', ->
         stateParams =
           event: ctrl.event
-          respondedUserIds: (user.id for user in ctrl.respondedUsers)
         expect($state.go).toHaveBeenCalledWith 'inviteFriends', stateParams
 
       it 'should hide the action sheet', ->

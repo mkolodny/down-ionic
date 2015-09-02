@@ -1,18 +1,7 @@
 class EventsCtrl
-  constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading, @$ionicModal, @$scope, @$state,
-                @$timeout, @$window, @Asteroid, @dividerHeight, @eventHeight,
-                @Invitation, @transitionDuration, @Auth) ->
-    # Save the section titles.
-    @sections = {}
-    @sections[@Invitation.noResponse] =
-      title: 'New'
-    @sections[@Invitation.accepted] =
-      title: 'Down'
-    @sections[@Invitation.maybe] =
-      title: 'Maybe'
-    @sections[@Invitation.declined] =
-      title: 'Can\'t'
-
+  constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading, @$ionicModal,
+                @$scope, @$state, @$timeout, @$window, @Asteroid, @dividerHeight,
+                @eventHeight, @Invitation, @transitionDuration, @Auth) ->
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
         scope: @$scope
@@ -79,12 +68,19 @@ class EventsCtrl
     # Build the list of items to show on the view.
     items = []
 
+    # Save the section titles.
+    sections = {}
+    sections[@Invitation.noResponse] = {title: 'New'}
+    sections[@Invitation.accepted] = {title: 'Down'}
+    sections[@Invitation.maybe] = {title: 'Maybe'}
+    sections[@Invitation.declined] = {title: 'Can\'t'}
+
     noResponseInvitations = (invitation for id, invitation of invitations \
         when invitation.response is @Invitation.noResponse)
     if noResponseInvitations.length > 0
       items.push
         isDivider: true
-        title: @sections[@Invitation.noResponse].title
+        title: sections[@Invitation.noResponse].title
       for invitation in noResponseInvitations
         items.push angular.extend
           isDivider: false
@@ -92,7 +88,7 @@ class EventsCtrl
           invitation: invitation
 
     for response in [@Invitation.accepted, @Invitation.maybe]
-      title = @sections[response].title
+      title = sections[response].title
       sectionInvitations = (invitation for id, invitation of invitations \
           when invitation.response is response)
 
@@ -118,7 +114,7 @@ class EventsCtrl
     if declinedInvitations.length > 0
       items.push
         isDivider: true
-        title: @sections[@Invitation.declined].title
+        title: sections[@Invitation.declined].title
       for invitation in declinedInvitations
         items.push angular.extend
           isDivider: false
