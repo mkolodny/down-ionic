@@ -319,19 +319,21 @@ Global Sass
 .permission-denied {
   text-align: center;
   color: $brand-color;
-  padding-top: 24px;
+  padding-top: 100px;
+  font-size: 16px;
   line-height: 18px;
 
   .message {
-    margin: 0 auto 14px;
+    margin: 0 auto 24px;
     max-width: 216px;
+
+    &.instructions {
+      font-weight: 900;
+      max-width: none;
+    }
   }
   i {
     margin-left: 5px;
     margin-right: 5px;
-  }
-  .instructions {
-    font-weight: 900;
-    max-width: none;
   }
 }

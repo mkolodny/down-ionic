@@ -1,14 +1,13 @@
 #request-location {
   background-color: $brand-color;
 
+  .permission-denied {
+    padding-top: 24px;
+  }
   .message {
     color: #fff;
-    font-size: 16px;
     max-width: 250px;
     padding-bottom: 10px;
-
-    &.instructions {
-      max-width: none;
-    }
+    margin-bottom: 14px;
   }
 }
