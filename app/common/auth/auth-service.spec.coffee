@@ -571,7 +571,7 @@ describe 'Auth service', ->
       describe 'because location permissions are denied', ->
         beforeEach ->
           error =
-            code: 'PositionError.PERMISSION_DENIED'
+            code: 1
 
           rejected = false
           promise.then null, ->

@@ -111,9 +111,9 @@ class Auth
   watchLocation: ->
     deferred = @$q.defer()
 
-    @$cordovaGeolocation.watchPosition().then null
-      , (error) =>
-        if error.code is 'PositionError.PERMISSION_DENIED'
+    @$cordovaGeolocation.watchPosition()
+      .then null, (error) =>
+        if error.code is 1
           @$state.go 'requestLocation'
           deferred.reject()
         else
