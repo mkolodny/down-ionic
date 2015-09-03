@@ -29,7 +29,7 @@
                   expanded: item.isExpanded
                 }"
                 ng-click="item.isDivider ? null : (item.wasJoined ? events.viewEvent(item) : events.toggleIsExpanded(item))"
-                ng-style="{top: events.moving ? item.top+'px': none, right: item.right+'px'}">
+                ng-style="{top: events.moving ? item.top+'px' : auto, right: item.right+'px'}">
         <!-- Divider -->
         <div ng-if="item.isDivider">
           {{item.title}}

@@ -71,17 +71,6 @@ Global Sass
     color: #fff;
   }
 }
-.item-divider {
-  text-transform: uppercase;
-  background-color: #fff;
-  color: $brand-color;
-  font-size: 12px;
-  border: none;
-
-  &.activated {
-    background-color: #fff;
-  }
-}
 .list-avatar {
   .item-divider {
     padding-left: 12px;
@@ -100,6 +89,20 @@ Global Sass
     padding-top: 14px;
     font-size: 20px;
     font-weight: 500;
+  }
+  &.item-divider {
+    margin-bottom: 0;
+  }
+}
+.item-divider {
+  text-transform: uppercase;
+  background-color: #fff;
+  color: $brand-color;
+  font-size: 12px;
+  border: none;
+
+  &.activated {
+    background-color: #fff;
   }
 }
 .item-avatar {

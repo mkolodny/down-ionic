@@ -8,12 +8,14 @@
     font-size: 18px;
     padding-right: 10px;
   }
+  .list,
+  .item {
+    width: 100%;
+  }
   .moving {
-    .list,
-    .item-divider,
     .item {
       position: absolute;
-      width: 100%;
+      transition: top 0.5s ease-in-out, right 1s linear;
     }
   }
   .item-divider {
@@ -27,7 +29,6 @@
   }
   .item {
     padding-right: 8px;
-    transition: top 0.5s ease-in-out, right 1s linear;
 
     &.updated {
       h2,
@@ -50,7 +51,7 @@
     }
     .chart-pie {
       position: absolute;
-      top: 10px;
+      top: 12px;
       left: 10px;
 
       &.gray {
