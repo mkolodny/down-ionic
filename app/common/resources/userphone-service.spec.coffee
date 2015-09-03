@@ -150,15 +150,13 @@ describe 'userphone service', ->
         $httpBackend.expectPOST url, requestData
           .respond 500, ''
 
-        UserPhone.create(contact).then null, ->
-          rejected = true
+        UserPhone.create contact
+          .then null, ->
+            rejected = true
         $httpBackend.flush 1
 
       it 'should reject the promise', ->
         expect(rejected).toBe true
-
-
-    xdescribe 'when the phone number is invalid', ->
 
 
   describe 'getting from phones', ->
