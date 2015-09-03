@@ -22,7 +22,6 @@ class EventCtrl
       # Watch for new messages.
       @messagesRQ.on 'change', @messagesOnChangeHandler
 
-
     # Stop listening for new messages.
     @$scope.$on '$ionicView.leave', =>
       @messagesRQ.off 'change', @messagesOnChangeHandler
@@ -33,7 +32,7 @@ class EventCtrl
       , =>
         @membersError = true
 
-  messagesOnChangeHandler: ->
+  messagesOnChangeHandler: =>
     @prepareMessages()
     if not @$scope.$$phase
       @$scope.$digest()

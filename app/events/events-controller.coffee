@@ -154,8 +154,8 @@ class EventsCtrl
         messages = angular.copy messagesRQ.result
         @setLatestMessage event, messages
 
-        # Whenever a new message gets posted on the event, set the latest message
-        # on the event.
+        # Whenever a new message gets posted on the event, set the
+        # latest message on the event.
         messagesRQ.on 'change', (_id) =>
           messages = angular.copy messagesRQ.result
           if @isNewMessage event, _id
@@ -164,7 +164,7 @@ class EventsCtrl
         # Whenever an event changes, check is the lastest message has been read
         eventsRQ.on 'change', =>
           latestMessage = messages[0]
-          if event.latestMessage? and latestMessage?
+          if event.latestMessage isnt undefined and latestMessage isnt undefined
             event.latestMessage.wasRead = @getWasRead latestMessage
 
 
