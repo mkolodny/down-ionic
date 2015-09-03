@@ -128,12 +128,15 @@ angular.module 'down', [
       # If we've already asked the user for push notifications permissions,
       #   register the `$cordovaPush` module so that we can send them in-app
       #   notifications.
-      if localStorageService.get('hasRequestedPushNotifications')
-        iosConfig =
+      if localStorageService.get 'hasRequestedPushNotifications'
+        $cordovaPush.register
           badge: true
           sound: true
           alert: true
-        $cordovaPush.register iosConfig
+
+      # Update the user's location while they use the app.
+      if localStorageService.get 'hasRequestedLocationServices'
+        Auth.watchLocation()
 
       Auth.redirectForAuthState()
 
