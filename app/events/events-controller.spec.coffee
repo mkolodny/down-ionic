@@ -12,7 +12,7 @@ require '../common/auth/auth-module'
 require './events-module'
 EventsCtrl = require './events-controller'
 
-describe 'events controller', ->
+fdescribe 'events controller', ->
   $compile = null
   $cordovaDatePicker = null
   $httpBackend = null
@@ -37,7 +37,6 @@ describe 'events controller', ->
   Invitation = null
   ngToast = null
   scope = null
-  transitionDuration = null
   User = null
 
   beforeEach angular.mock.module('ui.router')
@@ -74,7 +73,6 @@ describe 'events controller', ->
     Invitation = $injector.get 'Invitation'
     ngToast = $injector.get 'ngToast'
     scope = $rootScope.$new()
-    transitionDuration = $injector.get 'transitionDuration'
     User = $injector.get 'User'
 
     earlier = new Date()
@@ -114,6 +112,7 @@ describe 'events controller', ->
       isDivider: false
       wasJoined: true
       invitation: invitation
+      id: invitation.id
 
     # This is necessary because for some reason ionic is requesting this file
     # when the promise gets resolved.
@@ -326,10 +325,12 @@ describe 'events controller', ->
       items.push
         isDivider: true
         title: 'New'
+        id: 'New'
       items.push angular.extend
         isDivider: false
         wasJoined: false
         invitation: noResponseInvitation
+        id: noResponseInvitation.id
       joinedInvitations =
         'Down':
           newInvitation: newAcceptedInvitation
@@ -341,175 +342,28 @@ describe 'events controller', ->
         items.push
           isDivider: true
           title: title
+          id: title
         items.push angular.extend
           isDivider: false
           wasJoined: true
           invitation: _invitations.newInvitation
+          id: _invitations.newInvitation.id
         items.push angular.extend
           isDivider: false
           wasJoined: true
           invitation: _invitations.oldInvitation
+          id: _invitations.oldInvitation.id
       items.push
         isDivider: true
         title: 'Can\'t'
+        id: 'Can\'t'
       items.push angular.extend
         isDivider: false
         wasJoined: false
         invitation: declinedInvitation
+        id: declinedInvitation.id
       ctrl.setPositions items
       expect(items).toEqual items
-
-
-  describe 'moving an item', ->
-    items = null
-    invitations = null
-
-    beforeEach ->
-      event = invitation.event
-      noResponseInvitation = angular.extend {}, invitation,
-        id: 2
-        response: Invitation.noResponse
-        event: angular.extend {}, event,
-          id: 3
-      acceptedInvitation = angular.extend {}, invitation,
-        id: 4
-        response: Invitation.accepted
-        event: angular.extend {}, event,
-          id: 5
-      ctrl.items = []
-      ctrl.items.push
-        isDivider: true
-        title: 'New'
-      ctrl.items.push angular.extend
-        isDivider: false
-        wasJoined: false
-        isExpanded: true
-        invitation: noResponseInvitation
-      ctrl.items.push
-        isDivider: true
-        title: 'Down'
-      ctrl.items.push angular.extend
-        isDivider: false
-        wasJoined: true
-        isExpanded: false
-        invitation: acceptedInvitation
-      ctrl.setPositions ctrl.items
-
-      # Save the current items so that we can check equality later.
-      items = ctrl.items
-
-      # Update the item's response.
-      item.response = Invitation.maybe
-
-      # Mock the window's innerWidth so that we can use it to set the right
-      # property on items we remove.
-      $window.innerWidth = 10
-
-      noResponseInvitation.response = item.response
-      invitations = [noResponseInvitation, acceptedInvitation]
-      ctrl.moveItem item, invitations
-
-    it 'should set a moving flag', ->
-      expect(ctrl.moving).toBe true
-
-    it 'should collapse the item', ->
-      expect(item.isExpanded).toBe false
-
-    it 'should set a reordering property on the item', ->
-      expect(item.isReordering).toBe true
-
-    describe 'after a timeout', ->
-
-      beforeEach ->
-        $timeout.flush 0
-
-      it 'should update the items\' positions', ->
-        expect(ctrl.items).toBe items
-        expect(ctrl.items[0].right).toBe $window.innerWidth
-        expect(ctrl.items[2].top).toBe 0
-        expect(ctrl.items[3].top).toBe dividerHeight
-        expect(ctrl.items[1].top).toBe dividerHeight+eventHeight+dividerHeight
-
-      describe 'after time passes', ->
-
-        beforeEach ->
-          $timeout.flush transitionDuration
-          scope.$apply()
-
-        it 'should unset the moving flag', ->
-          expect(ctrl.moving).toBe false
-
-        it 'should replace the old items with the new ones', ->
-          expect(ctrl.items).toEqual ctrl.buildItems(invitations)
-
-
-  describe 'checking whether two items are the same', ->
-    item1 = null
-    item2 = null
-
-    describe 'when both are dividers', ->
-
-      beforeEach ->
-        item1 =
-          isDivider: true
-          title: 'Down'
-
-      describe 'that are the same', ->
-
-        beforeEach ->
-          item2 = angular.copy item1
-
-        it 'should return true', ->
-          expect(ctrl.areItemsEqual item1, item2).toBe true
-
-
-      describe 'that are different', ->
-
-        beforeEach ->
-          item2 =
-            isDivider: true
-            title: 'Maybe'
-
-        it 'should return false', ->
-          expect(ctrl.areItemsEqual item1, item2).toBe false
-
-
-    describe 'when both are invitations', ->
-
-      beforeEach ->
-        item1 = angular.copy item
-
-      describe 'that are the same', ->
-
-        beforeEach ->
-          item2 = angular.copy item1
-
-        it 'should return true', ->
-          expect(ctrl.areItemsEqual item1, item2).toBe true
-
-
-      describe 'that are different', ->
-
-        beforeEach ->
-          invitation = angular.extend {}, item1.invitation,
-            id: item1.invitation.id + 1
-          item2 = angular.copy item1
-          item2.invitation = invitation
-
-        it 'should return false', ->
-          expect(ctrl.areItemsEqual item1, item2).toBe false
-
-
-    describe 'when one is a divider and another is an invitation', ->
-
-      beforeEach ->
-        item1 =
-          isDivider: true
-          title: 'Down'
-        item2 = angular.copy item
-
-      it 'should return false', ->
-        expect(ctrl.areItemsEqual item1, item2).toBe false
 
 
   describe 'toggling whether an item is expanded', ->
@@ -712,6 +566,7 @@ describe 'events controller', ->
     earlier = null
     later = null
     messages = null
+    builtItems = null
 
     beforeEach ->
       event = invitation.event
@@ -742,8 +597,9 @@ describe 'events controller', ->
       # Reset the current items in case they were updated somewhere else.
       ctrl.items = [item]
 
-      spyOn ctrl, 'moveItem'
       spyOn(ctrl, 'getWasRead').and.returnValue true
+      builtItems = []
+      spyOn(ctrl, 'buildItems').and.returnValue builtItems
 
     describe 'when the latest message is a text', ->
 
@@ -765,8 +621,11 @@ describe 'events controller', ->
         createdAt = new Date textMessage.createdAt.$date
         expect(event.latestMessage.createdAt).toEqual createdAt
 
-      it 'should move the updated item', ->
-        expect(ctrl.moveItem).toHaveBeenCalledWith item, ctrl.invitations
+      it 'should rebuild the items list', ->
+        expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+      it 'should save the new items on the controller', ->
+        expect(ctrl.items).toBe builtItems
 
 
     describe 'when the latest message is an action', ->
@@ -867,6 +726,7 @@ describe 'events controller', ->
     newResponse = null
     originalInvitations = null
     originalInvitation = null
+    builtItems = null
 
     beforeEach ->
       jasmine.clock().install()
@@ -876,7 +736,8 @@ describe 'events controller', ->
       deferred = $q.defer()
       spyOn(Invitation, 'updateResponse').and.returnValue
         $promise: deferred.promise
-      spyOn ctrl, 'moveItem'
+      builtItems = []
+      spyOn(ctrl, 'buildItems').and.returnValue builtItems
 
       # Mock the invitations saved on the controller.
       ctrl.invitations =
@@ -903,379 +764,8 @@ describe 'events controller', ->
       expect(Invitation.updateResponse).toHaveBeenCalledWith originalInvitation, \
           newResponse
 
-    it 'should move the item in the items array', ->
-      expect(ctrl.moveItem).toHaveBeenCalledWith item, originalInvitations
-
-    describe 'when the update fails', ->
-
-      beforeEach ->
-        ctrl.moveItem.calls.reset()
-        spyOn ngToast, 'create'
-
-        deferred.reject()
-        scope.$apply()
-
-      it 'should show an error', ->
-        error = 'For some reason, that didn\'t work.'
-        expect(ngToast.create).toHaveBeenCalledWith error
-
-      it 'should move the item back to the original location', ->
-        # TODO: Test this live.
-        expect(ctrl.moveItem).toHaveBeenCalledWith item, originalInvitations
-
-
-  describe 'accepting an invitation', ->
-    $event = null
-
-    beforeEach ->
-      spyOn ctrl, 'respondToInvitation'
-
-      $event = '$event'
-      ctrl.acceptInvitation item, $event
-
-    it 'should respond to the invitation', ->
-      expect(ctrl.respondToInvitation).toHaveBeenCalledWith item, $event, \
-          Invitation.accepted
-
-
-  describe 'responding maybe to an invitation', ->
-    $event = null
-
-    beforeEach ->
-      spyOn ctrl, 'respondToInvitation'
-
-      $event = '$event'
-      ctrl.maybeInvitation item, $event
-
-    it 'should respond to the invitation', ->
-      expect(ctrl.respondToInvitation).toHaveBeenCalledWith item, $event, \
-          Invitation.maybe
-
-
-  describe 'declining an invitation', ->
-    $event = null
-
-    beforeEach ->
-      spyOn ctrl, 'respondToInvitation'
-
-      $event = '$event'
-      ctrl.declineInvitation item, $event
-
-    it 'should respond to the invitation', ->
-      expect(ctrl.respondToInvitation).toHaveBeenCalledWith item, $event, \
-          Invitation.declined
-
-
-  describe 'checking whether an item was declined', ->
-
-    describe 'when it was declined', ->
-
-      beforeEach ->
-        item.invitation.response = Invitation.declined
-
-      it 'should return true', ->
-        expect(ctrl.itemWasDeclined item).toBe true
-
-
-    describe 'when it wasn\'t declined', ->
-
-      beforeEach ->
-        item.invitation.response = Invitation.accepted
-
-      it 'should return false', ->
-        expect(ctrl.itemWasDeclined item).toBe false
-
-
-  describe 'toggling setting the date', ->
-    deferredDatePicker = null
-
-    beforeEach ->
-      deferredDatePicker = $q.defer()
-      spyOn($cordovaDatePicker, 'show').and.returnValue deferredDatePicker.promise
-
-    describe 'when there\'s no date right now', ->
-
-      beforeEach ->
-        ctrl.hasDate = false
-        ctrl.newEvent =
-          datetime: new Date 1438195002656
-
-        ctrl.toggleHasDate()
-
-      it 'should show the datepicker', ->
-        options =
-          mode: 'datetime'
-          date: ctrl.newEvent.datetime
-          allowOldDates: false
-          doneButtonLabel: 'Set Date'
-        expect($cordovaDatePicker.show).toHaveBeenCalledWith options
-
-      describe 'then a date gets set', ->
-        newDate = null
-
-        beforeEach ->
-          newDate = new Date 1438195002657
-          deferredDatePicker.resolve newDate
-          scope.$apply()
-
-        it 'should set the date on the new event', ->
-          expect(ctrl.newEvent.datetime).toBe newDate
-
-        it 'should set a flag', ->
-          expect(ctrl.newEvent.hasDate).toBe true
-
-
-    describe 'when the date hasn\'t been set yet', ->
-      date = null
-
-      beforeEach ->
-        jasmine.clock().install()
-        date = new Date 1438195002656
-        jasmine.clock().mockDate date
-
-        ctrl.newEvent = {}
-
-        ctrl.toggleHasDate()
-
-      afterEach ->
-        jasmine.clock().uninstall()
-
-      it 'should show the datepicker', ->
-        options =
-          mode: 'datetime'
-          date: date
-          allowOldDates: false
-          doneButtonLabel: 'Set Date'
-        expect($cordovaDatePicker.show).toHaveBeenCalledWith options
-
-
-    describe 'when the date is showing', ->
-
-      beforeEach ->
-        ctrl.newEvent.hasDate = true
-
-        ctrl.toggleHasDate()
-
-      it 'should hide the date', ->
-        expect(ctrl.newEvent.hasDate).toBe false
-
-
-  describe 'toggling setting a place', ->
-
-    describe 'when the event doesn\'t have a place', ->
-
-      beforeEach ->
-        ctrl.setPlaceModal =
-          show: jasmine.createSpy 'setPlaceModal.show'
-
-        ctrl.toggleHasPlace()
-
-      it 'should show the set place modal', ->
-        expect(ctrl.setPlaceModal.show).toHaveBeenCalled()
-
-
-    describe 'when the event has a place', ->
-
-      beforeEach ->
-        ctrl.newEvent.hasPlace = true
-
-        ctrl.toggleHasPlace()
-
-      it 'should hide the location input', ->
-        expect(ctrl.newEvent.hasPlace).toBe false
-
-
-  describe 'toggling adding a comment', ->
-
-    describe 'when the comment isn\'t shown', ->
-
-      beforeEach ->
-        ctrl.toggleHasComment()
-
-      it 'should set a flag', ->
-        expect(ctrl.newEvent.hasComment).toBe true
-
-
-    describe 'when the comment input is showing', ->
-
-      beforeEach ->
-        ctrl.newEvent.hasComment = true
-
-        ctrl.toggleHasComment()
-
-      it 'should hide the comment input', ->
-        expect(ctrl.newEvent.hasComment).toBe false
-
-
-  describe 'hiding the set place modal', ->
-
-    beforeEach ->
-      ctrl.setPlaceModal =
-        hide: jasmine.createSpy 'setPlaceModal.hide'
-
-      scope.hidePlaceModal()
-
-    it 'should hide the modal', ->
-      expect(ctrl.setPlaceModal.hide).toHaveBeenCalled()
-
-
-  describe 'cleaning up the set place modal', ->
-
-    beforeEach ->
-      ctrl.setPlaceModal =
-        remove: jasmine.createSpy 'setPlaceModal.remove'
-
-      scope.$broadcast '$destroy'
-
-    it 'should remove the modal', ->
-      expect(ctrl.setPlaceModal.remove).toHaveBeenCalled()
-
-
-  describe 'setting a place', ->
-    place = null
-
-    beforeEach ->
-      spyOn scope, 'hidePlaceModal'
-
-      place =
-        name: 'Pianos'
-        geometry:
-          location:
-            G: 40.721025
-            K: -73.987692
-      scope.$broadcast 'placeAutocomplete:placeChanged', place
-
-    it 'should mark the new event as having a place', ->
-      expect(ctrl.newEvent.hasPlace).toBe true
-
-    it 'should set the place on the new event', ->
-      expect(ctrl.newEvent.place).toEqual
-        name: place.name
-        lat: place.geometry.location.G
-        long: place.geometry.location.K
-
-    it 'should close the modal', ->
-      expect(scope.hidePlaceModal).toHaveBeenCalled()
-
-
-  describe 'inviting friends', ->
-    newEvent = null
-
-    beforeEach ->
-      ctrl.newEvent =
-        title: 'bars?!?!?!?'
-        hasDate: false
-      # ctrl.getNewEvent creates an event object with attributes set based on
-      # which icons are selected.
-      newEvent =
-        title: ctrl.newEvent.title
-      spyOn(ctrl, 'getNewEvent').and.returnValue newEvent
-      spyOn $ionicHistory, 'nextViewOptions'
-      spyOn $state, 'go'
-
-      ctrl.inviteFriends()
-
-    it 'should disable animating to the next view', ->
-      options = {disableAnimate: true}
-      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
-
-    it 'should navigate to the invite friends view', ->
-      expect($state.go).toHaveBeenCalledWith 'inviteFriends', {event: newEvent}
-
-
-  describe 'getting the new event', ->
-
-    describe 'when the user only set a title', ->
-
-      beforeEach ->
-        ctrl.newEvent =
-          title: 'bars?!!?!'
-
-      it 'should set the title on the event', ->
-        expect(ctrl.getNewEvent()).toEqual
-          title: ctrl.newEvent.title
-
-
-    describe 'when the user set a date', ->
-
-      beforeEach ->
-        ctrl.newEvent =
-          title: 'bars?!!?!'
-          hasDate: true
-          datetime: new Date()
-
-      it 'should set the datetime on the event', ->
-        expect(ctrl.getNewEvent()).toEqual
-          title: ctrl.newEvent.title
-          datetime: ctrl.newEvent.datetime
-
-
-    describe 'when the user set a place', ->
-
-      beforeEach ->
-        ctrl.newEvent =
-          title: 'bars?!!?!'
-          hasPlace: true
-          place:
-            name: '169 Bar'
-            lat: 40.7138251
-            long: -73.9897481
-
-      it 'should set the place on the event', ->
-        expect(ctrl.getNewEvent()).toEqual
-          title: ctrl.newEvent.title
-          place: ctrl.newEvent.place
-
-
-    describe 'when the user added a comment', ->
-
-      beforeEach ->
-        ctrl.newEvent =
-          title: 'bars?!!?!'
-          hasComment: true
-          comment: 'Who doesn\'t love go go dancers?'
-
-      it 'should set the place on the event', ->
-        expect(ctrl.getNewEvent()).toEqual
-          title: ctrl.newEvent.title
-          comment: ctrl.newEvent.comment
-
-
-  describe 'tapping to view my friends', ->
-
-    beforeEach ->
-      spyOn $ionicHistory, 'nextViewOptions'
-      spyOn $state, 'go'
-
-      ctrl.myFriends()
-
-    it 'should disable animating to the next view', ->
-      options = {disableAnimate: true}
-      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
-
-    it 'should go to the friends view', ->
-      expect($state.go).toHaveBeenCalledWith 'friends'
-
-
-  describe 'viewing an event group chat', ->
-
-    beforeEach ->
-      spyOn $state, 'go'
-
-      ctrl.viewEvent item
-
-    it 'should go to the event view', ->
-      expect($state.go).toHaveBeenCalledWith 'event',
-        invitation: item.invitation
-        id: item.invitation.event.id
-
-
-  describe 'pulling to refresh', ->
-
-    beforeEach ->
-      spyOn ctrl, 'getInvitations'
-
-      ctrl.refresh()
-
-    it 'should get an updated list of items', ->
-      expect(ctrl.getInvitations).toHaveBeenCalled()
+    it 'should rebuild the items array', ->
+      expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+    it 'should save the new items on the controller', ->
+      expect(ctrl.items).toBe builtItems

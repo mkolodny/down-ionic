@@ -18,8 +18,7 @@
       No suggestions right now.
     </div>
     <ion-list class="list-avatar" ng-class="{moving: events.moving}">
-      <!-- We might need to use `track by item.id` for the animations to work. -->
-      <ion-item ng-repeat="item in events.items"
+      <ion-item ng-repeat="item in events.items track by item.id"
                 ng-class="{
                   'item-divider': item.isDivider,
                   'item-avatar': !item.isDivider,

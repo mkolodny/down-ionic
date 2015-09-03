@@ -1,7 +1,7 @@
 class EventsCtrl
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$scope, @$state, @$timeout, @$window, @Asteroid, @dividerHeight,
-                @eventHeight, @Invitation, @ngToast, @transitionDuration, @Auth) ->
+                @$scope, @$state, @$timeout, @Asteroid, @dividerHeight,
+                @eventHeight, @Invitation, @ngToast, @Auth) ->
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
         scope: @$scope
@@ -81,11 +81,13 @@ class EventsCtrl
       items.push
         isDivider: true
         title: sections[@Invitation.noResponse].title
+        id: sections[@Invitation.noResponse].title
       for invitation in noResponseInvitations
         items.push angular.extend
           isDivider: false
           wasJoined: false
           invitation: invitation
+          id: invitation.id
 
     for response in [@Invitation.accepted, @Invitation.maybe]
       title = sections[response].title
@@ -93,6 +95,7 @@ class EventsCtrl
           when invitation.response is response)
 
       # Sort by latestMessage time
+      # TODO: Handle when the event doesn't have a latest message.
       sectionInvitations.sort (a, b) ->
         if a.event.latestMessage?.createdAt > b.event.latestMessage?.createdAt
           return -1
@@ -103,11 +106,13 @@ class EventsCtrl
         items.push
           isDivider: true
           title: title
+          id: title
         for invitation in sectionInvitations
           items.push angular.extend
             isDivider: false
             wasJoined: true
             invitation: invitation
+            id: invitation.id
 
     declinedInvitations = (invitation for id, invitation of invitations \
         when invitation.response is @Invitation.declined)
@@ -115,11 +120,13 @@ class EventsCtrl
       items.push
         isDivider: true
         title: sections[@Invitation.declined].title
+        id: sections[@Invitation.declined].title
       for invitation in declinedInvitations
         items.push angular.extend
           isDivider: false
           wasJoined: false
           invitation: invitation
+          id: invitation.id
 
     # Give every item a top and a right property to allow for transitions.
     @setPositions items
@@ -178,7 +185,8 @@ class EventsCtrl
     Messages = @Asteroid.getCollection 'messages'
     messagesRQ = Messages.reactiveQuery {_id: messageId}
     message = messagesRQ.result[0]
-    message.createdAt.$date > event.latestMessage?.createdAt?.getTime()
+    if message isnt undefined
+      message.createdAt.$date > event.latestMessage?.createdAt?.getTime()
 
   setLatestMessage: (event, messages) ->
     if messages.length is 0 then return
@@ -213,7 +221,7 @@ class EventsCtrl
     # Move the event's updated item.
     for item in @items
       if item.invitation?.event.id is event.id
-        @moveItem item, @invitations
+        @items = @buildItems @invitations
 
   getWasRead: (message) ->
     Events = @Asteroid.getCollection 'events'
@@ -229,54 +237,6 @@ class EventsCtrl
       when member.userId is "#{@Auth.user.id}")
     members[0].lastRead.$date >= message.createdAt.$date
 
-  moveItem: (item, invitations) ->
-    # TODO: If none of the items are going to move, just return.
-
-    @moving = true
-
-    # Make sure the item is collapsed.
-    item.isExpanded = false
-
-    # Mark the item as currently being re-ordered.
-    item.isReordering = true
-
-    # Wait for the moving flag to be set on the view so that the list becomes
-    # absolutely positioned.
-    @$timeout =>
-      newItems = @buildItems invitations
-
-      # Update the top position of the current items in the DOM to match where
-      # they'll be after we update the items.
-      for newItem in newItems
-        for oldItem in @items
-          if @areItemsEqual(newItem, oldItem)
-            oldItem.top = newItem.top
-
-      # Set the right position of items we'll be removing so that they're off the
-      # screen.
-      for oldItem in @items
-        willBeRemoved = true
-        # The item won't be removed if it's in the array of new items.
-        for newItem in newItems
-          if @areItemsEqual(newItem, oldItem)
-            willBeRemoved = false
-        if willBeRemoved
-          oldItem.right = @$window.innerWidth
-
-      # After `transitionDuration` ms, replace the old items array with the new one.
-      @$timeout =>
-        @moving = false
-        @items = newItems
-      , @transitionDuration
-
-  areItemsEqual: (item1, item2) ->
-    if item1.isDivider and item2.isDivider
-      item1.title is item2.title
-    else if item1.invitation? and item2.invitation?
-      item1.invitation.id is item2.invitation.id
-    else
-      false
-
   toggleIsExpanded: (item) ->
     item.isExpanded = not item.isExpanded
 
@@ -290,17 +250,16 @@ class EventsCtrl
     @respondToInvitation item, $event, @Invitation.declined
 
   respondToInvitation: (item, $event, response) ->
-    invitation = @invitations[item.invitation.id]
-
     # Prevent calling the ion-item element's ng-click.
     $event.stopPropagation()
 
+    invitation = @invitations[item.invitation.id]
     @Invitation.updateResponse invitation, response
       .$promise.then null, =>
-        @moveItem item, @invitations
+        @items = @buildItems @invitations
         @ngToast.create 'For some reason, that didn\'t work.'
 
-    @moveItem item, @invitations
+    @items = @buildItems @invitations
 
   itemWasDeclined: (item) ->
     item.invitation.response is @Invitation.declined
