@@ -9,7 +9,7 @@
       <label class="item item-input"
              ng-class="{'has-error': setUsernameForm.$submitted && setUsernameForm.username.$invalid }">
         <input ng-model="setUsername.username" name="username" required
-               placeholder="Username">
+               autocorrect="off" autocapitalize="off" placeholder="Username">
       </label>
       <div class="form-errors" ng-if="setUsernameForm.$submitted">
         <div class="form-error" ng-if="setUsernameForm.username.$error.required">
