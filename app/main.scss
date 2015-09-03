@@ -132,6 +132,8 @@ Global Sass
   max-width: none;
 }
 .loading {
+  font-weight: 900;
+
   .spinner {
     stroke: #fff;
     fill: #fff;
@@ -301,5 +303,26 @@ Global Sass
   .spinner {
     stroke: #666666;
     fill: #666666;
+  }
+}
+
+// Permission denied
+.permission-denied {
+  text-align: center;
+  color: $brand-color;
+  padding-top: 24px;
+  line-height: 18px;
+
+  .message {
+    margin: 0 auto 14px;
+    max-width: 216px;
+  }
+  i {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+  .instructions {
+    font-weight: 900;
+    max-width: none;
   }
 }
