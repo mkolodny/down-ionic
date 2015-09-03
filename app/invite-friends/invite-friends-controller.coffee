@@ -1,14 +1,22 @@
 class InviteFriendsCtrl
-  constructor: (@$ionicHistory, @$ionicLoading, @$scope, @$state, @$stateParams,
-                 @Auth, @Event, @Invitation) ->
-    @event = @$stateParams.event
+  constructor: (@$ionicHistory, @$ionicLoading, @$scope,
+          @$state, @$stateParams, @Auth, @Event, @Invitation) ->
     @selectedFriends = []
     @selectedFriendIds = {}
     @invitedUserIds = {}
 
     @$scope.$on '$ionicView.enter', =>
+      # use existing event if not set on state params
+      #   i.e. coming back from add friends
+      # NOTE : use @$state.params instead of @$stateParams
+      #   because https://github.com/driftyco/ionic/issues/3884
+      @event = @$state.params.event or @event
       # Clear previous errors
       @error = false
+
+      # Default to calling cleanupView after leaving
+      #   addFriends overwrites this
+      @cleanupViewAfterLeave = true
 
       # Don't animate the transition to the next view.
       @$ionicHistory.nextViewOptions
@@ -32,6 +40,16 @@ class InviteFriendsCtrl
       else
         # We're creating a new event.
         @buildItems()
+
+    @$scope.$on '$ionicView.afterLeave', =>
+      if @cleanupViewAfterLeave
+        @cleanupView()
+
+  cleanupView: ->
+    delete @event
+    @selectedFriends = []
+    @selectedFriendIds = {}
+    @invitedUserIds = {}
 
   buildItems: ->
     # Make a copy of the user's friends so that when the
@@ -126,10 +144,6 @@ class InviteFriendsCtrl
     delete @selectedFriendIds[friend.id]
 
   sendInvitations: ->
-    # Create the user's friends' invitations.
-    invitations = (@Invitation.serialize {toUserId: friend.id} \
-        for friend in @selectedFriends)
-
     @$ionicLoading.show
       template: '''
         <div class="loading-text">Sending suggestion...</div>
@@ -138,10 +152,15 @@ class InviteFriendsCtrl
 
     if 'id' of @event
       # Invite more people to an existing event.
-      @Invitation.bulkCreate invitations
-        .$promise.then =>
+      invitations = ({toUserId: friend.id} \
+            for friend in @selectedFriends)
+      eventId = @event.id
+
+      @Invitation.bulkCreate eventId, invitations
+        .then =>
           @$ionicHistory.clearCache()
         .then =>
+          @cleanupView()
           @$ionicHistory.goBack()
         , =>
           @error = 'inviteError'
@@ -149,6 +168,11 @@ class InviteFriendsCtrl
           @$ionicLoading.hide()
     else
       # Create a new event.
+
+      # Create the user's friends' invitations.
+      invitations = (@Invitation.serialize {toUserId: friend.id} \
+          for friend in @selectedFriends)
+
       # Create the current user's invitation.
       invitations.push @Invitation.serialize
         toUserId: @Auth.user.id
@@ -158,6 +182,7 @@ class InviteFriendsCtrl
         .$promise.then =>
           @$ionicHistory.clearCache()
         .then =>
+          @cleanupView()
           @$state.go 'events'
         , =>
           @error = 'inviteError'
@@ -165,6 +190,7 @@ class InviteFriendsCtrl
           @$ionicLoading.hide()
 
   addFriends: ->
+    @cleanupViewAfterLeave = false
     @$state.go 'addFriends'
 
   getWasSelected: (friend) ->

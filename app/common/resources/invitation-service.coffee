@@ -47,17 +47,6 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
     invitation
 
   resource = $resource "#{listUrl}/:id", null,
-    bulkCreate:
-      method: 'post'
-      isArray: true
-      transformRequest: (data, headersGetter) ->
-        invitations = (serializeInvitation(invitation) for invitation in data)
-        request = invitations: invitations
-        angular.toJson request
-      transformResponse: (data, headersGetter) ->
-        data = angular.fromJson data
-        (deserializeInvitation(invitation) for invitation in data)
-
     update:
       method: 'put'
       params:
@@ -95,6 +84,25 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
   resource.acceptAction = 'accept_action'
   resource.declineAction = 'decline_action'
   resource.maybeAction = 'maybe_action'
+
+  resource.bulkCreate = (eventId, invitations) ->
+    deferred = $q.defer()
+
+    invitationsPostData = (@serialize invitation \
+      for invitation in invitations)
+
+    postData =
+      event: eventId
+      invitations: invitationsPostData
+
+    $http.post listUrl, postData
+      .success (data, status) =>
+        invitations = (@deserialize invitation for invitation in data)
+        deferred.resolve invitations
+      .error (data, status) =>
+        deferred.reject()
+
+    deferred.promise
 
   resource.getMyInvitations = ->
     deferred = $q.defer()
