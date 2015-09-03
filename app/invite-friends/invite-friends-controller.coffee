@@ -1,6 +1,6 @@
 class InviteFriendsCtrl
-  constructor: (@$ionicHistory, @$ionicLoading, @$scope,
-          @$state, @$stateParams, @Auth, @Event, @Invitation) ->
+  constructor: (@$ionicHistory, @$ionicLoading, @$scope, @$state, @Auth, @Event,
+                @Invitation) ->
     @selectedFriends = []
     @selectedFriendIds = {}
     @invitedUserIds = {}

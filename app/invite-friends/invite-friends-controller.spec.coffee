@@ -8,13 +8,12 @@ require '../common/auth/auth-module'
 require '../common/resources/resources-module'
 InviteFriendsCtrl = require './invite-friends-controller'
 
-describe 'invite friends controller', ->
+fdescribe 'invite friends controller', ->
   $controller = null
   $ionicHistory = null
   $ionicLoading = null
   $q = null
   $state = null
-  $stateParams = null
   Auth = null
   ctrl = null
   event = null
@@ -36,8 +35,7 @@ describe 'invite friends controller', ->
     $ionicLoading = $injector.get '$ionicLoading'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
-    $state = $injector.get '$state'
-    $stateParams = angular.copy $injector.get('$stateParams')
+    $state = angular.copy $injector.get('$state')
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
@@ -96,7 +94,7 @@ describe 'invite friends controller', ->
         name: 'B Bar & Grill'
         lat: 40.7270718
         long: -73.9919324
-    $stateParams.event = event
+    $state.params.event = event
 
     spyOn $ionicHistory, 'nextViewOptions'
 
@@ -106,7 +104,7 @@ describe 'invite friends controller', ->
     ctrl = $controller InviteFriendsCtrl,
       $scope: scope
       Auth: Auth
-      $stateParams: $stateParams
+      $state: $state
   )
 
   it 'should init the array of selected friends', ->
@@ -156,7 +154,7 @@ describe 'invite friends controller', ->
           name: 'B Bar & Grill'
           lat: 40.7270718
           long: -73.9919324
-      $stateParams.event = event
+      $state.params.event = event
 
       deferred = $q.defer()
       spyOn(Event, 'getInvitedIds').and.returnValue deferred.promise
@@ -167,7 +165,7 @@ describe 'invite friends controller', ->
       ctrl = $controller InviteFriendsCtrl,
         $scope: scope
         Auth: Auth
-        $stateParams: $stateParams
+        $state: $state
       scope.$broadcast '$ionicView.enter'
       scope.$apply()
 
