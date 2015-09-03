@@ -73,8 +73,7 @@ class EventCtrl
   acceptInvitation: ->
     @Invitation.updateResponse @invitation, @Invitation.accepted
       .$promise.then null, =>
-        error = 'For some reason, that didn\'t work.'
-        @ngToast.create error
+        @ngToast.create 'For some reason, that didn\'t work.'
 
   maybeInvitation: ->
     @Invitation.updateResponse @invitation, @Invitation.maybe

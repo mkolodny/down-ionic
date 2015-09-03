@@ -6,6 +6,7 @@ require 'angular-sanitize'
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js'
 require 'ng-cordova'
+require 'ng-toast'
 require '../common/asteroid/asteroid-module'
 require '../common/auth/auth-module'
 require './events-module'
@@ -34,6 +35,7 @@ describe 'events controller', ->
   invitation = null
   later = null
   Invitation = null
+  ngToast = null
   scope = null
   transitionDuration = null
   User = null
@@ -49,6 +51,8 @@ describe 'events controller', ->
   beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('ngCordova')
+
+  beforeEach angular.mock.module('ngToast')
 
   beforeEach inject(($injector) ->
     $compile = $injector.get '$compile'
@@ -68,6 +72,7 @@ describe 'events controller', ->
     Event = $injector.get 'Event'
     eventHeight = $injector.get 'eventHeight'
     Invitation = $injector.get 'Invitation'
+    ngToast = $injector.get 'ngToast'
     scope = $rootScope.$new()
     transitionDuration = $injector.get 'transitionDuration'
     User = $injector.get 'User'
@@ -905,24 +910,18 @@ describe 'events controller', ->
 
       beforeEach ->
         ctrl.moveItem.calls.reset()
+        spyOn ngToast, 'create'
 
         deferred.reject()
         scope.$apply()
 
       it 'should show an error', ->
-        expect(item.respondError).toBe true
+        error = 'For some reason, that didn\'t work.'
+        expect(ngToast.create).toHaveBeenCalledWith error
 
       it 'should move the item back to the original location', ->
         # TODO: Test this live.
         expect(ctrl.moveItem).toHaveBeenCalledWith item, originalInvitations
-
-      describe 'then trying again', ->
-
-        beforeEach ->
-          ctrl.respondToInvitation item, $event, originalResponse
-
-        it 'should clear the error', ->
-          expect(item.respondError).toBeNull()
 
 
   describe 'accepting an invitation', ->

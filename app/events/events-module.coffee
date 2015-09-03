@@ -2,6 +2,7 @@ require 'angular'
 require 'angular-chart.js'
 require 'angular-elastic'
 require 'angular-ui-router'
+require 'ng-toast'
 require '../common/asteroid/asteroid-module'
 require '../common/auth/auth-module'
 require '../common/place-autocomplete/place-autocomplete-module'
@@ -18,6 +19,7 @@ angular.module 'down.events', [
     'down.viewLocation'
     'ionic'
     'monospaced.elastic'
+    'ngToast'
     'ui.router'
   ]
   .config ($stateProvider) ->

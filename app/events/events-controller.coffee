@@ -1,7 +1,7 @@
 class EventsCtrl
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading, @$ionicModal,
                 @$scope, @$state, @$timeout, @$window, @Asteroid, @dividerHeight,
-                @eventHeight, @Invitation, @transitionDuration, @Auth) ->
+                @eventHeight, @Invitation, @ngToast, @transitionDuration, @Auth) ->
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
         scope: @$scope
@@ -144,8 +144,8 @@ class EventsCtrl
     Messages = @Asteroid.getCollection 'messages'
     Events = @Asteroid.getCollection 'events'
     for event in events
-      messagesRQ = Messages.reactiveQuery {eventId: "#{event.id}" } # Meteor likes strings
-      eventsRQ = Events.reactiveQuery {_id: "#{event.id}" } # Meteor likes strings
+      messagesRQ = Messages.reactiveQuery {eventId: "#{event.id}" }
+      eventsRQ = Events.reactiveQuery {_id: "#{event.id}" }
 
       # Keep the same value of `messagesRQ` even after the variable changes
       #   next time through the loop.
@@ -166,7 +166,6 @@ class EventsCtrl
           latestMessage = messages[0]
           if event.latestMessage isnt undefined and latestMessage isnt undefined
             event.latestMessage.wasRead = @getWasRead latestMessage
-
 
   # mongo _id's are randomly generated client side via
   # Asteroid and therefore are not chronological
@@ -212,7 +211,6 @@ class EventsCtrl
     event.latestMessage.createdAt = new Date(latestMessage.createdAt.$date)
 
     # Move the event's updated item.
-    item = null
     for item in @items
       if item.invitation?.event.id is event.id
         @moveItem item, @invitations
@@ -297,13 +295,10 @@ class EventsCtrl
     # Prevent calling the ion-item element's ng-click.
     $event.stopPropagation()
 
-    # Clear any previous errors.
-    item.respondError = null
-
     @Invitation.updateResponse invitation, response
       .$promise.then null, =>
         @moveItem item, @invitations
-        item.respondError = true
+        @ngToast.create 'For some reason, that didn\'t work.'
 
     @moveItem item, @invitations
 
