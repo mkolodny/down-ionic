@@ -96,10 +96,13 @@ angular.module 'down', [
     # Listen for notifications.
     $rootScope.$on '$cordovaPush:notificationReceived', (event, notification) ->
       if notification.alert
-        ngToast.create notification.alert
+        alert = notification.alert
+        if alert.indexOf('from ') is 0
+          alert = "Down. #{alert}"
+        ngToast.create alert
 
       if notification.sound
-        sound = new Media(event.sound)
+        sound = new Media event.sound
         sound.play()
 
     ###
