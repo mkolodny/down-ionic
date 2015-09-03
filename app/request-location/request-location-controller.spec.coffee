@@ -62,4 +62,13 @@ describe 'request location controller', ->
         expect(localStorage.get 'hasRequestedLocationServices').toBe true
 
 
-    xdescribe 'permission denied', ->
+    describe 'permission denied', ->
+
+      beforeEach ->
+        spyOn Auth, 'redirectForAuthState'
+
+        deferred.reject()
+        scope.$apply()
+
+      it 'should show an error', ->
+        expect(ctrl.locationDenied).toBe true
