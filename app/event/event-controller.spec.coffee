@@ -4,6 +4,7 @@ require 'angular-animate'
 require 'angular-mocks'
 require 'angular-sanitize'
 require 'angular-ui-router'
+require 'ng-toast'
 require '../ionic/ionic-angular.js'
 require '../common/asteroid/asteroid-module'
 require '../common/resources/resources-module'
@@ -26,10 +27,10 @@ describe 'event controller', ->
   invitation = null
   Invitation = null
   laterMessage = null
-  onChange = null
   Messages = null
   messages = null
   messagesRQ = null
+  ngToast = null
   scope = null
   User = null
 
@@ -43,6 +44,8 @@ describe 'event controller', ->
 
   beforeEach angular.mock.module('down.auth')
 
+  beforeEach angular.mock.module('ngToast')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $ionicActionSheet = $injector.get '$ionicActionSheet'
@@ -55,6 +58,7 @@ describe 'event controller', ->
     Auth = angular.copy $injector.get('Asteroid')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
+    ngToast = $injector.get 'ngToast'
     scope = $injector.get '$rootScope'
     User = $injector.get 'User'
 
@@ -382,10 +386,14 @@ describe 'event controller', ->
     describe 'when the update fails', ->
 
       beforeEach ->
+        spyOn ngToast, 'create'
+
         deferred.reject()
         scope.$apply()
 
-      xit 'show an error', ->
+      it 'show an error', ->
+        error = 'For some reason, that didn\'t work.'
+        expect(ngToast.create).toHaveBeenCalledWith error
 
 
   describe 'responding maybe to the invitation', ->
@@ -410,10 +418,14 @@ describe 'event controller', ->
     describe 'when the update fails', ->
 
       beforeEach ->
+        spyOn ngToast, 'create'
+
         deferred.reject()
         scope.$apply()
 
-      xit 'show an error', ->
+      it 'show an error', ->
+        error = 'For some reason, that didn\'t work.'
+        expect(ngToast.create).toHaveBeenCalledWith error
 
 
   describe 'declining the invitation', ->
@@ -425,6 +437,8 @@ describe 'event controller', ->
       response = Invitation.accepted
       invitation.response = response
 
+      spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
       deferred = $q.defer()
       spyOn(Invitation, 'updateResponse').and.returnValue
         $promise: deferred.promise
@@ -432,20 +446,40 @@ describe 'event controller', ->
 
       ctrl.declineInvitation()
 
-    it 'should update the invitation', ->
-      expect(Invitation.updateResponse).toHaveBeenCalledWith invitation, \
-          Invitation.declined
+    it 'should show a loading overlay', ->
+      expect($ionicLoading.show).toHaveBeenCalled()
 
-    it 'should go to the events view', ->
-      expect($state.go).toHaveBeenCalledWith 'events'
-
-    describe 'when the update fails', ->
+    describe 'successfully', ->
 
       beforeEach ->
+        deferred.resolve()
+        scope.$apply()
+
+      it 'should update the invitation', ->
+        expect(Invitation.updateResponse).toHaveBeenCalledWith invitation, \
+            Invitation.declined
+
+      it 'should hide the loading overlay', ->
+        expect($ionicLoading.hide).toHaveBeenCalled()
+
+      it 'should go to the events view', ->
+        expect($state.go).toHaveBeenCalledWith 'events'
+
+
+    describe 'unsuccessfully', ->
+
+      beforeEach ->
+        spyOn ngToast, 'create'
+
         deferred.reject()
         scope.$apply()
 
-      xit 'show an error', ->
+      it 'show an error', ->
+        error = 'For some reason, that didn\'t work.'
+        expect(ngToast.create).toHaveBeenCalledWith error
+
+      it 'should hide the loading overlay', ->
+        expect($ionicLoading.hide).toHaveBeenCalled()
 
 
   describe 'checking whether a message is an action message', ->
@@ -628,6 +662,7 @@ describe 'event controller', ->
       spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
       spyOn $ionicLoading, 'show'
       spyOn $ionicLoading, 'hide'
+      spyOn ngToast, 'create'
 
       # Save the original invitation.
       originalInvitation = angular.copy invitation
@@ -652,13 +687,15 @@ describe 'event controller', ->
       describe 'when the update succeeds', ->
 
         beforeEach ->
-          deferred.resolve()
+          deferred.resolve ctrl.invitation
           scope.$apply()
 
         it 'should hide the loading modal', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
-        xit 'should show a success alert', ->
+        it 'show a success message', ->
+          message = 'Notifications are on.'
+          expect(ngToast.create).toHaveBeenCalledWith message
 
 
       describe 'when the update fails', ->
@@ -670,7 +707,12 @@ describe 'event controller', ->
         it 'should reset the invitation', ->
           expect(ctrl.invitation.muted).toBe false
 
-        xit 'should show an error', ->
+        it 'show an error', ->
+          error = 'For some reason, that didn\'t work.'
+          expect(ngToast.create).toHaveBeenCalledWith error
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
     describe 'when notifications are turned off', ->
@@ -680,7 +722,8 @@ describe 'event controller', ->
 
         ctrl.toggleNotifications()
 
-      xit 'should show a loading modal', ->
+      it 'should show a loading modal', ->
+        expect($ionicLoading.show).toHaveBeenCalled()
 
       it 'should edit the muted property', ->
         expect(ctrl.invitation.muted).toBe false
@@ -692,13 +735,15 @@ describe 'event controller', ->
       describe 'when the update succeeds', ->
 
         beforeEach ->
-          deferred.resolve()
+          deferred.resolve ctrl.invitation
           scope.$apply()
 
         it 'should hide the loading modal', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
-        xit 'should show a success alert', ->
+        it 'show a success message', ->
+          message = 'Notifications are off.'
+          expect(ngToast.create).toHaveBeenCalledWith message
 
 
       describe 'when the update fails', ->
@@ -709,3 +754,6 @@ describe 'event controller', ->
 
         it 'should reset the invitation', ->
           expect(ctrl.invitation.muted).toBe true
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()

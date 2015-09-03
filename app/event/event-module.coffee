@@ -1,6 +1,7 @@
 require 'angular'
 require 'angular-elastic'
 require 'angular-ui-router'
+require 'ng-toast'
 require '../common/asteroid/asteroid-module'
 require '../common/auth/auth-module'
 require '../common/resources/resources-module'
@@ -15,6 +16,7 @@ angular.module 'down.event', [
     'down.resources'
     'down.auth'
     'down.viewLocation'
+    'ngToast'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'event',

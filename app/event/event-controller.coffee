@@ -1,7 +1,7 @@
 class EventCtrl
   constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicScrollDelegate,
                 @$scope, @$state, @$stateParams, @Asteroid, @Auth, @Event,
-                @Invitation, @User) ->
+                @Invitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -72,14 +72,25 @@ class EventCtrl
 
   acceptInvitation: ->
     @Invitation.updateResponse @invitation, @Invitation.accepted
+      .$promise.then null, =>
+        error = 'For some reason, that didn\'t work.'
+        @ngToast.create error
 
   maybeInvitation: ->
     @Invitation.updateResponse @invitation, @Invitation.maybe
+      .$promise.then null, =>
+        @ngToast.create 'For some reason, that didn\'t work.'
 
   declineInvitation: ->
-    @Invitation.updateResponse @invitation, @Invitation.declined
+    @$ionicLoading.show()
 
-    @$state.go 'events'
+    @Invitation.updateResponse @invitation, @Invitation.declined
+      .$promise.then =>
+        @$state.go 'events'
+      , =>
+        @ngToast.create 'For some reason, that didn\'t work.'
+      .finally =>
+        @$ionicLoading.hide()
 
   isActionMessage: (message) ->
     actions = [
@@ -127,9 +138,14 @@ class EventCtrl
 
     @invitation.muted = not @invitation.muted
     @Invitation.update @invitation
-      .$promise.then null, =>
+      .$promise.then (invitation) =>
+        message = if invitation.muted then 'Notifications are on.' \
+            else 'Notifications are off.'
+        @ngToast.create message
+      , =>
         # Undo editing the invitation.
         @invitation.muted = not @invitation.muted
+        @ngToast.create 'For some reason, that didn\'t work.'
       .finally =>
         @$ionicLoading.hide()
 
