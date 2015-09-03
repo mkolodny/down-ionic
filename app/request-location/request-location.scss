@@ -1,3 +1,14 @@
 #request-location {
   background-color: $brand-color;
+
+  .message {
+    color: #fff;
+    font-size: 16px;
+    max-width: 250px;
+    padding-bottom: 10px;
+
+    &.instructions {
+      max-width: none;
+    }
+  }
 }

@@ -29,7 +29,7 @@ class AddFromAddressBookCtrl
       if contact.user?.username
         @items.push
           isDivider: false
-          user: new @User(contact.user)
+          user: new @User contact.user
       else
         @items.push
           isDivider: false
@@ -37,15 +37,16 @@ class AddFromAddressBookCtrl
 
   refresh: ->
     refreshCompleteEvent = 'scroll.refreshComplete'
-    @Contacts.getContacts().then (contacts) =>
-      @showContacts contacts
-      @$scope.$broadcast refreshCompleteEvent
-      @loadError = false
-    , =>
-      @$scope.$broadcast refreshCompleteEvent
-      @loadError = true
-    .finally =>
-      @isLoading = false
+    @Contacts.getContacts()
+      .then (contacts) =>
+        @showContacts contacts
+        @$scope.$broadcast refreshCompleteEvent
+        @getContactsError = false
+      , =>
+        @$scope.$broadcast refreshCompleteEvent
+        @getContactsError = true
+      .finally =>
+        @isLoading = false
 
   getInitials: (name) ->
     words = name.split ' '

@@ -20,7 +20,8 @@
 
         <!-- Friend Using Down -->
         <div ng-if="item.user">
-          <img class="item-image" ng-src="{{item.user.getImageUrl()}}" alt="Profile Pic">
+          <img class="item-image" ng-src="{{item.user.getImageUrl()}}"
+               alt="{{findFriends.getInitials(item.contact.name.formatted)}}">
           <h2>{{item.user.name}}</h2>
           <p>{{item.user.username}}</p>
           <user-friendship-button user="item.user">
@@ -45,5 +46,17 @@
         </div>
       </ion-item>
     </ion-list>
+    <div class="permission-denied" ng-if="findFriends.contactsRequestError">
+      <div class="message">
+        It looks like you didn't give Down permission to access your address book :(
+      </div>
+      <div class="message">
+        If that was a mistake, you can allow Down to access your address book from
+        your settings app:
+      </div>
+      <div class="message instructions">
+        Settings <i class="fa fa-arrow-right"></i> Down. <i class="fa fa-arrow-right"></i> Contacts
+      </div>
+    </div>
   </ion-content>
 </div>

@@ -3,11 +3,11 @@ class RequestLocationCtrl
     @localStorage = @localStorageService
 
   enableLocation: ->
-    @Auth.watchLocation().then =>
-      @localStorage.set 'hasRequestedLocationServices', true
-      @Auth.redirectForAuthState()
-    , =>
-      # TODO
-      @localStorage.set 'hasRequestedLocationServices', true
+    @Auth.watchLocation()
+      .then =>
+        @localStorage.set 'hasRequestedLocationServices', true
+        @Auth.redirectForAuthState()
+      , =>
+        @locationDenied = true
 
 module.exports = RequestLocationCtrl
