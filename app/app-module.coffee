@@ -150,7 +150,11 @@ angular.module 'down', [
           if not hasUpdate
             return
 
-          $ionicLoading.show()
+          $ionicLoading.show
+            template: '''
+              <div class="loading-text">Loading...</div>
+              <ion-spinner icon="bubbles"></ion-spinner>
+              '''
 
           # Download update
           $ionicDeploy.update()
