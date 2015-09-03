@@ -109,9 +109,6 @@ describe 'invite friends controller', ->
       $stateParams: $stateParams
   )
 
-  it 'should set the event on the controller', ->
-    expect(ctrl.event).toBe event
-
   it 'should init the array of selected friends', ->
     expect(ctrl.selectedFriends).toEqual []
 
@@ -121,19 +118,18 @@ describe 'invite friends controller', ->
   it 'should init the array of invited ids', ->
     expect(ctrl.invitedUserIds).toEqual {}
 
-  describe 'when we\'re creating a new event', ->
-
+  describe 'when entering the view', ->
     beforeEach ->
-      # The event set on $stateParams doesn't have an id.
-      ctrl = $controller InviteFriendsCtrl,
-        $scope: scope
-        Auth: Auth
-        $stateParams: $stateParams
-
       ctrl.error = 'inviteError'
 
       scope.$broadcast '$ionicView.enter'
       scope.$apply()
+
+    it 'should init cleanupViewAfterLeave', ->
+      expect(ctrl.cleanupViewAfterLeave).toBe true
+
+    it 'should set the event on the controller', ->
+      expect(ctrl.event).toBe event
 
     it 'should disable animating the transition to the next view', ->
       options = {disableAnimate: true}
@@ -219,6 +215,40 @@ describe 'invite friends controller', ->
 
         it 'should hide the loading indicator', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
+
+
+  describe 'after leaving the view', ->
+
+    describe 'when cleanupViewAfterLeave is true', ->
+      beforeEach ->
+        ctrl.cleanupViewAfterLeave = true
+        spyOn ctrl, 'cleanupView'
+
+        scope.$broadcast '$ionicView.afterLeave'
+        scope.$apply()
+
+      it 'should clean up the view', ->
+        expect(ctrl.cleanupView).toHaveBeenCalled()
+
+
+  describe 'cleaning up the view', ->
+
+    beforeEach ->
+      ctrl.event = 'some event object'
+      ctrl.selectedFriends = ['friend 1', 'friend 2']
+      ctrl.selectedFriendIds = {1: true, 2: true}
+      ctrl.invitedUserIds = {1: true}
+      ctrl.cleanupView()
+
+    it 'should delete the event', ->
+      expect(ctrl.event).toBeUndefined()
+
+    it 'should clear selected friends', ->
+      expect(ctrl.selectedFriends).toEqual []
+      expect(ctrl.selectedFriendIds).toEqual {}
+
+    it 'should clear invited user ids', ->
+      expect(ctrl.invitedUserIds).toEqual {}
 
 
   describe 'building the items array', ->
@@ -409,6 +439,7 @@ describe 'invite friends controller', ->
 
     beforeEach ->
       ctrl.selectedFriends = [Auth.user.friends[2], Auth.user.friends[3]]
+      ctrl.event = event
 
       deferredCacheClear = $q.defer()
       spyOn($ionicHistory, 'clearCache').and.returnValue \
@@ -422,8 +453,7 @@ describe 'invite friends controller', ->
 
       beforeEach ->
         deferredBulkCreate = $q.defer()
-        spyOn(Invitation, 'bulkCreate').and.returnValue
-          $promise: deferredBulkCreate.promise
+        spyOn(Invitation, 'bulkCreate').and.returnValue deferredBulkCreate.promise
 
         # The event id is set if we're inviting people to an existing event.
         ctrl.event.id = 1
@@ -438,9 +468,10 @@ describe 'invite friends controller', ->
         expect($ionicLoading.show).toHaveBeenCalledWith {template: template}
 
       it 'should bulk create invitations', ->
-        invitations = (Invitation.serialize {toUserId: friend.id} \
+        invitations = ({toUserId: friend.id} \
             for friend in ctrl.selectedFriends)
-        expect(Invitation.bulkCreate).toHaveBeenCalledWith invitations
+        eventId = ctrl.event.id
+        expect(Invitation.bulkCreate).toHaveBeenCalledWith eventId, invitations
 
 
       describe 'successfully', ->
@@ -548,8 +579,12 @@ describe 'invite friends controller', ->
 
     beforeEach ->
       spyOn $state, 'go'
+      ctrl.cleanupViewAfterLeave = true
 
       ctrl.addFriends()
+
+    it 'should set a flag to prevent the view from being cleaned up', ->
+      expect(ctrl.cleanupViewAfterLeave).toBe false
 
     it 'should go to the add friends view', ->
       expect($state.go).toHaveBeenCalledWith 'addFriends'

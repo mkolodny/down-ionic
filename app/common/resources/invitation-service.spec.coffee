@@ -207,8 +207,8 @@ describe 'invitation service', ->
     responseData = null
 
     beforeEach ->
+      eventId = 1
       invitation1 =
-        eventId: 1
         toUserId: 2
       invitation2 = angular.extend {}, invitation1, {toUserId: 3}
       invitations = [invitation1, invitation2]
@@ -216,7 +216,9 @@ describe 'invitation service', ->
       # Mock an array of invitations for the post data.
       invitationsPostData = (Invitation.serialize invitation \
           for invitation in invitations)
-      postData = invitations: invitationsPostData
+      postData =
+        event: eventId
+        invitations: invitationsPostData
 
       # Give each invitation in the response data a different id.
       i = 1
@@ -224,6 +226,7 @@ describe 'invitation service', ->
       for invitation in invitationsPostData
         responseData.push angular.extend
           id: i
+          event: eventId
           from_user: 3
           response: Invitation.noResponse
           previously_accepted: false
@@ -237,8 +240,8 @@ describe 'invitation service', ->
       $httpBackend.expectPOST listUrl, postData
         .respond 201, angular.toJson(responseData)
 
-      Invitation.bulkCreate invitations
-        .$promise.then (_response_) ->
+      Invitation.bulkCreate eventId, invitations
+        .then (_response_) ->
           response = _response_
       $httpBackend.flush 1
 
