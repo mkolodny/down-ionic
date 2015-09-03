@@ -52,7 +52,7 @@ describe 'user friendship button directive', ->
       Auth.isFriend.and.returnValue true
       Auth.user.friends = {}
       Auth.user.friends[scope.friend.id] = scope.friend
-    
+
       $compile(element) scope
       scope.$digest()
 
@@ -75,10 +75,9 @@ describe 'user friendship button directive', ->
         anchor = element.find 'a'
         anchor.triggerHandler 'click'
 
-      xit 'should show a spinner', ->
-        icon = element.find 'i'
-        expect(icon).toHaveClass 'fa-spinner'
-        expect(icon).toHaveClass 'fa-pulse'
+      it 'should show a spinner', ->
+        icon = element.find 'ion-spinner'
+        expect(icon.length).toBe 1
 
       it 'should delete the friendship', ->
         expect(Friendship.deleteWithFriendId).toHaveBeenCalledWith scope.friend.id
@@ -140,10 +139,9 @@ describe 'user friendship button directive', ->
         anchor = element.find 'a'
         anchor.triggerHandler 'click'
 
-      xit 'should show a spinner', ->
-        icon = element.find 'i'
-        expect(icon).toHaveClass 'fa-spinner'
-        expect(icon).toHaveClass 'fa-pulse'
+      it 'should show a spinner', ->
+        icon = element.find 'ion-spinner'
+        expect(icon.length).toBe 1
 
       it 'should create a friendship', ->
         friendship =
