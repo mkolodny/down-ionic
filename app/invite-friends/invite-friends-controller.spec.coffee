@@ -130,8 +130,7 @@ describe 'invite friends controller', ->
         Auth: Auth
         $stateParams: $stateParams
 
-      ctrl.getInvitedIdsError = true
-      ctrl.inviteError = true
+      ctrl.error = 'inviteError'
 
       scope.$broadcast '$ionicView.enter'
       scope.$apply()
@@ -141,8 +140,7 @@ describe 'invite friends controller', ->
       expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
 
     it 'should clear errors', ->
-      expect(ctrl.inviteError).toEqual false
-      expect(ctrl.getInvitedIdsError).toEqual false
+      expect(ctrl.error).toEqual false
 
 
   describe 'when we\'re inviting users to an existing event', ->
@@ -217,7 +215,7 @@ describe 'invite friends controller', ->
           scope.$apply()
 
         it 'should show an error', ->
-          expect(ctrl.getInvitedIdsError).toBe true
+          expect(ctrl.error).toBe 'getInvitedIdsError'
 
         it 'should hide the loading indicator', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
@@ -476,7 +474,7 @@ describe 'invite friends controller', ->
           scope.$apply()
 
         it 'should show an error', ->
-          expect(ctrl.inviteError).toBe true
+          expect(ctrl.error).toBe 'inviteError'
 
         it 'should hide the loading indicator', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
@@ -540,7 +538,7 @@ describe 'invite friends controller', ->
           scope.$apply()
 
         it 'should show an error', ->
-          expect(ctrl.inviteError).toBe true
+          expect(ctrl.error).toBe 'inviteError'
 
         it 'should hide the loading indicator', ->
           expect($ionicLoading.hide).toHaveBeenCalled()

@@ -8,9 +8,7 @@ class InviteFriendsCtrl
 
     @$scope.$on '$ionicView.enter', =>
       # Clear previous errors
-      #   TODO : Do something with inviteError
-      @inviteError = false
-      @getInvitedIdsError = false
+      @error = false
 
       # Don't animate the transition to the next view.
       @$ionicHistory.nextViewOptions
@@ -28,7 +26,7 @@ class InviteFriendsCtrl
               @invitedUserIds[id] = true
             @buildItems()
           , =>
-            @getInvitedIdsError = true
+            @error = 'getInvitedIdsError'
           .finally =>
             @$ionicLoading.hide()
       else
@@ -146,7 +144,7 @@ class InviteFriendsCtrl
         .then =>
           @$ionicHistory.goBack()
         , =>
-          @inviteError = true
+          @error = 'inviteError'
         .finally =>
           @$ionicLoading.hide()
     else
@@ -162,7 +160,7 @@ class InviteFriendsCtrl
         .then =>
           @$state.go 'events'
         , =>
-          @inviteError = true
+          @error = 'inviteError'
         .finally =>
           @$ionicLoading.hide()
 
