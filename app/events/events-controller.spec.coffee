@@ -208,21 +208,15 @@ describe 'events controller', ->
 
 
   describe 'when the modal loads', ->
+    modal = null
 
-    describe 'successfully', ->
-      modal = null
+    beforeEach ->
+      modal = 'modal'
+      deferredTemplate.resolve modal
+      scope.$apply()
 
-      beforeEach ->
-        modal = 'modal'
-        deferredTemplate.resolve modal
-        scope.$apply()
-
-      it 'should save the modal on the controller', ->
-        expect(ctrl.setPlaceModal).toBe modal
-
-
-    xdescribe 'unsuccessfully', ->
-      # TODO
+    it 'should save the modal on the controller', ->
+      expect(ctrl.setPlaceModal).toBe modal
 
 
   describe 'setting item positions', ->
