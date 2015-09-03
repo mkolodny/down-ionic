@@ -123,7 +123,7 @@ describe 'add from address book controller', ->
         scope.$apply()
 
       it 'should show an error', ->
-        expect(ctrl.loadError).toBe true
+        expect(ctrl.getContactsError).toBe true
 
       it 'should hide the loading spinner', ->
         expect(ctrl.isLoading).toBe false
@@ -172,7 +172,7 @@ describe 'add from address book controller', ->
         expect(refreshComplete).toBe true
 
       it 'should clear a load error', ->
-        expect(ctrl.loadError).toBe false
+        expect(ctrl.getContactsError).toBe false
 
 
     describe 'when the request fails', ->
@@ -185,7 +185,7 @@ describe 'add from address book controller', ->
         expect(refreshComplete).toBe true
 
       it 'should show a load error', ->
-        expect(ctrl.loadError).toBe true
+        expect(ctrl.getContactsError).toBe true
 
 
   describe 'getting a contact\'s initials', ->

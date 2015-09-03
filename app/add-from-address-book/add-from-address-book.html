@@ -42,7 +42,18 @@
       </ion-item>
     </ion-list>
     <div id="spinner-container" ng-if="addFromAddressBook.isLoading">
-      <ion-spinner></ion-spinner>
+      <ion-spinner icon="bubbles"></ion-spinner>
+    </div>
+    <div class="permission-denied" ng-if="addFromAddressBook.getContactsError">
+      <div class="message">
+        It looks like you didn't give Down permission to access your address book :(
+      </div>
+      <div class="message">
+        You can allow Down to access your address book from your settings app:
+      </div>
+      <div class="message instructions">
+        Settings <i class="fa fa-arrow-right"></i> Down. <i class="fa fa-arrow-right"></i> Contacts
+      </div>
     </div>
   </ion-content>
 </ion-view>
