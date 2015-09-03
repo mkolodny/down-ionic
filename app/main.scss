@@ -71,6 +71,8 @@ Global Sass
     color: #fff;
   }
 }
+
+// Items
 .list-avatar {
   .item-divider {
     padding-left: 12px;
@@ -94,6 +96,11 @@ Global Sass
     margin-bottom: 0;
   }
 }
+.collection-repeat-container {
+  & > .item {
+    border-bottom-width: 2px;
+  }
+}
 .item-divider {
   text-transform: uppercase;
   background-color: #fff;
@@ -115,6 +122,8 @@ Global Sass
     left: 11px;
   }
 }
+
+// Placeholder
 .placeholder {
   text-align: center;
   color: $brand-color;
