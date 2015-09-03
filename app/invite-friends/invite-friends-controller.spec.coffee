@@ -8,7 +8,7 @@ require '../common/auth/auth-module'
 require '../common/resources/resources-module'
 InviteFriendsCtrl = require './invite-friends-controller'
 
-fdescribe 'invite friends controller', ->
+describe 'invite friends controller', ->
   $controller = null
   $ionicHistory = null
   $ionicLoading = null

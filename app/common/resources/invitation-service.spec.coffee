@@ -172,8 +172,8 @@ describe 'invitation service', ->
         response: response.response
         previouslyAccepted: response.previously_accepted
         muted: response.muted
-        createdAt: new Date(response.created_at)
-        updatedAt: new Date(response.updated_at)
+        createdAt: new Date response.created_at
+        updatedAt: new Date response.updated_at
 
     describe 'when the relations are ids', ->
 
@@ -312,7 +312,7 @@ describe 'invitation service', ->
 
       # Mock the current date.
       jasmine.clock().install()
-      date = new Date(1438195002656)
+      date = new Date 1438195002656
       jasmine.clock().mockDate date
 
       invitationCopy = angular.copy invitation

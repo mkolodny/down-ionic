@@ -28,10 +28,10 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
       creatorId: event.creator
       title: event.title
       canceled: event.canceled
-      createdAt: new Date(event.created_at)
-      updatedAt: new Date(event.updated_at)
+      createdAt: new Date event.created_at
+      updatedAt: new Date event.updated_at
     if event.datetime?
-      response.datetime = new Date(event.datetime)
+      response.datetime = new Date event.datetime
     if event.place?
       response.place =
         name: event.place.name
@@ -39,7 +39,7 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
         long: event.place.geo.coordinates[1]
     if event.comment?
       response.comment = event.comment
-    new resource(response)
+    new resource response
 
   resource = $resource detailUrl, null,
     cancel:
@@ -122,7 +122,7 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
     deferred = $q.defer()
 
     $http.get "#{listUrl}/#{event.id}/invited-ids"
-      .success (data, status) -> 
+      .success (data, status) ->
         deferred.resolve data
       .error (data, status) ->
         deferred.reject()

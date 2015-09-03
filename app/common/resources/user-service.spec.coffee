@@ -205,7 +205,7 @@ describe 'user service', ->
         id: responseData.id
         authtoken: responseData.authtoken
       , user
-      expectedUser = new User(expectedUserData)
+      expectedUser = new User expectedUserData
       expect(response).toAngularEqual expectedUser
 
 
@@ -234,7 +234,7 @@ describe 'user service', ->
           response = _response_
       $httpBackend.flush 1
 
-      expectedUser = new User(user)
+      expectedUser = new User user
       expect(response).toAngularEqual expectedUser
 
 

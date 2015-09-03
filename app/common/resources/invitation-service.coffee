@@ -21,8 +21,8 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
       response: response.response
       previouslyAccepted: response.previously_accepted
       muted: response.muted
-      createdAt: new Date(response.created_at)
-      updatedAt: new Date(response.updated_at)
+      createdAt: new Date response.created_at
+      updatedAt: new Date response.updated_at
 
     # Always set a `<relation>Id` attribute on the invitation. If the relation is
     # an object, also set the relation on the invitation.

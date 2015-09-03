@@ -43,7 +43,7 @@ User = ($http, $q, $resource, apiRoot) ->
       for friend in data.facebook_friends
         friend = deserializeUser friend
         user.facebookFriends[friend.id] = friend
-    new resource(user)
+    new resource user
 
   resource = $resource "#{listUrl}/:id", null,
     save:

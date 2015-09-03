@@ -18,7 +18,7 @@ LinkInvitation = ($resource, apiRoot) ->
           eventId: data.event_id
           fromUserId: data.from_user_id
           linkId: data.link_id
-          createdAt: new Date(data.created_at)
+          createdAt: new Date data.created_at
         response
 
 module.exports = LinkInvitation

@@ -78,7 +78,7 @@ describe 'events controller', ->
     User = $injector.get 'User'
 
     earlier = new Date()
-    later = new Date(earlier.getTime()+1)
+    later = new Date earlier.getTime()+1
     invitation = new Invitation
       id: 1
       event: new Event
@@ -668,7 +668,7 @@ describe 'events controller', ->
         event =
           latestMessage:
             text: 'asdf'
-            createdAt: new Date(oldMessage.createdAt.$date)
+            createdAt: new Date oldMessage.createdAt.$date
         isNewMessage = ctrl.isNewMessage event, newMessage._id
 
       it 'should query for message object by _id', ->
@@ -684,7 +684,7 @@ describe 'events controller', ->
         messagesRQ.result = [oldMessage]
         event =
           latestMessage:
-            createdAt: new Date(newMessage.createdAt.$date)
+            createdAt: new Date newMessage.createdAt.$date
             text: 'asdf'
         isNewMessage = ctrl.isNewMessage event, oldMessage._id
 
@@ -762,7 +762,7 @@ describe 'events controller', ->
         expect(ctrl.getWasRead).toHaveBeenCalledWith textMessage
 
       it 'should update the messages createdAt time', ->
-        createdAt = new Date(textMessage.createdAt.$date)
+        createdAt = new Date textMessage.createdAt.$date
         expect(event.latestMessage.createdAt).toEqual createdAt
 
       it 'should move the updated item', ->
@@ -781,7 +781,7 @@ describe 'events controller', ->
         expect(event.latestMessage.text).toBe actionMessage.text
 
       it 'should update the messages createdAt time', ->
-        createdAt = new Date(actionMessage.createdAt.$date)
+        createdAt = new Date actionMessage.createdAt.$date
         expect(event.latestMessage.createdAt).toEqual createdAt
 
       it 'should set unread or read for latest message', ->
@@ -870,7 +870,7 @@ describe 'events controller', ->
 
     beforeEach ->
       jasmine.clock().install()
-      date = new Date(1438014089235)
+      date = new Date 1438014089235
       jasmine.clock().mockDate date
 
       deferred = $q.defer()
@@ -998,7 +998,7 @@ describe 'events controller', ->
       beforeEach ->
         ctrl.hasDate = false
         ctrl.newEvent =
-          datetime: new Date(1438195002656)
+          datetime: new Date 1438195002656
 
         ctrl.toggleHasDate()
 
@@ -1014,7 +1014,7 @@ describe 'events controller', ->
         newDate = null
 
         beforeEach ->
-          newDate = new Date(1438195002657)
+          newDate = new Date 1438195002657
           deferredDatePicker.resolve newDate
           scope.$apply()
 
@@ -1030,7 +1030,7 @@ describe 'events controller', ->
 
       beforeEach ->
         jasmine.clock().install()
-        date = new Date(1438195002656)
+        date = new Date 1438195002656
         jasmine.clock().mockDate date
 
         ctrl.newEvent = {}

@@ -40,7 +40,7 @@ class EventsCtrl
         allowOldDates: false
         doneButtonLabel: 'Set Date'
       # If the user has set the date before, use the previous date they set.
-      if angular.isDate(@newEvent.datetime)
+      if angular.isDate @newEvent.datetime
         options.date = @newEvent.datetime
       else
         options.date = new Date()
@@ -208,7 +208,7 @@ class EventsCtrl
     event.latestMessage.wasRead = @getWasRead latestMessage
 
     # Update the latest message createdAt date.
-    event.latestMessage.createdAt = new Date(latestMessage.createdAt.$date)
+    event.latestMessage.createdAt = new Date latestMessage.createdAt.$date
 
     # Move the event's updated item.
     for item in @items

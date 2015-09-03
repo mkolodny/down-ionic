@@ -42,7 +42,7 @@ class EventCtrl
   prepareMessages: ->
     @messages = angular.copy @messagesRQ.result
     for message in @messages
-      message.creator = new @User(message.creator)
+      message.creator = new @User message.creator
 
     # Sort the messages from oldest to newest.
     @messages.sort (a, b) ->

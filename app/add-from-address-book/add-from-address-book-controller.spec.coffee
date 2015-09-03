@@ -73,7 +73,7 @@ describe 'add from address book controller', ->
       title: 'A'
     ,
       isDivider: false
-      user: new User(user)
+      user: new User user
     ,
       isDivider: true
       title: 'B'

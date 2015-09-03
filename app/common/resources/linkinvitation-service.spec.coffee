@@ -47,5 +47,5 @@ describe 'linkinvitation service', ->
 
       expectedLinkInvitationData = angular.extend {id: responseData.id},
           linkInvitation
-      expectedLinkInvitation = new LinkInvitation(expectedLinkInvitationData)
+      expectedLinkInvitation = new LinkInvitation expectedLinkInvitationData
       expect(response).toAngularEqual expectedLinkInvitation

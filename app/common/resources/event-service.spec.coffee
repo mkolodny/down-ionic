@@ -130,8 +130,8 @@ describe 'event service', ->
           creatorId: response.creator
           title: response.title
           canceled: response.canceled
-          createdAt: new Date(response.created_at)
-          updatedAt: new Date(response.updated_at)
+          createdAt: new Date response.created_at
+          updatedAt: new Date response.updated_at
         expect(Event.deserialize response).toAngularEqual expectedEvent
 
     describe 'with the max amount of data', ->
@@ -157,15 +157,15 @@ describe 'event service', ->
           id: response.id
           creatorId: response.creator
           title: response.title
-          datetime: new Date(response.datetime)
+          datetime: new Date response.datetime
           place:
             name: response.place.name
             lat: response.place.geo.coordinates[0]
             long: response.place.geo.coordinates[1]
           comment: 'awwww yisssss'
           canceled: response.canceled
-          createdAt: new Date(response.created_at)
-          updatedAt: new Date(response.updated_at)
+          createdAt: new Date response.created_at
+          updatedAt: new Date response.updated_at
         expect(Event.deserialize response).toAngularEqual expectedEvent
 
 
@@ -191,7 +191,7 @@ describe 'event service', ->
 
       beforeEach ->
         jasmine.clock().install()
-        date = new Date(1438195002656)
+        date = new Date 1438195002656
         jasmine.clock().mockDate date
 
         responseData = angular.extend {id: 1}, requestData,
@@ -283,7 +283,7 @@ describe 'event service', ->
 
       beforeEach ->
         jasmine.clock().install()
-        date = new Date(1438195002656)
+        date = new Date 1438195002656
         jasmine.clock().mockDate date
 
         $httpBackend.expectPOST url, requestData
@@ -361,7 +361,7 @@ describe 'event service', ->
 
     beforeEach ->
       jasmine.clock().install()
-      currentDate = new Date(1438014089235)
+      currentDate = new Date 1438014089235
       jasmine.clock().mockDate currentDate
 
       event = new Event
@@ -380,7 +380,7 @@ describe 'event service', ->
       beforeEach ->
         event.datetime = null
         currentHours = currentDate.getHours()
-        event.createdAt = new Date().setHours(currentHours-6)
+        event.createdAt = new Date().setHours currentHours-6
 
         result = event.getPercentRemaining()
 

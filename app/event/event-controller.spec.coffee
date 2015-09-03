@@ -170,7 +170,7 @@ describe 'event controller', ->
       expect(ctrl.messagesRQ).toBe messagesRQ
 
     it 'should listen for new messages', ->
-      expect(messagesRQ.on).toHaveBeenCalledWith 'change',  ctrl.messagesOnChangeHandler
+      expect(messagesRQ.on).toHaveBeenCalledWith 'change', ctrl.messagesOnChangeHandler
 
     describe 'when new messages get posted', ->
       top = null
@@ -215,11 +215,11 @@ describe 'event controller', ->
     beforeEach ->
       # Mock the current date.
       jasmine.clock().install()
-      currentDate = new Date(1438195002656)
+      currentDate = new Date 1438195002656
       jasmine.clock().mockDate currentDate
 
       earlier = new Date()
-      later = new Date(earlier.getTime() + 1)
+      later = new Date earlier.getTime()+1
       creator =
         id: 2
         name: 'Guido van Rossum'
@@ -250,8 +250,8 @@ describe 'event controller', ->
       ctrl.prepareMessages()
 
     it 'should set the messages on the event from oldest to newest', ->
-      laterMessage.creator = new User(laterMessage.creator)
-      earlierMessage.creator = new User(earlierMessage.creator)
+      laterMessage.creator = new User laterMessage.creator
+      earlierMessage.creator = new User earlierMessage.creator
       expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
 
 

@@ -17,10 +17,9 @@ describe 'add from facebook controller', ->
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
-    $rootScope = $injector.get '$rootScope'
+    scope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     Auth = $injector.get 'Auth'
-    scope = $rootScope.$new true
 
     # Mock facebook friends that were saved in local storage.
     friend =

@@ -86,18 +86,17 @@ angular.module 'down', [
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
     if currentUser isnt null and currentPhone isnt null
-      Auth.user = new User(currentUser)
+      Auth.user = new User currentUser
       for id, friend of Auth.user.friends
-        Auth.user.friends[id] = new User(friend)
+        Auth.user.friends[id] = new User friend
       for id, friend of Auth.user.facebookFriends
-        Auth.user.facebookFriends[id] = new User(friend)
+        Auth.user.facebookFriends[id] = new User friend
       Auth.phone = currentPhone
 
     # Listen for notifications.
     $rootScope.$on '$cordovaPush:notificationReceived', (event, notification) ->
       if notification.alert
-        ngToast.create
-          content: notification.alert
+        ngToast.create notification.alert
 
       if notification.sound
         sound = new Media(event.sound)

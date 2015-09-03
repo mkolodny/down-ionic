@@ -65,7 +65,7 @@ describe 'userphone service', ->
       $httpBackend.flush 1
 
       expectedUserPhoneData = angular.extend {id: responseData.id}, userPhone
-      expectedUserPhone = new UserPhone(expectedUserPhoneData)
+      expectedUserPhone = new UserPhone expectedUserPhoneData
       expect(response).toAngularEqual expectedUserPhone
 
 

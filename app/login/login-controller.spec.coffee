@@ -11,7 +11,6 @@ LoginCtrl = require './login-controller'
 describe 'login controller', ->
   $httpBackend = null
   $ionicLoading = null
-  $rootScope = null
   $q = null
   $state = null
   Auth = null
@@ -28,11 +27,10 @@ describe 'login controller', ->
     $controller = $injector.get '$controller'
     $httpBackend = $injector.get '$httpBackend'
     $ionicLoading = $injector.get '$ionicLoading'
-    $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     Auth = $injector.get 'Auth'
-    scope = $rootScope.$new true
+    scope = $injector.get '$rootScope'
 
     ctrl = $controller LoginCtrl,
       Auth: Auth
@@ -87,7 +85,7 @@ describe 'login controller', ->
           spyOn Auth, 'redirectForAuthState'
 
           deferred.resolve()
-          $rootScope.$apply()
+          scope.$apply()
 
         it 'should go to the verify phone view', ->
           expect(Auth.redirectForAuthState).toHaveBeenCalled()
@@ -100,7 +98,7 @@ describe 'login controller', ->
 
         beforeEach ->
           deferred.reject()
-          $rootScope.$apply()
+          scope.$apply()
 
         it 'should show an error', ->
           expect(ctrl.error).toBe 'For some reason, that didn\'t work'

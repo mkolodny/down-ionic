@@ -59,7 +59,7 @@ describe 'friendship service', ->
 
     it 'should POST the friendship', ->
       expectedFriendshipData = angular.extend {id: responseData.id}, friendship
-      expectedFriendship = new Friendship(expectedFriendshipData)
+      expectedFriendship = new Friendship expectedFriendshipData
       expect(response).toAngularEqual expectedFriendship
 
 
