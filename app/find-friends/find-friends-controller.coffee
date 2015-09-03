@@ -12,13 +12,14 @@ class FindFriendsCtrl
           <ion-spinner icon="bubbles"></ion-spinner>
           '''
 
-      @Contacts.getContacts().then (contacts) =>
-        @items = @buildItems @Auth.user.facebookFriends, contacts
-      , =>
-        @contactsRequestError = true
-      .finally =>
-        @isLoading = false
-        @$ionicLoading.hide()
+      @Contacts.getContacts()
+        .then (contacts) =>
+          @items = @buildItems @Auth.user.facebookFriends, contacts
+        , =>
+          @contactsRequestError = true
+        .finally =>
+          @isLoading = false
+          @$ionicLoading.hide()
 
     # Build the list of items to show in the view.
     @items = @buildItems @Auth.user.facebookFriends
