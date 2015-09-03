@@ -171,10 +171,11 @@
     padding: 0;
     height: auto;
     display: block;
+    background-image: none;
+    border-top: 1px solid #eee;
   }
   textarea {
     border: none;
-    border-top: 1px solid #eee;
     width: 100%;
     padding-right: 50px;
     resize: none;

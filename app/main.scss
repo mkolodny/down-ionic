@@ -71,6 +71,29 @@ Global Sass
     color: #fff;
   }
 }
+.list-avatar {
+  .item-divider {
+    padding-left: 12px;
+  }
+}
+.item {
+  border-color: #eee;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  margin-bottom: 1px;
+
+  .contact-image {
+    background-color: #ccc;
+    color: #fff;
+    padding-top: 14px;
+    font-size: 20px;
+    font-weight: 500;
+  }
+  &.item-divider {
+    margin-bottom: 0;
+  }
+}
 .item-divider {
   text-transform: uppercase;
   background-color: #fff;
@@ -82,36 +105,13 @@ Global Sass
     background-color: #fff;
   }
 }
-.list-avatar {
-  .item-divider {
-    padding-left: 12px;
-  }
-}
-.item {
-  border-color: #eee;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  border-bottom-width: 2px;
-
-  &.last {
-    border-bottom-width: 1px;
-  }
-  .contact-image {
-    background-color: #ccc;
-    color: #fff;
-    padding-top: 14px;
-    font-size: 20px;
-    font-weight: 500;
-  }
-}
 .item-avatar {
   & > img:first-child,
   .item-image {
     background-color: #ccc;
     max-width: 50px;
     max-height: 50px;
-    top: 11px;
+    top: 13px;
     left: 11px;
   }
 }
@@ -243,7 +243,7 @@ Global Sass
   background-color: #fff;
   border-radius: 16px;
   height: 26px;
-  width: 67px;
+  width: 76px;
   line-height: 20px;
 
   &.activated {
