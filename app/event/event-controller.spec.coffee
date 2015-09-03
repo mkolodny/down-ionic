@@ -135,8 +135,7 @@ describe 'event controller', ->
       spyOn Asteroid, 'subscribe'
       # Create mocks/spies for getting the messages for this event.
       messagesRQ =
-        on: jasmine.createSpy('messagesRQ.on').and.callFake (name, _onChange_) ->
-          onChange = _onChange_
+        on: jasmine.createSpy('messagesRQ.on')
       Messages =
         reactiveQuery: jasmine.createSpy('Messages.reactiveQuery') \
             .and.returnValue messagesRQ
@@ -167,7 +166,7 @@ describe 'event controller', ->
       expect(ctrl.messagesRQ).toBe messagesRQ
 
     it 'should listen for new messages', ->
-      expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)
+      expect(messagesRQ.on).toHaveBeenCalledWith 'change',  ctrl.messagesOnChangeHandler
 
     describe 'when new messages get posted', ->
       top = null
@@ -178,7 +177,7 @@ describe 'event controller', ->
         spyOn($ionicScrollDelegate, 'getScrollPosition').and.returnValue
           top: top
 
-        onChange()
+        ctrl.messagesOnChangeHandler()
 
       it 'should prepare messages', ->
         expect(ctrl.prepareMessages).toHaveBeenCalled()
@@ -188,8 +187,6 @@ describe 'event controller', ->
         beforeEach ->
           ctrl.maxTop = top
 
-          onChange()
-
         it 'should scroll to the new bottom of the view', ->
           expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
@@ -197,13 +194,16 @@ describe 'event controller', ->
   describe 'when leaving the view', ->
 
     beforeEach ->
-      ctrl.messagesRQ = true
+      messagesRQ =
+        off: jasmine.createSpy 'messagesRQ.off'
+      ctrl.messagesRQ = messagesRQ
 
       scope.$broadcast '$ionicView.leave'
       scope.$apply()
 
     it 'should stop listening for new messages', ->
-      expect(ctrl.messagesRQ).toBeUndefined()
+      expect(ctrl.messagesRQ.off).toHaveBeenCalledWith(
+        'change', ctrl.messagesOnChangeHandler)
 
 
   describe 'prepare messages', ->

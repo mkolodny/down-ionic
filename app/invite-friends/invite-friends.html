@@ -5,7 +5,12 @@
             ><i class="fa fa-plus fa-lg"></i></button>
   </ion-nav-buttons>
   <ion-content>
-    <div class="placeholder" ng-if="inviteFriends.items.length === 0">
+    <div class="placeholder" ng-if="inviteFriends.error">
+      <div>Oops.. Looks like an error occurred. Please try again later.</div>
+    </div>
+    <div class="placeholder"
+          ng-if="inviteFriends.items.length === 0 &&
+                 inviteFriends.error === false">
       <div>You don't have any friends on Down yet...</div>
       <div>
         <button id="add-friends" class="button"
@@ -13,7 +18,8 @@
                 >Add Friends</button>
       </div>
     </div>
-    <ion-list ng-if="inviteFriends.items.length > 0">
+    <ion-list ng-if="inviteFriends.items.length > 0 &&
+                     inviteFriends.error === false">
      <ion-item class="item-icon-right"
                ng-click="inviteFriends.toggleAllNearbyFriends()"
                ng-class="{selected: inviteFriends.isAllNearbyFriendsSelected}">

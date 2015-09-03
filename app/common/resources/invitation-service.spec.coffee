@@ -32,6 +32,7 @@ describe 'invitation service', ->
     Asteroid =
       getCollection: jasmine.createSpy('Asteroid.getCollection').and.returnValue \
           Messages
+      call: jasmine.createSpy 'Asteroid.call'
     $provide.value 'Asteroid', Asteroid
     return
   )
@@ -288,6 +289,7 @@ describe 'invitation service', ->
     date = null
     originalResponse = null
     newResponse = null
+    messsagesDeferred = null
 
     beforeEach ->
       invitation =
@@ -301,6 +303,9 @@ describe 'invitation service', ->
 
       deferred = $q.defer()
       spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
+
+      messsagesDeferred = $q.defer()
+      Messages.insert.and.returnValue {remote: messsagesDeferred.promise}
 
       # Mock the current date.
       jasmine.clock().install()
@@ -333,6 +338,9 @@ describe 'invitation service', ->
           invitation.response = newResponse
           expect(Invitation.update).toHaveBeenCalledWith invitation
 
+        it 'should update the original invitation', ->
+          expect(invitationCopy.response).toBe Invitation.accepted
+
         it 'should get the messages collection', ->
           expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
@@ -351,8 +359,16 @@ describe 'invitation service', ->
               $date: date.getTime()
           expect(Messages.insert).toHaveBeenCalledWith message
 
-        it 'should update the original invitation', ->
-          expect(invitationCopy.response).toBe Invitation.accepted
+        describe 'meteor message saved successfully', ->
+          messageId = null
+
+          beforeEach ->
+            messageId = 'asdf'
+            messsagesDeferred.resolve messageId
+            $rootScope.$apply()
+
+          it 'should mark action message as read', ->
+            expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', messageId
 
 
       describe 'to maybe', ->
@@ -388,6 +404,17 @@ describe 'invitation service', ->
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.maybe
 
+        describe 'meteor message saved successfully', ->
+          messageId = null
+
+          beforeEach ->
+            messageId = 'asdf'
+            messsagesDeferred.resolve messageId
+            $rootScope.$apply()
+
+          it 'should mark action message as read', ->
+            expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', messageId
+
 
       describe 'from accepted to declined', ->
 
@@ -421,6 +448,17 @@ describe 'invitation service', ->
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.declined
+
+        describe 'meteor message saved successfully', ->
+          messageId = null
+
+          beforeEach ->
+            messageId = 'asdf'
+            messsagesDeferred.resolve messageId
+            $rootScope.$apply()
+
+          it 'should mark action message as read', ->
+            expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', messageId
 
 
     describe 'unsuccessfully', ->

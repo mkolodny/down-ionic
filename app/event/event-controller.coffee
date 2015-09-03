@@ -1,7 +1,7 @@
 class EventCtrl
-  constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicScrollDelegate, @$scope,
-                @$state, @$stateParams, @Asteroid, @Auth, @Event, @Invitation,
-                @User) ->
+  constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicScrollDelegate,
+                @$scope, @$state, @$stateParams, @Asteroid, @Auth, @Event,
+                @Invitation, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -20,25 +20,24 @@ class EventCtrl
       @prepareMessages()
 
       # Watch for new messages.
-      # TODO: Put this in a $ionicView.enter so that we re-start listening for new
-      #   messages when we leave and come back.
-      @messagesRQ.on 'change', =>
-        @prepareMessages()
-        if not @$scope.$$phase
-          @$scope.$digest()
-        if @maxTop is @$ionicScrollDelegate.getScrollPosition().top
-          @$ionicScrollDelegate.scrollBottom true
+      @messagesRQ.on 'change', @messagesOnChangeHandler
 
-    # TODO: Stop listening for new messages. Then start again event if the view was
-    #   cached.
+    # Stop listening for new messages.
     @$scope.$on '$ionicView.leave', =>
-      delete @messagesRQ
+      @messagesRQ.off 'change', @messagesOnChangeHandler
 
     @Invitation.getMemberInvitations {id: @event.id}
       .$promise.then (invitations) =>
         @members = (invitation.toUser for invitation in invitations)
       , =>
         @membersError = true
+
+  messagesOnChangeHandler: =>
+    @prepareMessages()
+    if not @$scope.$$phase
+      @$scope.$digest()
+    if @maxTop is @$ionicScrollDelegate.getScrollPosition().top
+      @$ionicScrollDelegate.scrollBottom true
 
   prepareMessages: ->
     @messages = angular.copy @messagesRQ.result

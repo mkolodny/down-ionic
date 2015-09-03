@@ -7,6 +7,9 @@ class InviteFriendsCtrl
     @invitedUserIds = {}
 
     @$scope.$on '$ionicView.enter', =>
+      # Clear previous errors
+      @error = false
+
       # Don't animate the transition to the next view.
       @$ionicHistory.nextViewOptions
         disableAnimate: true
@@ -17,24 +20,28 @@ class InviteFriendsCtrl
           template: '''
             <ion-spinner icon="bubbles"></ion-spinner>
           '''
-        @Event.getInvitedIds(@event).then (invitedUserIds) =>
-          for id in invitedUserIds
-            @invitedUserIds[id] = true
-
-          @buildItems()
-        .finally =>
-          @$ionicLoading.hide()
+        @Event.getInvitedIds(@event)
+          .then (invitedUserIds) =>
+            for id in invitedUserIds
+              @invitedUserIds[id] = true
+            @buildItems()
+          , =>
+            @error = 'getInvitedIdsError'
+          .finally =>
+            @$ionicLoading.hide()
       else
         # We're creating a new event.
         @buildItems()
 
   buildItems: ->
-    # Make a copy of the user's friends so that when the user selects the friend in
-    #   one section, they get selected in every section.
+    # Make a copy of the user's friends so that when the
+    #   user selects the friend in one section,
+    #   they get selected in every section.
     friends = angular.copy @Auth.user.friends
 
     # Build the list of alphabetically sorted nearby friends.
-    @nearbyFriends = (friend for id, friend of friends when @Auth.isNearby(friend))
+    @nearbyFriends = (friend for id, friend of friends \
+      when @Auth.isNearby(friend))
     @nearbyFriends.sort (a, b) ->
       if a.name.toLowerCase() < b.name.toLowerCase()
         return -1
@@ -137,7 +144,7 @@ class InviteFriendsCtrl
         .then =>
           @$ionicHistory.goBack()
         , =>
-          @inviteError = true
+          @error = 'inviteError'
         .finally =>
           @$ionicLoading.hide()
     else
@@ -153,7 +160,7 @@ class InviteFriendsCtrl
         .then =>
           @$state.go 'events'
         , =>
-          @inviteError = true
+          @error = 'inviteError'
         .finally =>
           @$ionicLoading.hide()
 
