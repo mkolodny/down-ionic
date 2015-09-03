@@ -33,11 +33,11 @@ class VerifyPhoneCtrl
     @Asteroid.login().then =>
       # Persist the user to local storage.
       @Auth.setUser user
-      if user.email?
+      if user.email is undefined
+        @$state.go 'facebookSync'
+      else
         # The user has synced with Facebook.
         @getFacebookFriends()
-      else
-        @$state.go 'facebookSync'
     , =>
       @error = 'Oops, something went wrong.'
 
@@ -53,7 +53,5 @@ class VerifyPhoneCtrl
           @$state.go 'facebookSync'
         else
           @error = 'Oops, something went wrong.'
-
-
 
 module.exports = VerifyPhoneCtrl

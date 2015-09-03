@@ -170,7 +170,7 @@ describe 'verify phone controller', ->
       describe 'when the user doesn\'t have a social account yet', ->
 
         beforeEach ->
-          delete user.email
+          user.email = undefined
           spyOn $state, 'go'
 
           deferred.resolve()
