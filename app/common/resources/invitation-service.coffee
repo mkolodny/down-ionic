@@ -137,6 +137,9 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
         type: type
         createdAt:
           $date: new Date().getTime()
+      .remote.then (messageId) ->
+        Asteroid.call 'readMessage', messageId
+      # Mark message as read
     , ->
       invitation.response = originalResponse
       deferred.reject()
