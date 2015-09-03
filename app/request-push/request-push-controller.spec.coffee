@@ -171,5 +171,3 @@ describe 'request push controller', ->
 
       it 'should hide the loading overlay', ->
         expect($ionicLoading.hide).toHaveBeenCalled()
-
-      xit 'should show an error', ->

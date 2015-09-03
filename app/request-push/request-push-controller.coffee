@@ -9,12 +9,13 @@ class RequestPushCtrl
       badge: true
       sound: true
       alert: true
+    requestedFlag = 'hasRequestedPushNotifications'
     @$cordovaPush.register iosConfig
       .then (deviceToken) =>
-        @localStorage.set 'hasRequestedPushNotifications', true
+        @localStorage.set requestedFlag, true
         @saveToken deviceToken
       , (error) =>
-        @localStorage.set 'hasRequestedPushNotifications', true
+        @localStorage.set requestedFlag, true
         @Auth.redirectForAuthState()
 
   saveToken: (deviceToken)->
