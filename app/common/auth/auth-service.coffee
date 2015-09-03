@@ -161,7 +161,7 @@ class Auth
         deferred.resolve @user.facebookFriends
       .error (data, status) =>
         if status is 400
-          deferred.reject 'TOKEN_EXPIRED'
+          deferred.reject 'MISSING_SOCIAL_ACCOUNT'
         deferred.reject()
 
     {$promise: deferred.promise}
