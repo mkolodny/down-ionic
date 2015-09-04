@@ -27,8 +27,7 @@
                   'item-reordering': item.isReordering,
                   expanded: item.isExpanded
                 }"
-                ng-click="item.isDivider ? null : (item.wasJoined ? events.viewEvent(item) : events.toggleIsExpanded(item))"
-                ng-style="{top: events.moving ? item.top+'px' : auto, right: item.right+'px'}">
+                ng-click="item.isDivider ? null : (item.wasJoined ? events.viewEvent(item) : events.toggleIsExpanded(item))">
         <!-- Divider -->
         <div ng-if="item.isDivider">
           {{item.title}}
@@ -36,23 +35,20 @@
 
         <!-- Event -->
         <div ng-if="item.invitation.fromUser">
-          <img class="item-image" ng-src="{{item.invitation.fromUser.getImageUrl()}}">
-          <canvas class="chart chart-pie white"
+          <img class="item-image"
+               ng-src="{{item.invitation.fromUser.getImageUrl()}}">
+          <canvas class="chart chart-pie"
+                  ng-repeat="color in ['#ffffff', 'rgb(217,217,217)']"
                   data="[
                     (100 - item.invitation.event.percentRemaining),
                     item.invitation.event.percentRemaining
                   ]"
-                  labels="[]"
-                  colours="['#ffffff', 'rgba(0,0,0,0)']" width="53" height="53"
-                  options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
-                  ></canvas>
-          <canvas class="chart chart-pie gray"
-                  data="[
-                    (100 - item.invitation.event.percentRemaining),
-                    item.invitation.event.percentRemaining
-                  ]"
-                  labels="[]"
-                  colours="['rgb(217,217,217)', 'rgba(0,0,0,0)']" width="53" height="53"
+                  ng-class="{
+                    'white': (color==='#ffffff'),
+                    'gray': (color==='rgb(217,217,217)')
+                  }"
+                  labels="['', '']"
+                  colours="[color, 'rgba(0,0,0,0)']" width="53" height="53"
                   options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
                   ></canvas>
           <span class="updated-at" ng-if="item.invitation.event.latestMessage">{{item.invitation.event.latestMessage.createdAt | date:'shortTime' | lowercase}}</span>
