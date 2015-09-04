@@ -32,14 +32,13 @@ class PushNotifications
 
     device = @$cordovaDevice.getDevice()
     name = "#{device.model}, #{device.version}"
-
+    pushDevice =
+      userId: @Auth.user.id
+      registrationId: deviceToken
+      deviceId: device.uuid
+      name: name
     if device.platform is 'iOS'
-      apnsDevice =
-        userId: @Auth.user.id
-        registrationId: deviceToken
-        deviceId: device.uuid
-        name: name
-      @APNSDevice.save apnsDevice
+      @APNSDevice.save pushDevice
         .$promise.then =>
           deferred.resolve()
         .finally =>
