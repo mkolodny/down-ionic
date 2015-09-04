@@ -12,7 +12,7 @@ require '../common/auth/auth-module'
 require './events-module'
 EventsCtrl = require './events-controller'
 
-fdescribe 'events controller', ->
+describe 'events controller', ->
   $compile = null
   $cordovaDatePicker = null
   $httpBackend = null

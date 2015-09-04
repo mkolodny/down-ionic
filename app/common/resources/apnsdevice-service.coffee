@@ -1,5 +1,5 @@
 APNSDevice = ($resource, apiRoot) ->
-  listUrl = "#{apiRoot}/apnsdevices"
+  listUrl = "#{apiRoot}/devices/apns"
 
   $resource "#{listUrl}/:id", null,
     save:
