@@ -1,9 +1,10 @@
 {
-  "name": "Down.",
+  "name": "down-mobile",
   "version": "2.0.0",
   "description": "Emphemeral group chats for events.",
   "repository": "https://github.com/mkolodny/down-ionic.git",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "UNLICENSED",
+  "private": true,
   "dependencies": {
     "angular": "1.3.13",
     "angular-animate": "1.3.13",
