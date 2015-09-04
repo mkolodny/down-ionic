@@ -133,54 +133,56 @@ fdescribe 'PushNotifications service', ->
 
 
   describe 'saving the device token', ->
-    device = null
-    deviceToken = null
-    deferred = null
-    resolved = null
-    rejected = null
 
-    beforeEach ->
-      deviceToken = '1234'
-
-      device =
-        cordova: '5.0'
-        model: 'iPhone 8'
-        platform: 'iOS'
-        uuid: '1234'
-        version: '8.1'
-      $cordovaDevice.getDevice.and.returnValue device
-
-      deferred = $q.defer()
-      spyOn(APNSDevice, 'save').and.returnValue {$promise: deferred.promise}
-
-      PushNotifications.saveToken(deviceToken).then ->
-        resolved = true
-      , ->
-        rejected = true
-
-    it 'should create a new APNSDevice and call save', ->
-      name = device.model + ', ' + device.version
-      apnsDevice =
-        userId: Auth.user.id
-        registrationId: deviceToken
-        deviceId: device.uuid
-        name: name
-      expect(APNSDevice.save).toHaveBeenCalledWith apnsDevice
-
-    describe 'successfully', ->
+    describe 'when using an iOS device', ->
+      device = null
+      deviceToken = null
+      deferred = null
+      resolved = null
+      rejected = null
 
       beforeEach ->
-        deferred.resolve()
-        scope.$apply()
+        deviceToken = '1234'
 
-      it 'should resolve the promise', ->
-        expect(resolved).toBe true
+        device =
+          cordova: '5.0'
+          model: 'iPhone 8'
+          platform: 'iOS'
+          uuid: '1234'
+          version: '8.1'
+        $cordovaDevice.getDevice.and.returnValue device
 
-    describe 'save failed', ->
+        deferred = $q.defer()
+        spyOn(APNSDevice, 'save').and.returnValue {$promise: deferred.promise}
 
-      beforeEach ->
-        deferred.reject()
-        scope.$apply()
+        PushNotifications.saveToken(deviceToken).then ->
+          resolved = true
+        , ->
+          rejected = true
 
-      it 'should reject the promise', ->
-        expect(rejected).toBe true
+      it 'should create a new APNSDevice and call save', ->
+        name = device.model + ', ' + device.version
+        apnsDevice =
+          userId: Auth.user.id
+          registrationId: deviceToken
+          deviceId: device.uuid
+          name: name
+        expect(APNSDevice.save).toHaveBeenCalledWith apnsDevice
+
+      describe 'successfully', ->
+
+        beforeEach ->
+          deferred.resolve()
+          scope.$apply()
+
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
+
+      describe 'save failed', ->
+
+        beforeEach ->
+          deferred.reject()
+          scope.$apply()
+
+        it 'should reject the promise', ->
+          expect(rejected).toBe true

@@ -32,16 +32,20 @@ class PushNotifications
 
     device = @$cordovaDevice.getDevice()
     name = "#{device.model}, #{device.version}"
-    apnsDevice =
-      userId: @Auth.user.id
-      registrationId: deviceToken
-      deviceId: device.uuid
-      name: name
-    @APNSDevice.save apnsDevice
-      .$promise.then =>
-        deferred.resolve()
-      .finally =>
-        deferred.reject()
+
+    if device.platform is 'iOS'
+      apnsDevice =
+        userId: @Auth.user.id
+        registrationId: deviceToken
+        deviceId: device.uuid
+        name: name
+      @APNSDevice.save apnsDevice
+        .$promise.then =>
+          deferred.resolve()
+        .finally =>
+          deferred.reject()
+    # else if device.platform is 'Android'
+      # TODO : use GCMDevice to save to DJANGO!
 
     return deferred.promise
 
