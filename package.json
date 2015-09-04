@@ -1,6 +1,6 @@
 {
-  "name": "Down",
-  "version": "1.0.0",
+  "name": "Down.",
+  "version": "2.0.0",
   "description": "Emphemeral group chats for events.",
   "repository": "https://github.com/mkolodny/down-ionic.git",
   "license": "SEE LICENSE IN LICENSE",
@@ -15,7 +15,7 @@
     "angular-ui-router": "0.2.13",
     "asteroid": "0.6.1",
     "browserify": "10.2.6",
-    "chart.js": "^1.0.2",
+    "chart.js": "1.0.2",
     "coffee-script": "1.9.3",
     "coffeeify": "1.1.0",
     "ddp.js": "1.1.0",
