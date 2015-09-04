@@ -223,96 +223,85 @@ fdescribe 'events controller', ->
       expect(ctrl.setPlaceModal).toBe modal
 
 
-  describe 'setting item positions', ->
-    items = null
-
-    beforeEach ->
-      items = [
-        isDivider: true
-        title: 'Down'
-      ,
-        isDivider: false
-        wasJoined: true
-      ,
-        isDivider: true
-        title: 'Maybe'
-      ,
-        isDivider: false
-        wasJoined: true
-      ]
-      ctrl.setPositions items
-
-    it 'should set a top property', ->
-      top = 0
-      for item in items
-        expect(item.top).toBe top
-        if item.isDivider
-          top += dividerHeight
-        else
-          top += eventHeight
-
-    it 'should set a right property', ->
-      for item in items
-        expect(item.right).toBe 0
-
-
   describe 'building the items list', ->
-    noResponseInvitation = null
+    newNoResponseInvitation = null
+    oldNoResponseInvitation = null
     newAcceptedInvitation = null
     oldAcceptedInvitation = null
     newMaybeInvitation = null
     oldMaybeInvitation = null
-    declinedInvitation = null
+    newDeclinedInvitation = null
+    oldDeclinedInvitation = null
     invitations = null
     builtItems = null
 
     beforeEach ->
       event = invitation.event
-      noResponseInvitation = angular.extend {}, invitation,
+      oldTimestamp = 1
+      newTimestamp = 2
+      newNoResponseInvitation = angular.extend {}, invitation,
         id: 2
         response: Invitation.noResponse
-        event: angular.extend event,
+        event: angular.extend {}, event,
           id: 2
+          latestMessage:
+            createdAt: newTimestamp
+      oldNoResponseInvitation = angular.extend {}, invitation,
+        id: 3
+        response: Invitation.noResponse
+        event: angular.extend {}, event,
+          id: 3
+          latestMessage:
+            createdAt: oldTimestamp
       newAcceptedInvitation = angular.extend {}, invitation,
         id: 4
         response: Invitation.accepted
-        event: angular.extend event,
+        event: angular.extend {}, event,
           id: 4
           latestMessage:
-            createdAt: 10
+            createdAt: newTimestamp
       oldAcceptedInvitation = angular.extend {}, invitation,
-        id: 3
+        id: 5
         response: Invitation.accepted
-        event: angular.extend event,
-          id: 3
-          latestMessage:
-            createdAt: 1
+        event: angular.extend {}, event,
+          id: 5
+          createdAt: oldTimestamp
+      delete oldAcceptedInvitation.event.latestMessage
       newMaybeInvitation = angular.extend {}, invitation,
         id: 6
         response: Invitation.maybe
-        event: angular.extend event,
+        event: angular.extend {}, event,
           id: 6
-          latestMessage:
-            createdAt: 10
+          createdAt: newTimestamp
+      delete newMaybeInvitation.event.latestMessage
       oldMaybeInvitation = angular.extend {}, invitation,
-        id: 5
-        response: Invitation.maybe
-        event: angular.extend event,
-          id: 5
-          latestMessage:
-            createdAt: 1
-      declinedInvitation = angular.extend {}, invitation,
         id: 7
-        response: Invitation.declined
-        event: angular.extend event,
+        response: Invitation.maybe
+        event: angular.extend {}, event,
           id: 7
+          latestMessage:
+            createdAt: oldTimestamp
+      newDeclinedInvitation = angular.extend {}, invitation,
+        id: 8
+        response: Invitation.declined
+        event: angular.extend {}, event,
+          id: 8
+          createdAt: newTimestamp
+      oldDeclinedInvitation = angular.extend {}, invitation,
+        id: 9
+        response: Invitation.declined
+        event: angular.extend {}, event,
+          id: 9
+          createdAt: oldTimestamp
       invitationsArray = [
-        noResponseInvitation
+        oldNoResponseInvitation
+        newNoResponseInvitation
         newAcceptedInvitation
         oldAcceptedInvitation
-        newMaybeInvitation
         oldMaybeInvitation
-        declinedInvitation
+        newMaybeInvitation
+        oldDeclinedInvitation
+        newDeclinedInvitation
       ]
       invitations = {}
       for invitation in invitationsArray
@@ -326,11 +315,12 @@ fdescribe 'events controller', ->
         isDivider: true
         title: 'New'
         id: 'New'
-      items.push angular.extend
-        isDivider: false
-        wasJoined: false
-        invitation: noResponseInvitation
-        id: noResponseInvitation.id
+      for invitation in [newNoResponseInvitation, oldNoResponseInvitation]
+        items.push angular.extend
+          isDivider: false
+          wasJoined: false
+          invitation: invitation
+          id: invitation.id
       joinedInvitations =
         'Down':
           newInvitation: newAcceptedInvitation
@@ -357,13 +347,13 @@ fdescribe 'events controller', ->
         isDivider: true
         title: 'Can\'t'
         id: 'Can\'t'
-      items.push angular.extend
-        isDivider: false
-        wasJoined: false
-        invitation: declinedInvitation
-        id: declinedInvitation.id
-      ctrl.setPositions items
-      expect(items).toEqual items
+      for invitation in [newDeclinedInvitation, oldDeclinedInvitation]
+        items.push angular.extend
+          isDivider: false
+          wasJoined: false
+          invitation: invitation
+          id: invitation.id
+      expect(builtItems).toEqual items
 
 
   describe 'toggling whether an item is expanded', ->

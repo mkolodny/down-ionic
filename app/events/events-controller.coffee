@@ -77,6 +77,13 @@ class EventsCtrl
 
     noResponseInvitations = (invitation for id, invitation of invitations \
         when invitation.response is @Invitation.noResponse)
+    noResponseInvitations.sort (a, b) ->
+      aCreatedAt = a.event.latestMessage?.createdAt or a.event.createdAt
+      bCreatedAt = b.event.latestMessage?.createdAt or b.event.createdAt
+      if aCreatedAt > bCreatedAt
+        return -1
+      else
+        return 1
     if noResponseInvitations.length > 0
       items.push
         isDivider: true
@@ -94,10 +101,11 @@ class EventsCtrl
       sectionInvitations = (invitation for id, invitation of invitations \
           when invitation.response is response)
 
-      # Sort by latestMessage time
-      # TODO: Handle when the event doesn't have a latest message.
+      # Sort by latestMessage time.
       sectionInvitations.sort (a, b) ->
-        if a.event.latestMessage?.createdAt > b.event.latestMessage?.createdAt
+        aCreatedAt = a.event.latestMessage?.createdAt or a.event.createdAt
+        bCreatedAt = b.event.latestMessage?.createdAt or b.event.createdAt
+        if aCreatedAt > bCreatedAt
           return -1
         else
           return 1
@@ -116,6 +124,13 @@ class EventsCtrl
 
     declinedInvitations = (invitation for id, invitation of invitations \
         when invitation.response is @Invitation.declined)
+    declinedInvitations.sort (a, b) ->
+      aCreatedAt = a.event.latestMessage?.createdAt or a.event.createdAt
+      bCreatedAt = b.event.latestMessage?.createdAt or b.event.createdAt
+      if aCreatedAt > bCreatedAt
+        return -1
+      else
+        return 1
     if declinedInvitations.length > 0
       items.push
         isDivider: true
@@ -127,21 +142,7 @@ class EventsCtrl
           wasJoined: false
           invitation: invitation
           id: invitation.id
-
-    # Give every item a top and a right property to allow for transitions.
-    @setPositions items
-
     items
-
-  setPositions: (items) ->
-    top = 0
-    for item in items
-      item.top = top
-      item.right = 0
-      if item.isDivider
-        top += @dividerHeight
-      else
-        top += @eventHeight
 
   eventsMessagesSubscribe: (events) ->
     # Subscribe to the messages posted in each event.
