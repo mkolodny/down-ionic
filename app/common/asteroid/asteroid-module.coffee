@@ -6,4 +6,4 @@ angular.module 'down.asteroid', [
     'down.auth'
   ]
   .service 'Asteroid', Asteroid
-  .value 'host', 'down-staging.meteor.com'
+  .value 'host', 'down-meteor.herokuapp.com'
