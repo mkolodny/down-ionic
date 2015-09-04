@@ -36,6 +36,7 @@ fdescribe 'PushNotifications service', ->
 
     $cordovaDevice =
       getDevice: jasmine.createSpy '$cordovaDevice.getDevice'
+      getPlatform: jasmine.createSpy '$cordovaDevice.getPlatform'
     $provide.value '$cordovaDevice', $cordovaDevice
 
     Auth =
@@ -60,45 +61,75 @@ fdescribe 'PushNotifications service', ->
   describe 'registering a device', ->
     deferred = null
     apnsDeferred = null
-    iosConfig = null
     device = null
 
     beforeEach ->
       deferred = $q.defer()
       $cordovaPush.register.and.returnValue deferred.promise
 
-      iosConfig =
-        badge: true
-        sound: true
-        alert: true
-
-      PushNotifications.register()
-
-
-    it 'should trigger the request notifications prompt', ->
-      expect($cordovaPush.register).toHaveBeenCalledWith iosConfig
-
-    describe 'permission granted', ->
-      deviceToken = null
+    describe 'when it is an Android device', ->
+      androidConfig = null
 
       beforeEach ->
-        deviceToken = '1234'
+        senderId = '1234'
+        PushNotifications.androidSenderId = senderId
+        androidConfig =
+          senderId: senderId
+        $cordovaDevice.getPlatform.and.returnValue 'Android'
 
-        spyOn PushNotifications, 'saveToken'
+        PushNotifications.register()
 
-        deferred.resolve deviceToken
-        scope.$apply()
-
-      it 'should call save token', ->
-        expect(PushNotifications.saveToken).toHaveBeenCalledWith deviceToken
+      it 'should trigger the request notifications prompt', ->
+        expect($cordovaPush.register).toHaveBeenCalledWith androidConfig
 
 
-    describe 'permission denied', ->
+    describe 'when is is an iOS device', ->
+      iosConfig = null
+      resolved = null
+      rejected = null
+
       beforeEach ->
-        spyOn Auth, 'redirectForAuthState'
+        iosConfig =
+          badge: true
+          sound: true
+          alert: true
+        $cordovaDevice.getPlatform.and.returnValue 'iOS'
 
-        deferred.reject()
-        scope.$apply()
+        PushNotifications.register().then ->
+          resolved = true
+        , ->
+          rejected = true
+
+      it 'should trigger the request notifications prompt', ->
+        expect($cordovaPush.register).toHaveBeenCalledWith iosConfig
+
+      describe 'permission granted', ->
+        deviceToken = null
+
+        beforeEach ->
+          deviceToken = '1234'
+
+          spyOn PushNotifications, 'saveToken'
+
+          deferred.resolve deviceToken
+          scope.$apply()
+
+        it 'should call save token', ->
+          expect(PushNotifications.saveToken).toHaveBeenCalledWith deviceToken
+
+        xit 'should resolve the promise', ->
+          expect(resolved).toBe true
+
+
+      describe 'permission denied', ->
+        rejected = null
+
+        beforeEach ->
+          deferred.reject()
+          scope.$apply()
+
+        it 'should reject the promise', ->
+          expect(rejected).toBe true
 
 
   describe 'saving the device token', ->

@@ -6,12 +6,20 @@ class PushNotifications
   register: ->
     deferred = @$q.defer()
 
-    # iOS Notification Permissions Options
-    iosConfig =
-      badge: true
-      sound: true
-      alert: true
-    @$cordovaPush.register iosConfig
+    platform = @$cordovaDevice.getPlatform()
+    config = null
+    if platform is 'iOS'
+      # iOS Notification Permissions Options
+      config =
+        badge: true
+        sound: true
+        alert: true
+    else if platform is 'Android'
+      # Android Notification permissions options
+      config =
+        senderId: @androidSenderId
+
+    @$cordovaPush.register config
       .then (deviceToken) =>
         @saveToken deviceToken
       , (error) =>
