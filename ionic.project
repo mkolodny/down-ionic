@@ -3,5 +3,12 @@
   "app_id": "e918d37e",
   "gulpStartupTasks": [
     "watch"
+  ],
+  "browsers": [
+    {
+      "platform": "android",
+      "browser": "crosswalk",
+      "version": "12.41.296.5"
+    }
   ]
 }
