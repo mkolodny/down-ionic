@@ -88,6 +88,7 @@ describe 'Auth service', ->
     it 'should save the user to localstorage', ->
       expect(localStorage.get 'currentUser').toEqual expectedUser
 
+
   describe 'set phone', ->
     phone = null
 
@@ -394,7 +395,7 @@ describe 'Auth service', ->
         expect($state.go).toHaveBeenCalledWith 'verifyPhone'
 
 
-    describe 'the user doesn\'t have an email', ->
+    describe 'the user doesn\'t have an image url', ->
 
       beforeEach ->
         Auth.phone = '+19252852230'
