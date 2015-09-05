@@ -13,6 +13,7 @@ fdescribe 'PushNotifications service', ->
   scope = null
   APNSDevice = null
   Auth = null
+  GCMDevice = null
   PushNotifications = null
 
   beforeEach angular.mock.module('ionic')
@@ -51,6 +52,7 @@ fdescribe 'PushNotifications service', ->
     $rootScope = $injector.get '$rootScope'
     scope = $rootScope.$new()
     APNSDevice = $injector.get 'APNSDevice'
+    GCMDevice = $injector.get 'GCMDevice'
     localStorage = $injector.get 'localStorageService'
     PushNotifications = angular.copy $injector.get('PushNotifications')
   )
@@ -168,6 +170,60 @@ fdescribe 'PushNotifications service', ->
           deviceId: device.uuid
           name: name
         expect(APNSDevice.save).toHaveBeenCalledWith apnsDevice
+
+      describe 'successfully', ->
+
+        beforeEach ->
+          deferred.resolve()
+          scope.$apply()
+
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
+
+      describe 'save failed', ->
+
+        beforeEach ->
+          deferred.reject()
+          scope.$apply()
+
+        it 'should reject the promise', ->
+          expect(rejected).toBe true
+
+
+    describe 'when using an iOS device', ->
+      device = null
+      deviceToken = null
+      deferred = null
+      resolved = null
+      rejected = null
+
+      beforeEach ->
+        deviceToken = '1234'
+
+        device =
+          cordova: '5.0'
+          model: 'That Shitty Galaxy Phone 3'
+          platform: 'Android'
+          uuid: '1234'
+          version: '1.3'
+        $cordovaDevice.getDevice.and.returnValue device
+
+        deferred = $q.defer()
+        spyOn(GCMDevice, 'save').and.returnValue {$promise: deferred.promise}
+
+        PushNotifications.saveToken(deviceToken).then ->
+          resolved = true
+        , ->
+          rejected = true
+
+      it 'should create a new APNSDevice and call save', ->
+        name = device.model + ', ' + device.version
+        gcmDevice =
+          userId: Auth.user.id
+          registrationId: deviceToken
+          deviceId: device.uuid
+          name: name
+        expect(GCMDevice.save).toHaveBeenCalledWith gcmDevice
 
       describe 'successfully', ->
 

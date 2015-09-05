@@ -1,6 +1,6 @@
 class PushNotifications
   constructor: (@$cordovaDevice, @$cordovaPush, @$q,
-               @Auth, @APNSDevice, localStorageService) ->
+               @Auth, @APNSDevice, @GCMDevice, localStorageService) ->
     @localStorage = localStorageService
 
   register: ->
@@ -43,8 +43,12 @@ class PushNotifications
           deferred.resolve()
         .finally =>
           deferred.reject()
-    # else if device.platform is 'Android'
-      # TODO : use GCMDevice to save to DJANGO!
+    else if device.platform is 'Android'
+      @GCMDevice.save pushDevice
+        .$promise.then =>
+          deferred.resolve()
+        .finally =>
+          deferred.reject()
 
     return deferred.promise
 
