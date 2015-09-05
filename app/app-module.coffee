@@ -81,7 +81,7 @@ angular.module 'down', [
       dismissButton: true
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, ngToast, $rootScope, $window, Auth,
-        localStorageService, User) ->
+        localStorageService, User, PushNotifications) ->
     # Check local storage for currentUser and currentPhone
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
@@ -92,18 +92,6 @@ angular.module 'down', [
       for id, friend of Auth.user.facebookFriends
         Auth.user.facebookFriends[id] = new User friend
       Auth.phone = currentPhone
-
-    # Listen for notifications.
-    $rootScope.$on '$cordovaPush:notificationReceived', (event, notification) ->
-      if notification.alert
-        alert = notification.alert
-        if alert.indexOf('from ') is 0
-          alert = "Down. #{alert}"
-        ngToast.create alert
-
-      if notification.sound
-        sound = new Media event.sound
-        sound.play()
 
     ###
     Put anything that touches Cordova in here!
@@ -126,6 +114,9 @@ angular.module 'down', [
       #branch.init 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv', (err, data) ->
       # Production
       branch.init 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ', (err, data) ->
+
+      # Start listening for notifications.
+      PushNotifications.listen()
 
       # Update the user's location while they use the app.
       if localStorageService.get 'hasRequestedLocationServices'
