@@ -1,5 +1,8 @@
 require 'angular'
 require 'ng-cordova'
+require 'angular-animate' # for ngToast
+require 'angular-sanitize' # for ngToast
+require 'ng-toast'
 require 'angular-local-storage'
 require '../auth/auth-module'
 require '../../ionic/ionic-core.js'
@@ -12,6 +15,7 @@ angular.module 'down.pushNotifications', [
     'down.auth'
     'LocalStorageModule'
     'ngCordova'
+    'ngToast'
     'ionic'
   ]
   .service 'PushNotifications', PushNotifications

@@ -1,6 +1,7 @@
 class PushNotifications
-  constructor: (@$cordovaDevice, @$cordovaPush, @$q,
-               @Auth, @APNSDevice, @GCMDevice, localStorageService) ->
+  constructor: (@$cordovaDevice, @$cordovaPush, @$q, @$rootScope,
+               @Auth, @APNSDevice, @GCMDevice, localStorageService,
+               @ngToast) ->
     @localStorage = localStorageService
 
   register: ->
@@ -22,6 +23,8 @@ class PushNotifications
     @$cordovaPush.register config
       .then (deviceToken) =>
         @saveToken deviceToken
+      .then ->
+        deferred.resolve()
       , (error) =>
         deferred.reject()
 
@@ -63,5 +66,27 @@ class PushNotifications
         @register()
     else if platform is 'Android'
       @register()
+
+    # Listen for notifications.
+    @$rootScope.$on '$cordovaPush:notificationReceived', @handleNotification
+
+  handleNotification: (event, notification) =>
+    platform = @$cordovaDevice.getPlatform()
+
+    if platform is 'iOS'
+      if notification.alert
+        alert = notification.alert
+        if alert.indexOf('from ') is 0
+          alert = "Down. #{alert}"
+        @ngToast.create alert
+        #   if notification.sound
+        #     sound = new Media event.sound
+        #     sound.play()
+
+    else if platform is 'Android'
+      if notification.event is 'message'
+        @ngToast.create notification.message
+
+
 
 module.exports = PushNotifications
