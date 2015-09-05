@@ -14,7 +14,7 @@ describe 'apnsdevice service', ->
     apiRoot = $injector.get 'apiRoot'
     APNSDevice = $injector.get 'APNSDevice'
 
-    listUrl = "#{apiRoot}/apnsdevices"
+    listUrl = "#{apiRoot}/devices/apns"
   )
 
   afterEach ->
