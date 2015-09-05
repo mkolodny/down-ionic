@@ -52,4 +52,16 @@ class PushNotifications
 
     return deferred.promise
 
+  listen: ->
+    platform = @$cordovaDevice.getPlatform()
+
+    if platform is 'iOS'
+       # If we've already asked the user for push notifications permissions,
+      #   register the `$cordovaPush` module so that we can send them in-app
+      #   notifications. This is required to start listening for notifications.
+      if @localStorage.get 'hasRequestedPushNotifications'
+        @register()
+    else if platform is 'Android'
+      @register()
+
 module.exports = PushNotifications

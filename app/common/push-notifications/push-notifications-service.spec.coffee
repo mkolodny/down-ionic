@@ -5,7 +5,7 @@ require './push-notifications-module'
 require '../resources/resources-module'
 require '../auth/auth-module'
 
-fdescribe 'PushNotifications service', ->
+describe 'PushNotifications service', ->
   $cordovaPush = null
   $cordovaDevice = null
   $q = null
@@ -242,3 +242,30 @@ fdescribe 'PushNotifications service', ->
 
         it 'should reject the promise', ->
           expect(rejected).toBe true
+
+  describe 'listening for notifications', ->
+
+    describe 'when using an iOS device', ->
+
+      describe 'when we have already request push permissions', ->
+
+        beforeEach ->
+          localStorage.set 'hasRequestedPushNotifications', true
+          $cordovaDevice.getPlatform.and.returnValue 'iOS'
+          spyOn PushNotifications, 'register'
+
+          PushNotifications.listen()
+
+        it 'should call register', ->
+          expect(PushNotifications.register).toHaveBeenCalled()
+
+    describe 'when using an Android device', ->
+
+      beforeEach ->        
+        $cordovaDevice.getPlatform.and.returnValue 'Android'
+        spyOn PushNotifications, 'register'
+
+        PushNotifications.listen()
+          
+      fit 'should call register', ->
+        expect(PushNotifications.register).toHaveBeenCalled()

@@ -127,15 +127,6 @@ angular.module 'down', [
       # Production
       branch.init 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ', (err, data) ->
 
-      # If we've already asked the user for push notifications permissions,
-      #   register the `$cordovaPush` module so that we can send them in-app
-      #   notifications.
-      if localStorageService.get 'hasRequestedPushNotifications'
-        $cordovaPush.register
-          badge: true
-          sound: true
-          alert: true
-
       # Update the user's location while they use the app.
       if localStorageService.get 'hasRequestedLocationServices'
         Auth.watchLocation()
