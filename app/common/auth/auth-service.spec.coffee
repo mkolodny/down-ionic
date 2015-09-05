@@ -1,3 +1,4 @@
+require '../../ionic/ionic.js'
 require 'angular'
 require 'angular-mocks'
 require 'angular-ui-router'
@@ -42,10 +43,6 @@ describe 'Auth service', ->
           deserializedUser
       listUrl: 'listUrl'
     $provide.value 'User', User
-
-    $cordovaDevice =
-      getPlatform: jasmine.createSpy '$cordovaDevice.getPlatform'
-    $provide.value '$cordovaDevice', $cordovaDevice
 
     $state =
       go: jasmine.createSpy '$state.go'
@@ -430,7 +427,7 @@ describe 'Auth service', ->
     describe 'when using an iOS device', ->
 
       beforeEach ->
-        $cordovaDevice.getPlatform.and.returnValue 'iOS'
+        spyOn(ionic.Platform, 'isIOS').and.returnValue true
 
       describe 'we haven\'t requested location services', ->
 

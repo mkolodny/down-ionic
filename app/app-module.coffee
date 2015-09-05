@@ -22,6 +22,7 @@ require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
 require './common/auth/auth-module'
 require './common/resources/resources-module'
+require './common/push-notifications/push-notifications-module'
 require './event/event-module'
 require './my-friends/my-friends-module'
 require './add-friends/add-friends-module'
@@ -52,6 +53,7 @@ angular.module 'down', [
     'down.myFriends'
     'down.addFriends'
     'down.friends'
+    'down.pushNotifications'
     'LocalStorageModule'
   ]
   .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider,

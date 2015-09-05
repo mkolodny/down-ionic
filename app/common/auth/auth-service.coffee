@@ -1,8 +1,9 @@
 haversine = require 'haversine'
+require '../../ionic/ionic.js'
 
 class Auth
   constructor: (@$http, @$q, @apiRoot, @User, @$cordovaGeolocation,
-                @$cordovaDevice, @$state, localStorageService) ->
+                @$state, localStorageService) ->
     @localStorage = localStorageService
 
   user: {}
@@ -89,7 +90,7 @@ class Auth
     haversine(start, end, {unit: 'mile'}) <= 5
 
   redirectForAuthState: ->
-    platform = @$cordovaDevice.getPlatform()
+    isIOS = ionic.Platform.isIOS()
 
     if not @phone?
       @$state.go 'login'
@@ -100,13 +101,13 @@ class Auth
     else if not @user.username?
       @$state.go 'setUsername'
     else if @localStorage.get('hasRequestedLocationServices') is null \
-         and platform is 'iOS'
+         and isIOS
       @$state.go 'requestLocation'
     else if @localStorage.get('hasRequestedPushNotifications') is null \
-         and platform is 'iOS'
+         and isIOS
       @$state.go 'requestPush'
     else if @localStorage.get('hasRequestedContacts') is null \
-         and platform is 'iOS'
+         and isIOS
       @$state.go 'requestContacts'
     else if @localStorage.get('hasCompletedFindFriends') is null
       @$state.go 'findFriends'
