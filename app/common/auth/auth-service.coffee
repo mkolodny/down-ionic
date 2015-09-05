@@ -2,7 +2,7 @@ haversine = require 'haversine'
 
 class Auth
   constructor: (@$http, @$q, @apiRoot, @User, @$cordovaGeolocation,
-                @$state, localStorageService) ->
+                @$cordovaDevice, @$state, localStorageService) ->
     @localStorage = localStorageService
 
   user: {}
@@ -89,6 +89,8 @@ class Auth
     haversine(start, end, {unit: 'mile'}) <= 5
 
   redirectForAuthState: ->
+    platform = @$cordovaDevice.getPlatform()
+
     if not @phone?
       @$state.go 'login'
     else if not @user?.id
@@ -97,13 +99,16 @@ class Auth
       @$state.go 'facebookSync'
     else if not @user.username?
       @$state.go 'setUsername'
-    else if not @localStorage.get 'hasRequestedLocationServices'
+    else if @localStorage.get('hasRequestedLocationServices') is null \
+         and platform is 'iOS'
       @$state.go 'requestLocation'
-    else if not @localStorage.get 'hasRequestedPushNotifications'
+    else if @localStorage.get('hasRequestedPushNotifications') is null \
+         and platform is 'iOS'
       @$state.go 'requestPush'
-    else if not @localStorage.get 'hasRequestedContacts'
+    else if @localStorage.get('hasRequestedContacts') is null \
+         and platform is 'iOS'
       @$state.go 'requestContacts'
-    else if not @localStorage.get 'hasCompletedFindFriends'
+    else if @localStorage.get('hasCompletedFindFriends') is null
       @$state.go 'findFriends'
     else
       @$state.go 'events'

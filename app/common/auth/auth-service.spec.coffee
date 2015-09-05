@@ -7,6 +7,7 @@ require './auth-module'
 
 describe 'Auth service', ->
   $cordovaGeolocation = null
+  $cordovaDevice = null
   $httpBackend = null
   scope = null
   $state = null
@@ -21,6 +22,8 @@ describe 'Auth service', ->
   beforeEach angular.mock.module('down.auth')
 
   beforeEach angular.mock.module('ngCordova.plugins.geolocation')
+
+  beforeEach angular.mock.module('ngCordova.plugins.device')
 
   beforeEach angular.mock.module('ui.router')
 
@@ -39,6 +42,10 @@ describe 'Auth service', ->
           deserializedUser
       listUrl: 'listUrl'
     $provide.value 'User', User
+
+    $cordovaDevice =
+      getPlatform: jasmine.createSpy '$cordovaDevice.getPlatform'
+    $provide.value '$cordovaDevice', $cordovaDevice
 
     $state =
       go: jasmine.createSpy '$state.go'
@@ -420,61 +427,65 @@ describe 'Auth service', ->
       it 'should go to the add username view', ->
         expect($state.go).toHaveBeenCalledWith 'setUsername'
 
-
-    describe 'we haven\'t requested location services', ->
-
-      beforeEach ->
-        Auth.phone = '+19252852230'
-        Auth.user =
-          id: 1
-          name: 'Alan Turing'
-          email: 'aturing@gmail.com'
-          imageUrl: 'https://facebook.com/profile-pic/tdog'
-          username: 'tdog'
-        Auth.redirectForAuthState()
-
-      it 'should go to the request push notifications view', ->
-        expect($state.go).toHaveBeenCalledWith 'requestLocation'
-
-
-    describe 'we haven\'t requested push services', ->
+    describe 'when using an iOS device', ->
 
       beforeEach ->
-        Auth.phone = '+19252852230'
-        Auth.user =
-          id: 1
-          name: 'Alan Turing'
-          email: 'aturing@gmail.com'
-          imageUrl: 'https://facebook.com/profile-pic/tdog'
-          location:
-            lat: 40.7265834
-            long: -73.9821535
-          username: 'tdog'
-        localStorage.set 'hasRequestedLocationServices', true
-        Auth.redirectForAuthState()
+        $cordovaDevice.getPlatform.and.returnValue 'iOS'
 
-      it 'should go to the request push notifications view', ->
-        expect($state.go).toHaveBeenCalledWith 'requestPush'
+      describe 'we haven\'t requested location services', ->
 
-    describe 'we haven\'t requested contacts access', ->
+        beforeEach ->
+          Auth.phone = '+19252852230'
+          Auth.user =
+            id: 1
+            name: 'Alan Turing'
+            email: 'aturing@gmail.com'
+            imageUrl: 'https://facebook.com/profile-pic/tdog'
+            username: 'tdog'
+          Auth.redirectForAuthState()
 
-      beforeEach ->
-        Auth.phone = '+19252852230'
-        Auth.user =
-          id: 1
-          name: 'Alan Turing'
-          email: 'aturing@gmail.com'
-          imageUrl: 'https://facebook.com/profile-pic/tdog'
-          location:
-            lat: 40.7265834
-            long: -73.9821535
-          username: 'tdog'
-        localStorage.set 'hasRequestedLocationServices', true
-        localStorage.set 'hasRequestedPushNotifications', true
-        Auth.redirectForAuthState()
+        it 'should go to the request push notifications view', ->
+          expect($state.go).toHaveBeenCalledWith 'requestLocation'
 
-      it 'should go to the request contacts view', ->
-        expect($state.go).toHaveBeenCalledWith 'requestContacts'
+
+      describe 'we haven\'t requested push services', ->
+
+        beforeEach ->
+          Auth.phone = '+19252852230'
+          Auth.user =
+            id: 1
+            name: 'Alan Turing'
+            email: 'aturing@gmail.com'
+            imageUrl: 'https://facebook.com/profile-pic/tdog'
+            location:
+              lat: 40.7265834
+              long: -73.9821535
+            username: 'tdog'
+          localStorage.set 'hasRequestedLocationServices', true
+          Auth.redirectForAuthState()
+
+        it 'should go to the request push notifications view', ->
+          expect($state.go).toHaveBeenCalledWith 'requestPush'
+
+      describe 'we haven\'t requested contacts access', ->
+
+        beforeEach ->
+          Auth.phone = '+19252852230'
+          Auth.user =
+            id: 1
+            name: 'Alan Turing'
+            email: 'aturing@gmail.com'
+            imageUrl: 'https://facebook.com/profile-pic/tdog'
+            location:
+              lat: 40.7265834
+              long: -73.9821535
+            username: 'tdog'
+          localStorage.set 'hasRequestedLocationServices', true
+          localStorage.set 'hasRequestedPushNotifications', true
+          Auth.redirectForAuthState()
+
+        it 'should go to the request contacts view', ->
+          expect($state.go).toHaveBeenCalledWith 'requestContacts'
 
     describe 'we haven\'t shown the find friends view', ->
       beforeEach ->
