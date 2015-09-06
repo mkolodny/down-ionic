@@ -19,4 +19,4 @@ angular.module 'down.pushNotifications', [
     'ionic'
   ]
   .service 'PushNotifications', PushNotifications
-  .value 'androidSenderId', '189543748377'
+  .value 'androidSenderID', '189543748377'

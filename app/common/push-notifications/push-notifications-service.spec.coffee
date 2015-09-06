@@ -82,10 +82,10 @@ describe 'PushNotifications service', ->
       rejected = null
 
       beforeEach ->
-        senderId = '1234'
-        PushNotifications.androidSenderId = senderId
+        senderID = '1234'
+        PushNotifications.androidSenderID = senderID
         androidConfig =
-          senderId: senderId
+          senderID: senderID
         $cordovaDevice.getPlatform.and.returnValue 'Android'
 
         PushNotifications.register().then ->

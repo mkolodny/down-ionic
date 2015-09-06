@@ -1,7 +1,7 @@
 class PushNotifications
-  constructor: (@$cordovaDevice, @$cordovaPush, @$q, @$rootScope,
-               @Auth, @APNSDevice, @GCMDevice, localStorageService,
-               @ngToast) ->
+  constructor: (@androidSenderID, @$cordovaDevice, @$cordovaPush, @$q,
+               @$rootScope, @Auth, @APNSDevice, @GCMDevice, 
+               localStorageService, @ngToast) ->
     @localStorage = localStorageService
 
   register: ->
@@ -18,7 +18,7 @@ class PushNotifications
     else if platform is 'Android'
       # Android Notification permissions options
       config =
-        senderId: @androidSenderId
+        senderID: @androidSenderID
 
     @$cordovaPush.register config
       .then (deviceToken) =>
@@ -59,7 +59,7 @@ class PushNotifications
     platform = @$cordovaDevice.getPlatform()
 
     if platform is 'iOS'
-       # If we've already asked the user for push notifications permissions,
+      # If we've already asked the user for push notifications permissions,
       #   register the `$cordovaPush` module so that we can send them in-app
       #   notifications. This is required to start listening for notifications.
       if @localStorage.get 'hasRequestedPushNotifications'
@@ -72,7 +72,6 @@ class PushNotifications
 
   handleNotification: (event, notification) =>
     platform = @$cordovaDevice.getPlatform()
-
     if platform is 'iOS'
       if notification.alert
         alert = notification.alert
