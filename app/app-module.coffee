@@ -82,8 +82,9 @@ angular.module 'down', [
       maxNumber: 1
       dismissButton: true
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
-        $ionicPlatform, ngToast, $rootScope, $window, Auth,
-        localStorageService, User, PushNotifications) ->
+        $ionicPlatform, $ionicPopup, $ionicHistory, ngToast, 
+        $rootScope, $window, Auth, localStorageService, User,
+        PushNotifications, $state) ->
     # Check local storage for currentUser and currentPhone
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
@@ -119,6 +120,32 @@ angular.module 'down', [
 
       # Start listening for notifications.
       PushNotifications.listen()
+
+      # Prevent hardware back button from returning 
+      #   to login views on Android
+      $ionicPlatform.registerBackButtonAction (event) ->
+        currentState = $state.current.name
+        # States where going back is disabled, therefore the  
+        #   hardware back button should exit the app
+        disabledStates = [
+          'login'
+          'facebookSync'
+          'setUsername'
+          'findFriends'
+          'events'
+        ]
+        if currentState in disabledStates
+          # Prompt user before exiting app
+          $ionicPopup.confirm(
+            title: 'System Warning'
+            template: 'Are you sure you want to exit the app?'
+          ).then (response) ->
+            if response
+              ionic.Platform.exitApp()
+        else
+          $ionicHistory.goBack()
+      , 100 # override action priority 100 (Return to previous view)
+
 
       # Update the user's location while they use the app.
       if localStorageService.get 'hasRequestedLocationServices'
