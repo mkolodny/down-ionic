@@ -274,9 +274,6 @@ describe 'Auth service', ->
       it 'should get or create the user', ->
         expect(response).toAngularEqual deserializedUser
 
-      it 'should set the returned user on the Auth object', ->
-        expect(Auth.user).toEqual deserializedUser
-
 
     describe 'when the request fails', ->
 

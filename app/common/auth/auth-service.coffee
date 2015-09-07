@@ -56,8 +56,7 @@ class Auth
 
     @$http.post "#{@apiRoot}/sessions/facebook", {access_token: accessToken}
       .success (data, status) =>
-        user = @User.deserialize data
-        @setUser user
+        @user = @User.deserialize data
         deferred.resolve @user
       .error (data, status) ->
         deferred.reject status
