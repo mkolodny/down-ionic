@@ -81,7 +81,10 @@ class EventCtrl
         @ngToast.create 'For some reason, that didn\'t work.'
 
   declineInvitation: ->
-    @$ionicLoading.show()
+    @$ionicLoading.show
+      template: '''
+        <ion-spinner icon="bubbles"></ion-spinner>
+        '''
 
     @Invitation.updateResponse @invitation, @Invitation.declined
       .$promise.then =>

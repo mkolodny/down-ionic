@@ -347,6 +347,9 @@ describe 'invitation service', ->
         it 'should get the messages collection', ->
           expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
+
         it 'should save the message on the meteor server', ->
           message =
             creator:
@@ -407,6 +410,9 @@ describe 'invitation service', ->
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.maybe
 
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
+
         describe 'meteor message saved successfully', ->
           messageId = null
 
@@ -451,6 +457,9 @@ describe 'invitation service', ->
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.declined
+
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
 
         describe 'meteor message saved successfully', ->
           messageId = null
