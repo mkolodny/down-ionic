@@ -1,4 +1,4 @@
-LinkInvitation = ($resource, apiRoot, Event, User) ->
+LinkInvitation = ($resource, apiRoot, Event, Invitation, User) ->
   listUrl = "#{apiRoot}/link-invitations"
 
   serializeLinkInvitation = (linkInvitation) ->
@@ -20,6 +20,9 @@ LinkInvitation = ($resource, apiRoot, Event, User) ->
     else
       linkInvitation.fromUserId = response.from_user.id
       linkInvitation.fromUser = User.deserialize response.from_user
+    if angular.isObject response.invitation
+      linkInvitation.invitationId = response.invitationId
+      linkInvitation.invitation = Invitation.deserialize response.invitation
     linkInvitation
 
   resource = $resource "#{listUrl}/:id", null,
