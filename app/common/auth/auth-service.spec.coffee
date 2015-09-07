@@ -207,7 +207,7 @@ describe 'Auth service', ->
         expect(response).toAngularEqual deserializedUser
 
       it 'should set the returned user on the Auth object', ->
-        expect(Auth.user).toBe deserializedUser
+        expect(Auth.user).toEqual deserializedUser
 
 
     describe 'when the request fails', ->
@@ -223,6 +223,59 @@ describe 'Auth service', ->
         $httpBackend.flush 1
 
         expect(rejectedStatus).toEqual status
+
+
+  describe 'authenticating with facebook', ->
+    fbAuthUrl = null
+    accessToken = null
+    postData = null
+
+    beforeEach ->
+      fbAuthUrl = "#{apiRoot}/sessions/facebook"
+      accessToken = 'mikeisstinky'
+      postData = access_token: accessToken
+
+    describe 'on success', ->
+      responseData = null
+      response = null
+
+      beforeEach ->
+        friend =
+          id: 2
+          email: 'jclarke@gmail.com'
+          name: 'Joan Clarke'
+          username: 'jmamba'
+          image_url: 'http://imgur.com/jcke'
+          location:
+            type: 'Point'
+            coordinates: [40.7265836, -73.9821539]
+        responseData =
+          id: 1
+          email: 'aturing@gmail.com'
+          name: 'Alan Turing'
+          username: 'tdog'
+          image_url: 'https://facebook.com/profile-pic/tdog'
+          location:
+            type: 'Point'
+            coordinates: [40.7265834, -73.9821535]
+          authtoken: 'fdsa4321'
+          facebook_friends: [friend]
+        $httpBackend.expectPOST fbAuthUrl, postData
+          .respond 200, responseData
+
+        Auth.authWithFacebook(accessToken).then (_response_) ->
+          response = _response_
+        $httpBackend.flush 1
+
+      it 'should call deserialize with response data', ->
+        expect(User.deserialize).toHaveBeenCalledWith responseData
+        expect(User.deserialize.calls.count()).toBe 1
+
+      it 'should get or create the user', ->
+        expect(response).toAngularEqual deserializedUser
+
+      it 'should set the returned user on the Auth object', ->
+        expect(Auth.user).toEqual deserializedUser
 
 
   describe 'syncing with facebook', ->
@@ -249,7 +302,6 @@ describe 'Auth service', ->
             lat: 40.7265834
             long: -73.9821535
           authtoken: 'fdsa4321'
-          firebaseToken: 'qwer6789'
         friend =
           id: 2
           email: 'jclarke@gmail.com'
@@ -288,12 +340,8 @@ describe 'Auth service', ->
       it 'should return the user', ->
         expect(response).toAngularEqual Auth.user
 
-      it 'should update the logged in user', ->
-        expectedUserData = angular.extend {}, Auth.user, deserializedUser
-        expect(Auth.user).toEqual expectedUserData
-
       it 'should save the user in local storage', ->
-        expect(Auth.setUser).toHaveBeenCalledWith Auth.user
+        expect(Auth.setUser).toHaveBeenCalledWith deserializedUser
 
 
     describe 'on error', ->
