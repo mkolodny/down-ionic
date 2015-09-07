@@ -201,6 +201,34 @@ describe 'invitation service', ->
         expect(Invitation.deserialize response).toEqual expectedInvitation
 
 
+  describe 'saving', ->
+    responseData = null
+    response = null
+
+    beforeEach ->
+      invitation =
+        toUserId: 1
+        eventId: 2
+      requestData = Invitation.serialize invitation
+      responseData = angular.extend
+        id: 3
+        from_user: 4
+        response: Invitation.noResponse
+      , requestData
+
+      $httpBackend.expectPOST listUrl, requestData
+        .respond 201, angular.toJson(responseData)
+
+      Invitation.save invitation
+        .$promise.then (_response_) ->
+          response = _response_
+      $httpBackend.flush 1
+
+    it 'should POST the invitation', ->
+      expectedInvitation = Invitation.deserialize responseData
+      expect(response).toAngularEqual expectedInvitation
+
+
   describe 'bulk creating', ->
     invitations = null
     response = null

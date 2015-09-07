@@ -96,7 +96,7 @@ class Auth
       @$state.go 'login'
     else if not @user?.id
       @$state.go 'verifyPhone'
-    else if not @user.email?
+    else if not @user.imageUrl?
       @$state.go 'facebookSync'
     else if not @user.username?
       @$state.go 'setUsername'
