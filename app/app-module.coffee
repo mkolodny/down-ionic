@@ -5,6 +5,7 @@ require 'angular-sanitize' # for ngToast
 require 'angular-ui-router'
 require 'ng-toast'
 require 'ng-cordova'
+require './ionic/ionic.js' # for ionic global object
 require './ionic/ionic-core.js'
 require './ionic/ionic-deploy.js'
 require './login/login-module'
@@ -146,9 +147,9 @@ angular.module 'down', [
           $ionicHistory.goBack()
       , 100 # override action priority 100 (Return to previous view)
 
-
       # Update the user's location while they use the app.
-      if localStorageService.get 'hasRequestedLocationServices'
+      if localStorageService.get('hasRequestedLocationServices') \
+          or !ionic.Platform.isIOS()
         Auth.watchLocation()
 
       Auth.redirectForAuthState()
