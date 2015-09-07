@@ -72,19 +72,20 @@ class PushNotifications
 
   handleNotification: (event, notification) =>
     platform = @$cordovaDevice.getPlatform()
-    if platform is 'iOS'
-      if notification.alert
-        alert = notification.alert
-        if alert.indexOf('from ') is 0
-          alert = "Down. #{alert}"
-        @ngToast.create alert
-        #   if notification.sound
-        #     sound = new Media event.sound
-        #     sound.play()
 
-    else if platform is 'Android'
-      if notification.event is 'message'
-        @ngToast.create notification.message
+    # Parse message for each platform
+    message = null
+    if platform is 'iOS' and notification.alert      
+      message = notification.alert
+    else if platform is 'Android' \
+         and notification.event is 'message'
+      message = notification.message
+
+    if message isnt null
+      # format message for in app display
+      if message.indexOf('from ') is 0
+        message = "Down. #{message}"
+      @ngToast.create message
 
 
 

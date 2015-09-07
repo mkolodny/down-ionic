@@ -419,3 +419,20 @@ describe 'PushNotifications service', ->
 
         it 'should show a notification', ->
           expect(ngToast.create).toHaveBeenCalledWith message
+
+
+      describe 'when notification is for a new invitation', ->
+        message = null
+      
+        beforeEach ->
+          message = 'from Chris MacPherson'
+          notification =
+            event: 'message'
+            message: message
+
+          spyOn ngToast, 'create'
+
+          PushNotifications.handleNotification null, notification
+
+        it 'should show add "Down. " to the message and show a notification', ->
+          expect(ngToast.create).toHaveBeenCalledWith "Down. #{message}"
