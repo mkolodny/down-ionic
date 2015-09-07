@@ -119,7 +119,7 @@ class Auth
 
     @$cordovaGeolocation.watchPosition()
       .then null, (error) =>
-        if error.code is 1
+        if error.code is 1 and ionic.Platform.isIOS()
           @$state.go 'requestLocation'
           deferred.reject()
         else

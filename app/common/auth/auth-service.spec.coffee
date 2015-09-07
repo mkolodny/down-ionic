@@ -576,23 +576,28 @@ describe 'Auth service', ->
     describe 'when location data cannot be recieved', ->
       rejected = null
 
-      describe 'because location permissions are denied', ->
+      describe 'when using an iOS device', ->
+
         beforeEach ->
-          error =
-            code: 1
+          spyOn(ionic.Platform, 'isIOS').and.returnValue true
 
-          rejected = false
-          promise.then null, ->
-            rejected = true
+        describe 'because location permissions are denied', ->
+          beforeEach ->
+            error =
+              code: 1
 
-          cordovaDeferred.reject error
-          scope.$apply()
+            rejected = false
+            promise.then null, ->
+              rejected = true
 
-        it 'should send the user to the enable location services view', ->
-          expect($state.go).toHaveBeenCalledWith 'requestLocation'
+            cordovaDeferred.reject error
+            scope.$apply()
 
-        it 'should reject the promise', ->
-          expect(rejected).toBe true
+          it 'should send the user to the enable location services view', ->
+            expect($state.go).toHaveBeenCalledWith 'requestLocation'
+
+          it 'should reject the promise', ->
+            expect(rejected).toBe true
 
 
       describe 'because of timeout or location unavailable', ->
