@@ -47,6 +47,15 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
     invitation
 
   resource = $resource "#{listUrl}/:id", null,
+    save:
+      method: 'post'
+      transformRequest: (data, headersGetter) ->
+        request = serializeInvitation data
+        angular.toJson request
+      transformResponse: (data, headersGetter) ->
+        data = angular.fromJson data
+        deserializeInvitation data
+
     update:
       method: 'put'
       params:
