@@ -278,6 +278,21 @@ describe 'Auth service', ->
         expect(Auth.user).toEqual deserializedUser
 
 
+    describe 'when the request fails', ->
+
+      it 'should reject the promise', ->
+        status = 500
+        $httpBackend.expectPOST fbAuthUrl, postData
+          .respond status, null
+
+        rejectedStatus = null
+        Auth.authWithFacebook(accessToken).then null, (_status_) ->
+          rejectedStatus = _status_
+        $httpBackend.flush 1
+
+        expect(rejectedStatus).toEqual status
+
+
   describe 'syncing with facebook', ->
     fbSyncUrl = null
     accessToken = null
