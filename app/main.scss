@@ -51,6 +51,9 @@ Global Sass
 */
 
 // Global
+body {
+  -webkit-font-smoothing: antialiased;
+}
 .button {
   border-radius: 4px;
 }

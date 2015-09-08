@@ -30,7 +30,7 @@ class Auth
     deferred.promise
 
   ###*
-   * Check verifcation code with the server
+   * Check verification code with the server
    *
    * @param  {String} phone
    * @param  {String} code
