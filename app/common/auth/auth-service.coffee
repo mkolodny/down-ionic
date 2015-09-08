@@ -51,14 +51,25 @@ class Auth
 
     deferred.promise
 
-  syncWithFacebook: (accessToken) ->
+  facebookLogin: (accessToken) ->
+    deferred = @$q.defer()
+
+    @$http.post "#{@apiRoot}/sessions/facebook", {access_token: accessToken}
+      .success (data, status) =>
+        @user = @User.deserialize data
+        deferred.resolve @user
+      .error (data, status) ->
+        deferred.reject status
+
+    deferred.promise
+
+  facebookSync: (accessToken) ->
     deferred = @$q.defer()
 
     @$http.post "#{@apiRoot}/social-account", {access_token: accessToken}
       .success (data, status) =>
         user = @User.deserialize data
-        angular.extend @user, user
-        @setUser @user
+        @setUser user
         deferred.resolve @user
       .error (data, status) ->
         deferred.reject status
