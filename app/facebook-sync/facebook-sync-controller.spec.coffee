@@ -58,7 +58,7 @@ describe 'facebook sync controller', ->
       deferredFacebook = $q.defer()
       spyOn($cordovaFacebook, 'login').and.returnValue deferredFacebook.promise
 
-      ctrl.syncWithFacebook()
+      ctrl.facebookSync()
 
     it 'should try to login with Facebook', ->
       permissions = ['email', 'user_friends', 'public_profile']
@@ -72,7 +72,7 @@ describe 'facebook sync controller', ->
         spyOn $ionicLoading, 'show'
         spyOn $ionicLoading, 'hide'
         deferredSync = $q.defer()
-        spyOn(Auth, 'syncWithFacebook').and.returnValue deferredSync.promise
+        spyOn(Auth, 'facebookSync').and.returnValue deferredSync.promise
 
         accessToken = 'asdf1234'
         deferredFacebook.resolve
@@ -88,7 +88,7 @@ describe 'facebook sync controller', ->
         expect($ionicLoading.show).toHaveBeenCalledWith {template: template}
 
       it 'should sync the backend', ->
-        expect(Auth.syncWithFacebook).toHaveBeenCalledWith accessToken
+        expect(Auth.facebookSync).toHaveBeenCalledWith accessToken
 
       describe 'when sync is successful', ->
         user = null
