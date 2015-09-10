@@ -146,7 +146,9 @@ class InviteFriendsCtrl
   sendInvitations: ->
     @$ionicLoading.show
       template: '''
-        <div class="loading-text">Sending suggestion...</div>
+        <div class="loading-text">
+          Sending suggestion...
+        </div>
         <ion-spinner icon="bubbles"></ion-spinner>
         '''
 
