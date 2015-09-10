@@ -31,7 +31,7 @@ class Auth
     deferred.promise
 
   ###*
-   * Check verifcation code with the server
+   * Check verification code with the server
    *
    * @param  {String} phone
    * @param  {String} code
@@ -52,7 +52,7 @@ class Auth
 
     deferred.promise
 
-  authWithFacebook: (accessToken) ->
+  facebookLogin: (accessToken) ->
     deferred = @$q.defer()
 
     @$http.post "#{@apiRoot}/sessions/facebook", {access_token: accessToken}
@@ -64,7 +64,7 @@ class Auth
 
     deferred.promise
 
-  syncWithFacebook: (accessToken) ->
+  facebookSync: (accessToken) ->
     deferred = @$q.defer()
 
     @$http.post "#{@apiRoot}/social-account", {access_token: accessToken}

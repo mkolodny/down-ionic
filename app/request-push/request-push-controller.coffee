@@ -1,20 +1,29 @@
 class RequestPushCtrl
-  constructor: (@$ionicLoading, @Auth, @PushNotifications,
+  constructor: (@$cordovaPush, @$cordovaDevice, @Auth, @APNSDevice,
                 localStorageService) ->
     @localStorage = localStorageService
 
   enablePush: ->
-    @$ionicLoading.show
-      template: '''
-        <div class="loading-text">Enabling push notifications...</div>
-        <ion-spinner icon="bubbles"></ion-spinner>
-        '''
+    # iOS Notification Permissions Options
+    iosConfig =
+      badge: true
+      sound: true
+      alert: true
+    @$cordovaPush.register iosConfig
+      .then (deviceToken) =>
+        @saveToken deviceToken
 
-    requestedFlag = 'hasRequestedPushNotifications'
-    @PushNotifications.register().then null, null
-    .finally =>
-      @localStorage.set requestedFlag, true
-      @Auth.redirectForAuthState()
-      @$ionicLoading.hide()
+    @localStorage.set 'hasRequestedPushNotifications', true
+    @Auth.redirectForAuthState()
+
+  saveToken: (deviceToken)->
+    device = @$cordovaDevice.getDevice()
+    name = "#{device.model}, #{device.version}"
+    apnsDevice =
+      userId: @Auth.user.id
+      registrationId: deviceToken
+      deviceId: device.uuid
+      name: name
+    @APNSDevice.save apnsDevice
 
 module.exports = RequestPushCtrl

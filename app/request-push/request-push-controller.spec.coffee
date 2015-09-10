@@ -1,17 +1,15 @@
-require '../ionic/ionic.js'
 require 'angular'
-require 'angular-animate'
 require 'angular-mocks'
-require 'angular-sanitize'
 require 'angular-local-storage'
-require '../ionic/ionic-angular.js'
+require 'ng-cordova'
 require '../common/resources/resources-module'
 require '../common/auth/auth-module'
 require '../common/push-notifications/push-notifications-module'
 RequestPushCtrl = require './request-push-controller'
 
 describe 'request push controller', ->
-  $ionicLoading = null
+  $cordovaPush = null
+  $cordovaDevice = null
   $state = null
   $q = null
   scope = null
@@ -19,8 +17,6 @@ describe 'request push controller', ->
   localStorage = null
   Auth = null
   PushNotifications = null
-
-  beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('ui.router')
 
@@ -30,7 +26,8 @@ describe 'request push controller', ->
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
-    $ionicLoading = $injector.get '$ionicLoading'
+    $cordovaPush = $injector.get '$cordovaPush'
+    $cordovaDevice = $injector.get '$cordovaDevice'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     $q = $injector.get '$q'
@@ -52,33 +49,67 @@ describe 'request push controller', ->
     
     beforeEach ->
       deferred = $q.defer()
-      spyOn(PushNotifications, 'register').and.returnValue deferred.promise
+      spyOn($cordovaPush, 'register').and.returnValue deferred.promise
 
       spyOn Auth, 'redirectForAuthState'
-      spyOn $ionicLoading, 'show'
-      spyOn $ionicLoading, 'hide'
+
+      iosConfig =
+        badge: true
+        sound: true
+        alert: true
 
       ctrl.enablePush()
 
-    it 'should show a loading indicator', ->
-      expect($ionicLoading.show).toHaveBeenCalled()
+    it 'should trigger the request notifications prompt', ->
+      expect($cordovaPush.register).toHaveBeenCalledWith iosConfig
 
+    it 'should set a flag in local storage', ->
+      expect(localStorage.get 'hasRequestedPushNotifications').toBe true
 
-    describe 'registered successfully', ->
+    it 'should redirect for auth state', ->
+      expect(Auth.redirectForAuthState).toHaveBeenCalled()
+
+    describe 'permission granted', ->
+      deviceToken = null
 
       beforeEach ->
-        deferred.resolve()
+        deviceToken = '1234'
+
+        spyOn ctrl, 'saveToken'
+
+        deferred.resolve deviceToken
         scope.$apply()
 
-      it 'should set hasRequestedPushNotifications to true', ->
-        expect(localStorage.get('hasRequestedPushNotifications')).toBe true
-
-      it 'should redirect for auth state', ->
-        expect(Auth.redirectForAuthState).toHaveBeenCalled()
-
-      it 'should hide the loading indicator', ->
-        expect($ionicLoading.hide).toHaveBeenCalled()
+      it 'should call save token', ->
+        expect(ctrl.saveToken).toHaveBeenCalledWith deviceToken
 
 
+  describe 'saving the device token', ->
+    device = null
+    deviceToken = null
 
+    beforeEach ->
+      deviceToken = '1234'
+      Auth.user =
+        id: 1
 
+      device =
+        cordova: '5.0'
+        model: 'iPhone 8'
+        platform: 'iOS'
+        uuid: '1234'
+        version: '8.1'
+      spyOn($cordovaDevice, 'getDevice').and.returnValue device
+
+      spyOn APNSDevice, 'save'
+
+      ctrl.saveToken deviceToken
+
+    it 'should create a new APNSDevice and call save', ->
+      name = device.model + ', ' + device.version
+      apnsDevice =
+        userId: Auth.user.id
+        registrationId: deviceToken
+        deviceId: device.uuid
+        name: name
+      expect(APNSDevice.save).toHaveBeenCalledWith apnsDevice

@@ -229,7 +229,7 @@ describe 'Auth service', ->
         expect(rejectedStatus).toEqual status
 
 
-  describe 'authenticating with facebook', ->
+  describe 'logging in with facebook', ->
     fbAuthUrl = null
     accessToken = null
     postData = null
@@ -267,7 +267,7 @@ describe 'Auth service', ->
         $httpBackend.expectPOST fbAuthUrl, postData
           .respond 200, responseData
 
-        Auth.authWithFacebook(accessToken).then (_response_) ->
+        Auth.facebookLogin(accessToken).then (_response_) ->
           response = _response_
         $httpBackend.flush 1
 
@@ -287,7 +287,7 @@ describe 'Auth service', ->
           .respond status, null
 
         rejectedStatus = null
-        Auth.authWithFacebook(accessToken).then null, (_status_) ->
+        Auth.facebookLogin(accessToken).then null, (_status_) ->
           rejectedStatus = _status_
         $httpBackend.flush 1
 
@@ -349,7 +349,7 @@ describe 'Auth service', ->
           facebookFriends: facebookFriends
         User.deserialize.and.returnValue deserializedUser
 
-        Auth.syncWithFacebook(accessToken).then (_response_) ->
+        Auth.facebookSync(accessToken).then (_response_) ->
           response = _response_
         $httpBackend.flush 1
 
@@ -368,7 +368,7 @@ describe 'Auth service', ->
           .respond status, null
 
         rejectedStatus = null
-        Auth.syncWithFacebook(accessToken).then null, (_status_) ->
+        Auth.facebookSync(accessToken).then null, (_status_) ->
           rejectedStatus = _status_
         $httpBackend.flush 1
 

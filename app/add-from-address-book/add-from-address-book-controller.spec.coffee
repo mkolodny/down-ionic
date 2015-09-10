@@ -206,3 +206,17 @@ describe 'add from address book controller', ->
 
       it 'should return the first letter of their name', ->
         expect(ctrl.getInitials 'p').toBe 'P'
+
+
+    describe 'when they have no last name', ->
+
+      describe 'and multiple letters in their first name', ->
+
+        it 'should return the first two letters of their first name', ->
+          expect(ctrl.getInitials 'Pele ').toBe 'PE'
+
+
+      describe 'and one letter in their first name', ->
+
+        it 'should return the first two letters of their first name', ->
+          expect(ctrl.getInitials 'P ').toBe 'P'
