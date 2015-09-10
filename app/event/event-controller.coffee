@@ -11,28 +11,32 @@ class EventCtrl
 
     # Start out at the most recent message.
     @$scope.$on '$ionicView.enter', =>
-      @$ionicScrollDelegate.scrollBottom true
-
-      # Get/subscribe to the messages posted in this event.
+      # Subscribe to this event.
       @Asteroid.subscribe 'messages', @event.id
+
+      # Show the messages posted so far.
       @Messages = @Asteroid.getCollection 'messages'
       @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}"}
       @prepareMessages()
+      @$ionicScrollDelegate.scrollBottom true
 
       # Watch for new messages.
-      @messagesRQ.on 'change', @messagesOnChangeHandler
+      @messagesRQ.on 'change', @updateMessages
 
-    # Stop listening for new messages.
+      # Watch for new members
+      @Events = @Asteroid.getCollection 'events'
+      @eventsRQ = @Events.reactiveQuery {id: "#{@event.id}"}
+      @eventsRQ.on 'change', @updateMembers
+
+      # Show the members on the view.
+      @updateMembers()
+
+    # Stop listening for new messages and members.
     @$scope.$on '$ionicView.leave', =>
-      @messagesRQ.off 'change', @messagesOnChangeHandler
+      @messagesRQ.off 'change', @updateMessages
+      @eventsRQ.off 'change', @updateMembers
 
-    @Invitation.getMemberInvitations {id: @event.id}
-      .$promise.then (invitations) =>
-        @members = (invitation.toUser for invitation in invitations)
-      , =>
-        @membersError = true
-
-  messagesOnChangeHandler: =>
+  updateMessages: =>
     @prepareMessages()
     if not @$scope.$$phase
       @$scope.$digest()
@@ -52,10 +56,19 @@ class EventCtrl
         return 1
 
     # Mark newest message as read
-    newestMessage = @messages[@messages.length - 1]
-    @Asteroid.call 'readMessage', newestMessage._id
+    if @messages.length > 0
+      newestMessage = @messages[@messages.length - 1]
+      @Asteroid.call 'readMessage', newestMessage._id
+
+  updateMembers: =>
+    @Invitation.getMemberInvitations {id: @event.id}
+      .$promise.then (invitations) =>
+        @members = (invitation.toUser for invitation in invitations)
+      , =>
+        @membersError = true
 
   saveMaxTop: ->
+    # TODO: use angularjs-scroll-glue
     @maxTop = @$ionicScrollDelegate.getScrollPosition().top
 
   toggleIsHeaderExpanded: ->

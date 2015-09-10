@@ -20,16 +20,12 @@ describe 'event controller', ->
   Auth = null
   ctrl = null
   currentDate = null
-  deferred = null
   earlierMessage = null
   Event = null
   event = null
   invitation = null
   Invitation = null
   laterMessage = null
-  Messages = null
-  messages = null
-  messagesRQ = null
   ngToast = null
   scope = null
   User = null
@@ -106,10 +102,6 @@ describe 'event controller', ->
         lat: 40.7265834
         long: -73.9821535
 
-    deferred = $q.defer()
-    spyOn(Invitation, 'getMemberInvitations').and.returnValue
-      $promise: deferred.promise
-
     ctrl = $controller EventCtrl,
       $scope: scope
       Auth: Auth
@@ -127,23 +119,36 @@ describe 'event controller', ->
   it 'should set the event title on the event', ->
     expect(ctrl.event.titleWithLongVariableName).toBe event.title
 
-  it 'should request the event members\' invitations', ->
-    expect(Invitation.getMemberInvitations).toHaveBeenCalledWith {id: event.id}
-
   describe 'once the view loads', ->
+    Messages = null
+    messagesRQ = null
+    Events = null
+    eventsRQ = null
 
     beforeEach ->
       spyOn $ionicScrollDelegate, 'scrollBottom'
       spyOn ctrl, 'prepareMessages'
 
       spyOn Asteroid, 'subscribe'
-      # Create mocks/spies for getting the messages for this event.
+      # Create mocks/spies for getting the messages for this event, and the event
+      #   itself.
       messagesRQ =
-        on: jasmine.createSpy('messagesRQ.on')
+        on: jasmine.createSpy 'messagesRQ.on'
       Messages =
         reactiveQuery: jasmine.createSpy('Messages.reactiveQuery') \
             .and.returnValue messagesRQ
-      spyOn(Asteroid, 'getCollection').and.returnValue Messages
+      eventsRQ =
+        on: jasmine.createSpy 'eventsRQ.on'
+      Events =
+        reactiveQuery: jasmine.createSpy('Messages.reactiveQuery') \
+            .and.returnValue eventsRQ
+      spyOn(Asteroid, 'getCollection').and.callFake (collection) ->
+        if collection is 'messages'
+          Messages
+        else if collection is 'events'
+          Events
+
+      spyOn ctrl, 'updateMembers'
 
       scope.$emit '$ionicView.enter'
       scope.$apply()
@@ -170,7 +175,27 @@ describe 'event controller', ->
       expect(ctrl.messagesRQ).toBe messagesRQ
 
     it 'should listen for new messages', ->
-      expect(messagesRQ.on).toHaveBeenCalledWith 'change', ctrl.messagesOnChangeHandler
+      expect(messagesRQ.on).toHaveBeenCalledWith 'change', \
+          ctrl.updateMessages
+
+    it 'should get the events collection', ->
+      expect(Asteroid.getCollection).toHaveBeenCalledWith 'events'
+
+    it 'should set the events collection on the controller', ->
+      expect(ctrl.Events).toBe Events
+
+    it 'should ask for the event', ->
+      expect(Events.reactiveQuery).toHaveBeenCalledWith {id: "#{event.id}"}
+
+    it 'should set the events reactive query on the controller', ->
+      expect(ctrl.eventsRQ).toBe eventsRQ
+
+    it 'should listen for changes to the event', ->
+      expect(eventsRQ.on).toHaveBeenCalledWith 'change', \
+          ctrl.updateMembers
+
+    it 'should update the members array', ->
+      expect(ctrl.updateMembers).toHaveBeenCalled()
 
     describe 'when new messages get posted', ->
       top = null
@@ -181,7 +206,7 @@ describe 'event controller', ->
         spyOn($ionicScrollDelegate, 'getScrollPosition').and.returnValue
           top: top
 
-        ctrl.messagesOnChangeHandler()
+        ctrl.updateMessages()
 
       it 'should prepare messages', ->
         expect(ctrl.prepareMessages).toHaveBeenCalled()
@@ -201,16 +226,24 @@ describe 'event controller', ->
       messagesRQ =
         off: jasmine.createSpy 'messagesRQ.off'
       ctrl.messagesRQ = messagesRQ
+      eventsRQ =
+        off: jasmine.createSpy 'eventsRQ.off'
+      ctrl.eventsRQ = eventsRQ
 
       scope.$broadcast '$ionicView.leave'
       scope.$apply()
 
     it 'should stop listening for new messages', ->
       expect(ctrl.messagesRQ.off).toHaveBeenCalledWith(
-        'change', ctrl.messagesOnChangeHandler)
+        'change', ctrl.updateMessages)
+
+    it 'should stop listening for new members', ->
+      expect(ctrl.eventsRQ.off).toHaveBeenCalledWith(
+        'change', ctrl.updateMembers)
 
 
   describe 'prepare messages', ->
+    messages = null
 
     beforeEach ->
       # Mock the current date.
@@ -242,6 +275,8 @@ describe 'event controller', ->
         type: 'action'
       messages = [earlierMessage, laterMessage]
 
+      spyOn Asteroid, 'call'
+
       messagesRQ =
         result: messages
       ctrl.messagesRQ = messagesRQ
@@ -249,10 +284,16 @@ describe 'event controller', ->
       ctrl.messagesRQ
       ctrl.prepareMessages()
 
+    afterEach ->
+      jasmine.clock().uninstall()
+
     it 'should set the messages on the event from oldest to newest', ->
       laterMessage.creator = new User laterMessage.creator
       earlierMessage.creator = new User earlierMessage.creator
       expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
+
+    it 'should mark the newest message as read', ->
+      expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', laterMessage._id
 
 
   describe 'when the user hits the bottom of the view', ->
@@ -269,35 +310,45 @@ describe 'event controller', ->
       expect(ctrl.maxTop).toBe top
 
 
-  describe 'when the invitations return successfully', ->
-    acceptedInvitation = null
-    maybeInvitation = null
-    invitations = null
+  describe 'updating the members array', ->
+    deferred = null
 
     beforeEach ->
-      acceptedInvitation = angular.extend {}, invitation,
-        response: Invitation.accepted
-      maybeInvitation = angular.extend {}, invitation,
-        response: Invitation.maybe
-      invitations = [acceptedInvitation, maybeInvitation]
-      deferred.resolve invitations
-      scope.$apply()
+      deferred = $q.defer()
+      spyOn(Invitation, 'getMemberInvitations').and.returnValue
+        $promise: deferred.promise
 
-    it 'should set the accepted/maybe invitations on the controller', ->
-      memberInvitations = [acceptedInvitation, maybeInvitation]
-      members = (invitation.toUser for invitation in memberInvitations)
-      expect(ctrl.members).toEqual members
+      ctrl.updateMembers()
+
+    describe 'successfully', ->
+      acceptedInvitation = null
+      maybeInvitation = null
+      invitations = null
+
+      beforeEach ->
+        acceptedInvitation = angular.extend {}, invitation,
+          response: Invitation.accepted
+        maybeInvitation = angular.extend {}, invitation,
+          response: Invitation.maybe
+        invitations = [acceptedInvitation, maybeInvitation]
+        deferred.resolve invitations
+        scope.$apply()
+
+      it 'should set the accepted/maybe invitations on the controller', ->
+        memberInvitations = [acceptedInvitation, maybeInvitation]
+        members = (invitation.toUser for invitation in memberInvitations)
+        expect(ctrl.members).toEqual members
 
 
-  describe 'when the invitations return unsuccessfully', ->
+    describe 'unsuccessfully', ->
 
-    beforeEach ->
-      deferred.reject()
-      scope.$apply()
+      beforeEach ->
+        deferred.reject()
+        scope.$apply()
 
-    it 'should show an error', ->
-      # TODO: Show the error in the view.
-      expect(ctrl.membersError).toBe true
+      it 'should show an error', ->
+        # TODO: Show the error in the view.
+        expect(ctrl.membersError).toBe true
 
 
   describe 'toggling whether the header is expanded', ->
