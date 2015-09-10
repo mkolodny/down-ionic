@@ -33,6 +33,7 @@ describe 'invitation service', ->
       getCollection: jasmine.createSpy('Asteroid.getCollection').and.returnValue \
           Messages
       call: jasmine.createSpy 'Asteroid.call'
+      subscribe: jasmine.createSpy 'Asteroid.subscribe'
     $provide.value 'Asteroid', Asteroid
     return
   )
@@ -374,6 +375,9 @@ describe 'invitation service', ->
 
         it 'should get the messages collection', ->
           expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+
+        it 'should re-subscribe to the event messages', ->
+          expect(Asteroid.subscribe).toHaveBeenCalledWith 'messages', "#{invitation.eventId}"
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true
