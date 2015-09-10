@@ -136,13 +136,7 @@ angular.module 'down', [
           'events'
         ]
         if currentState in disabledStates
-          # Prompt user before exiting app
-          $ionicPopup.confirm(
-            title: 'System Warning'
-            template: 'Are you sure you want to exit the app?'
-          ).then (response) ->
-            if response
-              ionic.Platform.exitApp()
+          ionic.Platform.exitApp()
         else
           $ionicHistory.goBack()
       , 100 # override action priority 100 (Return to previous view)
