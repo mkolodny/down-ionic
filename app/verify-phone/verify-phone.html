@@ -1,4 +1,9 @@
-<ion-view id="verify-phone" class="onboard-view" hide-nav-bar="true">
+<ion-view id="verify-phone" class="onboard-view" hide-back-button="true">
+  <ion-nav-buttons side="left">
+    <button class="button button-clear icon" ng-click="$ionicGoBack()"
+            ontouchstart
+            >Logout</button>
+  </ion-nav-buttons>
   <div class="explanation">
     Please enter the verification code you get by text message.
   </div>
@@ -6,7 +11,7 @@
     <form name="verifyPhoneForm" novalidate role="form">
       <label class="item item-input">
         <input ng-model="verifyPhone.code" name="code" minlength="4"
-               maxlength="4" placeholder="1234" required
+               maxlength="4" placeholder="• • • •" required
                type="tel"
                ng-class="{'has-error': verifyPhoneForm.$submitted && verifyPhoneForm.phone.$invalid }">
       </label>
