@@ -5,6 +5,7 @@ require './resources-module'
 describe 'linkinvitation service', ->
   $httpBackend = null
   Event = null
+  Invitation = null
   LinkInvitation = null
   listUrl = null
   User = null
@@ -15,6 +16,7 @@ describe 'linkinvitation service', ->
     $httpBackend = $injector.get '$httpBackend'
     apiRoot = $injector.get 'apiRoot'
     Event = $injector.get 'Event'
+    Invitation = $injector.get 'Invitation'
     LinkInvitation = $injector.get 'LinkInvitation'
     User = $injector.get 'User'
 
@@ -80,6 +82,12 @@ describe 'linkinvitation service', ->
           from_user:
             id: 4
             name: 'Alicia Vikander'
+          invitation:
+            id: 5
+            event: 6
+            from_user: 4
+            to_user: 7
+            response: Invitation.noResponse
           link_id: 'asdf'
           created_at: new Date().toISOString()
         linkInvitation = LinkInvitation.deserialize response
@@ -90,6 +98,7 @@ describe 'linkinvitation service', ->
           eventId: response.event.id
           fromUser: User.deserialize response.from_user
           fromUserId: response.from_user.id
+          invitation: Invitation.deserialize response.invitation
           linkId: response.link_id
           createdAt: new Date response.created_at
         expect(linkInvitation).toAngularEqual expectedLinkInvitation
