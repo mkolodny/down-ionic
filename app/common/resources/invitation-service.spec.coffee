@@ -33,6 +33,7 @@ describe 'invitation service', ->
       getCollection: jasmine.createSpy('Asteroid.getCollection').and.returnValue \
           Messages
       call: jasmine.createSpy 'Asteroid.call'
+      subscribe: jasmine.createSpy 'Asteroid.subscribe'
     $provide.value 'Asteroid', Asteroid
     return
   )
@@ -375,6 +376,12 @@ describe 'invitation service', ->
         it 'should get the messages collection', ->
           expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
+        it 'should re-subscribe to the event messages', ->
+          expect(Asteroid.subscribe).toHaveBeenCalledWith 'messages', "#{invitation.eventId}"
+
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
+
         it 'should save the message on the meteor server', ->
           message =
             creator:
@@ -435,6 +442,9 @@ describe 'invitation service', ->
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.maybe
 
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
+
         describe 'meteor message saved successfully', ->
           messageId = null
 
@@ -479,6 +489,9 @@ describe 'invitation service', ->
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.declined
+
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
 
         describe 'meteor message saved successfully', ->
           messageId = null

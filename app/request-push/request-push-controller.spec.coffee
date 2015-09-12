@@ -4,6 +4,7 @@ require 'angular-local-storage'
 require 'ng-cordova'
 require '../common/resources/resources-module'
 require '../common/auth/auth-module'
+require '../common/push-notifications/push-notifications-module'
 RequestPushCtrl = require './request-push-controller'
 
 describe 'request push controller', ->
@@ -12,20 +13,16 @@ describe 'request push controller', ->
   $state = null
   $q = null
   scope = null
-  APNSDevice = null
   ctrl = null
   localStorage = null
   Auth = null
+  PushNotifications = null
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('ngCordova.plugins.push')
-
-  beforeEach angular.mock.module('ngCordova.plugins.device')
+  beforeEach angular.mock.module('down.pushNotifications')
 
   beforeEach angular.mock.module('LocalStorageModule')
-
-  beforeEach angular.mock.module('down.resources')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
@@ -36,7 +33,7 @@ describe 'request push controller', ->
     $q = $injector.get '$q'
     scope = $rootScope.$new()
     localStorage = $injector.get 'localStorageService'
-    APNSDevice = $injector.get 'APNSDevice'
+    PushNotifications = $injector.get 'PushNotifications'
     Auth = $injector.get 'Auth'
 
     ctrl = $controller RequestPushCtrl,
@@ -49,10 +46,7 @@ describe 'request push controller', ->
 
   describe 'requesting push notifications permission', ->
     deferred = null
-    apnsDeferred = null
-    iosConfig = null
-    device = null
-
+    
     beforeEach ->
       deferred = $q.defer()
       spyOn($cordovaPush, 'register').and.returnValue deferred.promise

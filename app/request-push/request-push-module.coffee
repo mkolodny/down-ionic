@@ -1,13 +1,13 @@
 require 'angular'
 require 'angular-ui-router'
 require 'angular-local-storage'
-require 'ng-cordova'
+require '../common/push-notifications/push-notifications-module'
 RequestPushCtrl = require './request-push-controller'
 
 angular.module 'down.requestPush', [
     'ui.router'
-    'ngCordova'
     'LocalStorageModule'
+    'down.pushNotifications'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'requestPush',

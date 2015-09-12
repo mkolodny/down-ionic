@@ -1,3 +1,4 @@
+require '../../ionic/ionic.js'
 require 'angular'
 require 'angular-mocks'
 require 'angular-ui-router'
@@ -7,6 +8,7 @@ require './auth-module'
 
 describe 'Auth service', ->
   $cordovaGeolocation = null
+  $cordovaDevice = null
   $httpBackend = null
   scope = null
   $state = null
@@ -21,6 +23,8 @@ describe 'Auth service', ->
   beforeEach angular.mock.module('down.auth')
 
   beforeEach angular.mock.module('ngCordova.plugins.geolocation')
+
+  beforeEach angular.mock.module('ngCordova.plugins.device')
 
   beforeEach angular.mock.module('ui.router')
 
@@ -481,61 +485,65 @@ describe 'Auth service', ->
       it 'should go to the add username view', ->
         expect($state.go).toHaveBeenCalledWith 'setUsername'
 
-
-    describe 'we haven\'t requested location services', ->
-
-      beforeEach ->
-        Auth.phone = '+19252852230'
-        Auth.user =
-          id: 1
-          name: 'Alan Turing'
-          email: 'aturing@gmail.com'
-          imageUrl: 'https://facebook.com/profile-pic/tdog'
-          username: 'tdog'
-        Auth.redirectForAuthState()
-
-      it 'should go to the request push notifications view', ->
-        expect($state.go).toHaveBeenCalledWith 'requestLocation'
-
-
-    describe 'we haven\'t requested push services', ->
+    describe 'when using an iOS device', ->
 
       beforeEach ->
-        Auth.phone = '+19252852230'
-        Auth.user =
-          id: 1
-          name: 'Alan Turing'
-          email: 'aturing@gmail.com'
-          imageUrl: 'https://facebook.com/profile-pic/tdog'
-          location:
-            lat: 40.7265834
-            long: -73.9821535
-          username: 'tdog'
-        localStorage.set 'hasRequestedLocationServices', true
-        Auth.redirectForAuthState()
+        spyOn(ionic.Platform, 'isIOS').and.returnValue true
 
-      it 'should go to the request push notifications view', ->
-        expect($state.go).toHaveBeenCalledWith 'requestPush'
+      describe 'we haven\'t requested location services', ->
 
-    describe 'we haven\'t requested contacts access', ->
+        beforeEach ->
+          Auth.phone = '+19252852230'
+          Auth.user =
+            id: 1
+            name: 'Alan Turing'
+            email: 'aturing@gmail.com'
+            imageUrl: 'https://facebook.com/profile-pic/tdog'
+            username: 'tdog'
+          Auth.redirectForAuthState()
 
-      beforeEach ->
-        Auth.phone = '+19252852230'
-        Auth.user =
-          id: 1
-          name: 'Alan Turing'
-          email: 'aturing@gmail.com'
-          imageUrl: 'https://facebook.com/profile-pic/tdog'
-          location:
-            lat: 40.7265834
-            long: -73.9821535
-          username: 'tdog'
-        localStorage.set 'hasRequestedLocationServices', true
-        localStorage.set 'hasRequestedPushNotifications', true
-        Auth.redirectForAuthState()
+        it 'should go to the request push notifications view', ->
+          expect($state.go).toHaveBeenCalledWith 'requestLocation'
 
-      it 'should go to the request contacts view', ->
-        expect($state.go).toHaveBeenCalledWith 'requestContacts'
+
+      describe 'we haven\'t requested push services', ->
+
+        beforeEach ->
+          Auth.phone = '+19252852230'
+          Auth.user =
+            id: 1
+            name: 'Alan Turing'
+            email: 'aturing@gmail.com'
+            imageUrl: 'https://facebook.com/profile-pic/tdog'
+            location:
+              lat: 40.7265834
+              long: -73.9821535
+            username: 'tdog'
+          localStorage.set 'hasRequestedLocationServices', true
+          Auth.redirectForAuthState()
+
+        it 'should go to the request push notifications view', ->
+          expect($state.go).toHaveBeenCalledWith 'requestPush'
+
+      describe 'we haven\'t requested contacts access', ->
+
+        beforeEach ->
+          Auth.phone = '+19252852230'
+          Auth.user =
+            id: 1
+            name: 'Alan Turing'
+            email: 'aturing@gmail.com'
+            imageUrl: 'https://facebook.com/profile-pic/tdog'
+            location:
+              lat: 40.7265834
+              long: -73.9821535
+            username: 'tdog'
+          localStorage.set 'hasRequestedLocationServices', true
+          localStorage.set 'hasRequestedPushNotifications', true
+          Auth.redirectForAuthState()
+
+        it 'should go to the request contacts view', ->
+          expect($state.go).toHaveBeenCalledWith 'requestContacts'
 
     describe 'we haven\'t shown the find friends view', ->
       beforeEach ->
@@ -629,23 +637,28 @@ describe 'Auth service', ->
     describe 'when location data cannot be recieved', ->
       rejected = null
 
-      describe 'because location permissions are denied', ->
+      describe 'when using an iOS device', ->
+
         beforeEach ->
-          error =
-            code: 1
+          spyOn(ionic.Platform, 'isIOS').and.returnValue true
 
-          rejected = false
-          promise.then null, ->
-            rejected = true
+        describe 'because location permissions are denied', ->
+          beforeEach ->
+            error =
+              code: 1
 
-          cordovaDeferred.reject error
-          scope.$apply()
+            rejected = false
+            promise.then null, ->
+              rejected = true
 
-        it 'should send the user to the enable location services view', ->
-          expect($state.go).toHaveBeenCalledWith 'requestLocation'
+            cordovaDeferred.reject error
+            scope.$apply()
 
-        it 'should reject the promise', ->
-          expect(rejected).toBe true
+          it 'should send the user to the enable location services view', ->
+            expect($state.go).toHaveBeenCalledWith 'requestLocation'
+
+          it 'should reject the promise', ->
+            expect(rejected).toBe true
 
 
       describe 'because of timeout or location unavailable', ->

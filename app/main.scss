@@ -289,8 +289,12 @@ body {
 .ng-toast {
   position: absolute;
   width: 100%;
-  margin-top: 15px;
+  margin-top: 0;
   z-index: 12;
+}
+.platform-ios .ng-toast {
+  // Offset for iOS status bar
+  margin-top: $ios-statusbar-height;
 }
 .alert {
   background-color: $brand-color;
@@ -307,6 +311,7 @@ body {
   font-size: 21px;
   background: transparent;
   border: 0;
+  width: 45px;
 }
 
 // Spinner

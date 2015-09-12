@@ -5,6 +5,7 @@ require 'angular-sanitize' # for ngToast
 require 'angular-ui-router'
 require 'ng-toast'
 require 'ng-cordova'
+require './ionic/ionic.js' # for ionic global object
 require './ionic/ionic-core.js'
 require './ionic/ionic-deploy.js'
 require './login/login-module'
@@ -22,6 +23,7 @@ require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
 require './common/auth/auth-module'
 require './common/resources/resources-module'
+require './common/push-notifications/push-notifications-module'
 require './event/event-module'
 require './my-friends/my-friends-module'
 require './add-friends/add-friends-module'
@@ -52,6 +54,7 @@ angular.module 'down', [
     'down.myFriends'
     'down.addFriends'
     'down.friends'
+    'down.pushNotifications'
     'LocalStorageModule'
   ]
   .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider,
@@ -80,8 +83,9 @@ angular.module 'down', [
       maxNumber: 1
       dismissButton: true
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
-        $ionicPlatform, ngToast, $rootScope, $window, Auth,
-        localStorageService, User) ->
+        $ionicPlatform, $ionicPopup, $ionicHistory, ngToast, 
+        $rootScope, $window, Auth, localStorageService, User,
+        PushNotifications, $state) ->
     # Check local storage for currentUser and currentPhone
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
@@ -92,18 +96,6 @@ angular.module 'down', [
       for id, friend of Auth.user.facebookFriends
         Auth.user.facebookFriends[id] = new User friend
       Auth.phone = currentPhone
-
-    # Listen for notifications.
-    $rootScope.$on '$cordovaPush:notificationReceived', (event, notification) ->
-      if notification.alert
-        alert = notification.alert
-        if alert.indexOf('from ') is 0
-          alert = "Down. #{alert}"
-        ngToast.create alert
-
-      if notification.sound
-        sound = new Media event.sound
-        sound.play()
 
     ###
     Put anything that touches Cordova in here!
@@ -127,17 +119,31 @@ angular.module 'down', [
       # Production
       branch.init 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ', (err, data) ->
 
-      # If we've already asked the user for push notifications permissions,
-      #   register the `$cordovaPush` module so that we can send them in-app
-      #   notifications.
-      if localStorageService.get 'hasRequestedPushNotifications'
-        $cordovaPush.register
-          badge: true
-          sound: true
-          alert: true
+      # Start listening for notifications.
+      PushNotifications.listen()
+
+      # Prevent hardware back button from returning 
+      #   to login views on Android
+      $ionicPlatform.registerBackButtonAction (event) ->
+        currentState = $state.current.name
+        # States where going back is disabled, therefore the  
+        #   hardware back button should exit the app
+        disabledStates = [
+          'login'
+          'facebookSync'
+          'setUsername'
+          'findFriends'
+          'events'
+        ]
+        if currentState in disabledStates
+          ionic.Platform.exitApp()
+        else
+          $ionicHistory.goBack()
+      , 100 # override action priority 100 (Return to previous view)
 
       # Update the user's location while they use the app.
-      if localStorageService.get 'hasRequestedLocationServices'
+      if localStorageService.get('hasRequestedLocationServices') \
+          or !ionic.Platform.isIOS()
         Auth.watchLocation()
 
       Auth.redirectForAuthState()
