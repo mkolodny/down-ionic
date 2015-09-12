@@ -1,6 +1,4 @@
-require '../../vendor/intl-phone/libphonenumber-utils.js'
-
-contactFriendshipButtonDirective = (Auth, UserPhone) ->
+contactFriendshipButtonDirective = ['Auth', 'UserPhone', (Auth, UserPhone) ->
   restrict: 'E'
   scope:
     contact: '='
@@ -26,5 +24,6 @@ contactFriendshipButtonDirective = (Auth, UserPhone) ->
           Auth.setUser Auth.user
         , ->
           $scope.isLoading = false
+]
 
 module.exports = contactFriendshipButtonDirective

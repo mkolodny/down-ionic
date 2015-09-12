@@ -1,4 +1,6 @@
 class InviteFriendsCtrl
+  @$inject: ['$ionicHistory', '$ionicLoading', '$scope', '$state', 'Auth',
+             'Event', 'Invitation']
   constructor: (@$ionicHistory, @$ionicLoading, @$scope, @$state, @Auth, @Event,
                 @Invitation) ->
     @selectedFriends = []
@@ -26,6 +28,7 @@ class InviteFriendsCtrl
         # We're inviting more people to an existing event.
         @$ionicLoading.show
           template: '''
+          <div class="loading-text">Sending suggestion...</div>
             <ion-spinner icon="bubbles"></ion-spinner>
           '''
         @Event.getInvitedIds(@event)

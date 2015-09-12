@@ -1,4 +1,5 @@
 class LoginCtrl
+  @$inject: ['$ionicLoading', '$scope', '$state', 'Auth']
   constructor: (@$ionicLoading, @$scope, @$state, @Auth) ->
 
   login: ->

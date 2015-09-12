@@ -1,4 +1,5 @@
 class FacebookSyncCtrl
+  @$inject: ['$cordovaFacebook', '$ionicLoading', '$state', 'Auth']
   constructor: (@$cordovaFacebook, @$ionicLoading, @$state, @Auth) ->
 
   facebookSync: ->

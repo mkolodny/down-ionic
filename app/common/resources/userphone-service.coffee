@@ -1,6 +1,8 @@
 require '../../vendor/intl-phone/libphonenumber-utils.js'
 
-UserPhone = ($http, $q, $resource, apiRoot, Auth, localStorageService, User) ->
+UserPhone = ['$http', '$q', '$resource', 'apiRoot', 'Auth', 'localStorageService', \
+             'User', \
+             ($http, $q, $resource, apiRoot, Auth, localStorageService, User) ->
   listUrl = "#{apiRoot}/userphones"
 
   resource = $resource "#{listUrl}/:id", null,
@@ -70,5 +72,6 @@ UserPhone = ($http, $q, $resource, apiRoot, Auth, localStorageService, User) ->
     deferred.promise
 
   resource
+]
 
 module.exports = UserPhone

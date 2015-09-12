@@ -1,4 +1,5 @@
 class VerifyPhoneCtrl
+  @$inject: ['$ionicLoading', '$scope', '$state', 'Asteroid', 'Auth']
   constructor: (@$ionicLoading, @$scope, @$state, @Asteroid, @Auth) ->
 
   authenticate: ->

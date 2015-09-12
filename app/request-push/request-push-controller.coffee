@@ -1,5 +1,7 @@
 class RequestPushCtrl
-  constructor: (@$cordovaPush, @$cordovaDevice, @Auth, @APNSDevice,
+  @$inject: ['$cordovaDevice', '$cordovaPush', 'APNSDevice', 'Auth',
+             'localStorageService']
+  constructor: (@$cordovaDevice, @$cordovaPush, @APNSDevice, @Auth,
                 localStorageService) ->
     @localStorage = localStorageService
 

@@ -1,6 +1,8 @@
 haversine = require 'haversine'
 
 class Auth
+  @$inject: ['$http', '$q', 'apiRoot', 'User', '$cordovaGeolocation',
+             '$state', 'localStorageService']
   constructor: (@$http, @$q, @apiRoot, @User, @$cordovaGeolocation,
                 @$state, localStorageService) ->
     @localStorage = localStorageService

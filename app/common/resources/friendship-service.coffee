@@ -1,4 +1,5 @@
-Friendship = ($http, $resource, $q, apiRoot, Auth) ->
+Friendship = ['$http', '$q', '$resource', 'apiRoot', 'Auth', \
+              ($http, $q, $resource, apiRoot, Auth) ->
   listUrl = "#{apiRoot}/friendships"
 
   resource = $resource "#{listUrl}/:id", null,
@@ -35,5 +36,6 @@ Friendship = ($http, $resource, $q, apiRoot, Auth) ->
     {$promise: deferred.promise}
 
   resource
+]
 
 module.exports = Friendship

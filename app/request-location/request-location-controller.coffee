@@ -1,6 +1,7 @@
 class RequestLocationCtrl
-  constructor: (@$state, @localStorageService, @Auth) ->
-    @localStorage = @localStorageService
+  @$inject: ['$state', 'Auth', 'localStorageService']
+  constructor: (@$state, @Auth, localStorageService) ->
+    @localStorage = localStorageService
 
   enableLocation: ->
     @Auth.watchLocation()

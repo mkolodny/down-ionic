@@ -1,4 +1,5 @@
-Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
+Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
+         ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
   listUrl = "#{apiRoot}/events"
   detailUrl = "#{listUrl}/:id"
   serializeEvent = (event) ->
@@ -130,5 +131,6 @@ Event = ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
     deferred.promise
 
   resource
+]
 
 module.exports = Event

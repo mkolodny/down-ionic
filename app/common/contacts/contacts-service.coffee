@@ -1,7 +1,9 @@
 require '../../vendor/intl-phone/libphonenumber-utils.js'
 
 class Contacts
-  constructor: (@$q, @$http, @$cordovaContacts, @Auth, localStorageService,
+  @$inject: ['$http', '$cordovaContacts', '$q', 'Auth', 'localStorageService'
+             'UserPhone']
+  constructor: (@$http, @$cordovaContacts, @$q, @Auth, localStorageService,
                 @UserPhone) ->
     @localStorage = localStorageService
 

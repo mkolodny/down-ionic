@@ -1,4 +1,5 @@
 class AddFromFacebookCtrl
+  @$inject: ['$scope', 'Auth']
   constructor: (@$scope, @Auth) ->
     # Build the array of items to show in the view.
     if @Auth.user.facebookFriends?

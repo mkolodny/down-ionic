@@ -1,4 +1,5 @@
-LinkInvitation = ($resource, apiRoot, Event, Invitation, User) ->
+LinkInvitation = ['$resource', 'apiRoot', 'Event', 'Invitation', 'User', \
+                  ($resource, apiRoot, Event, Invitation, User) ->
   listUrl = "#{apiRoot}/link-invitations"
 
   serializeLinkInvitation = (linkInvitation) ->
@@ -48,5 +49,6 @@ LinkInvitation = ($resource, apiRoot, Event, Invitation, User) ->
   resource.deserialize = deserializeLinkInvitation
 
   resource
+]
 
 module.exports = LinkInvitation

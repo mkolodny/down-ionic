@@ -1,4 +1,5 @@
 class FriendsCtrl
+  @$inject: ['$ionicHistory', '$state']
   constructor: (@$ionicHistory, @$state) ->
 
   showMyFriends: ->

@@ -1,4 +1,4 @@
-APNSDevice = ($resource, apiRoot) ->
+APNSDevice = ['$resource', 'apiRoot', ($resource, apiRoot) ->
   listUrl = "#{apiRoot}/devices/apns"
 
   $resource "#{listUrl}/:id", null,
@@ -20,5 +20,6 @@ APNSDevice = ($resource, apiRoot) ->
           deviceId: data.device_id
           name: data.name
         response
+]
 
 module.exports = APNSDevice

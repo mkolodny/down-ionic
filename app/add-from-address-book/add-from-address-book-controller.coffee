@@ -1,4 +1,5 @@
 class AddFromAddressBookCtrl
+  @$inject: ['$scope', 'Contacts', 'localStorageService', 'User']
   constructor: (@$scope, @Contacts, localStorageService, @User) ->
     @localStorage = localStorageService
 

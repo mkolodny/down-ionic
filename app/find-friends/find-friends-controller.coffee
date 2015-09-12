@@ -1,6 +1,8 @@
 class FindFriendsCtrl
-  constructor: (@$ionicLoading, @$scope, @$state, @Auth, @User,
-                localStorageService, @Contacts) ->
+  @$inject: ['$ionicLoading', '$scope', '$state', 'Auth', 'Contacts',
+             'localStorageService', 'User']
+  constructor: (@$ionicLoading, @$scope, @$state, @Auth, @Contacts,
+                localStorageService, @User) ->
     @localStorage = localStorageService
 
     # Request Contacts Permission

@@ -1,4 +1,6 @@
-Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
+Invitation = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event', \
+              'User', \
+              ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
   listUrl = "#{apiRoot}/invitations"
   detailUrl =
   serializeInvitation = (invitation) ->
@@ -164,5 +166,6 @@ Invitation = ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
     {$promise: deferred.promise}
 
   resource
+]
 
 module.exports = Invitation

@@ -1,4 +1,5 @@
 class RequestContactsCtrl
+  @$inject: ['$state']
   constructor: (@$state) ->
 
   requestContacts: ->

@@ -1,7 +1,10 @@
 class EventsCtrl
+  @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading', '$ionicModal',
+             '$scope', '$state', '$timeout', 'Asteroid', 'Invitation', 'ngToast',
+             'Auth']
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$scope, @$state, @$timeout, @Asteroid, @dividerHeight,
-                @eventHeight, @Invitation, @ngToast, @Auth) ->
+                @$scope, @$state, @$timeout, @Asteroid, @Invitation, @ngToast,
+                @Auth) ->
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
         scope: @$scope

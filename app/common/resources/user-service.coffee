@@ -1,4 +1,4 @@
-User = ($http, $q, $resource, apiRoot) ->
+User = ['$http', '$q', '$resource', 'apiRoot', ($http, $q, $resource, apiRoot) ->
   listUrl = "#{apiRoot}/users"
   serializeUser = (user) ->
     data =
@@ -102,5 +102,6 @@ User = ($http, $q, $resource, apiRoot) ->
     "#{@imageUrl}?width=#{size}&height=#{size}"
 
   resource
+]
 
 module.exports = User

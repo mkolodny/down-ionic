@@ -1,4 +1,5 @@
 class AddFriendsCtrl
+  @$inject: ['$ionicHistory', '$state']
   constructor: (@$ionicHistory, @$state) ->
 
   addByUsername: ->

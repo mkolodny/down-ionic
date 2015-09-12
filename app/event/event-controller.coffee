@@ -1,4 +1,7 @@
 class EventCtrl
+  @$inject: ['$ionicActionSheet', '$ionicLoading', '$ionicScrollDelegate',
+             '$scope', '$state', '$stateParams', 'Asteroid', 'Auth', 'Event',
+             'Invitation', 'ngToast', 'User']
   constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicScrollDelegate,
                 @$scope, @$state, @$stateParams, @Asteroid, @Auth, @Event,
                 @Invitation, @ngToast, @User) ->

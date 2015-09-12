@@ -1,6 +1,7 @@
 class MyFriendsCtrl
   # TODO: Handle when the user's friends aren't saved yet. We have to update the
   #   friends' locations somehow.
+  @$inject: ['$ionicHistory', '$state', 'Auth']
   constructor: (@$ionicHistory, @$state, @Auth) ->
     friends = angular.copy @Auth.user.friends
 

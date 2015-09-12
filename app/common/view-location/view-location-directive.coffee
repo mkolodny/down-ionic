@@ -1,4 +1,4 @@
-viewLocationDirective = ($ionicActionSheet, $window) ->
+viewLocationDirective = ['$ionicActionSheet', '$window', ($ionicActionSheet, $window) ->
   restrict: 'A'
   scope:
     location: '='
@@ -35,5 +35,6 @@ viewLocationDirective = ($ionicActionSheet, $window) ->
                 location = $scope.location
                 url = "maps://?q=#{location.lat},#{location.long}"
                 $window.open url, '_system'
+]
 
 module.exports = viewLocationDirective

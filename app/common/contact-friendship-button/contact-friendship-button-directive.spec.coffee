@@ -1,6 +1,5 @@
 require 'angular'
 require 'angular-mocks'
-require '../../vendor/intl-phone/libphonenumber-utils.js'
 require '../resources/resources-module'
 require './contact-friendship-button-module'
 

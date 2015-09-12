@@ -1,4 +1,5 @@
 class SetUsernameCtrl
+  @$inject: ['$ionicLoading', '$scope', '$state', 'Auth', 'User']
   constructor: (@$ionicLoading, @$scope, @$state, @Auth, @User) ->
 
   setUsername: ->
