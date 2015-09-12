@@ -27,10 +27,8 @@ describe 'events controller', ->
   ctrl = null
   deferredGetInvitations = null
   deferredTemplate = null
-  dividerHeight = null
   earlier = null
   Event = null
-  eventHeight = null
   item = null
   invitation = null
   later = null
@@ -67,9 +65,7 @@ describe 'events controller', ->
     $window = $injector.get '$window'
     Asteroid = $injector.get 'Asteroid'
     Auth = angular.copy $injector.get 'Auth'
-    dividerHeight = $injector.get 'dividerHeight'
     Event = $injector.get 'Event'
-    eventHeight = $injector.get 'eventHeight'
     Invitation = $injector.get 'Invitation'
     ngToast = $injector.get 'ngToast'
     scope = $rootScope.$new()
