@@ -56,7 +56,7 @@ angular.module 'down', [
   ]
   .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider,
            ngToastProvider) ->
-    acceptHeader = 'application/json; version=1.2'
+    acceptHeader = 'application/json; version=2.0'
     $httpProvider.defaults.headers.common['Accept'] = acceptHeader
     $httpProvider.interceptors.push ($injector) ->
       # Include the Authorization header in each request.
