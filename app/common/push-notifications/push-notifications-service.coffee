@@ -1,34 +1,23 @@
 class PushNotifications
   constructor: (@androidSenderID, @$cordovaDevice, @$cordovaPush, @$q,
-               @$rootScope, @Auth, @APNSDevice, @GCMDevice, 
+               @$rootScope, @$window, @Auth, @APNSDevice, @GCMDevice, 
                localStorageService, @ngToast) ->
     @localStorage = localStorageService
 
-  register: ->
-    deferred = @$q.defer()
-
+  listen: ->
     platform = @$cordovaDevice.getPlatform()
-    config = null
+
     if platform is 'iOS'
-      # iOS Notification Permissions Options
-      config =
-        badge: true
-        sound: true
-        alert: true
+      # If we've already asked the user for push notifications permissions,
+      #   register the `$cordovaPush` module so that we can send them in-app
+      #   notifications. This is required to start listening for notifications.
+      if @localStorage.get 'hasRequestedPushNotifications'
+        @register()
+
+      # Listen for notifications.
+      @$rootScope.$on '$cordovaPush:notificationReceived', @handleNotification
     else if platform is 'Android'
-      # Android Notification permissions options
-      config =
-        senderID: @androidSenderID
-
-    @$cordovaPush.register config
-      .then (deviceToken) =>
-        @saveToken deviceToken
-      .then ->
-        deferred.resolve()
-      , (error) =>
-        deferred.reject()
-
-    return deferred.promise
+      @registerAndroid()
 
   saveToken: (deviceToken)->
     deferred = @$q.defer()
@@ -55,38 +44,57 @@ class PushNotifications
 
     deferred.promise
 
-  listen: ->
-    platform = @$cordovaDevice.getPlatform()
+  registerAndroid: ->
+    options =
+      android:
+        senderID: @androidSenderID
+    push = @$window.PushNotification
+    push.init options
+    push.on 'registration', @handleRegistrationAndroid
+    push.on 'notification', @handleNotificationAndroid
 
-    if platform is 'iOS'
-      # If we've already asked the user for push notifications permissions,
-      #   register the `$cordovaPush` module so that we can send them in-app
-      #   notifications. This is required to start listening for notifications.
-      if @localStorage.get 'hasRequestedPushNotifications'
-        @register()
-    else if platform is 'Android'
-      @register()
+  handleRegistrationAndroid: (data) =>
+    deviceToken = data.registrationId
+    @saveToken deviceToken
 
-    # Listen for notifications.
-    @$rootScope.$on '$cordovaPush:notificationReceived', @handleNotification
+  handleNotificationAndroid: (data) =>
+    if data.message
+      message = data.message
+      # format message for in app display
+      if message.indexOf('from ') is 0
+        message = "Down. #{message}"
+      @ngToast.create message
+
+  register: ->
+    deferred = @$q.defer()
+
+    # iOS Notification Permissions Options
+    config =
+      badge: true
+      sound: true
+      alert: true
+
+    @$cordovaPush.register config
+      .then (deviceToken) =>
+        @saveToken deviceToken
+      .then ->
+        deferred.resolve()
+      , (error) =>
+        deferred.reject()
+
+    deferred.promise
 
   handleNotification: (event, notification) =>
     platform = @$cordovaDevice.getPlatform()
 
-    # Parse message for each platform
     message = null
     if platform is 'iOS' and notification.alert      
       message = notification.alert
-    else if platform is 'Android' \
-         and notification.event is 'message'
-      message = notification.message
 
     if message isnt null
       # format message for in app display
       if message.indexOf('from ') is 0
         message = "Down. #{message}"
       @ngToast.create message
-
-
 
 module.exports = PushNotifications
