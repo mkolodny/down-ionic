@@ -1,10 +1,10 @@
-require '../ionic/ionic.js'
+require '../ionic/ionic.js' # for ionic module
 require 'angular'
-require 'angular-animate'
+require 'angular-animate' # for ionic module
 require 'angular-mocks'
-require 'angular-sanitize'
+require 'angular-sanitize' # for ionic module
 require 'angular-ui-router'
-require '../ionic/ionic-angular.js'
+require '../ionic/ionic-angular.js' # for ionic module
 require 'ng-cordova'
 require 'ng-toast'
 require '../common/asteroid/asteroid-module'
@@ -417,7 +417,7 @@ describe 'events controller', ->
 
     it 'should subscribe to each events\' messages', ->
       for event in events
-        expect(Asteroid.subscribe).toHaveBeenCalledWith 'messages', event.id
+        expect(Asteroid.subscribe).toHaveBeenCalledWith 'event', event.id
 
     it 'should get the messages collection', ->
       expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'

@@ -1,10 +1,10 @@
 class EventCtrl
-  @$inject: ['$ionicActionSheet', '$ionicLoading', '$ionicScrollDelegate',
+  @$inject: ['$ionicActionSheet', '$ionicLoading', '$ionicPopup', '$ionicScrollDelegate',
              '$scope', '$state', '$stateParams', 'Asteroid', 'Auth', 'Event',
-             'Invitation', 'ngToast', 'User']
-  constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicScrollDelegate,
+             'Invitation', 'LinkInvitation', 'ngToast', 'User']
+  constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicPopup, @$ionicScrollDelegate,
                 @$scope, @$state, @$stateParams, @Asteroid, @Auth, @Event,
-                @Invitation, @ngToast, @User) ->
+                @Invitation, @LinkInvitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -15,7 +15,7 @@ class EventCtrl
     # Start out at the most recent message.
     @$scope.$on '$ionicView.enter', =>
       # Subscribe to this event.
-      @Asteroid.subscribe 'messages', @event.id
+      @Asteroid.subscribe 'event', @event.id
 
       # Show the messages posted so far.
       @Messages = @Asteroid.getCollection 'messages'
@@ -97,7 +97,10 @@ class EventCtrl
         @ngToast.create 'For some reason, that didn\'t work.'
 
   declineInvitation: ->
-    @$ionicLoading.show()
+    @$ionicLoading.show
+      template: '''
+        <ion-spinner icon="bubbles"></ion-spinner>
+        '''
 
     @Invitation.updateResponse @invitation, @Invitation.declined
       .$promise.then =>
@@ -128,25 +131,50 @@ class EventCtrl
     hideSheet = null
     options =
       buttons: [
+        text: 'Send To...'
+      ,
+        text: 'Get Share Link'
+      ,
         text: notificationText
-      ,
-        text: 'Send To..'
-      ,
-        text: 'Report'
       ]
       cancelText: 'Cancel'
       buttonClicked: (index) =>
         if index is 0
-          @toggleNotifications()
-          hideSheet()
-        if index is 1
           @$state.go 'inviteFriends',
             event: @event
           hideSheet()
+        if index is 1
+          @getLinkInvitation()
+          hideSheet()
         if index is 2
+          @toggleNotifications()
           hideSheet()
 
     hideSheet = @$ionicActionSheet.show options
+
+  getLinkInvitation: ->
+    linkInvitation =
+      eventId: @event.id
+      fromUserId: @Auth.user.id
+    @LinkInvitation.save(linkInvitation).$promise
+      .then (linkInvitation) =>
+        @linkId = linkInvitation.linkId
+        @$ionicPopup.alert
+          title: 'Share Link'
+          template: """
+            <p>
+              Send this share link to your friends 
+              to see if they are down!
+            </p>
+            <p>
+              <strong>
+                http://down.life/e/#{@linkId}
+              </strong>
+            </p>
+          """
+      , =>
+        # TODO : Do something with this error
+        @linkInvitationError = true
 
   toggleNotifications: ->
     @$ionicLoading.show()

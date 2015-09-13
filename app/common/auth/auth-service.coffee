@@ -1,4 +1,5 @@
 haversine = require 'haversine'
+require '../../ionic/ionic.js'
 
 class Auth
   @$inject: ['$http', '$q', 'apiRoot', 'User', '$cordovaGeolocation',
@@ -102,6 +103,8 @@ class Auth
     haversine(start, end, {unit: 'mile'}) <= 5
 
   redirectForAuthState: ->
+    isIOS = ionic.Platform.isIOS()
+
     if not @phone?
       @$state.go 'login'
     else if not @user?.id
@@ -110,13 +113,16 @@ class Auth
       @$state.go 'facebookSync'
     else if not @user.username?
       @$state.go 'setUsername'
-    else if not @localStorage.get 'hasRequestedLocationServices'
+    else if @localStorage.get('hasRequestedLocationServices') is null \
+         and isIOS
       @$state.go 'requestLocation'
-    else if not @localStorage.get 'hasRequestedPushNotifications'
+    else if @localStorage.get('hasRequestedPushNotifications') is null \
+         and isIOS
       @$state.go 'requestPush'
-    else if not @localStorage.get 'hasRequestedContacts'
+    else if @localStorage.get('hasRequestedContacts') is null \
+         and isIOS
       @$state.go 'requestContacts'
-    else if not @localStorage.get 'hasCompletedFindFriends'
+    else if @localStorage.get('hasCompletedFindFriends') is null
       @$state.go 'findFriends'
     else
       @$state.go 'events'
@@ -126,7 +132,7 @@ class Auth
 
     @$cordovaGeolocation.watchPosition()
       .then null, (error) =>
-        if error.code is 1
+        if error.code is 1 and ionic.Platform.isIOS()
           @$state.go 'requestLocation'
           deferred.reject()
         else

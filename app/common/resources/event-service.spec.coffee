@@ -5,6 +5,8 @@ require './resources-module'
 
 describe 'event service', ->
   $httpBackend = null
+  $rootScope = null
+  $q = null
   Asteroid = null
   Auth = null
   Event = null
@@ -34,12 +36,15 @@ describe 'event service', ->
     Asteroid =
       getCollection: jasmine.createSpy('Asteroid.getCollection').and.returnValue \
           Messages
+      call: jasmine.createSpy 'Asteroid.call'
     $provide.value 'Asteroid', Asteroid
     return
   )
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
+    $rootScope = $injector.get '$rootScope'
+    $q = $injector.get '$q'
     apiRoot = $injector.get 'apiRoot'
     User = $injector.get 'User'
     Event = $injector.get 'Event'
@@ -188,8 +193,12 @@ describe 'event service', ->
       requestData = Event.serialize event
 
     describe 'successfully', ->
+      messagesDeferred = null
 
       beforeEach ->
+        messagesDeferred = $q.defer()
+        Messages.insert.and.returnValue {remote: messagesDeferred.promise}
+
         jasmine.clock().install()
         date = new Date 1438195002656
         jasmine.clock().mockDate date
@@ -237,6 +246,17 @@ describe 'event service', ->
           createdAt:
             $date: new Date().getTime()
         expect(Messages.insert).toHaveBeenCalledWith message
+
+      describe 'when the message saves', ->
+        messageId = null
+
+        beforeEach ->
+          messageId = 'asdf'
+          messagesDeferred.resolve messageId
+          $rootScope.$apply()
+
+        it 'should mark the message as read', ->
+          expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', messageId
 
 
     describe 'unsuccessfully', ->

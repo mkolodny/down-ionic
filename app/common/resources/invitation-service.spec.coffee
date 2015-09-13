@@ -33,6 +33,7 @@ describe 'invitation service', ->
       getCollection: jasmine.createSpy('Asteroid.getCollection').and.returnValue \
           Messages
       call: jasmine.createSpy 'Asteroid.call'
+      subscribe: jasmine.createSpy 'Asteroid.subscribe'
     $provide.value 'Asteroid', Asteroid
     return
   )
@@ -320,7 +321,7 @@ describe 'invitation service', ->
     date = null
     originalResponse = null
     newResponse = null
-    messsagesDeferred = null
+    messagesDeferred = null
 
     beforeEach ->
       invitation =
@@ -335,8 +336,8 @@ describe 'invitation service', ->
       deferred = $q.defer()
       spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
 
-      messsagesDeferred = $q.defer()
-      Messages.insert.and.returnValue {remote: messsagesDeferred.promise}
+      messagesDeferred = $q.defer()
+      Messages.insert.and.returnValue {remote: messagesDeferred.promise}
 
       # Mock the current date.
       jasmine.clock().install()
@@ -375,6 +376,12 @@ describe 'invitation service', ->
         it 'should get the messages collection', ->
           expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
+        it 'should re-subscribe to the event messages', ->
+          expect(Asteroid.subscribe).toHaveBeenCalledWith 'event', "#{invitation.eventId}"
+
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
+
         it 'should save the message on the meteor server', ->
           message =
             creator:
@@ -395,7 +402,7 @@ describe 'invitation service', ->
 
           beforeEach ->
             messageId = 'asdf'
-            messsagesDeferred.resolve messageId
+            messagesDeferred.resolve messageId
             $rootScope.$apply()
 
           it 'should mark action message as read', ->
@@ -435,12 +442,15 @@ describe 'invitation service', ->
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.maybe
 
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
+
         describe 'meteor message saved successfully', ->
           messageId = null
 
           beforeEach ->
             messageId = 'asdf'
-            messsagesDeferred.resolve messageId
+            messagesDeferred.resolve messageId
             $rootScope.$apply()
 
           it 'should mark action message as read', ->
@@ -480,12 +490,15 @@ describe 'invitation service', ->
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.declined
 
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
+
         describe 'meteor message saved successfully', ->
           messageId = null
 
           beforeEach ->
             messageId = 'asdf'
-            messsagesDeferred.resolve messageId
+            messagesDeferred.resolve messageId
             $rootScope.$apply()
 
           it 'should mark action message as read', ->

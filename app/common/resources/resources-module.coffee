@@ -6,6 +6,7 @@ require '../auth/auth-module'
 APNSDevice = require './apnsdevice-service'
 Event = require './event-service'
 Friendship = require './friendship-service'
+GCMDevice = require './gcmdevice-service'
 Invitation = require './invitation-service'
 LinkInvitation = require './linkinvitation-service'
 User = require './user-service'
@@ -22,6 +23,7 @@ angular.module 'down.resources', [
   .factory 'APNSDevice', APNSDevice
   .factory 'Event', Event
   .factory 'Friendship', Friendship
+  .factory 'GCMDevice', GCMDevice
   .factory 'Invitation', Invitation
   .factory 'LinkInvitation', LinkInvitation
   .factory 'User', User

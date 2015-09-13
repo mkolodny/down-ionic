@@ -133,6 +133,9 @@ Invitation = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event'
     originalResponse = invitation.response
     invitation.response = newResponse
     @update(invitation).$promise.then (_invitation) =>
+      # Re-subscribe to event messages
+      Asteroid.subscribe 'event', "#{_invitation.eventId}" # Meteor likes strings
+
       # Post an action message.
       if _invitation.response is @accepted
         text = "#{Auth.user.name} is down"
@@ -157,8 +160,10 @@ Invitation = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event'
         createdAt:
           $date: new Date().getTime()
       .remote.then (messageId) ->
+        # Mark message as read
         Asteroid.call 'readMessage', messageId
-      # Mark message as read
+
+      deferred.resolve()
     , ->
       invitation.response = originalResponse
       deferred.reject()

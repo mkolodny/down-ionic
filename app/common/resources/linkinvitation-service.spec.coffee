@@ -42,7 +42,7 @@ describe 'linkinvitation service', ->
     it 'should return the serialized link invitation', ->
       expectedLinkInvitation =
         event: linkInvitation.eventId
-        from_user_id: linkInvitation.fromUserId
+        from_user: linkInvitation.fromUserId
       expect(serializedLinkInvitation).toEqual expectedLinkInvitation
 
 
