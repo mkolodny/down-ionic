@@ -53,7 +53,7 @@ class PushNotifications
         .finally =>
           deferred.reject()
 
-    return deferred.promise
+    deferred.promise
 
   listen: ->
     platform = @$cordovaDevice.getPlatform()
