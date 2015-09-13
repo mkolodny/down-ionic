@@ -69,108 +69,23 @@ describe 'userphone service', ->
       expect(response).toAngularEqual expectedUserPhone
 
 
-  describe 'creating from a contact', ->
-    contact = null
-    intlPhone = null
-    requestData = null
+  describe 'getting from contacts', ->
     url = null
-    user = null
-
-    beforeEach ->
-      contact =
-        id: 1
-        name:
-          formatted: 'Alan Turing'
-          givenName: 'Alan'
-          familyName: 'Turing'
-        phoneNumbers: [
-          type: 'mobile'
-          value: '2036227310'
-          pref: true
-        ]
-      intlPhone = '+12036227310'
-      requestData =
-        name: contact.name.formatted
-        #first_name: contact.name.givenName
-        #last_name: contact.name.familyName
-        phone: intlPhone
-      url = "#{listUrl}/contact"
-
-    describe 'successfully', ->
-      response = null
-
-      beforeEach ->
-        # Mock the contacts having been saved in local storage.
-        contacts =
-          "#{contact.id}": contact
-        localStorage.set 'contacts', contacts
-
-        user =
-          id: 1
-          email: 'aturing@gmail.com'
-          name: contact.name.formatted
-          #first_name: contact.name.givenName
-          #last_name: contact.name.familyName
-          username: 'tdog'
-          image_url: 'https://facebook.com/profile-pic/tdog'
-          location:
-            type: 'Point'
-            coordinates: [40.7265834, -73.9821535]
-        responseData =
-          user: user
-          phone: intlPhone
-        $httpBackend.expectPOST url, requestData
-          .respond 201, angular.toJson(responseData)
-
-        UserPhone.create(contact).then (_response_) ->
-          response = _response_
-        $httpBackend.flush 1
-
-      it 'should POST the contact', ->
-        data =
-          contact: contact
-          userphone:
-            user: User.deserialize user
-            phone: intlPhone
-        expect(response).toAngularEqual data
-
-      it 'should update the contact in local storage', ->
-        contacts = localStorage.get 'contacts'
-        updatedContact = angular.extend {}, contact,
-          user: User.deserialize user
-        updatedContacts =
-          "#{contact.id}": updatedContact
-        expect(contacts).toAngularEqual updatedContacts
-
-
-    describe 'unsuccessfully', ->
-      rejected = false
-
-      beforeEach ->
-        $httpBackend.expectPOST url, requestData
-          .respond 500, ''
-
-        UserPhone.create contact
-          .then null, ->
-            rejected = true
-        $httpBackend.flush 1
-
-      it 'should reject the promise', ->
-        expect(rejected).toBe true
-
-
-  describe 'getting from phones', ->
-    url = null
+    name = null
     phone = null
-    phones = null
+    contacts = null
     requestData = null
 
     beforeEach ->
-      url = "#{listUrl}/phones"
+      url = "#{listUrl}/contacts"
+      name = 'Alan Turing'
       phone = '+12036227310'
-      phones = [phone]
+      contacts = [
+        name: name
+        phone: phone
+      ]
       requestData =
-        phones: phones
+        contacts: contacts
 
     describe 'successfully', ->
       user = null
@@ -180,7 +95,7 @@ describe 'userphone service', ->
         user =
           id: 1
           email: 'aturing@gmail.com'
-          name: 'Alan Turing'
+          name: name
           username: 'tdog'
           image_url: 'https://facebook.com/profile-pic/tdog'
           location:
@@ -193,7 +108,7 @@ describe 'userphone service', ->
         $httpBackend.expectPOST url, requestData
           .respond 200, angular.toJson(responseData)
 
-        UserPhone.getFromPhones phones
+        UserPhone.getFromContacts contacts
           .$promise.then (_response_) ->
             response = _response_
         $httpBackend.flush 1

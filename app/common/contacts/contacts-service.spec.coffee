@@ -176,21 +176,18 @@ describe 'Contacts service', ->
 
     describe 'successfully', ->
       contactId = null
-      phone = null
-      contact = null
+      userPhone = null
       user = null
       identifiedContacts = null
 
       beforeEach ->
         contactId = '1234'
         phone = '+19252855230'
-
         contact =
           id: contactId
           phoneNumbers: [
             value: phone
           ]
-
         contactCopy = angular.copy contact
         contacts = {"#{contactCopy.id}": contactCopy}
         Contacts.identifyContacts contacts
@@ -205,8 +202,10 @@ describe 'Contacts service', ->
         deferred.resolve [userPhone]
         scope.$apply()
 
-      it 'should add a user property to contacts that have users', ->
-        expect(identifiedContacts[contactId].user).toBe user
+      it 'should return an object of users', ->
+        users = {}
+        users[user.id] = user
+        expect(identifiedContacts).toEqual users
 
 
     describe 'not successfully :(', ->
@@ -245,7 +244,8 @@ describe 'Contacts service', ->
     phone1 = null
     phone2 = null
     phone3 = null
-
+    contact1 = null
+    contact2 = null
     deferred = null
     promise = null
 
@@ -253,6 +253,8 @@ describe 'Contacts service', ->
       phone1 = '+19252852230'
       contact1 =
         id: '1234'
+        name:
+          formatted: 'Ada Lovelace'
         phoneNumbers: [
           value: phone1
         ]
@@ -261,6 +263,8 @@ describe 'Contacts service', ->
       phone3 = '+15555555555'
       contact2 =
         id: '1122'
+        name:
+          formatted: 'Linus Torvalds'
         phoneNumbers: [
           value: phone2
         ,
@@ -268,7 +272,8 @@ describe 'Contacts service', ->
         ]
 
       deferred = $q.defer()
-      spyOn(UserPhone, 'getFromPhones').and.returnValue {$promise: deferred.promise}
+      spyOn(UserPhone, 'getFromContacts').and.returnValue
+        $promise: deferred.promise
 
       contactsDict = {}
       contactsDict[contact1.id] = contact1
@@ -277,9 +282,18 @@ describe 'Contacts service', ->
 
       promise = Contacts.getContactUsers contactsDictCopy
 
-    it 'should check contacts to see if a users exist for every number', ->
-      allPhones = [phone2, phone3, phone1]
-      expect(UserPhone.getFromPhones).toHaveBeenCalledWith allPhones
+    it 'should check contacts to see if a users exist for every contact', ->
+      contacts = [
+        name: contact2.name.formatted
+        phone: phone2
+      ,
+        name: contact2.name.formatted
+        phone: phone3
+      ,
+        name: contact1.name.formatted
+        phone: phone1
+      ]
+      expect(UserPhone.getFromContacts).toHaveBeenCalledWith contacts
 
     it 'should return a promise', ->
       expect(promise).toBe deferred.promise
@@ -365,6 +379,30 @@ describe 'Contacts service', ->
         expect(filteredContacts).toEqual []
 
 
+    describe 'when two contacts have the same phone number', ->
+      contact1 = null
+
+      beforeEach ->
+        phone = '+12036227310'
+        contact1 =
+          name:
+            formatted: 'Jimbo Walker'
+          phoneNumbers: [
+            value: phone
+          ]
+        contact2 =
+          name:
+            formatted: 'Jimbo Walker'
+          phoneNumbers: [
+            value: phone
+          ]
+        filteredContacts = Contacts.filterContacts [contact1, contact2]
+
+      it 'should only return the first contact', ->
+        expect(filteredContacts).toEqual [contact1]
+
+
+
   describe 'filtering numbers', ->
     phoneNumbers = null
     filteredNumbers = null
@@ -400,6 +438,20 @@ describe 'Contacts service', ->
 
       it 'should return an empty array', ->
         expect(filteredNumbers).toEqual []
+
+
+    describe 'with two of the same numbers', ->
+      phone = null
+
+      beforeEach ->
+        phone =
+          value: '+19252852230'
+        phoneNumbers = [phone, phone]
+        phoneNumbersCopy = angular.copy phoneNumbers
+        filteredNumbers = Contacts.filterNumbers phoneNumbersCopy
+
+      it 'should only return one of a certain number', ->
+        expect(filteredNumbers).toEqual [phone]
 
 
   describe 'formatting numbers', ->

@@ -29,10 +29,10 @@ class Contacts
         @identifyContacts contactsDict
       , (error) =>
         deferred.reject error
-      .then (contactsDict) =>
-        @saveContacts contactsDict
+      .then (users) =>
+        @saveContacts users
         @localStorage.set 'hasRequestedContacts', true
-        deferred.resolve contactsDict
+        deferred.resolve users
       , ->
         error =
           code: 'IDENTIFY_FAILED'
@@ -49,7 +49,9 @@ class Contacts
    *                     format - {
    *                       contactId: {
    *                         id: <String>,
-   *                         name: <String>,
+   *                         name: {
+   *                           formatted: <String>,
+   *                         },
    *                         phoneNumbers: [
    *                           {
    *                             type: <String>, # e.g. 'home'
@@ -63,19 +65,21 @@ class Contacts
   ###
   identifyContacts: (contacts) ->
     # Create a dictionary in the format: {phone: contactId, ...}
-    contactIdsDict = {}
+    # username; mobile #; whatever
+    contactIds = {}
     for id, contact of contacts
       for phoneNumber in contact.phoneNumbers
         phone = phoneNumber.value
-        contactIdsDict[phone] = contact.id
+        contactIds[phone] = contact.id
 
     deferred = @$q.defer()
     @getContactUsers contacts
       .then (userPhones) =>
+        users = {}
         for userPhone in userPhones
-          contactId = contactIdsDict[userPhone.phone]
-          contacts[contactId].user = userPhone.user
-        deferred.resolve contacts
+          user = userPhone.user
+          users[user.id] = user
+        deferred.resolve users
       , ->
         deferred.reject()
     deferred.promise
@@ -87,19 +91,32 @@ class Contacts
     contactsObject
 
   getContactUsers: (contacts) ->
-    phones = []
+    contactPhones = []
     for id, contact of contacts
       for phoneNumber in contact.phoneNumbers
-        phones.push phoneNumber.value
-    @UserPhone.getFromPhones(phones).$promise
+        contactPhones.push
+          name: contact.name.formatted
+          phone: phoneNumber.value
+    @UserPhone.getFromContacts(contactPhones).$promise
 
   filterContacts: (contacts) ->
     filteredContacts = []
+    phones = {}
     for contact in contacts
       if contact.name.formatted and contact.phoneNumbers?.length > 0
         # Make sure the contact isn't the current user.
-        phones = (phoneNumber.value for phoneNumber in contact.phoneNumbers)
-        if @Auth.phone in phones
+        phoneNumbers = (phoneNumber.value for phoneNumber in contact.phoneNumbers)
+        if @Auth.phone in phoneNumbers
+          continue
+
+        unique = true
+        for phoneNumber in phoneNumbers
+          # Make sure the contact is unique.
+          if phones[phoneNumber]
+            unique = false
+          phones[phoneNumber] = true
+
+        if not unique
           continue
 
         filteredContacts.push contact
@@ -120,11 +137,11 @@ class Contacts
     if numbers is null
       return []
 
-    filteredNumbers = []
+    filteredNumbers = {}
     for number in numbers
       if intlTelInputUtils.isValidNumber number.value
-        filteredNumbers.push number
-    filteredNumbers
+        filteredNumbers[number.value] = number
+    (number for value, number of filteredNumbers)
 
   saveContacts: (contacts) ->
     @localStorage.set 'contacts', contacts

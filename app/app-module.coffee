@@ -143,8 +143,8 @@ angular.module 'down', [
       Auth.redirectForAuthState()
 
     $ionicPlatform.ready ->
-      #bootstrap()
-      #return
+      bootstrap()
+      return
 
       # Check For Updates
       $ionicDeploy.setChannel 'staging' # 'dev', 'staging', 'production'
