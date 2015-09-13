@@ -417,7 +417,7 @@ describe 'events controller', ->
 
     it 'should subscribe to each events\' messages', ->
       for event in events
-        expect(Asteroid.subscribe).toHaveBeenCalledWith 'messages', event.id
+        expect(Asteroid.subscribe).toHaveBeenCalledWith 'event', event.id
 
     it 'should get the messages collection', ->
       expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'

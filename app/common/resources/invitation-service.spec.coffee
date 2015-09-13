@@ -377,7 +377,7 @@ describe 'invitation service', ->
           expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
         it 'should re-subscribe to the event messages', ->
-          expect(Asteroid.subscribe).toHaveBeenCalledWith 'messages', "#{invitation.eventId}"
+          expect(Asteroid.subscribe).toHaveBeenCalledWith 'event', "#{invitation.eventId}"
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true

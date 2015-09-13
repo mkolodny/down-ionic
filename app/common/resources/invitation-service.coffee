@@ -134,7 +134,7 @@ Invitation = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event'
     invitation.response = newResponse
     @update(invitation).$promise.then (_invitation) =>
       # Re-subscribe to event messages
-      Asteroid.subscribe 'messages', "#{_invitation.eventId}" # Meteor likes strings
+      Asteroid.subscribe 'event', "#{_invitation.eventId}" # Meteor likes strings
 
       # Post an action message.
       if _invitation.response is @accepted

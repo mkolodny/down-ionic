@@ -15,7 +15,7 @@ class EventCtrl
     # Start out at the most recent message.
     @$scope.$on '$ionicView.enter', =>
       # Subscribe to this event.
-      @Asteroid.subscribe 'messages', @event.id
+      @Asteroid.subscribe 'event', @event.id
 
       # Show the messages posted so far.
       @Messages = @Asteroid.getCollection 'messages'

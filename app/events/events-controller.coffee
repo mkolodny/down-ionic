@@ -150,7 +150,7 @@ class EventsCtrl
   eventsMessagesSubscribe: (events) ->
     # Subscribe to the messages posted in each event.
     for event in events
-      @Asteroid.subscribe 'messages', event.id
+      @Asteroid.subscribe 'event', event.id
 
     Messages = @Asteroid.getCollection 'messages'
     Events = @Asteroid.getCollection 'events'
