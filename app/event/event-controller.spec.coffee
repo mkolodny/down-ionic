@@ -13,6 +13,7 @@ EventCtrl = require './event-controller'
 describe 'event controller', ->
   $ionicActionSheet = null
   $ionicLoading = null
+  $ionicPopup = null
   $ionicScrollDelegate = null
   $q = null
   $state = null
@@ -25,6 +26,7 @@ describe 'event controller', ->
   event = null
   invitation = null
   Invitation = null
+  LinkInvitation = null
   laterMessage = null
   ngToast = null
   scope = null
@@ -46,6 +48,7 @@ describe 'event controller', ->
     $controller = $injector.get '$controller'
     $ionicActionSheet = $injector.get '$ionicActionSheet'
     $ionicLoading = $injector.get '$ionicLoading'
+    $ionicPopup = $injector.get '$ionicPopup'
     $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
@@ -54,6 +57,7 @@ describe 'event controller', ->
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
+    LinkInvitation = $injector.get 'LinkInvitation'
     ngToast = $injector.get 'ngToast'
     scope = $injector.get '$rootScope'
     User = $injector.get 'User'
@@ -639,7 +643,7 @@ describe 'event controller', ->
       beforeEach ->
         spyOn $state, 'go'
         ctrl.showMoreOptions()
-        buttonClickedCallback 1
+        buttonClickedCallback 0
 
       it 'should go to the invite friends view', ->
         stateParams =
@@ -648,6 +652,58 @@ describe 'event controller', ->
 
       it 'should hide the action sheet', ->
         expect(hideSheet).toHaveBeenCalled()
+
+
+    describe 'tapping the get group link button', ->
+
+      beforeEach ->
+        spyOn ctrl, 'getLinkInvitation'
+        ctrl.showMoreOptions()
+        buttonClickedCallback 1
+
+      it 'should get a link invitation', ->
+        expect(ctrl.getLinkInvitation).toHaveBeenCalled()
+
+
+    describe 'getting a link invitation', ->
+      deferred = null
+
+      beforeEach ->
+        deferred = $q.defer()
+        spyOn(LinkInvitation, 'save').and.returnValue {$promise: deferred.promise}
+        ctrl.getLinkInvitation()
+
+      it 'should create a link invitation', ->
+        linkInvitation =
+          eventId: ctrl.event.id
+          fromUserId: Auth.user.id
+        expect(LinkInvitation.save).toHaveBeenCalledWith linkInvitation
+
+      describe 'successfully', ->
+        linkId = null
+
+        beforeEach ->
+          spyOn $ionicPopup, 'alert'
+          linkId = 'http://down.life/e/mikepleb'
+          deferred.resolve {linkId: linkId}
+          scope.$apply()
+
+        it 'should set the linkId on the controller', ->
+          expect(ctrl.linkId).toEqual linkId
+
+        it 'should show a modal with the share link', ->
+          expect($ionicPopup.alert).toHaveBeenCalled()
+
+
+      describe 'on error', ->
+
+        beforeEach ->
+          deferred.reject()
+          scope.$apply()
+
+        xit 'should show an error', ->
+          expect(ctrl.linkInvitationError).toBe true
+
 
     describe 'when notifications are turned on', ->
 
@@ -659,11 +715,11 @@ describe 'event controller', ->
       it 'should show an action sheet', ->
         options =
           buttons: [
+            text: 'Send To...'
+          ,
+            text: 'Get Share Link'
+          ,
             text: 'Mute Notifications'
-          ,
-            text: 'Send To..'
-          ,
-            text: 'Report'
           ]
           cancelText: 'Cancel'
           buttonClicked: jasmine.any Function
@@ -674,7 +730,7 @@ describe 'event controller', ->
         beforeEach ->
           spyOn ctrl, 'toggleNotifications'
 
-          buttonClickedCallback 0
+          buttonClickedCallback 2
 
         it 'should update the event', ->
           expect(ctrl.toggleNotifications).toHaveBeenCalled()
@@ -693,11 +749,11 @@ describe 'event controller', ->
       it 'should show an action sheet', ->
         options =
           buttons: [
+            text: 'Send To...'
+          ,
+            text: 'Get Share Link'
+          ,
             text: 'Turn On Notifications'
-          ,
-            text: 'Send To..'
-          ,
-            text: 'Report'
           ]
           cancelText: 'Cancel'
           buttonClicked: jasmine.any Function

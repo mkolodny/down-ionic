@@ -5,7 +5,7 @@ LinkInvitation = ['$resource', 'apiRoot', 'Event', 'Invitation', 'User', \
   serializeLinkInvitation = (linkInvitation) ->
     data =
       event: linkInvitation.eventId
-      from_user_id: linkInvitation.fromUserId
+      from_user: linkInvitation.fromUserId
     data
   deserializeLinkInvitation = (response) ->
     linkInvitation =
