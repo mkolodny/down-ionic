@@ -75,14 +75,6 @@
       "id": "ionic-plugin-deploy"
     },
     {
-      "locator": "https://github.com/jeduan/cordova-plugin-facebook4.git",
-      "id": "com.phonegap.plugins.facebookconnect",
-      "variables": {
-        "APP_ID": "864552050271610",
-        "APP_NAME": "DownDev"
-      }
-    },
-    {
       "locator": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-geolocation.git",
       "id": "cordova-plugin-geolocation"
     },
@@ -92,8 +84,16 @@
       "id": "io.branch.sdk"
     },
     {
-      "locator": "https://github.com/ajlin500/phonegap-plugin-push",
-      "id": "phonegap-plugin-push"
+      "locator": "https://github.com/phonegap-build/PushPlugin",
+      "id": "com.phonegap.plugins.PushPlugin"
+    },
+    {
+      "locator": "https://github.com/Wizcorp/phonegap-facebook-plugin.git",
+      "id": "com.phonegap.plugins.facebookconnect",
+      "variables": {
+        "APP_ID": "864552050271610",
+        "APP_NAME": "DownDev"
+      }
     }
   ],
   "cordovaPlatforms": [
