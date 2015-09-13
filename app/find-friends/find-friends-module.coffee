@@ -4,7 +4,7 @@ require 'angular-local-storage'
 require '../common/auth/auth-module'
 require '../common/contacts/contacts-module'
 require '../common/resources/resources-module'
-require '../common/user-friendship-button/user-friendship-button-module'
+require '../common/friendship-button/friendship-button-module'
 FindFriendsCtrl = require './find-friends-controller'
 
 angular.module 'down.findFriends', [
@@ -13,7 +13,7 @@ angular.module 'down.findFriends', [
     'down.resources'
     'down.auth'
     'down.contacts'
-    'down.userFriendshipButton'
+    'down.friendshipButton'
     'LocalStorageModule'
   ]
   .config ($stateProvider) ->

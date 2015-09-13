@@ -5,7 +5,7 @@ UserPhone = ['$http', '$q', '$resource', 'apiRoot', 'Auth', 'localStorageService
              ($http, $q, $resource, apiRoot, Auth, localStorageService, User) ->
   listUrl = "#{apiRoot}/userphones"
 
-  resource = $resource "#{listUrl}/:id", null,
+  $resource "#{listUrl}/:id", null,
     save:
       method: 'post'
       transformRequest: (data, headersGetter) ->
@@ -21,12 +21,12 @@ UserPhone = ['$http', '$q', '$resource', 'apiRoot', 'Auth', 'localStorageService
           phone: data.phone
         response
 
-    getFromPhones:
+    getFromContacts:
       method: 'post'
-      url: "#{listUrl}/phones"
+      url: "#{listUrl}/contacts"
       isArray: true
       transformRequest: (data, headersGetter) ->
-        request = {phones: data}
+        request = {contacts: data}
         angular.toJson request
       transformResponse: (data, headersGetter) ->
         data = angular.fromJson data
@@ -35,43 +35,6 @@ UserPhone = ['$http', '$q', '$resource', 'apiRoot', 'Auth', 'localStorageService
           phone: userphone.phone
         } for userphone in data)
         response
-
-  resource.create = (contact) ->
-    deferred = $q.defer()
-
-    # Get the contact's preferred phone number, formatted accorded to the current
-    #   user's country code. `intlTelInputUtils` is on the window object from
-    #   libphonenumber-utils.
-    # TODO: Validate the number.
-    phone = contact.phoneNumbers[0].value
-    countryCode = intlTelInputUtils.getCountryCode Auth.phone
-    intlPhone = intlTelInputUtils.formatNumberByType phone, countryCode,
-        intlTelInputUtils.numberFormat.E164
-
-    requestData =
-      name: contact.name.formatted
-      phone: intlPhone
-    $http.post "#{listUrl}/contact", requestData
-      .success (data, status) ->
-        userphone = data
-        userphone.user = User.deserialize data.user
-
-        # Update the contact in local storage.
-        contacts = localStorageService.get 'contacts'
-        contact.user = userphone.user
-        contacts[contact.id] = contact
-        localStorageService.set 'contacts', contacts
-
-        response =
-          contact: contact
-          userphone: userphone
-        deferred.resolve response
-      .error (data, status) ->
-        deferred.reject()
-
-    deferred.promise
-
-  resource
 ]
 
 module.exports = UserPhone

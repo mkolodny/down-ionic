@@ -13,9 +13,9 @@
       </ion-item>
       <ion-item class="item-icon-right">
         <h2>{{addByUsername.username}}</h2>
-        <user-friendship-button  user="addByUsername.friend"
-                                 ng-if="addByUsername.friend">
-        </user-friendship-button>
+        <friendship-button user="addByUsername.friend"
+                           ng-if="addByUsername.friend">
+        </friendship-button>
         <i class="icon"><ion-spinner ng-if="addByUsername.isSearching" 
             icon="bubbles"></ion-spinner></i>
       </ion-item>

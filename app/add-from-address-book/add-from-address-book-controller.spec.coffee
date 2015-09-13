@@ -42,22 +42,10 @@ describe 'add from address book controller', ->
         long: -73.9821535
     contacts =
       1:
-        name:
-          formatted: 'Bruce Lee'
-        phoneNumbers: [
-          type: 'home'
-          value: '2345678901'
-          pref: true
-        ]
-      2:
-        user: user
-        name:
-          formatted: 'Alan Turing'
-        phoneNumbers: [
-          type: 'mobile'
-          value: '3345678901'
-          pref: true
-        ]
+        id: 1
+        name: 'Bruce Lee'
+        username: null
+      2: user
     localStorage.set 'contacts', contacts
 
     ctrl = $controller AddFromAddressBookCtrl,

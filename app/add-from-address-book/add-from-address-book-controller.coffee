@@ -13,24 +13,24 @@ class AddFromAddressBookCtrl
   showContacts: (contacts) ->
     contactsArray = (contact for id, contact of contacts)
     contactsArray.sort (a, b) ->
-      if a.name.formatted.toLowerCase() < b.name.formatted.toLowerCase()
+      if a.name.toLowerCase() < b.name.toLowerCase()
         return -1
       else
         return 1
     @items = []
     currentLetter = null
     for contact in contactsArray
-      firstLetter = contact.name.formatted[0].toUpperCase()
+      firstLetter = contact.name[0].toUpperCase()
       if firstLetter != currentLetter
         @items.push
           isDivider: true
           title: firstLetter
         currentLetter = firstLetter
 
-      if contact.user?.username
+      if contact.username isnt null
         @items.push
           isDivider: false
-          user: new @User contact.user
+          user: new @User contact
       else
         @items.push
           isDivider: false

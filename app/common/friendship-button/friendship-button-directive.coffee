@@ -1,4 +1,4 @@
-userFriendshipButtonDirective = ['Auth', 'Friendship', (Auth, Friendship) ->
+friendshipButtonDirective = ['Auth', 'Friendship', (Auth, Friendship) ->
   restrict: 'E'
   scope:
     user: '='
@@ -42,4 +42,4 @@ userFriendshipButtonDirective = ['Auth', 'Friendship', (Auth, Friendship) ->
             $scope.isLoading = false
 ]
 
-module.exports = userFriendshipButtonDirective
+module.exports = friendshipButtonDirective

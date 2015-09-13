@@ -26,18 +26,18 @@ class FindFriendsCtrl
     # Build the list of items to show in the view.
     @items = @buildItems @Auth.user.facebookFriends
 
-  buildItems: (facebookFriends, contacts = {}) ->
-    # Create a separate array of contacts who aren't users, and contacts who are
-    #   users. Ignore any contacts who are also facebook friends.
-    users = (contact.user for id, contact of contacts when 'user' of contact \
-        and 'username' of contact.user \
-        and contact.user.id not of facebookFriends)
-    contacts = (contact for id, contact of contacts when not contact.user?.username)
-
-    # Merge the user's facebook friends with the user's contacts who are Down
-    #   users.
-    facebookFriendsArray = (friend for id, friend of facebookFriends)
-    users = facebookFriendsArray.concat users
+  buildItems: (facebookFriends, contactsDict = {}) ->
+    # Create a separate array of users with usernames, and one with contacts (who
+    #   don't have usernames). Make sure the users are unique.
+    users = (friend for id, friend of facebookFriends)
+    contacts = []
+    for id, contact of contactsDict
+      if angular.isDefined facebookFriends[contact.id]
+        continue
+      if contact.username isnt null
+        users.push contact
+      else
+        contacts.push contact
 
     items = []
 
@@ -64,7 +64,7 @@ class FindFriendsCtrl
         isDivider: true
         title: 'Contacts'
       contacts.sort (a, b) ->
-        if a.name.formatted.toLowerCase() < b.name.formatted.toLowerCase()
+        if a.name.toLowerCase() < b.name.toLowerCase()
           return -1
         else
           return 1

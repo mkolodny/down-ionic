@@ -168,45 +168,28 @@ describe 'find friends controller', ->
 
 
   describe 'building the items list', ->
-    contactWithoutUser = null
-    contactWithFbFriend = null
-    contactWithUser = null
+    contactUser = null
+    contactFbFriend = null
+    contactWithoutUsername = null
     result = null
 
     beforeEach ->
-      contactWithoutUser =
-        id: 1
-        name:
-          formatted: 'Mike Pleb'
-        phoneNumbers: [
-          value: '+1952852230'
-        ]
-      contactWithUser =
-        id: 2
-        name:
-          formatted: 'Andrew Plebfoot'
-        phoneNumbers: [
-          value: '+1952852231'
-        ]
-        user:
-          id: 3
-          name: 'Andrew Plebfoot'
-          username: 'a'
-      contactWithFbFriend =
+      contactUser =
         id: 3
-        name:
-          formatted: 'Chris MacPleb'
-        phoneNumbers: [
-          value: '+1952852231'
-        ]
-        user:
-          id: facebookFriend.id
-          name: 'Chris MacPleb'
-          username: 'cmac9889'
+        name: 'Andrew Plebfoot'
+        username: 'a'
+      contactFbFriend =
+        id: facebookFriend.id
+        name: 'Chris MacPleb'
+        username: 'cmac9889'
+      contactWithoutUsername =
+        id: 4
+        name: 'Mike Pleb'
+        username: null
       contacts = [
-        contactWithoutUser
-        contactWithUser
-        contactWithFbFriend
+        contactUser
+        contactWithoutUsername
+        contactFbFriend
       ]
       contactsDict = {}
       for contact in contacts
@@ -220,7 +203,7 @@ describe 'find friends controller', ->
         title: 'Friends Using Down'
       ,
         isDivider: false
-        user: contactWithUser.user
+        user: contactUser
       ,
         isDivider: false
         user: facebookFriend
@@ -229,7 +212,7 @@ describe 'find friends controller', ->
         title: 'Contacts'
       ,
         isDivider: false
-        contact: contactWithoutUser
+        contact: contactWithoutUsername
       ]
       expect(result).toEqual items
 
