@@ -321,7 +321,7 @@ describe 'invitation service', ->
     date = null
     originalResponse = null
     newResponse = null
-    messsagesDeferred = null
+    messagesDeferred = null
 
     beforeEach ->
       invitation =
@@ -336,8 +336,8 @@ describe 'invitation service', ->
       deferred = $q.defer()
       spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
 
-      messsagesDeferred = $q.defer()
-      Messages.insert.and.returnValue {remote: messsagesDeferred.promise}
+      messagesDeferred = $q.defer()
+      Messages.insert.and.returnValue {remote: messagesDeferred.promise}
 
       # Mock the current date.
       jasmine.clock().install()
@@ -402,7 +402,7 @@ describe 'invitation service', ->
 
           beforeEach ->
             messageId = 'asdf'
-            messsagesDeferred.resolve messageId
+            messagesDeferred.resolve messageId
             $rootScope.$apply()
 
           it 'should mark action message as read', ->
@@ -450,7 +450,7 @@ describe 'invitation service', ->
 
           beforeEach ->
             messageId = 'asdf'
-            messsagesDeferred.resolve messageId
+            messagesDeferred.resolve messageId
             $rootScope.$apply()
 
           it 'should mark action message as read', ->
@@ -498,7 +498,7 @@ describe 'invitation service', ->
 
           beforeEach ->
             messageId = 'asdf'
-            messsagesDeferred.resolve messageId
+            messagesDeferred.resolve messageId
             $rootScope.$apply()
 
           it 'should mark action message as read', ->

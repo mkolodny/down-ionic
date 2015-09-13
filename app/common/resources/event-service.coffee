@@ -75,6 +75,8 @@ Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
                                #   would create a circular dependecy.
           createdAt:
             $date: new Date().getTime()
+        .remote.then (messageId) ->
+          Asteroid.call 'readMessage', messageId
 
         deferred.resolve event
       .error (data, status) =>
