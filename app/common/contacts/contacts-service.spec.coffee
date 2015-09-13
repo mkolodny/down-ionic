@@ -91,7 +91,6 @@ describe 'Contacts service', ->
           name: 'Mike Pleb'
           phoneNumbers: phoneNumbers
         contacts = [contact]
-        contactsDict = Contacts.contactArrayToDict contacts
 
         spyOn(Contacts, 'filterContacts').and.returnValue contacts
         spyOn(Contacts, 'filterNumbers').and.returnValue phoneNumbers
@@ -114,13 +113,13 @@ describe 'Contacts service', ->
         expect(Contacts.formatNumbers).toHaveBeenCalledWith phoneNumbers
 
       it 'should identify contacts', ->
-        expect(Contacts.identifyContacts).toHaveBeenCalledWith contactsDict
+        expect(Contacts.identifyContacts).toHaveBeenCalledWith contacts
 
       describe 'and contacts are identified successfully', ->
-        contactsDict = null
+        contacts = null
 
         beforeEach ->
-          contactsDict = {"#{contactId}": contact}
+          contacts = [contact]
           spyOn Contacts, 'saveContacts'
 
           # Since this method is called after we get the contacts from Cordova, we
@@ -131,17 +130,17 @@ describe 'Contacts service', ->
           #   contacts resolves.
           notification = null
 
-          identifyDeferred.resolve contactsDict
+          identifyDeferred.resolve contacts
           scope.$apply()
 
         it 'should save the contacts', ->
-          expect(Contacts.saveContacts).toHaveBeenCalledWith contactsDict
+          expect(Contacts.saveContacts).toHaveBeenCalledWith contacts
 
         it 'should set hasRequestedContacts to true', ->
           expect(localStorage.get 'hasRequestedContacts').toEqual true
 
         it 'should resolve the promise with the contacts', ->
-          expect(response).toEqual contactsDict
+          expect(response).toEqual contacts
 
 
       describe 'identify error', ->
@@ -172,12 +171,12 @@ describe 'Contacts service', ->
 
     beforeEach ->
       deferred = $q.defer()
-      spyOn(Contacts, 'getContactUsers').and.returnValue deferred.promise
+      spyOn(Contacts, 'toUsers').and.returnValue deferred.promise
 
     describe 'successfully', ->
       contactId = null
       userPhone = null
-      user = null
+      users = null
       identifiedContacts = null
 
       beforeEach ->
@@ -189,22 +188,19 @@ describe 'Contacts service', ->
             value: phone
           ]
         contactCopy = angular.copy contact
-        contacts = {"#{contactCopy.id}": contactCopy}
+        contacts = [contactCopy]
         Contacts.identifyContacts contacts
           .then (_contacts_) ->
             identifiedContacts = _contacts_
 
         user =
           id: 98765
-        userPhone =
-          user: user
-          phone: phone
-        deferred.resolve [userPhone]
+        users = {}
+        users[user.id] = user
+        deferred.resolve users
         scope.$apply()
 
       it 'should return an object of users', ->
-        users = {}
-        users[user.id] = user
         expect(identifiedContacts).toEqual users
 
 
@@ -224,30 +220,16 @@ describe 'Contacts service', ->
         expect(rejected).toEqual true
 
 
-  describe 'converting a contacts array to an object', ->
-    contactId = null
-    contact = null
-    contactsDict = null
-
-    beforeEach ->
-      contactId = '12345'
-      contact =
-        id: contactId
-        name: 'Mike Pleb'
-      contactsDict = Contacts.contactArrayToDict [contact]
-
-    it 'should return an object with key contact id and value contact', ->
-      expect(contactsDict).toEqual {"#{contactId}": contact}
-
-
-  describe 'getting contact users', ->
+  describe 'getting the users associated with contacts', ->
     phone1 = null
     phone2 = null
     phone3 = null
     contact1 = null
     contact2 = null
+    contacts = null
+    rejected = null
     deferred = null
-    promise = null
+    users = null
 
     beforeEach ->
       phone1 = '+19252852230'
@@ -275,28 +257,61 @@ describe 'Contacts service', ->
       spyOn(UserPhone, 'getFromContacts').and.returnValue
         $promise: deferred.promise
 
-      contactsDict = {}
-      contactsDict[contact1.id] = contact1
-      contactsDict[contact2.id] = contact2
-      contactsDictCopy = angular.copy contactsDict
+      contacts = [contact1, contact2]
+      rejected = false
+      Contacts.toUsers contacts
+        .then (_users_) ->
+          users = _users_
+        , ->
+          rejected = true
 
-      promise = Contacts.getContactUsers contactsDictCopy
-
-    it 'should check contacts to see if a users exist for every contact', ->
+    it 'should check contacts to see if users exist', ->
       contacts = [
+        name: contact1.name.formatted
+        phone: phone1
+      ,
         name: contact2.name.formatted
         phone: phone2
       ,
         name: contact2.name.formatted
         phone: phone3
-      ,
-        name: contact1.name.formatted
-        phone: phone1
       ]
       expect(UserPhone.getFromContacts).toHaveBeenCalledWith contacts
 
-    it 'should return a promise', ->
-      expect(promise).toBe deferred.promise
+    describe 'when the userphones return successfully', ->
+      userPhone = null
+      userPhones = null
+
+      beforeEach ->
+        userPhone =
+          user:
+            id: 1
+            name: 'Tony Soprano'
+          phone: '+12036227310'
+        userPhones = [userPhone]
+        spyOn(Contacts, 'filterUserPhones').and.returnValue userPhones
+
+        deferred.resolve userPhones
+        scope.$apply()
+
+      it 'should filter users', ->
+        expect(Contacts.filterUserPhones).toHaveBeenCalledWith userPhones, contacts
+
+      it 'should resolve the promise with the users', ->
+        user = userPhone.user
+        expectedUsers = {}
+        expectedUsers[user.id] = user
+        expect(users).toEqual expectedUsers
+
+
+    describe 'when the userphone call is unsuccessful', ->
+
+      beforeEach ->
+        deferred.reject()
+        scope.$apply()
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
 
 
   describe 'filtering contacts', ->
@@ -480,18 +495,125 @@ describe 'Contacts service', ->
         expect(formattedNumbers).toEqual null
 
 
+  describe 'filtering userphones', ->
+    homePhone = null
+    mobilePhone = null
+    filteredUserPhones = null
+
+    beforeEach ->
+      homePhone = '+12036227310'
+      mobilePhone = '+14388833650'
+
+    describe 'when a user has a username', ->
+      userPhoneWithUsername = null
+
+      beforeEach ->
+        contacts = [
+          id: 1
+          phoneNumbers: [
+            type: 'home' # TODO: test lowercase
+            value: homePhone
+          ,
+            type: 'mobile'
+            value: mobilePhone
+          ]
+        ]
+
+        userPhoneWithUsername =
+          user:
+            id: 1
+            username: 'trixy'
+          phone: homePhone
+        userPhoneWithoutUsername =
+          user:
+            id: 2
+            username: null
+          phone: mobilePhone
+        userPhones = [userPhoneWithUsername, userPhoneWithoutUsername]
+        filteredUserPhones = Contacts.filterUserPhones userPhones, contacts
+
+      it 'should return the userphone for the user with a username', ->
+        expect(filteredUserPhones).toEqual [userPhoneWithUsername]
+
+
+    describe 'when a user has a mobile phone', ->
+      userPhoneWithMobile = null
+
+      beforeEach ->
+        contacts = [
+          id: 1
+          phoneNumbers: [
+            type: 'home' # TODO: test lowercase
+            value: homePhone
+          ,
+            type: 'mobile'
+            value: mobilePhone
+          ]
+        ]
+
+        userPhoneWithHome =
+          user:
+            id: 1
+            username: null
+          phone: homePhone
+        userPhoneWithMobile =
+          user:
+            id: 2
+            username: null
+          phone: mobilePhone
+        userPhones = [userPhoneWithHome, userPhoneWithMobile]
+        filteredUserPhones = Contacts.filterUserPhones userPhones, contacts
+
+      it 'should return the userphone for the user with a mobile phone', ->
+        expect(filteredUserPhones).toEqual [userPhoneWithMobile]
+
+
+    describe 'when no users have usernames of mobile phones', ->
+      userPhone1 = null
+
+      beforeEach ->
+        contacts = [
+          id: 1
+          phoneNumbers: [
+            type: 'home' # TODO: test lowercase
+            value: homePhone
+          ,
+            type: 'home'
+            value: mobilePhone
+          ]
+        ]
+
+        userPhone1 =
+          user:
+            id: 1
+            username: null
+          phone: homePhone
+        userPhone2 =
+          user:
+            id: 2
+            username: null
+          phone: mobilePhone
+        userPhones = [userPhone1, userPhone2]
+        filteredUserPhones = Contacts.filterUserPhones userPhones, contacts
+
+      it 'should return the first userphone', ->
+        expect(filteredUserPhones).toEqual [userPhone1]
+
+
   describe 'saving contacts', ->
-    contact = null
+    contacts = null
 
     beforeEach ->
       contact =
         id: '1234'
         name:
           formatted: 'Mike Pleb'
+      contacts = {}
+      contacts[contact.id] = contact
 
       localStorage.set 'contacts', {}
-      Contacts.saveContacts [contact]
+      Contacts.saveContacts contacts
 
-    it 'should save the contact to localStorage', ->
+    it 'should save the contacts to localStorage', ->
       savedContacts = localStorage.get 'contacts'
-      expect(savedContacts).toEqual [contact]
+      expect(savedContacts).toEqual contacts

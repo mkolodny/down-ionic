@@ -19,14 +19,14 @@ class Contacts
         'phoneNumbers'
       ]
     @$cordovaContacts.find options
-      .then (contactsArray) =>
-        for contact in contactsArray
+      .then (contacts) =>
+        console.log contacts
+        for contact in contacts
           contact.phoneNumbers = @formatNumbers contact.phoneNumbers
           contact.phoneNumbers = @filterNumbers contact.phoneNumbers
-        contactsArray = @filterContacts contactsArray
-        contactsDict = @contactArrayToDict contactsArray
+        contacts = @filterContacts contacts
 
-        @identifyContacts contactsDict
+        @identifyContacts contacts
       , (error) =>
         deferred.reject error
       .then (users) =>
@@ -65,16 +65,33 @@ class Contacts
   ###
   identifyContacts: (contacts) ->
     # Create a dictionary in the format: {phone: contactId, ...}
-    # username; mobile #; whatever
     contactIds = {}
-    for id, contact of contacts
+    for contact in contacts
       for phoneNumber in contact.phoneNumbers
         phone = phoneNumber.value
         contactIds[phone] = contact.id
 
     deferred = @$q.defer()
-    @getContactUsers contacts
-      .then (userPhones) =>
+    @toUsers contacts
+      .then (users) =>
+        deferred.resolve users
+      , ->
+        deferred.reject()
+    deferred.promise
+
+  toUsers: (contacts) ->
+    deferred = @$q.defer()
+
+    contactPhones = []
+    for contact in contacts
+      for phoneNumber in contact.phoneNumbers
+        contactPhones.push
+          name: contact.name.formatted
+          phone: phoneNumber.value
+
+    @UserPhone.getFromContacts contactPhones
+      .$promise.then (userPhones) =>
+        userPhones = @filterUserPhones userPhones, contacts
         users = {}
         for userPhone in userPhones
           user = userPhone.user
@@ -82,22 +99,8 @@ class Contacts
         deferred.resolve users
       , ->
         deferred.reject()
+
     deferred.promise
-
-  contactArrayToDict: (contacts) ->
-    contactsObject = {}
-    for contact in contacts
-      contactsObject[contact.id] = contact
-    contactsObject
-
-  getContactUsers: (contacts) ->
-    contactPhones = []
-    for id, contact of contacts
-      for phoneNumber in contact.phoneNumbers
-        contactPhones.push
-          name: contact.name.formatted
-          phone: phoneNumber.value
-    @UserPhone.getFromContacts(contactPhones).$promise
 
   filterContacts: (contacts) ->
     filteredContacts = []
@@ -142,6 +145,55 @@ class Contacts
       if intlTelInputUtils.isValidNumber number.value
         filteredNumbers[number.value] = number
     (number for value, number of filteredNumbers)
+
+  ###*
+   * Return a single user for each contact. Prefer users with usernames, then
+   * mobile phone numbers. If a contact has neither, select the first contact.
+   *
+   * @param {UserPhone[]} userphones - A userphone for each phone number in
+                                       contacts.
+   * @param {Object[]} contacts - A filtered array of contacts.
+   * @return {User[]} - A single user for each contact.
+  ###
+  filterUserPhones: (userPhones, contacts) ->
+    # Map each phone to its userphone.
+    phonesUserPhones = {}
+    for userPhone in userPhones
+      phonesUserPhones[userPhone.phone] = userPhone
+
+    # Map each contact to an array of objects, where each object contains one of
+    #   the contact's userphones, and the second is the type of phone number it is.
+    contactPhoneNumbers = {}
+    for contact in contacts
+      contactPhoneNumbers[contact.id] = (
+          {userPhone: phonesUserPhones[phoneNumber.value], type: phoneNumber.type} \
+          for phoneNumber in contact.phoneNumbers)
+
+    # Filter the userphones.
+    filteredUserPhones = []
+    for contactId, phoneNumbers of contactPhoneNumbers
+      selectedUserPhone = null
+
+      for phoneNumber in phoneNumbers
+        if phoneNumber.userPhone.user.username isnt null
+          selectedUserPhone = phoneNumber.userPhone
+          break
+
+      if selectedUserPhone isnt null
+        filteredUserPhones.push selectedUserPhone
+        continue
+
+      for phoneNumber in phoneNumbers
+        if phoneNumber.type is 'mobile'
+          selectedUserPhone = phoneNumber.userPhone
+
+      if selectedUserPhone isnt null
+        filteredUserPhones.push selectedUserPhone
+        continue
+
+      filteredUserPhones.push phoneNumbers[0].userPhone
+
+    filteredUserPhones
 
   saveContacts: (contacts) ->
     @localStorage.set 'contacts', contacts
