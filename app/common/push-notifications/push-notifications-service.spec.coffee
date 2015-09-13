@@ -331,6 +331,7 @@ describe 'PushNotifications service', ->
 
   describe 'register android', ->
     pushOptions = null
+    push = null
 
     beforeEach ->
       androidSenderID = '1234'
@@ -338,9 +339,12 @@ describe 'PushNotifications service', ->
       pushOptions =
         android:
           senderID: androidSenderID
+          icon: 'push_icon'
+          iconColor: '#6A38AB'
+      push =
+        on: jasmine.createSpy 'push.on'
       $window.PushNotification = 
-        init: jasmine.createSpy 'PushNotification.init'
-        on: jasmine.createSpy 'PushNotification.on'
+        init: jasmine.createSpy('PushNotification.init').and.returnValue push
 
       PushNotifications.registerAndroid()
 
@@ -348,10 +352,10 @@ describe 'PushNotifications service', ->
       expect($window.PushNotification.init).toHaveBeenCalledWith pushOptions
 
     it 'should listen for notification registration', ->
-      expect($window.PushNotification.on).toHaveBeenCalledWith 'registration', PushNotifications.handleRegistrationAndroid
+      expect(push.on).toHaveBeenCalledWith 'registration', PushNotifications.handleRegistrationAndroid
 
     it 'should listen for notifications', ->
-      expect($window.PushNotification.on).toHaveBeenCalledWith 'notification', PushNotifications.handleNotificationAndroid
+      expect(push.on).toHaveBeenCalledWith 'notification', PushNotifications.handleNotificationAndroid
 
 
   describe 'handle registration android', ->

@@ -48,8 +48,9 @@ class PushNotifications
     options =
       android:
         senderID: @androidSenderID
-    push = @$window.PushNotification
-    push.init options
+        icon: 'push_icon'
+        iconColor: '#6A38AB'
+    push = @$window.PushNotification.init options
     push.on 'registration', @handleRegistrationAndroid
     push.on 'notification', @handleNotificationAndroid
 
@@ -64,6 +65,11 @@ class PushNotifications
       if message.indexOf('from ') is 0
         message = "Down. #{message}"
       @ngToast.create message
+
+      # Refresh UI because scope changed happened 
+      #   outside angular lifecycle
+      if not @$rootScope.$$phase
+        @$rootScope.$digest()
 
   register: ->
     deferred = @$q.defer()
