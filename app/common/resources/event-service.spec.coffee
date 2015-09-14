@@ -240,7 +240,7 @@ describe 'event service', ->
             firstName: Auth.user.firstName
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
-          text: "#{Auth.user.name} might be down"
+          text: "#{Auth.user.name} might be down."
           eventId: "#{responseData.id}" # meteor likes strings
           type: Invitation.maybeAction
           createdAt:
