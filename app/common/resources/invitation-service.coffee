@@ -163,7 +163,7 @@ Invitation = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event'
         # Mark message as read
         Asteroid.call 'readMessage', messageId
 
-      deferred.resolve()
+      deferred.resolve invitation
     , ->
       invitation.response = originalResponse
       deferred.reject()
