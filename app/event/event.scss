@@ -15,10 +15,6 @@
       max-height: 284px; // the element's max height
     }
   }
-  .platform-ios #expanded-header {
-    // Offset for ios-status-bar
-    top: $bar-height + $ios-statusbar-height !important;
-  }
   h2 {
     color: #fff;
     font-size: 18px;
@@ -32,6 +28,7 @@
     margin-top: 10px;
     overflow-x: auto;
     white-space: nowrap;
+    height: 41px;
   }
   .member {
     border-radius: 50%;
@@ -205,5 +202,12 @@
   }
   .fa-arrow-right {
     color: blue;
+  }
+
+  .platform-ios {
+    #expanded-header {
+      // Offset for ios-status-bar
+      top: $bar-height + $ios-statusbar-height !important;
+    }
   }
 }
