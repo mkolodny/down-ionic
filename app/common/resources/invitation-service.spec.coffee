@@ -349,7 +349,8 @@ describe 'invitation service', ->
           expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
         it 'should re-subscribe to the event messages', ->
-          expect(Asteroid.subscribe).toHaveBeenCalledWith 'event', "#{invitation.eventId}"
+          expect(Asteroid.subscribe).toHaveBeenCalledWith(
+              'event', "#{invitation.eventId}")
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true
@@ -362,7 +363,7 @@ describe 'invitation service', ->
               firstName: Auth.user.firstName
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
-            text: "#{Auth.user.name} is down"
+            text: "#{Auth.user.name} is down."
             eventId: "#{invitation.eventId}"
             type: Invitation.acceptAction
             createdAt:
@@ -404,7 +405,7 @@ describe 'invitation service', ->
               firstName: Auth.user.firstName
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
-            text: "#{Auth.user.name} might be down"
+            text: "#{Auth.user.name} might be down."
             eventId: "#{invitation.eventId}"
             type: Invitation.maybeAction
             createdAt:
@@ -452,7 +453,7 @@ describe 'invitation service', ->
               firstName: Auth.user.firstName
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
-            text: "#{Auth.user.name} can\'t make it"
+            text: "#{Auth.user.name} can\'t make it."
             eventId: "#{invitation.eventId}"
             type: Invitation.declineAction
             createdAt:

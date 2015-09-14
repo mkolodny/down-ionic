@@ -129,13 +129,13 @@ Invitation = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event'
 
       # Post an action message.
       if _invitation.response is @accepted
-        text = "#{Auth.user.name} is down"
+        text = "#{Auth.user.name} is down."
         type = @acceptAction
       else if _invitation.response is @maybe
-        text = "#{Auth.user.name} might be down"
+        text = "#{Auth.user.name} might be down."
         type = @maybeAction
       else if _invitation.response is @declined
-        text = "#{Auth.user.name} can't make it"
+        text = "#{Auth.user.name} can't make it."
         type = @declineAction
       Messages = Asteroid.getCollection 'messages'
       Messages.insert
