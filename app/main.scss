@@ -63,17 +63,6 @@ body {
 .buttons-right {
   padding-right: 3px;
 }
-.bar {
-  background-color: $brand-color;
-
-  .title {
-    color: #fff;
-    font-size: 23px;
-  }
-  i { 
-    color: #fff;
-  }
-}
 
 // Items
 .list-avatar {
@@ -236,6 +225,17 @@ body {
   background-image: none;
   border-bottom: none;
 }
+.bar {
+  background-color: $brand-color;
+
+  .title {
+    color: #fff;
+    font-size: 23px;
+  }
+  i { 
+    color: #fff;
+  }
+}
 #event-title {
   display: inline-block;
   text-overflow: ellipsis;
@@ -344,4 +344,10 @@ body {
     margin-left: 5px;
     margin-right: 5px;
   }
+}
+
+// Popup
+#share-link {
+  padding: 7px;
+  color: #767676;
 }
