@@ -75,7 +75,7 @@
       "id": "ionic-plugin-deploy"
     },
     {
-      "locator": "https://github.com/Wizcorp/phonegap-facebook-plugin.git",
+      "locator": "https://github.com/jeduan/cordova-plugin-facebook4.git",
       "id": "com.phonegap.plugins.facebookconnect",
       "variables": {
         "APP_ID": "864552050271610",
@@ -92,8 +92,8 @@
       "id": "io.branch.sdk"
     },
     {
-      "locator": "https://github.com/phonegap-build/PushPlugin",
-      "id": "com.phonegap.plugins.PushPlugin"
+      "locator": "https://github.com/ajlin500/phonegap-plugin-push",
+      "id": "phonegap-plugin-push"
     }
   ],
   "cordovaPlatforms": [
