@@ -173,7 +173,10 @@ describe 'invite friends controller', ->
       expect(Event.getInvitedIds).toHaveBeenCalledWith event
 
     it 'should show a loading indicator', ->
-      expect($ionicLoading.show).toHaveBeenCalled()
+      expect($ionicLoading.show).toHaveBeenCalledWith
+        template: '''
+        <ion-spinner icon="bubbles"></ion-spinner>
+        '''
 
     describe 'getting invited ids', ->
 

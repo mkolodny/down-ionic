@@ -28,8 +28,7 @@ class InviteFriendsCtrl
         # We're inviting more people to an existing event.
         @$ionicLoading.show
           template: '''
-          <div class="loading-text">Sending suggestion...</div>
-            <ion-spinner icon="bubbles"></ion-spinner>
+          <ion-spinner icon="bubbles"></ion-spinner>
           '''
         @Event.getInvitedIds(@event)
           .then (invitedUserIds) =>
