@@ -189,7 +189,7 @@ describe 'event controller', ->
       expect(ctrl.Events).toBe Events
 
     it 'should ask for the event', ->
-      expect(Events.reactiveQuery).toHaveBeenCalledWith {id: "#{event.id}"}
+      expect(Events.reactiveQuery).toHaveBeenCalledWith {_id: "#{event.id}"}
 
     it 'should set the events reactive query on the controller', ->
       expect(ctrl.eventsRQ).toBe eventsRQ

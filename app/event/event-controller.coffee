@@ -1,10 +1,10 @@
 class EventCtrl
-  @$inject: ['$ionicActionSheet', '$ionicLoading', '$ionicPopup', '$ionicScrollDelegate',
-             '$scope', '$state', '$stateParams', 'Asteroid', 'Auth', 'Event',
-             'Invitation', 'LinkInvitation', 'ngToast', 'User']
-  constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicPopup, @$ionicScrollDelegate,
-                @$scope, @$state, @$stateParams, @Asteroid, @Auth, @Event,
-                @Invitation, @LinkInvitation, @ngToast, @User) ->
+  @$inject: ['$ionicActionSheet', '$ionicLoading', '$ionicPopup',
+             '$ionicScrollDelegate', '$scope', '$state', '$stateParams', 'Asteroid',
+             'Auth', 'Event',  'Invitation', 'LinkInvitation', 'ngToast', 'User']
+  constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicPopup,
+                @$ionicScrollDelegate, @$scope, @$state, @$stateParams, @Asteroid,
+                @Auth, @Event, @Invitation, @LinkInvitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -28,7 +28,7 @@ class EventCtrl
 
       # Watch for new members
       @Events = @Asteroid.getCollection 'events'
-      @eventsRQ = @Events.reactiveQuery {id: "#{@event.id}"}
+      @eventsRQ = @Events.reactiveQuery {_id: "#{@event.id}"}
       @eventsRQ.on 'change', @updateMembers
 
       # Show the members on the view.
@@ -67,6 +67,8 @@ class EventCtrl
     @Invitation.getMemberInvitations {id: @event.id}
       .$promise.then (invitations) =>
         @members = (invitation.toUser for invitation in invitations)
+        if not @$scope.$$phase
+          @$scope.$digest()
       , =>
         @membersError = true
 
@@ -163,7 +165,7 @@ class EventCtrl
           title: 'Share Link'
           template: """
             <p>
-              Send this share link to your friends 
+              Send this share link to your friends
               to see if they are down!
             </p>
             <p>
