@@ -671,7 +671,13 @@ describe 'event controller', ->
       beforeEach ->
         deferred = $q.defer()
         spyOn(LinkInvitation, 'save').and.returnValue {$promise: deferred.promise}
+        spyOn $ionicLoading, 'show'
+        spyOn $ionicLoading, 'hide'
+
         ctrl.getLinkInvitation()
+
+      it 'should show a loading overlay', ->
+        expect($ionicLoading.show).toHaveBeenCalled()
 
       it 'should create a link invitation', ->
         linkInvitation =
@@ -684,25 +690,31 @@ describe 'event controller', ->
 
         beforeEach ->
           spyOn $ionicPopup, 'alert'
-          linkId = 'http://down.life/e/mikepleb'
+          linkId = 'mikepleb'
           deferred.resolve {linkId: linkId}
           scope.$apply()
 
-        it 'should set the linkId on the controller', ->
-          expect(ctrl.linkId).toEqual linkId
-
         it 'should show a modal with the share link', ->
           expect($ionicPopup.alert).toHaveBeenCalled()
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
       describe 'on error', ->
 
         beforeEach ->
+          spyOn ngToast, 'create'
+
           deferred.reject()
           scope.$apply()
 
-        xit 'should show an error', ->
-          expect(ctrl.linkInvitationError).toBe true
+        it 'should show an error', ->
+          error = 'For some reason, that didn\'t work.'
+          expect(ngToast.create).toHaveBeenCalledWith error
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
     describe 'when notifications are turned on', ->
@@ -717,7 +729,7 @@ describe 'event controller', ->
           buttons: [
             text: 'Send To...'
           ,
-            text: 'Get Share Link'
+            text: 'Copy Group Link'
           ,
             text: 'Mute Notifications'
           ]
@@ -751,7 +763,7 @@ describe 'event controller', ->
           buttons: [
             text: 'Send To...'
           ,
-            text: 'Get Share Link'
+            text: 'Copy Group Link'
           ,
             text: 'Turn On Notifications'
           ]

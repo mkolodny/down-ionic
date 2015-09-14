@@ -135,7 +135,7 @@ class EventCtrl
       buttons: [
         text: 'Send To...'
       ,
-        text: 'Get Share Link'
+        text: 'Copy Group Link'
       ,
         text: notificationText
       ]
@@ -155,28 +155,27 @@ class EventCtrl
     hideSheet = @$ionicActionSheet.show options
 
   getLinkInvitation: ->
+    @$ionicLoading.show()
+
     linkInvitation =
       eventId: @event.id
       fromUserId: @Auth.user.id
-    @LinkInvitation.save(linkInvitation).$promise
-      .then (linkInvitation) =>
-        @linkId = linkInvitation.linkId
+    @LinkInvitation.save linkInvitation
+      .$promise.then (linkInvitation) =>
         @$ionicPopup.alert
-          title: 'Share Link'
+          title: 'Copy Group Link'
           template: """
-            <p>
-              Send this share link to your friends
-              to see if they are down!
-            </p>
-            <p>
-              <strong>
-                http://down.life/e/#{@linkId}
-              </strong>
-            </p>
+            <input id="share-link" readonly
+                   value="http://down.life/e/#{linkInvitation.linkId}">
           """
+          buttons: [
+            text: 'Done'
+            type: 'button-positive'
+          ]
+        @$ionicLoading.hide()
       , =>
-        # TODO : Do something with this error
-        @linkInvitationError = true
+        @ngToast.create 'For some reason, that didn\'t work.'
+        @$ionicLoading.hide()
 
   toggleNotifications: ->
     @$ionicLoading.show()
