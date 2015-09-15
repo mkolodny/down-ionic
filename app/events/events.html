@@ -30,7 +30,8 @@
                 ng-click="item.isDivider ? null : (item.wasJoined ? events.viewEvent(item) : events.toggleIsExpanded(item))">
         <!-- Divider -->
         <div ng-if="item.isDivider">
-          {{item.title}}
+          <span class="divider-title">{{item.title}}</span>
+          <div class="divider-line"></div>
         </div>
 
         <!-- Event -->

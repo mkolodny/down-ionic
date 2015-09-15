@@ -19,6 +19,8 @@
     }
   }
   .item-divider {
+    text-align: center;
+
     img,
     h2,
     p,
@@ -26,6 +28,15 @@
     i {
       display: none;
     }
+  }
+  .divider-title {
+    background-color: #fff;
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+  .divider-line {
+    border-top: 1px solid #eee;
+    margin-top: -11px;
   }
   .item {
     padding-right: 8px;
