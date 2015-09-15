@@ -1,5 +1,6 @@
 require '../ionic/ionic.js'
 require 'angular'
+require 'angular-local-storage'
 require 'angular-mocks'
 require 'angular-sanitize'
 require 'angular-ui-router'
@@ -15,10 +16,12 @@ describe 'invite friends controller', ->
   $q = null
   $state = null
   Auth = null
+  contacts = null
   ctrl = null
   event = null
   Event = null
   Invitation = null
+  localStorage = null
   scope = null
 
   beforeEach angular.mock.module('ionic')
@@ -29,17 +32,19 @@ describe 'invite friends controller', ->
 
   beforeEach angular.mock.module('down.resources')
 
+  beforeEach angular.mock.module('LocalStorageModule')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $ionicHistory = $injector.get '$ionicHistory'
     $ionicLoading = $injector.get '$ionicLoading'
-    $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = angular.copy $injector.get('$state')
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
-    scope = $rootScope.$new()
+    localStorage = $injector.get 'localStorageService'
+    scope = $injector.get '$rootScope'
 
     # Mock the logged in user.
     Auth.user =
@@ -81,6 +86,12 @@ describe 'invite friends controller', ->
         location:
           lat: 40.79893 # just over 5 mi away
           long: -73.9821535
+    Auth.user.facebookFriends =
+      4: Auth.user.friends[4]
+    contacts =
+      2: Auth.user.friends[2]
+      3: Auth.user.friends[3]
+    localStorage.set 'contacts', contacts
 
     # Mock the event being created.
     event =
@@ -106,6 +117,9 @@ describe 'invite friends controller', ->
       Auth: Auth
       $state: $state
   )
+
+  afterEach ->
+    localStorage.clearAll()
 
   it 'should init the array of selected friends', ->
     expect(ctrl.selectedFriends).toEqual []
@@ -254,52 +268,124 @@ describe 'invite friends controller', ->
 
   describe 'building the items array', ->
 
-    beforeEach ->
-      ctrl.buildItems()
+    describe 'when we\'ve requested contacts', ->
 
-    it 'should be an array of nearby friends then alphabetical friends', ->
-      items = [
-        isDivider: true
-        title: 'Nearby Friends'
-      ]
-      for friend in ctrl.nearbyFriends
-        items.push
+      beforeEach ->
+        ctrl.buildItems()
+
+      it 'should set the items on the controller', ->
+        items = [
+          isDivider: true
+          title: 'Nearby Friends'
+        ]
+        for friend in ctrl.nearbyFriends
+          items.push
+            isDivider: false
+            friend: friend
+        alphabeticalItems = [
+          isDivider: true
+          title: Auth.user.friends[4].name[0]
+        ,
           isDivider: false
-          friend: friend
-      alphabeticalItems = [
-        isDivider: true
-        title: Auth.user.friends[4].name[0]
-      ,
-        isDivider: false
-        friend: Auth.user.friends[4]
-      ,
-        isDivider: true
-        title: Auth.user.friends[3].name[0]
-      ,
-        isDivider: false
-        friend: Auth.user.friends[3]
-      ,
-        isDivider: true
-        title: Auth.user.friends[2].name[0]
-      ,
-        isDivider: false
-        friend: Auth.user.friends[2]
-      ]
-      for item in alphabeticalItems
-        items.push item
-      expect(ctrl.items).toEqual items
+          friend: Auth.user.friends[4]
+        ,
+          isDivider: true
+          title: Auth.user.friends[3].name[0]
+        ,
+          isDivider: false
+          friend: Auth.user.friends[3]
+        ,
+          isDivider: true
+          title: Auth.user.friends[2].name[0]
+        ,
+          isDivider: false
+          friend: Auth.user.friends[2]
+        ]
+        for item in alphabeticalItems
+          items.push item
+        items.push
+          isDivider: true
+          title: 'Facebook Friends'
+        facebookFriendsItems = [
+          isDivider: false
+          friend: Auth.user.facebookFriends[4]
+        ]
+        for item in facebookFriendsItems
+          items.push item
+        items.push
+          isDivider: true
+          title: 'Contacts'
+        contactsItems = [
+          isDivider: false
+          friend: contacts[3]
+        ,
+          isDivider: false
+          friend: contacts[2]
+        ]
+        for item in contactsItems
+          items.push item
+        expect(ctrl.items).toEqual items
 
-    it 'should save a sorted array of nearby friends', ->
-      expect(ctrl.nearbyFriends).toEqual  [ # Alphabetical
-        Auth.user.friends[3]
-        Auth.user.friends[2]
-      ]
+      it 'should save a sorted array of nearby friends', ->
+        expect(ctrl.nearbyFriends).toEqual [ # Alphabetical
+          Auth.user.friends[3]
+          Auth.user.friends[2]
+        ]
 
-    it 'should save nearby friend ids', ->
-      nearbyFriendIds = {}
-      nearbyFriendIds[2] = true
-      nearbyFriendIds[3] = true
-      expect(ctrl.nearbyFriendIds).toEqual nearbyFriendIds
+      it 'should save nearby friend ids', ->
+        nearbyFriendIds = {}
+        nearbyFriendIds[2] = true
+        nearbyFriendIds[3] = true
+        expect(ctrl.nearbyFriendIds).toEqual nearbyFriendIds
+
+
+    describe 'when the user doesn\'t have contacts yet', ->
+
+      beforeEach ->
+        localStorage.clearAll()
+
+        ctrl.buildItems()
+
+      it 'should set the items on the controller', ->
+        items = [
+          isDivider: true
+          title: 'Nearby Friends'
+        ]
+        for friend in ctrl.nearbyFriends
+          items.push
+            isDivider: false
+            friend: friend
+        alphabeticalItems = [
+          isDivider: true
+          title: Auth.user.friends[4].name[0]
+        ,
+          isDivider: false
+          friend: Auth.user.friends[4]
+        ,
+          isDivider: true
+          title: Auth.user.friends[3].name[0]
+        ,
+          isDivider: false
+          friend: Auth.user.friends[3]
+        ,
+          isDivider: true
+          title: Auth.user.friends[2].name[0]
+        ,
+          isDivider: false
+          friend: Auth.user.friends[2]
+        ]
+        for item in alphabeticalItems
+          items.push item
+        items.push
+          isDivider: true
+          title: 'Facebook Friends'
+        facebookFriendsItems = [
+          isDivider: false
+          friend: Auth.user.facebookFriends[4]
+        ]
+        for item in facebookFriendsItems
+          items.push item
+        expect(ctrl.items).toEqual items
 
 
   describe 'toggling whether a friend is selected', ->

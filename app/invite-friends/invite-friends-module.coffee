@@ -1,4 +1,5 @@
 require 'angular'
+require 'angular-local-storage'
 require 'angular-ui-router'
 require '../common/auth/auth-module'
 require '../common/resources/resources-module'
@@ -9,6 +10,7 @@ angular.module 'down.inviteFriends', [
     'ui.router'
     'down.auth'
     'down.resources'
+    'LocalStorageModule'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'inviteFriends',

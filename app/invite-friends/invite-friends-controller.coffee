@@ -1,8 +1,10 @@
 class InviteFriendsCtrl
   @$inject: ['$ionicHistory', '$ionicLoading', '$scope', '$state', 'Auth',
-             'Event', 'Invitation']
+             'Event', 'Invitation', 'localStorageService']
   constructor: (@$ionicHistory, @$ionicLoading, @$scope, @$state, @Auth, @Event,
-                @Invitation) ->
+                @Invitation, localStorageService) ->
+    @localStorage = localStorageService
+
     @selectedFriends = []
     @selectedFriendIds = {}
     @invitedUserIds = {}
@@ -54,14 +56,9 @@ class InviteFriendsCtrl
     @invitedUserIds = {}
 
   buildItems: ->
-    # Make a copy of the user's friends so that when the
-    #   user selects the friend in one section,
-    #   they get selected in every section.
-    friends = angular.copy @Auth.user.friends
-
     # Build the list of alphabetically sorted nearby friends.
-    @nearbyFriends = (friend for id, friend of friends \
-      when @Auth.isNearby(friend))
+    @nearbyFriends = (friend for id, friend of @Auth.user.friends \
+      when @Auth.isNearby friend)
     @nearbyFriends.sort (a, b) ->
       if a.name.toLowerCase() < b.name.toLowerCase()
         return -1
@@ -74,7 +71,7 @@ class InviteFriendsCtrl
       @nearbyFriendIds[nearbyFriend.id] = true
 
     # Build the list of alphabetically sorted items.
-    friends = (friend for id, friend of friends)
+    friends = (friend for id, friend of @Auth.user.friends)
     friends.sort (a, b) ->
       if a.name.toLowerCase() < b.name.toLowerCase()
         return -1
@@ -93,6 +90,26 @@ class InviteFriendsCtrl
         isDivider: false
         friend: friend
 
+    # Build the list of facebook friends.
+    facebookFriends = (friend for id, friend of @Auth.user.facebookFriends)
+    facebookFriends.sort (a, b) ->
+      if a.name.toLowerCase() < b.name.toLowerCase()
+        return -1
+      else
+        return 1
+    facebookFriendsItems = ({isDivider: false, friend: friend} \
+        for friend in facebookFriends)
+
+    # Build the list of contacts.
+    contacts = (contact for id, contact of @localStorage.get 'contacts')
+    contacts.sort (a, b) ->
+      if a.name.toLowerCase() < b.name.toLowerCase()
+        return -1
+      else
+        return 1
+    contactsItems = ({isDivider: false, friend: friend} \
+        for friend in contacts)
+
     # Build the list of items to show in the collection.
     @items = []
     if @nearbyFriends.length > 0
@@ -104,6 +121,18 @@ class InviteFriendsCtrl
         isDivider: false
         friend: friend
     for item in alphabeticalItems
+      @items.push item
+    if facebookFriendsItems.length > 0
+      @items.push
+        isDivider: true
+        title: 'Facebook Friends'
+    for item in facebookFriendsItems
+      @items.push item
+    if contactsItems.length > 0
+      @items.push
+        isDivider: true
+        title: 'Contacts'
+    for item in contactsItems
       @items.push item
 
   toggleSelected: (friend) ->
