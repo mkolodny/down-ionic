@@ -135,9 +135,28 @@ describe 'find friends controller', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
 
-      describe 'with an error', ->
+      describe 'with a permission denied error', ->
         beforeEach ->
-          contactsDeferred.reject()
+          error =
+            code: 'PERMISSION_DENIED_ERROR'
+          contactsDeferred.reject error
+          scope.$apply()
+
+        it 'should set isLoading to false', ->
+          expect(ctrl.isLoading).toEqual false
+
+        it 'should show an error', ->
+          expect(ctrl.contactsDeniedError).toBe true
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
+
+      describe 'with a request failed error', ->
+        beforeEach ->
+          error =
+            code: 'aowiejfw'
+          contactsDeferred.reject error
           scope.$apply()
 
         it 'should set isLoading to false', ->

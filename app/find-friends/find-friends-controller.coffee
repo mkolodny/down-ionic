@@ -17,8 +17,11 @@ class FindFriendsCtrl
       @Contacts.getContacts()
         .then (contacts) =>
           @items = @buildItems @Auth.user.facebookFriends, contacts
-        , =>
-          @contactsRequestError = true
+        , (error) =>
+          if error.code is 'PERMISSION_DENIED_ERROR'
+            @contactsDeniedError = true
+          else
+            @contactsRequestError = true
         .finally =>
           @isLoading = false
           @$ionicLoading.hide()

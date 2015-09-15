@@ -20,7 +20,6 @@ class Contacts
       ]
     @$cordovaContacts.find options
       .then (contacts) =>
-        console.log contacts
         for contact in contacts
           contact.phoneNumbers = @formatNumbers contact.phoneNumbers
           contact.phoneNumbers = @filterNumbers contact.phoneNumbers
@@ -28,6 +27,9 @@ class Contacts
 
         @identifyContacts contacts
       , (error) =>
+        # Overwrite the error for now with a single error message.
+        error =
+          code: 'PERMISSION_DENIED_ERROR'
         deferred.reject error
       .then (users) =>
         @saveContacts users

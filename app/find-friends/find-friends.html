@@ -36,7 +36,7 @@
         </div>
       </ion-item>
     </ion-list>
-    <div class="permission-denied" ng-if="findFriends.contactsRequestError">
+    <div class="permission-denied" ng-if="findFriends.contactsDeniedError">
       <div class="message">
         It looks like you didn't give Down permission to access your address book :(
       </div>
@@ -47,6 +47,24 @@
       <div class="message instructions">
         Settings <i class="fa fa-arrow-right"></i> Down. <i class="fa fa-arrow-right"></i> Contacts
       </div>
+    </div>
+    <div class="permission-denied" ng-if="findFriends.contactsRequestError">
+      <div class="message">
+        Sorry, we weren't able to access your address book.
+      </div>
+      <!--
+      <div class="message">
+        Oops, something went wrong. Tap this button to try to access your address
+        book again:
+      </div>
+      <div class="message">
+        <div id="button-container">
+          <button class="button" ng-click="findFriends.()">
+            Enable Push Notifications
+          </button>
+        </div>
+      </div>
+      -->
     </div>
   </ion-content>
 </div>

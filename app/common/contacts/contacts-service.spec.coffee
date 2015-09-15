@@ -157,7 +157,7 @@ describe 'Contacts service', ->
 
       beforeEach ->
         cordovaError =
-          code: 'PERMISSION_DENIED_ERROR'
+          code: 'blah'
 
         cordovaDeferred.reject cordovaError
         scope.$apply()
