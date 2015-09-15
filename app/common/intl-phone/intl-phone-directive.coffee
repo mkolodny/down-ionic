@@ -6,7 +6,7 @@ intlPhone = ->
     # TODO: Test this.
     # Init the international tel input plugin on the element.
     element.intlTelInput
-      utilsScript: 'app/vendor/intl-phone/libphonenumber-utils.js'
+      utilsScript: 'https://d3r38ef3fjjz7g.cloudfront.net/vendor/libphonenumber-utils.js'
 
     model.$parsers.unshift (value) ->
       # Set the phone number on the model.
