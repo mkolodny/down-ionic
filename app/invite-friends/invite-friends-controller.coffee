@@ -171,7 +171,7 @@ class InviteFriendsCtrl
         @isAllNearbyFriendsSelected = false
 
     @selectedFriends = (_friend for _friend in @selectedFriends \
-        when _friend isnt friend)
+        when _friend.id isnt friend.id)
     delete @selectedFriendIds[friend.id]
 
   sendInvitations: ->
@@ -200,7 +200,7 @@ class InviteFriendsCtrl
         .finally =>
           @$ionicLoading.hide()
     else
-      # Create a new event.
+      ## Create a new event.
 
       # Create the user's friends' invitations.
       invitations = (@Invitation.serialize {toUserId: friend.id} \

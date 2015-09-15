@@ -34,10 +34,10 @@
                item-width="100%"
                ng-click="inviteFriends.toggleSelected(item.friend)"
                ng-class="{
-                selected: item.friend && inviteFriends.getWasSelected(item.friend),
-                'item-divider': item.isDivider,
-                'item-icon-right': !item.isDivider,
-                disabled: item.friend && inviteFriends.getWasInvited(item.friend)
+                 selected: item.friend && inviteFriends.getWasSelected(item.friend),
+                 'item-divider': item.isDivider,
+                 'item-icon-right': !item.isDivider,
+                 disabled: item.friend && inviteFriends.getWasInvited(item.friend)
                }"
                item-height="item.isDivider ? '36px' : '43px'">
        <div class="divider" ng-if="item.isDivider">

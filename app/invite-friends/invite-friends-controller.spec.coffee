@@ -499,7 +499,8 @@ describe 'invite friends controller', ->
         ctrl.nearbyFriendIds = {}
         ctrl.nearbyFriendIds[friend.id] = true
 
-        ctrl.deselectFriend friend
+        friendCopy = angular.copy friend
+        ctrl.deselectFriend friendCopy
 
       it 'should remove the friend from the list of selected friends', ->
         expect(ctrl.selectedFriends).toEqual [Auth.user.friends[3]]
@@ -515,7 +516,8 @@ describe 'invite friends controller', ->
         beforeEach ->
           ctrl.isAllNearbyFriendsSelected = true
 
-          ctrl.deselectFriend friend
+          friendCopy = angular.copy friend
+          ctrl.deselectFriend friendCopy
 
         it 'should deselect all nearby friends', ->
           expect(ctrl.isAllNearbyFriendsSelected).toBe false
