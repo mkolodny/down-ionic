@@ -5,18 +5,19 @@
             ontouchstart
             ><i class="fa fa-plus fa-lg"></i></button>
   </ion-nav-buttons>
-  <ion-content>
+  <ion-content ng-class="{'hasnt-selected-friends': !inviteFriends.selectedFriends.length}">
     <div class="placeholder" ng-if="inviteFriends.error">
       <div>Oops.. Looks like an error occurred. Please try again later.</div>
     </div>
     <div class="placeholder"
-          ng-if="inviteFriends.items.length === 0 &&
-                 inviteFriends.error === false">
+         ng-if="inviteFriends.items.length === 0 &&
+                inviteFriends.error === false">
       <div>You don't have any friends on Down yet...</div>
       <div>
-        <button id="add-friends" class="button"
-                ng-click="inviteFriends.addFriends()" ontouchstart
-                >Add Friends</button>
+        <button id="add-friends"
+                class="button"
+                ng-click="inviteFriends.addFriends()"
+                ontouchstart>Add Friends</button>
       </div>
     </div>
     <ion-list ng-if="inviteFriends.items.length > 0 &&
@@ -29,14 +30,15 @@
           ng-class="{'fa-square-o': !inviteFriends.isAllNearbyFriendsSelected, 'fa-check-square': inviteFriends.isAllNearbyFriendsSelected}"
           ></i>
      </ion-item>
-     <ion-item collection-repeat="item in inviteFriends.items" item-width="100%"
+     <ion-item collection-repeat="item in inviteFriends.items"
+               item-width="100%"
                ng-click="inviteFriends.toggleSelected(item.friend)"
                ng-class="{
                 selected: item.friend && inviteFriends.getWasSelected(item.friend),
                 'item-divider': item.isDivider,
                 'item-icon-right': !item.isDivider,
                 disabled: item.friend && inviteFriends.getWasInvited(item.friend)
-              }"
+               }"
                item-height="item.isDivider ? '36px' : '43px'">
        <div class="divider" ng-if="item.isDivider">
          {{item.title}}
