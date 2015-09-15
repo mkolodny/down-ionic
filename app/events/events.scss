@@ -49,6 +49,11 @@
         display: block !important;
       }
     }
+    &.expanded {
+      h2 {
+        white-space: normal;
+      }
+    }
     .chart-pie {
       position: absolute;
       top: 12px;
@@ -67,10 +72,6 @@
     h2 {
       font-weight: 400px;
       margin-bottom: 2px;
-
-      &.expanded {
-        white-space: normal;
-      }
     }
     p,
     .updated-at {
