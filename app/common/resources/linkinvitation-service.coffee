@@ -42,6 +42,8 @@ LinkInvitation = ['$resource', 'apiRoot', 'Event', 'Invitation', 'User', \
       params:
         linkId: '@linkId'
       transformResponse: (data, headersGetter) ->
+        if angular.isDefined data.detail # There was an error.
+          return null
         data = angular.fromJson data
         deserializeLinkInvitation data
 

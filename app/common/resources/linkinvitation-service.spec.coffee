@@ -137,32 +137,54 @@ describe 'linkinvitation service', ->
 
 
   describe 'getting', ->
-    responseData = null
-    response = null
+    linkId = null
+    url = null
 
     beforeEach ->
       linkId = 'asdf'
       url = "#{listUrl}/#{linkId}"
 
-      responseData =
-        id: 1
-        event:
-          id: 2
-          creatorId: 3
-          title: 'bars?!?!!?'
-        from_user:
-          id: 4
-          name: 'Alicia Vikander'
-        linkId: 'asdf'
-        createdAt: new Date()
-      $httpBackend.expectGET url
-        .respond 200, angular.toJson(responseData)
+    describe 'successfully', ->
+      responseData = null
+      response = null
 
-      LinkInvitation.getByLinkId {linkId: linkId}
-        .$promise.then (_response_) ->
-          response = _response_
-      $httpBackend.flush 1
+      beforeEach ->
+        responseData =
+          id: 1
+          event:
+            id: 2
+            creatorId: 3
+            title: 'bars?!?!!?'
+          from_user:
+            id: 4
+            name: 'Alicia Vikander'
+          linkId: 'asdf'
+          createdAt: new Date()
+        $httpBackend.expectGET url
+          .respond 200, angular.toJson(responseData)
 
-    it 'should GET the linkInvitation', ->
-      expectedLinkInvitation = LinkInvitation.deserialize responseData
-      expect(response).toAngularEqual expectedLinkInvitation
+        LinkInvitation.getByLinkId {linkId: linkId}
+          .$promise.then (_response_) ->
+            response = _response_
+        $httpBackend.flush 1
+
+      it 'should GET the linkInvitation', ->
+        expectedLinkInvitation = LinkInvitation.deserialize responseData
+        expect(response).toAngularEqual expectedLinkInvitation
+
+
+    describe 'with a 404', ->
+      responseData = null
+      response = null
+
+      beforeEach ->
+        $httpBackend.expectGET url
+          .respond 404, {detail: 'Not found.'}
+
+        LinkInvitation.getByLinkId {linkId: linkId}
+          .$promise.then (_response_) ->
+            response = _response_
+        $httpBackend.flush 1
+
+      it 'should return null', ->
+        expect(response).toBeNull()
