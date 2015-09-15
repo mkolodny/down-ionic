@@ -270,6 +270,12 @@ body {
   // TODO: Figure out how to set the bottom dynamically based on the footer's
   //   contents.
 }
+.platform-ios {
+  #expanded-header {
+    // Offset for ios-status-bar
+    top: $bar-height + $ios-statusbar-height !important;
+  }
+}
 
 // Friendship Buttons
 .friendship-button {

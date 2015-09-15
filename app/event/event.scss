@@ -7,7 +7,7 @@
     width: 100%;
     z-index: 1;
     max-height: 0;
-    top: $bar-height !important;
+    top: $bar-height;
     transition: max-height 0.16s ease-out;
     overflow: hidden;
 
@@ -202,12 +202,5 @@
   }
   .fa-arrow-right {
     color: blue;
-  }
-
-  .platform-ios {
-    #expanded-header {
-      // Offset for ios-status-bar
-      top: $bar-height + $ios-statusbar-height !important;
-    }
   }
 }
