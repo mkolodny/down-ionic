@@ -165,9 +165,9 @@ class EventCtrl
         @$ionicPopup.alert
           title: 'Copy Group Link'
           template: """
-            <input id="share-link" readonly
+            <input id="share-link"
                    value="http://down.life/e/#{linkInvitation.linkId}">
-          """
+            """
           buttons: [
             text: 'Done'
             type: 'button-positive'
