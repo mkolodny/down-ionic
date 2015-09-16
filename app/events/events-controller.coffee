@@ -22,8 +22,8 @@ class EventsCtrl
       @newEvent.hasPlace = true
       @newEvent.place =
         name: place.name
-        lat: place.geometry.location.G
-        long: place.geometry.location.K
+        lat: place.geometry.location.lat()
+        long: place.geometry.location.lng()
       @$scope.hidePlaceModal()
 
     # Clean up the set place modal after hiding it.
