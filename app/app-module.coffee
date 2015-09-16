@@ -22,6 +22,7 @@ require './add-by-username/add-by-username-module'
 require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
 require './common/auth/auth-module'
+require './common/asteroid/asteroid-module'
 require './common/resources/resources-module'
 require './common/push-notifications/push-notifications-module'
 require './event/event-module'
@@ -36,6 +37,7 @@ angular.module 'down', [
     'ngCordova'
     'ngToast'
     'down.auth'
+    'down.asteroid'
     'down.resources'
     'down.login'
     'down.verifyPhone'
@@ -84,13 +86,14 @@ angular.module 'down', [
       dismissButton: true
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, ngToast, 
-        $rootScope, $window, Auth, localStorageService, User,
+        $rootScope, $window, Auth, Asteroid, localStorageService, User,
         PushNotifications, $state) ->
     # Check local storage for currentUser and currentPhone
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
     if currentUser isnt null and currentPhone isnt null
       Auth.user = new User currentUser
+      Asteroid.login() # re-establish asteroid auth
       for id, friend of Auth.user.friends
         Auth.user.friends[id] = new User friend
       for id, friend of Auth.user.facebookFriends
