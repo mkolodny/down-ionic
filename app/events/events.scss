@@ -136,6 +136,8 @@
     height: auto;
     display: block;
     padding: 0;
+    background-image: none;
+    border-top: 1px solid #b2b2b2;
     //box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
 
     .event-detail {
