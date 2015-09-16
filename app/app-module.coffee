@@ -85,7 +85,7 @@ angular.module 'down', [
       maxNumber: 1
       dismissButton: true
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
-        $ionicPlatform, $ionicPopup, $ionicHistory, ngToast, 
+        $ionicPlatform, $ionicPopup, $ionicHistory, ngToast,
         $rootScope, $window, Auth, Asteroid, localStorageService, User,
         PushNotifications, $state) ->
     # Check local storage for currentUser and currentPhone
@@ -125,11 +125,11 @@ angular.module 'down', [
       # Start listening for notifications.
       PushNotifications.listen()
 
-      # Prevent hardware back button from returning 
+      # Prevent hardware back button from returning
       #   to login views on Android
       $ionicPlatform.registerBackButtonAction (event) ->
         currentState = $state.current.name
-        # States where going back is disabled, therefore the  
+        # States where going back is disabled, therefore the
         #   hardware back button should exit the app
         disabledStates = [
           'login'
@@ -174,3 +174,7 @@ angular.module 'down', [
               $ionicLoading.hide()
         .finally ->
           bootstrap()
+  .constant '$ionicLoadingConfig',
+    template: '''
+      <ion-spinner icon="bubbles"></ion-spinner>
+      '''

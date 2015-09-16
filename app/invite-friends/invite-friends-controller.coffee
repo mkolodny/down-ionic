@@ -29,10 +29,8 @@ class InviteFriendsCtrl
 
       if 'id' of @event
         # We're inviting more people to an existing event.
-        @$ionicLoading.show
-          template: '''
-          <ion-spinner icon="bubbles"></ion-spinner>
-          '''
+        @$ionicLoading.show()
+
         @Event.getInvitedIds(@event)
           .then (invitedUserIds) =>
             for id in invitedUserIds
