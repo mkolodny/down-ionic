@@ -204,3 +204,11 @@
     color: blue;
   }
 }
+
+.platform-ios {
+  #event {
+    ion-footer-bar {
+      border-top: .5px solid #b2b2b2;
+    }
+  }
+}
