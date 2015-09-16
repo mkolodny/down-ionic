@@ -164,7 +164,7 @@
   #new-event-details {
     padding-left: 13px;
     padding-right: 13px;
-    padding-top: 10px;
+    padding-top: 7px;
 
     .fa-comment-o {
       margin-top: 4px;
@@ -213,6 +213,14 @@
 
     & > i {
       color: #ccc !important;
+    }
+  }
+}
+
+.platform-ios {
+  #events {
+    #new-event-details {
+      padding-top: 3px;
     }
   }
 }
