@@ -12,7 +12,7 @@
     <div class="placeholder"
          ng-if="inviteFriends.items.length === 0 &&
                 inviteFriends.error === false">
-      <div>You don't have any friends on Down yet...</div>
+      <div>You don't have any friends on Down, yet...</div>
       <div>
         <button id="add-friends"
                 class="button"
@@ -30,7 +30,7 @@
           ng-class="{'fa-square-o': !inviteFriends.isAllNearbyFriendsSelected, 'fa-check-square': inviteFriends.isAllNearbyFriendsSelected}"
           ></i>
      </ion-item>
-     <ion-item collection-repeat="item in inviteFriends.items"
+     <ion-item collection-repeat="item in inviteFriends.items track by item.id"
                item-width="100%"
                ng-click="inviteFriends.toggleSelected(item.friend)"
                ng-class="{

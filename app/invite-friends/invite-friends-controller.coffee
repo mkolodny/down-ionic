@@ -15,6 +15,7 @@ class InviteFriendsCtrl
       # NOTE : use @$state.params instead of @$stateParams
       #   because https://github.com/driftyco/ionic/issues/3884
       @event = @$state.params.event or @event
+
       # Clear previous errors
       @error = false
 
@@ -134,6 +135,13 @@ class InviteFriendsCtrl
         title: 'Contacts'
     for item in contactsItems
       @items.push item
+
+    # Give each item an id so that we can use `track by` to improve performance.
+    for item in @items
+      if item.isDivider
+        item.id = item.title
+      else
+        item.id = item.friend.id
 
   toggleSelected: (friend) ->
     if @getWasSelected friend

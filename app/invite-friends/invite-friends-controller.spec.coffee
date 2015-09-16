@@ -324,6 +324,11 @@ describe 'invite friends controller', ->
         ]
         for item in contactsItems
           items.push item
+        for item in items
+          if item.isDivider
+            item.id = item.title
+          else
+            item.id = item.friend.id
         expect(ctrl.items).toEqual items
 
       it 'should save a sorted array of nearby friends', ->
@@ -385,6 +390,11 @@ describe 'invite friends controller', ->
         ]
         for item in facebookFriendsItems
           items.push item
+        for item in items
+          if item.isDivider
+            item.id = item.title
+          else
+            item.id = item.friend.id
         expect(ctrl.items).toEqual items
 
 
