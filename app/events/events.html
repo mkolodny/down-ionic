@@ -23,7 +23,7 @@
                   'item-divider': item.isDivider,
                   'item-avatar': !item.isDivider,
                   'item-icon-right': !item.isDivider,
-                  updated: !item.invitation.event.latestMessage.wasRead,
+                  updated: !item.isDivider && !events.itemWasDeclined(item) && !item.invitation.event.latestMessage.wasRead,
                   'item-reordering': item.isReordering,
                   expanded: item.isExpanded
                 }"
