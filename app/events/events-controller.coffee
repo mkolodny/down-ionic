@@ -237,9 +237,14 @@ class EventsCtrl
     if event is undefined
       return true
 
-    members = (member for member in event.members \
-      when member.userId is "#{@Auth.user.id}")
-    members[0].lastRead.$date >= message.createdAt.$date
+    currentUser = (member for member in event.members \
+        when member.userId is "#{@Auth.user.id}")[0]
+
+    # Make sure the current user is still a member.
+    if currentUser is undefined
+      return true
+
+    currentUser.lastRead.$date >= message.createdAt.$date
 
   toggleIsExpanded: (item) ->
     item.isExpanded = not item.isExpanded

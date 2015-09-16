@@ -440,8 +440,7 @@ describe 'events controller', ->
         ctrl.setLatestMessage.calls.reset()
         changedDocId = 'asdf'
 
-
-      describe 'message is new', ->
+      describe 'and the message is new', ->
 
         beforeEach ->
           spyOn(ctrl, 'isNewMessage').and.returnValue true
@@ -451,10 +450,11 @@ describe 'events controller', ->
           expect(ctrl.isNewMessage).toHaveBeenCalledWith event, changedDocId
 
         it 'should set the latest message on the event', ->
-          expect(ctrl.setLatestMessage).toHaveBeenCalledWith event, messagesRQ.result
+          expect(ctrl.setLatestMessage).toHaveBeenCalledWith(
+              event, messagesRQ.result)
 
 
-      describe 'message is not new', ->
+      describe 'and the message is not new', ->
 
         beforeEach ->
           spyOn(ctrl, 'isNewMessage').and.returnValue false
@@ -476,6 +476,7 @@ describe 'events controller', ->
 
       it 'should set wasRead for the latest message', ->
         expect(event.latestMessage.wasRead).toBe true
+
 
   describe 'is new message for event', ->
     oldMessage = null
@@ -664,7 +665,7 @@ describe 'events controller', ->
       beforeEach ->
         event =
           members: [
-            userId: "1"
+            userId: "#{Auth.user.id}"
             lastRead:
               $date: message.createdAt.$date + 1
           ]
@@ -681,7 +682,7 @@ describe 'events controller', ->
       beforeEach ->
         event =
           members: [
-            userId: '1'
+            userId: "#{Auth.user.id}"
             lastRead:
               $date: message.createdAt.$date - 1
           ]
@@ -697,6 +698,23 @@ describe 'events controller', ->
 
       beforeEach ->
         eventsRQ.result = [undefined]
+
+        wasRead = ctrl.getWasRead message
+
+      it 'should return true', ->
+        expect(wasRead).toBe true
+
+
+    describe 'when the user isn\'t a member', ->
+
+      beforeEach ->
+        event =
+          members: [
+            userId: "#{Auth.user.id+1}"
+            lastRead:
+              $date: message.createdAt.$date - 1
+          ]
+        eventsRQ.result = [event]
 
         wasRead = ctrl.getWasRead message
 
