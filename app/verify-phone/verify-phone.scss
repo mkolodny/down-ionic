@@ -10,7 +10,12 @@
   }
   input {
     padding-right: 0;
-    padding-top: 7px;
     line-height: 34px;
+  }
+}
+
+.platform-ios {
+  input {
+    padding-top: 7px;
   }
 }

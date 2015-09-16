@@ -10,7 +10,6 @@
   }
   #phone {
     padding-right: 48px; // To keep things centered with the 48px padding-left
-    padding-top: 8px;
     border-radius: 0;
     height: 45px;
   }
@@ -32,6 +31,14 @@
   only screen and (min-resolution: 2dppx) {
     .iti-flag {
       background-image: url('../images/flags@2x.png');
+    }
+  }
+}
+
+.platform-ios {
+  #login {
+    #phone {
+      padding-top: 8px;
     }
   }
 }
