@@ -163,7 +163,7 @@ class EventCtrl
           title: 'Copy Group Link'
           template: """
             <input id="share-link"
-                   value="http://down.life/e/#{linkInvitation.linkId}">
+                   value="https://down.life/e/#{linkInvitation.linkId}">
             """
           buttons: [
             text: 'Done'
