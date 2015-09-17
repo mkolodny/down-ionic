@@ -113,6 +113,15 @@ describe 'PushNotifications service', ->
         it 'should call save token', ->
           expect(PushNotifications.saveToken).toHaveBeenCalledWith deviceToken
 
+        describe 'a notification is sent', ->
+
+          beforeEach ->
+            spyOn PushNotifications, 'handleNotification'
+            $rootScope.$broadcast '$cordovaPush:notificationReceived'
+            $rootScope.$apply()
+
+          it 'should call handle notificaiton', ->
+            expect(PushNotifications.handleNotification).toHaveBeenCalled()
 
         describe 'save succeeds', ->
 
