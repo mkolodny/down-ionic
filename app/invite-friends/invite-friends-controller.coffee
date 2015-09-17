@@ -112,8 +112,8 @@ class InviteFriendsCtrl
         return 1
     contactsItems = ({isDivider: false, friend: friend} \
         for friend in contacts \
-        when @Auth.user.friends[id] is undefined \
-        and @Auth.user.facebookFriends[id] is undefined)
+        when @Auth.user.friends[friend.id] is undefined \
+        and @Auth.user.facebookFriends[friend.id] is undefined)
 
     # Build the list of items to show in the collection.
     @items = []
