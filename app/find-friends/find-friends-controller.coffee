@@ -7,7 +7,13 @@ class FindFriendsCtrl
 
     # Request Contacts Permission
     @isLoading = true
-    @$scope.$on '$ionicView.loaded', =>
+    @$scope.$on '$ionicView.enter', =>
+      @$ionicLoading.show
+        template: '''
+          <div class="loading-text" id="loading-contacts">Loading your contacts...<br>(This might take a while)</div>
+          <ion-spinner icon="bubbles"></ion-spinner>
+          '''
+
       @Contacts.getContacts()
         .then (contacts) =>
           @items = @buildItems @Auth.user.facebookFriends, contacts
@@ -19,12 +25,6 @@ class FindFriendsCtrl
         .finally =>
           @isLoading = false
           @$ionicLoading.hide()
-
-    @$ionicLoading.show
-      template: '''
-        <div class="loading-text" id="loading-contacts">Loading your contacts...<br>(This might take a while)</div>
-        <ion-spinner icon="bubbles"></ion-spinner>
-        '''
 
     # Build the list of items to show in the view.
     @items = @buildItems @Auth.user.facebookFriends

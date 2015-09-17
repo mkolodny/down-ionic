@@ -49,7 +49,6 @@ describe 'find friends controller', ->
 
     contactsDeferred = $q.defer()
     spyOn(Contacts, 'getContacts').and.returnValue contactsDeferred.promise
-    spyOn $ionicLoading, 'show'
 
     # Need dis in the constructor
     facebookFriend =
@@ -71,19 +70,20 @@ describe 'find friends controller', ->
   it 'should set isLoading to true', ->
     expect(ctrl.isLoading).toEqual true
 
-  it 'should show a loading overlay', ->
-    template = '''
-      <div class="loading-text" id="loading-contacts">Loading your contacts...<br>(This might take a while)</div>
-      <ion-spinner icon="bubbles"></ion-spinner>
-      '''
-    expect($ionicLoading.show).toHaveBeenCalledWith template: template
-
   describe 'when the view finishes loading', ->
 
     beforeEach ->
+      spyOn $ionicLoading, 'show'
       spyOn $ionicLoading, 'hide'
 
-      scope.$emit '$ionicView.loaded'
+      scope.$emit '$ionicView.enter'
+
+    it 'should show a loading overlay', ->
+      template = '''
+        <div class="loading-text" id="loading-contacts">Loading your contacts...<br>(This might take a while)</div>
+        <ion-spinner icon="bubbles"></ion-spinner>
+        '''
+      expect($ionicLoading.show).toHaveBeenCalledWith template: template
 
     it 'should request the user\'s contacts', ->
       expect(Contacts.getContacts).toHaveBeenCalled()
