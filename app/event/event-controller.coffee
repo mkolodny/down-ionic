@@ -180,8 +180,8 @@ class EventCtrl
     @invitation.muted = not @invitation.muted
     @Invitation.update @invitation
       .$promise.then (invitation) =>
-        message = if invitation.muted then 'Notifications are on.' \
-            else 'Notifications are off.'
+        message = if invitation.muted then 'Notifications are now off.' \
+            else 'Notifications are now on.'
         @ngToast.create message
       , =>
         # Undo editing the invitation.

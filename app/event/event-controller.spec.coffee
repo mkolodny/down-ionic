@@ -789,7 +789,7 @@ describe 'event controller', ->
     describe 'when notifications are turned on', ->
 
       beforeEach ->
-        ctrl.invitation.muted = false
+        ctrl.invitation.muted = true
 
         ctrl.toggleNotifications()
 
@@ -813,7 +813,7 @@ describe 'event controller', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
         it 'show a success message', ->
-          message = 'Notifications are on.'
+          message = 'Notifications are now on.'
           expect(ngToast.create).toHaveBeenCalledWith message
 
 
@@ -837,7 +837,7 @@ describe 'event controller', ->
     describe 'when notifications are turned off', ->
 
       beforeEach ->
-        ctrl.invitation.muted = true
+        ctrl.invitation.muted = false
 
         ctrl.toggleNotifications()
 
@@ -861,7 +861,7 @@ describe 'event controller', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
         it 'show a success message', ->
-          message = 'Notifications are off.'
+          message = 'Notifications are now off.'
           expect(ngToast.create).toHaveBeenCalledWith message
 
 
