@@ -186,6 +186,36 @@ body {
   }
 }
 
+// Search
+.search-bar {
+  i {
+    position: absolute;
+    padding: 13px 16px;
+    color: #aaa;
+  }
+  input {
+    width: 100%;
+    border: none;
+    border-top: 1px solid #e6e6e6;
+    border-bottom: 1px solid #e6e6e6;
+    padding: 10px 39px;
+    margin-top: -1px;
+    margin-bottom: 1px;
+    font-size: 16px;
+    border-radius: none;
+  }
+  .fa-times {
+    top: 0;
+    right: 0;
+    font-size: 16px;
+  }
+}
+.no-results {
+  text-align: center;
+  margin-top: 10px;
+  color: #777;
+}
+
 // Place search
 .pac-container {
   box-shadow: none;

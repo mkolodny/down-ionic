@@ -74,7 +74,14 @@ class FindFriendsCtrl
       for contact in contacts
         items.push
           isDivider: false
-          contact: contact
+          user: contact
+
+    # Give each item an id so that we can use `track by` for performance.
+    for item in items
+      if item.isDivider
+        item.id = item.title
+      else
+        item.id = item.user.id
 
     items
 
@@ -95,5 +102,15 @@ class FindFriendsCtrl
   done: ->
     @localStorage.set 'hasCompletedFindFriends', true
     @Auth.redirectForAuthState()
+
+  search: (item) =>
+    console.log item.id
+    if not @query
+      return true
+
+    if item.isDivider
+      return false
+
+    item.user.name.toLowerCase().indexOf(@query.toLowerCase()) isnt -1
 
 module.exports = FindFriendsCtrl

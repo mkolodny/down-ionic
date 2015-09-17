@@ -231,8 +231,13 @@ describe 'find friends controller', ->
         title: 'Contacts'
       ,
         isDivider: false
-        contact: contactWithoutUsername
+        user: contactWithoutUsername
       ]
+      for item in items
+        if item.isDivider
+          item.id = item.title
+        else
+          item.id = item.user.id
       expect(result).toEqual items
 
 

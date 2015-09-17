@@ -20,17 +20,32 @@
                 ontouchstart>Add Friends</button>
       </div>
     </div>
+    <div class="search-bar"
+         ng-if="inviteFriends.items.length > 0 &&
+                inviteFriends.error === false">
+      <i class="fa fa-search"></i>
+      <input ng-model="inviteFriends.query" placeholder="Search">
+      <i class="fa fa-times" ng-click="inviteFriends.query = null"
+         ng-if="inviteFriends.query"></i>
+    </div>
+    <!--
+    <div class="no-results"
+         ng-if="inviteFriends.items.length === 0 && inviteFriends.error === false">
+      No results.
+    </div>
+    -->
     <ion-list ng-if="inviteFriends.items.length > 0 &&
                      inviteFriends.error === false">
      <ion-item class="item-icon-right"
                ng-click="inviteFriends.toggleAllNearbyFriends()"
-               ng-class="{selected: inviteFriends.isAllNearbyFriendsSelected}">
+               ng-class="{selected: inviteFriends.isAllNearbyFriendsSelected}"
+               ng-if="!inviteFriends.query">
        <h2>All Nearby Friends</h2>
        <i class="icon fa" id="all-friends-icon"
           ng-class="{'fa-square-o': !inviteFriends.isAllNearbyFriendsSelected, 'fa-check-square': inviteFriends.isAllNearbyFriendsSelected}"
           ></i>
      </ion-item>
-     <ion-item collection-repeat="item in inviteFriends.items track by item.id"
+     <ion-item collection-repeat="item in inviteFriends.items | filter:inviteFriends.search track by item.id"
                item-width="100%"
                ng-click="inviteFriends.toggleSelected(item.friend)"
                ng-class="{

@@ -79,6 +79,9 @@ class InviteFriendsCtrl
     alphabeticalItems = []
     currentLetter = null
     for friend in friends
+      if angular.isDefined @nearbyFriendIds[friend.id]
+        continue
+
       if friend.name[0] != currentLetter
         alphabeticalItems.push
           isDivider: true
@@ -90,7 +93,8 @@ class InviteFriendsCtrl
         friend: friend
 
     # Build the list of facebook friends.
-    facebookFriends = (friend for id, friend of @Auth.user.facebookFriends)
+    facebookFriends = (friend for id, friend of @Auth.user.facebookFriends \
+        when @Auth.user.friends[id] is undefined)
     facebookFriends.sort (a, b) ->
       if a.name.toLowerCase() < b.name.toLowerCase()
         return -1
@@ -107,7 +111,9 @@ class InviteFriendsCtrl
       else
         return 1
     contactsItems = ({isDivider: false, friend: friend} \
-        for friend in contacts)
+        for friend in contacts \
+        when @Auth.user.friends[id] is undefined \
+        and @Auth.user.facebookFriends[id] is undefined)
 
     # Build the list of items to show in the collection.
     @items = []
@@ -237,5 +243,14 @@ class InviteFriendsCtrl
 
   getWasInvited: (friend) ->
     @invitedUserIds[friend.id] is true
+
+  search: (item) =>
+    if not @query
+      return true
+
+    if item.isDivider
+      return false
+
+    item.friend.name.toLowerCase().indexOf(@query.toLowerCase()) isnt -1
 
 module.exports = InviteFriendsCtrl
