@@ -85,6 +85,8 @@ class PushNotifications
 
     @$cordovaPush.register config
       .then (deviceToken) =>
+        # Listen for notifications.
+        @$rootScope.$on '$cordovaPush:notificationReceived', @handleNotification
         @saveToken deviceToken
       .then ->
         deferred.resolve()
