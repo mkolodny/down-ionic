@@ -104,7 +104,6 @@ class FindFriendsCtrl
     @Auth.redirectForAuthState()
 
   search: (item) =>
-    console.log item.id
     if not @query
       return true
 

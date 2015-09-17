@@ -4,7 +4,7 @@ viewLocationDirective = ['$ionicActionSheet', '$window', ($ionicActionSheet, $wi
     location: '='
   template: '<span ng-click="showActionSheet()" ng-transclude></span>'
   transclude: true
-  controller: ($scope) ->
+  controller: ['$scope', ($scope) ->
     $scope.showActionSheet = ->
       $window.appAvailability.checkBool 'comgooglemaps://', \
           (googleMapsIsAvailable) ->
@@ -35,6 +35,7 @@ viewLocationDirective = ['$ionicActionSheet', '$window', ($ionicActionSheet, $wi
                 location = $scope.location
                 url = "maps://?q=#{location.lat},#{location.long}"
                 $window.open url, '_system'
+  ]
 ]
 
 module.exports = viewLocationDirective

@@ -15,7 +15,7 @@ friendshipButtonDirective = ['Auth', 'Friendship', (Auth, Friendship) ->
           ><ion-spinner icon="bubbles"></ion-spinner></i>
     </a>
     """
-  controller: ($scope) ->
+  controller: ['$scope', ($scope) ->
     $scope.isFriend = (user) ->
       Auth.isFriend user.id
 
@@ -40,6 +40,7 @@ friendshipButtonDirective = ['Auth', 'Friendship', (Auth, Friendship) ->
             Auth.setUser Auth.user
           .finally ->
             $scope.isLoading = false
+  ]
 ]
 
 module.exports = friendshipButtonDirective
