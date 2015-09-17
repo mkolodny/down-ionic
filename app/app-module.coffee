@@ -5,6 +5,7 @@ require 'angular-sanitize' # for ngToast
 require 'angular-ui-router'
 require 'ng-toast'
 require 'ng-cordova'
+require './ionic/angular-ios9-uiwebview.patch.js'
 require './ionic/ionic.js' # for ionic global object
 require './ionic/ionic-core.js'
 require './ionic/ionic-deploy.js'
@@ -58,6 +59,7 @@ angular.module 'down', [
     'down.friends'
     'down.pushNotifications'
     'LocalStorageModule'
+    'ngIOS9UIWebViewPatch'
   ]
   .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider,
            ngToastProvider) ->
