@@ -14,7 +14,6 @@ describe 'facebook sync controller', ->
   $httpBackend = null
   $ionicLoading = null
   $q = null
-  $state = null
   Auth = null
   ctrl = null
   scope = null
@@ -36,7 +35,6 @@ describe 'facebook sync controller', ->
     $ionicLoading = $injector.get '$ionicLoading'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
-    $state = $injector.get '$state'
     Auth = angular.copy $injector.get('Auth')
     scope = $rootScope.$new()
 
@@ -94,8 +92,8 @@ describe 'facebook sync controller', ->
         user = null
 
         beforeEach ->
-          spyOn $state, 'go'
           spyOn Auth, 'setUser'
+          spyOn Auth, 'redirectForAuthState'
           Auth.user =
             friends: 'some friends'
           user =
@@ -109,8 +107,8 @@ describe 'facebook sync controller', ->
         it 'should set the user on Auth', ->
           expect(Auth.setUser).toHaveBeenCalledWith user
 
-        it 'should go to the set username view', ->
-          expect($state.go).toHaveBeenCalledWith 'setUsername'
+        it 'should redirect for auth state', ->
+          expect(Auth.redirectForAuthState).toHaveBeenCalled()
 
         it 'should hide the loading overlay', ->
           expect($ionicLoading.hide).toHaveBeenCalled()

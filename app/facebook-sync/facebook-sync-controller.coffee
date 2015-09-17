@@ -15,7 +15,7 @@ class FacebookSyncCtrl
         @Auth.facebookSync response.authResponse.accessToken
       .then (user) =>
         @Auth.setUser user
-        @$state.go 'setUsername'
+        @Auth.redirectForAuthState()
       , (error) =>
         @error = 'Oops, something went wrong. Please try again.'
       .finally =>
