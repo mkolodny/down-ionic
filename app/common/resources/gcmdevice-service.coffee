@@ -20,5 +20,6 @@ GCMDevice = ['$resource', 'apiRoot', ($resource, apiRoot) ->
           deviceId: data.device_id
           name: data.name
         response
+]
 
 module.exports = GCMDevice

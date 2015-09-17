@@ -1,10 +1,10 @@
 class PushNotifications
-  @$inject: ['androidSenderID', '$cordovaDevice', '$cordovaPush', '$q',
-               '$rootScope', '$window', 'Auth', 'APNSDevice', 'GCMDevice', 
-               'localStorageService', 'ngToast']
-  constructor: (@androidSenderID, @$cordovaDevice, @$cordovaPush, @$q,
-               @$rootScope, @$window, @Auth, @APNSDevice, @GCMDevice, 
-               localStorageService, @ngToast) ->
+  @$inject: ['$cordovaDevice', '$cordovaPush', '$q', '$rootScope', '$window',
+             'androidSenderID', 'Auth', 'APNSDevice', 'GCMDevice',
+             'localStorageService', 'ngToast']
+  constructor: (@$cordovaDevice, @$cordovaPush, @$q, @$rootScope, @$window,
+                @androidSenderID, @Auth, @APNSDevice, @GCMDevice,
+                localStorageService, @ngToast) ->
     @localStorage = localStorageService
 
   listen: ->
@@ -69,7 +69,7 @@ class PushNotifications
         message = "Down. #{message}"
       @ngToast.create message
 
-      # Refresh UI because scope changed happened 
+      # Refresh UI because scope changed happened
       #   outside angular lifecycle
       if not @$rootScope.$$phase
         @$rootScope.$digest()
@@ -97,7 +97,7 @@ class PushNotifications
     platform = @$cordovaDevice.getPlatform()
 
     message = null
-    if platform is 'iOS' and notification.alert      
+    if platform is 'iOS' and notification.alert
       message = notification.alert
 
     if message isnt null
