@@ -203,6 +203,7 @@ body {
     margin-bottom: 1px;
     font-size: 16px;
     border-radius: 0 !important;
+    -webkit-appearance: none; // remove the inset on ios
   }
   .fa-times {
     top: 0;
