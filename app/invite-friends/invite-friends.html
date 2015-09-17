@@ -57,6 +57,7 @@
                item-height="item.isDivider ? '36px' : '43px'">
        <div class="divider" ng-if="item.isDivider">
          {{item.title}}
+         <span id="via-sms" ng-if="item.title === 'Contacts'">via SMS</span>
        </div>
        <div class="friend" ng-if="item.friend">
          <h2>{{item.friend.name}}</h2>

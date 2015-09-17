@@ -19,6 +19,10 @@
   .fa-check-square.disabled {
     color: rgba(106, 56, 171, 0.33)
   }
+  #via-sms {
+    float: right;
+    text-transform: initial;
+  }
   ion-footer-bar {
     &.hidden {
       bottom: -44px;
