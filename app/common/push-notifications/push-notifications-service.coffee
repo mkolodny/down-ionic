@@ -1,4 +1,7 @@
 class PushNotifications
+  @$inject: ['androidSenderID', '$cordovaDevice', '$cordovaPush', '$q',
+               '$rootScope', '$window', 'Auth', 'APNSDevice', 'GCMDevice', 
+               'localStorageService', 'ngToast']
   constructor: (@androidSenderID, @$cordovaDevice, @$cordovaPush, @$q,
                @$rootScope, @$window, @Auth, @APNSDevice, @GCMDevice, 
                localStorageService, @ngToast) ->
