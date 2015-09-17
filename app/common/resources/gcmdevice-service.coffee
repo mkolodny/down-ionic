@@ -1,4 +1,4 @@
-GCMDevice = ($resource, apiRoot) ->
+GCMDevice = ['$resource', 'apiRoot', ($resource, apiRoot) ->
   listUrl = "#{apiRoot}/devices/gcm"
 
   $resource "#{listUrl}/:id", null,
