@@ -55,7 +55,7 @@
           <span class="updated-at" ng-if="item.invitation.event.latestMessage">{{item.invitation.event.latestMessage.createdAt | date:'shortTime' | lowercase}}</span>
           <span class="updated-at" ng-if="!item.invitation.event.latestMessage">{{item.invitation.createdAt | date:'shortTime' | lowercase}}</span>
           <h2>{{item.invitation.event.title}}</h2>
-          <p ng-if="item.wasJoined">
+          <p class="latest-message" ng-if="item.wasJoined">
             <span ng-if="item.invitation.event.latestMessage.text"
                   >{{item.invitation.event.latestMessage.text}}</span>
             <span ng-if="!item.invitation.event.latestMessage.text"
