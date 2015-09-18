@@ -64,7 +64,7 @@
   </ion-content>
   <ion-footer-bar class="bar-light" keyboard-attach>
     <textarea ng-model="event.message" placeholder="Type a message..." msd-elastic
-              rows="1" ng-disabled="event.members.length < 2"></textarea>
+              rows="1"></textarea>
     <button id="send-message" class="button button-clear"
             ng-disabled="!event.message" ng-click="event.sendMessage()" ontouchstart
             >Send</button>
