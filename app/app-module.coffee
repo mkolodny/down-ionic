@@ -1,6 +1,8 @@
 require 'angular'
 require 'angular-animate' # for ngToast
 require 'angular-local-storage'
+require 'angulartics'
+require 'angulartics-google-analytics'
 require 'angular-sanitize' # for ngToast
 require 'angular-ui-router'
 require 'ng-toast'
@@ -32,6 +34,8 @@ require './add-friends/add-friends-module'
 require './friends/friends-module'
 
 angular.module 'down', [
+    'angulartics'
+    'angulartics.google.analytics'
     'ionic'
     'ionic.service.core'
     'ionic.service.deploy'
