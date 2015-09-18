@@ -102,6 +102,9 @@
     .respond-buttons {
       margin-top: 10px;
     }
+    & + .item-divider {
+      margin-top: -16px;
+    }
   }
   .event-detail {
     display: flex;
