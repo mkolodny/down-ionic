@@ -1,8 +1,8 @@
 class EventCtrl
-  @$inject: ['$ionicActionSheet', '$ionicLoading', '$ionicPopup',
+  @$inject: ['$ionicActionSheet', '$ionicLoading', '$ionicModal', '$ionicPopup',
              '$ionicScrollDelegate', '$scope', '$state', '$stateParams', 'Asteroid',
              'Auth', 'Event',  'Invitation', 'LinkInvitation', 'ngToast', 'User']
-  constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicPopup,
+  constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicModal, @$ionicPopup,
                 @$ionicScrollDelegate, @$scope, @$state, @$stateParams, @Asteroid,
                 @Auth, @Event, @Invitation, @LinkInvitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
@@ -11,6 +11,23 @@ class EventCtrl
     # Give the event a long title variable name as a workaround for:
     #   https://github.com/driftyco/ionic/issues/2881
     @event.titleWithLongVariableName = @event.title
+
+    # Init the set place modal.
+    @$ionicModal.fromTemplateUrl 'app/guest-list/guest-list.html',
+        scope: @$scope
+        animation: 'slide-in-up'
+    .then (modal) =>
+      @guestListModal = modal
+
+    # Clean up the guest list modal after hiding it.
+    @$scope.$on '$destroy', =>
+      @guestListModal.remove()
+
+    # Set functions to control the guest list on the scope so that they can be
+    # called from inside the modal.
+    @$scope.guestList =
+      hide: =>
+        @guestListModal.hide()
 
     # Start out at the most recent message.
     @$scope.$on '$ionicView.enter', =>
@@ -67,10 +84,51 @@ class EventCtrl
     @Invitation.getMemberInvitations {id: @event.id}
       .$promise.then (invitations) =>
         @members = (invitation.toUser for invitation in invitations)
+        @buildGuestList invitations
         if not @$scope.$$phase
           @$scope.$digest()
       , =>
         @membersError = true
+
+  buildGuestList: (memberInvitations) ->
+    acceptedInvitations = (invitation for invitation in memberInvitations \
+        when invitation.response is @Invitation.accepted)
+    maybeInvitations = (invitation for invitation in memberInvitations \
+        when invitation.response is @Invitation.maybe)
+
+    items = []
+    if acceptedInvitations.length > 0
+      items.push
+        isDivider: true
+        title: 'Down'
+
+      for invitation in acceptedInvitations
+        items.push
+          isDivider: false
+          user: invitation.toUser
+
+    if maybeInvitations.length > 0
+      items.push
+        isDivider: true
+        title: 'Maybe'
+
+      for invitation in maybeInvitations
+        items.push
+          isDivider: false
+          user: invitation.toUser
+
+    # Give each item an id so that we can use `track by` to improve rendering
+    # performance.
+    for item in items
+      if item.isDivider
+        item.id = item.title
+      else
+        item.id = item.user.id
+
+    @$scope.guestList.items = items
+
+  showGuestList: ->
+    @guestListModal.show()
 
   saveMaxTop: ->
     # TODO: use angularjs-scroll-glue

@@ -27,7 +27,7 @@
     <div id="event-comment" class="event-detail" ng-if="event.event.comment">
       <i class="fa fa-comment-o"></i>{{event.event.comment}}
     </div>
-    <div id="members">
+    <div id="members" ng-click="event.showGuestList()" ontouchstart>
       <img class="member" ng-src="{{member.getImageUrl(72)}}"
            ng-repeat="member in event.members">
     </div>

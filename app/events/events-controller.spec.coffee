@@ -211,12 +211,32 @@ describe 'events controller', ->
     modal = null
 
     beforeEach ->
-      modal = 'modal'
+      modal =
+        remove: jasmine.createSpy 'modal.remove'
+        hide: jasmine.createSpy 'modal.hide'
       deferredTemplate.resolve modal
       scope.$apply()
 
     it 'should save the modal on the controller', ->
       expect(ctrl.setPlaceModal).toBe modal
+
+    describe 'then the modal is hidden', ->
+
+      beforeEach ->
+        scope.$broadcast '$destroy'
+        scope.$apply()
+
+      it 'should clean up the modal', ->
+        expect(modal.remove).toHaveBeenCalled()
+
+
+    describe 'hiding the guest list modal', ->
+
+      beforeEach ->
+        scope.hidePlaceModal()
+
+      it 'should hide the modal', ->
+        expect(modal.hide).toHaveBeenCalled()
 
 
   describe 'building the items list', ->

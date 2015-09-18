@@ -13,6 +13,7 @@ EventCtrl = require './event-controller'
 describe 'event controller', ->
   $ionicActionSheet = null
   $ionicLoading = null
+  $ionicModal = null
   $ionicPopup = null
   $ionicScrollDelegate = null
   $q = null
@@ -21,6 +22,7 @@ describe 'event controller', ->
   Auth = null
   ctrl = null
   currentDate = null
+  deferredTemplate = null
   earlierMessage = null
   Event = null
   event = null
@@ -48,6 +50,7 @@ describe 'event controller', ->
     $controller = $injector.get '$controller'
     $ionicActionSheet = $injector.get '$ionicActionSheet'
     $ionicLoading = $injector.get '$ionicLoading'
+    $ionicModal = $injector.get '$ionicModal'
     $ionicPopup = $injector.get '$ionicPopup'
     $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
     $q = $injector.get '$q'
@@ -106,6 +109,9 @@ describe 'event controller', ->
         lat: 40.7265834
         long: -73.9821535
 
+    deferredTemplate = $q.defer()
+    spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
+
     ctrl = $controller EventCtrl,
       $scope: scope
       Auth: Auth
@@ -122,6 +128,12 @@ describe 'event controller', ->
 
   it 'should set the event title on the event', ->
     expect(ctrl.event.titleWithLongVariableName).toBe event.title
+
+  it 'should init a guest list modal', ->
+    templateUrl = 'app/guest-list/guest-list.html'
+    expect($ionicModal.fromTemplateUrl).toHaveBeenCalledWith templateUrl,
+      scope: scope
+      animation: 'slide-in-up'
 
   describe 'once the view loads', ->
     Messages = null
@@ -300,6 +312,85 @@ describe 'event controller', ->
       expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', laterMessage._id
 
 
+  describe 'when the modal loads', ->
+    modal = null
+
+    beforeEach ->
+      modal =
+        remove: jasmine.createSpy 'modal.remove'
+        hide: jasmine.createSpy 'modal.hide'
+      deferredTemplate.resolve modal
+      scope.$apply()
+
+    it 'should save the modal on the controller', ->
+      expect(ctrl.guestListModal).toBe modal
+
+    describe 'then the modal is hidden', ->
+
+      beforeEach ->
+        scope.$broadcast '$destroy'
+        scope.$apply()
+
+      it 'should clean up the modal', ->
+        expect(modal.remove).toHaveBeenCalled()
+
+
+    describe 'hiding the guest list modal', ->
+
+      beforeEach ->
+        scope.guestList.hide()
+
+      it 'should hide the modal', ->
+        expect(modal.hide).toHaveBeenCalled()
+
+
+  describe 'building the guest list', ->
+    acceptedInvitation = null
+    maybeInvitation = null
+
+    beforeEach ->
+      acceptedInvitation = angular.extend {}, invitation,
+        response: Invitation.accepted
+      maybeInvitation = angular.extend {}, invitation,
+        response: Invitation.maybe
+      memberInvitations = [acceptedInvitation, maybeInvitation]
+
+      ctrl.buildGuestList memberInvitations
+
+    it 'should set the items on the scope', ->
+      items = [
+        isDivider: true
+        title: 'Down'
+      ,
+        isDivider: false
+        user: acceptedInvitation.toUser
+      ,
+        isDivider: true
+        title: 'Maybe'
+      ,
+        isDivider: false
+        user: maybeInvitation.toUser
+      ]
+      for item in items
+        if item.isDivider
+          item.id = item.title
+        else
+          item.id = item.user.id
+      expect(scope.guestList.items).toEqual items
+
+
+  describe 'showing the guest list', ->
+
+    beforeEach ->
+      ctrl.guestListModal =
+        show: jasmine.createSpy 'guestListModal.show'
+
+      ctrl.showGuestList()
+
+    it 'should show the guest list modal', ->
+      expect(ctrl.guestListModal.show).toHaveBeenCalled()
+
+
   describe 'when the user hits the bottom of the view', ->
     top = null
 
@@ -330,6 +421,8 @@ describe 'event controller', ->
       invitations = null
 
       beforeEach ->
+        spyOn ctrl, 'buildGuestList'
+
         acceptedInvitation = angular.extend {}, invitation,
           response: Invitation.accepted
         maybeInvitation = angular.extend {}, invitation,
@@ -342,6 +435,10 @@ describe 'event controller', ->
         memberInvitations = [acceptedInvitation, maybeInvitation]
         members = (invitation.toUser for invitation in memberInvitations)
         expect(ctrl.members).toEqual members
+
+      it 'should build the guest list', ->
+        memberInvitations = [acceptedInvitation, maybeInvitation]
+        expect(ctrl.buildGuestList).toHaveBeenCalledWith memberInvitations
 
 
     describe 'unsuccessfully', ->
