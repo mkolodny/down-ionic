@@ -5,7 +5,7 @@ require 'ng-toast'
 require '../common/asteroid/asteroid-module'
 require '../common/auth/auth-module'
 require '../common/resources/resources-module'
-require '../common/view-location/view-location-module'
+require '../common/view-place/view-place-module'
 EventCtrl = require './event-controller'
 
 angular.module 'down.event', [
@@ -15,7 +15,7 @@ angular.module 'down.event', [
     'down.asteroid'
     'down.resources'
     'down.auth'
-    'down.viewLocation'
+    'down.viewPlace'
     'ngToast'
   ]
   .config ($stateProvider) ->
