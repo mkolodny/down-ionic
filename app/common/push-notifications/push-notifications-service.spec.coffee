@@ -76,6 +76,7 @@ describe 'PushNotifications service', ->
     beforeEach ->
       deferred = $q.defer()
       $cordovaPush.register.and.returnValue deferred.promise
+      spyOn PushNotifications, 'handleNotification'
 
     describe 'when is is an iOS device', ->
       iosConfig = null
@@ -116,12 +117,12 @@ describe 'PushNotifications service', ->
         describe 'a notification is sent', ->
 
           beforeEach ->
-            spyOn PushNotifications, 'handleNotification'
             $rootScope.$broadcast '$cordovaPush:notificationReceived'
             $rootScope.$apply()
 
           it 'should call handle notificaiton', ->
             expect(PushNotifications.handleNotification).toHaveBeenCalled()
+
 
         describe 'save succeeds', ->
 
