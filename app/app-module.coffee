@@ -86,10 +86,17 @@ angular.module 'down', [
       animation: 'slide'
       maxNumber: 1
       dismissButton: true
+  .value 'apiRoot', 'https://down-prod.herokuapp.com/api'
+  #.value 'apiRoot', 'http://down-staging.herokuapp.com/api'
+  #.value 'apiRoot', 'http://10.97.76.29:8000/api'
+  .value 'host', 'down-meteor.herokuapp.com'
+  #.value 'host', 'down-meteor-staging.herokuapp.com'
+  .value 'branchKey', 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ'
+  #.value 'branchKey', 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv'
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, ngToast,
-        $rootScope, $window, Auth, Asteroid, localStorageService, User,
-        PushNotifications, $state) ->
+        $rootScope, $state, $window, Auth, Asteroid, branchKey,
+        localStorageService, PushNotifications, User) ->
     # Check local storage for currentUser and currentPhone
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
@@ -119,10 +126,7 @@ angular.module 'down', [
       $cordovaStatusbar.style 1
 
       # Start a Branch session.
-      # Staging
-      #branch.init 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv', (err, data) ->
-      # Production
-      branch.init 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ', (err, data) ->
+      branch.init branchKey, (err, data) ->
 
       # Start listening for notifications.
       PushNotifications.listen()
