@@ -134,21 +134,62 @@ describe 'invite friends controller', ->
     beforeEach ->
       ctrl.error = 'inviteError'
 
-      scope.$broadcast '$ionicView.enter'
-      scope.$apply()
+    describe 'with items', ->
+      beforeEach ->
+        spyOn(ctrl, 'buildItems').and.callFake ->
+          # Mock there being items.
+          ctrl.items = [
+            isDivider: false
+            friend: Auth.user.friends[2]
+          ]
 
-    it 'should init cleanupViewAfterLeave', ->
-      expect(ctrl.cleanupViewAfterLeave).toBe true
+        scope.$broadcast '$ionicView.enter'
+        scope.$apply()
 
-    it 'should set the event on the controller', ->
-      expect(ctrl.event).toBe event
+      it 'should init cleanupViewAfterLeave', ->
+        expect(ctrl.cleanupViewAfterLeave).toBe true
 
-    it 'should disable animating the transition to the next view', ->
-      options = {disableAnimate: true}
-      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+      it 'should set the event on the controller', ->
+        expect(ctrl.event).toBe event
 
-    it 'should clear errors', ->
-      expect(ctrl.error).toEqual false
+      it 'should disable animating the transition to the next view', ->
+        options = {disableAnimate: true}
+        expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+
+      it 'should clear errors', ->
+        expect(ctrl.error).toEqual false
+
+      it 'should build the items array', ->
+        expect(ctrl.buildItems).toHaveBeenCalled()
+
+
+    describe 'with no items', ->
+      beforeEach ->
+        spyOn(ctrl, 'buildItems').and.callFake ->
+          # Mock there being items.
+          ctrl.items = []
+
+        scope.$broadcast '$ionicView.enter'
+        scope.$apply()
+
+      it 'should init cleanupViewAfterLeave', ->
+        expect(ctrl.cleanupViewAfterLeave).toBe true
+
+      it 'should set the event on the controller', ->
+        expect(ctrl.event).toBe event
+
+      it 'should disable animating the transition to the next view', ->
+        options = {disableAnimate: true}
+        expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+
+      it 'should clear errors', ->
+        expect(ctrl.error).toEqual false
+
+      it 'should build the items array', ->
+        expect(ctrl.buildItems).toHaveBeenCalled()
+
+      it 'should set a no items flag', ->
+        expect(ctrl.noItems).toBe true
 
 
   describe 'when we\'re inviting users to an existing event', ->
@@ -194,24 +235,59 @@ describe 'invite friends controller', ->
       describe 'when successful', ->
         invitedUserIds = null
 
-        beforeEach ->
-          spyOn(ctrl, 'buildItems').and.callThrough()
+        describe 'with items', ->
 
-          invitedUserIds = [2]
-          deferred.resolve invitedUserIds
-          scope.$apply()
+          beforeEach ->
+            spyOn(ctrl, 'buildItems').and.callFake ->
+              # Mock there being items.
+              ctrl.items = [
+                isDivider: false
+                friend: Auth.user.friends[2]
+              ]
 
-        it 'should hide the loading indicator', ->
-          expect($ionicLoading.hide).toHaveBeenCalled()
+            invitedUserIds = [2]
+            deferred.resolve invitedUserIds
+            scope.$apply()
 
-        it 'should save users\' ids who were invited', ->
-          expectedIds = {}
-          for id in invitedUserIds
-            expectedIds[id] = true
-          expect(ctrl.invitedUserIds).toEqual expectedIds
+          it 'should hide the loading indicator', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
 
-        it 'should call build items', ->
-          expect(ctrl.buildItems).toHaveBeenCalled()
+          it 'should save users\' ids who were invited', ->
+            expectedIds = {}
+            for id in invitedUserIds
+              expectedIds[id] = true
+            expect(ctrl.invitedUserIds).toEqual expectedIds
+
+          it 'should call build items', ->
+            expect(ctrl.buildItems).toHaveBeenCalled()
+
+
+        describe 'with no items', ->
+
+          beforeEach ->
+            spyOn(ctrl, 'buildItems').and.callFake ->
+              # Mock there being items.
+              ctrl.items = []
+
+            invitedUserIds = [2]
+            deferred.resolve invitedUserIds
+            scope.$apply()
+
+          it 'should hide the loading indicator', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
+
+          it 'should save users\' ids who were invited', ->
+            expectedIds = {}
+            for id in invitedUserIds
+              expectedIds[id] = true
+            expect(ctrl.invitedUserIds).toEqual expectedIds
+
+          it 'should call build items', ->
+            expect(ctrl.buildItems).toHaveBeenCalled()
+
+          it 'should set a no items flag', ->
+            expect(ctrl.noItems).toBe true
+
 
 
       describe 'when there is an error', ->
@@ -265,133 +341,146 @@ describe 'invite friends controller', ->
 
   describe 'building the items array', ->
 
-    describe 'when we\'ve requested contacts', ->
+    describe 'without a query', ->
 
       beforeEach ->
+        ctrl.query = ''
+
+      describe 'when we\'ve requested contacts', ->
+
+        beforeEach ->
+          ctrl.buildItems()
+
+        it 'should set the items on the controller', ->
+          items = [
+            isDivider: true
+            title: 'Nearby Friends'
+          ]
+          for friend in ctrl.nearbyFriends
+            items.push
+              isDivider: false
+              friend: friend
+          alphabeticalItems = [
+            isDivider: true
+            title: Auth.user.friends[4].name[0]
+          ,
+            isDivider: false
+            friend: Auth.user.friends[4]
+          ,
+            isDivider: true
+            title: Auth.user.friends[3].name[0]
+          ,
+            isDivider: false
+            friend: Auth.user.friends[3]
+          ,
+            isDivider: true
+            title: Auth.user.friends[2].name[0]
+          ,
+            isDivider: false
+            friend: Auth.user.friends[2]
+          ]
+          for item in alphabeticalItems
+            items.push item
+          items.push
+            isDivider: true
+            title: 'Facebook Friends'
+          facebookFriendsItems = [
+            isDivider: false
+            friend: Auth.user.facebookFriends[4]
+          ]
+          for item in facebookFriendsItems
+            items.push item
+          items.push
+            isDivider: true
+            title: 'Contacts'
+          contactsItems = [
+            isDivider: false
+            friend: contacts[3]
+          ,
+            isDivider: false
+            friend: contacts[2]
+          ]
+          for item in contactsItems
+            items.push item
+          expect(ctrl.items).toEqual items
+
+        it 'should save a sorted array of nearby friends', ->
+          expect(ctrl.nearbyFriends).toEqual [ # Alphabetical
+            Auth.user.friends[3]
+            Auth.user.friends[2]
+          ]
+
+        it 'should save nearby friend ids', ->
+          nearbyFriendIds = {}
+          nearbyFriendIds[2] = true
+          nearbyFriendIds[3] = true
+          expect(ctrl.nearbyFriendIds).toEqual nearbyFriendIds
+
+
+      describe 'when the user doesn\'t have contacts yet', ->
+
+        beforeEach ->
+          localStorage.clearAll()
+
+          ctrl.buildItems()
+
+        it 'should set the items on the controller', ->
+          items = [
+            isDivider: true
+            title: 'Nearby Friends'
+          ]
+          for friend in ctrl.nearbyFriends
+            items.push
+              isDivider: false
+              friend: friend
+          alphabeticalItems = [
+            isDivider: true
+            title: Auth.user.friends[4].name[0]
+          ,
+            isDivider: false
+            friend: Auth.user.friends[4]
+          ,
+            isDivider: true
+            title: Auth.user.friends[3].name[0]
+          ,
+            isDivider: false
+            friend: Auth.user.friends[3]
+          ,
+            isDivider: true
+            title: Auth.user.friends[2].name[0]
+          ,
+            isDivider: false
+            friend: Auth.user.friends[2]
+          ]
+          for item in alphabeticalItems
+            items.push item
+          items.push
+            isDivider: true
+            title: 'Facebook Friends'
+          facebookFriendsItems = [
+            isDivider: false
+            friend: Auth.user.facebookFriends[4]
+          ]
+          for item in facebookFriendsItems
+            items.push item
+          expect(ctrl.items).toEqual items
+
+
+    describe 'with a query', ->
+
+      beforeEach ->
+        ctrl.query = 'U'
+
         ctrl.buildItems()
 
-      it 'should set the items on the controller', ->
+      it 'should build the items array', ->
         items = [
-          isDivider: true
-          title: 'Nearby Friends'
-        ]
-        for friend in ctrl.nearbyFriends
-          items.push
-            isDivider: false
-            friend: friend
-        alphabeticalItems = [
-          isDivider: true
-          title: Auth.user.friends[4].name[0]
-        ,
           isDivider: false
           friend: Auth.user.friends[4]
-        ,
-          isDivider: true
-          title: Auth.user.friends[3].name[0]
-        ,
-          isDivider: false
-          friend: Auth.user.friends[3]
-        ,
-          isDivider: true
-          title: Auth.user.friends[2].name[0]
         ,
           isDivider: false
           friend: Auth.user.friends[2]
         ]
-        for item in alphabeticalItems
-          items.push item
-        items.push
-          isDivider: true
-          title: 'Facebook Friends'
-        facebookFriendsItems = [
-          isDivider: false
-          friend: Auth.user.facebookFriends[4]
-        ]
-        for item in facebookFriendsItems
-          items.push item
-        items.push
-          isDivider: true
-          title: 'Contacts'
-        contactsItems = [
-          isDivider: false
-          friend: contacts[3]
-        ,
-          isDivider: false
-          friend: contacts[2]
-        ]
-        for item in contactsItems
-          items.push item
-        for item in items
-          if item.isDivider
-            item.id = item.title
-          else
-            item.id = item.friend.id
-        expect(ctrl.items).toEqual items
-
-      it 'should save a sorted array of nearby friends', ->
-        expect(ctrl.nearbyFriends).toEqual [ # Alphabetical
-          Auth.user.friends[3]
-          Auth.user.friends[2]
-        ]
-
-      it 'should save nearby friend ids', ->
-        nearbyFriendIds = {}
-        nearbyFriendIds[2] = true
-        nearbyFriendIds[3] = true
-        expect(ctrl.nearbyFriendIds).toEqual nearbyFriendIds
-
-
-    describe 'when the user doesn\'t have contacts yet', ->
-
-      beforeEach ->
-        localStorage.clearAll()
-
-        ctrl.buildItems()
-
-      it 'should set the items on the controller', ->
-        items = [
-          isDivider: true
-          title: 'Nearby Friends'
-        ]
-        for friend in ctrl.nearbyFriends
-          items.push
-            isDivider: false
-            friend: friend
-        alphabeticalItems = [
-          isDivider: true
-          title: Auth.user.friends[4].name[0]
-        ,
-          isDivider: false
-          friend: Auth.user.friends[4]
-        ,
-          isDivider: true
-          title: Auth.user.friends[3].name[0]
-        ,
-          isDivider: false
-          friend: Auth.user.friends[3]
-        ,
-          isDivider: true
-          title: Auth.user.friends[2].name[0]
-        ,
-          isDivider: false
-          friend: Auth.user.friends[2]
-        ]
-        for item in alphabeticalItems
-          items.push item
-        items.push
-          isDivider: true
-          title: 'Facebook Friends'
-        facebookFriendsItems = [
-          isDivider: false
-          friend: Auth.user.facebookFriends[4]
-        ]
-        for item in facebookFriendsItems
-          items.push item
-        for item in items
-          if item.isDivider
-            item.id = item.title
-          else
-            item.id = item.friend.id
         expect(ctrl.items).toEqual items
 
 
