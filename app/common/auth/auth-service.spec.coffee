@@ -733,6 +733,19 @@ describe 'Auth service', ->
       it 'should return false', ->
         expect(Auth.isNearby user).toBe false
 
+
+    describe 'when the authenticated user doesn\'t have a location', ->
+
+      beforeEach ->
+        user.location =
+          lat: 40.7265834
+          long: -73.9821535
+        Auth.user.location = undefined
+
+      it 'should return false', ->
+        expect(Auth.isNearby user).toBe false
+
+
     describe 'when the user is at most 5 mi away', ->
 
       beforeEach ->
