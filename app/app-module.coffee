@@ -1,6 +1,7 @@
 require 'angular'
 require 'angular-animate' # for ngToast
 require 'angular-local-storage'
+require 'angular-mixpanel'
 require 'angular-sanitize' # for ngToast
 require 'angular-ui-router'
 require 'ng-toast'
@@ -22,6 +23,7 @@ require './invite-friends/invite-friends-module'
 require './add-by-username/add-by-username-module'
 require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
+require './common/angular-mixpanel/angular-mixpanel-module'
 require './common/auth/auth-module'
 require './common/asteroid/asteroid-module'
 require './common/env/env-module'
@@ -31,8 +33,10 @@ require './event/event-module'
 require './my-friends/my-friends-module'
 require './add-friends/add-friends-module'
 require './friends/friends-module'
+require './vendor/mixpanel/mixpanel-jslib-snippet'
 
 angular.module 'down', [
+    'analytics.mixpanel'
     'ionic'
     'ionic.service.core'
     'ionic.service.deploy'
@@ -63,8 +67,8 @@ angular.module 'down', [
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]
-  .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider,
-           ngToastProvider) ->
+  .config ($httpProvider, $ionicConfigProvider, $mixpanelProvider, $urlRouterProvider,
+           mixpanelToken, ngToastProvider) ->
     acceptHeader = 'application/json; version=2.0'
     $httpProvider.defaults.headers.common['Accept'] = acceptHeader
     $httpProvider.interceptors.push ($injector) ->
@@ -82,27 +86,23 @@ angular.module 'down', [
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
 
+    # Init mixpanel
+    $mixpanelProvider.apiKey mixpanelToken
+
     # Toasts
     ngToastProvider.configure
       horizontalPosition: 'center'
       animation: 'slide'
       maxNumber: 1
       dismissButton: true
+
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
-        $ionicPlatform, $ionicPopup, $ionicHistory, ngToast,
+        $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel, ngToast,
         $rootScope, $state, $window, Auth, Asteroid, branchKey,
-        localStorageService, PushNotifications, User) ->
-    # Check local storage for currentUser and currentPhone
-    currentUser = localStorageService.get 'currentUser'
-    currentPhone = localStorageService.get 'currentPhone'
-    if currentUser isnt null and currentPhone isnt null
-      Auth.user = new User currentUser
-      Asteroid.login() # re-establish asteroid auth
-      for id, friend of Auth.user.friends
-        Auth.user.friends[id] = new User friend
-      for id, friend of Auth.user.facebookFriends
-        Auth.user.facebookFriends[id] = new User friend
-      Auth.phone = currentPhone
+        localStorageService, ionicDeployChannel, PushNotifications, User) ->
+    
+    # Resume session from localStorage
+    Auth.resumeSession()
 
     ###
     Put anything that touches Cordova in here!
@@ -145,6 +145,10 @@ angular.module 'down', [
           $ionicHistory.goBack()
       , 100 # override action priority 100 (Return to previous view)
 
+      # Track App Opens
+      $ionicPlatform.on 'resume', ->
+        $mixpanel.track "Opened App"
+
       # Update the user's location while they use the app.
       if localStorageService.get('hasRequestedLocationServices') \
           or !ionic.Platform.isIOS()
@@ -157,7 +161,7 @@ angular.module 'down', [
       # return
 
       # Check For Updates
-      $ionicDeploy.setChannel 'staging' # 'dev', 'staging', 'production'
+      $ionicDeploy.setChannel ionicDeployChannel
       $ionicDeploy.check()
         .then (hasUpdate) ->
           if not hasUpdate

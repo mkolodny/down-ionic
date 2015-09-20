@@ -156,10 +156,11 @@ describe 'verify phone controller', ->
       user =
         id: 1
         email: 'aturing@gmail.com'
+        authtoken: '1234'
       ctrl.meteorLogin user
 
     it 'should attempt to login', ->
-      expect(Asteroid.login).toHaveBeenCalled()
+      expect(Asteroid.login).toHaveBeenCalledWith user.id, user.authtoken
 
     describe 'successfully', ->
 
