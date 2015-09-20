@@ -5,22 +5,30 @@ require 'angular-ui-router'
 require 'angular-local-storage'
 require 'ng-cordova'
 require './auth-module'
+require '../angular-mixpanel/angular-mixpanel-module'
+require '../asteroid/asteroid-module'
 
 describe 'Auth service', ->
   $cordovaGeolocation = null
   $cordovaDevice = null
   $httpBackend = null
+  $mixpanel = null
   scope = null
   $state = null
   $q = null
   apiRoot = null
   Auth = null
+  Asteroid = null
   Invitation = null
   User = null
   deserializedUser = null
   localStorage = null
 
+  beforeEach angular.mock.module('analytics.mixpanel')
+
   beforeEach angular.mock.module('down.auth')
+
+  beforeEach angular.mock.module('down.asteroid')
 
   beforeEach angular.mock.module('ngCordova.plugins.geolocation')
 
@@ -37,16 +45,32 @@ describe 'Auth service', ->
 
     deserializedUser =
       id: 1
-    User =
-      update: jasmine.createSpy 'User.update'
-      deserialize: jasmine.createSpy('User.deserialize').and.returnValue \
+    class User
+      constructor: (user) ->
+        @id = user.id
+        @name = user.name
+        @authtoken = user.authtoken
+        @friends = user.friends
+        @facebookFriends = user.facebookFriends
+      @update: jasmine.createSpy 'User.update'
+      @deserialize: jasmine.createSpy('User.deserialize').and.returnValue \
           deserializedUser
-      listUrl: 'listUrl'
+      @listUrl: 'listUrl'
     $provide.value 'User', User
 
     $state =
       go: jasmine.createSpy '$state.go'
     $provide.value '$state', $state
+
+    $mixpanel =
+      identify: jasmine.createSpy '$mixpanel.identify'
+      people:
+        set: jasmine.createSpy '$mixpanel.people.set'
+    $provide.value '$mixpanel', $mixpanel
+
+    Asteroid =
+      login: jasmine.createSpy 'Asteroid.login'
+    $provide.value 'Asteroid', Asteroid
 
     return
   )
@@ -69,6 +93,106 @@ describe 'Auth service', ->
   it 'should init the user', ->
     expect(Auth.user).toEqual {}
 
+  describe 'resume session', ->
+
+    describe 'when a user is stored in local storage', ->
+      user = null
+      friends = null
+      facebookFriends = null
+
+      beforeEach ->
+        friends =
+          2:
+            id: 2
+            name: 'Jimbo Walker'
+        facebookFriends =
+          3:
+            id: 3
+            name: 'Other Friend'
+        user =
+          id: 1
+          name: 'Andrew Linfoot'
+          authtoken: 'asdfkasf'
+          friends: friends
+          facebookFriends: facebookFriends
+        localStorage.set 'currentUser', user
+
+        spyOn Auth, 'mixpanelIdentify'
+
+        Auth.resumeSession()
+
+      it 'should set the user on Auth', ->
+        expect(Auth.user).toAngularEqual user
+
+      it 'should log in to Asteroid', ->
+        expect(Asteroid.login).toHaveBeenCalledWith user.id, user.authtoken
+
+      it 'should identify the user with mixpanel', ->
+        expect(Auth.mixpanelIdentify).toHaveBeenCalled()
+
+      describe 'when a user has friends', ->
+
+        it 'should set the friends on the user', ->
+          expect(Auth.user.friends).toAngularEqual friends
+
+
+      describe 'when a user has facebook friends', ->
+
+        it 'should set the facebookFriends on the user', ->
+          expect(Auth.user.facebookFriends).toAngularEqual facebookFriends
+
+
+    describe 'when a phone is stored in localStorage', ->
+      phone = null
+
+      beforeEach ->
+        phone = '+19252852230'
+        localStorage.set 'currentPhone', phone
+        Auth.resumeSession()
+
+      it 'should set the phone on Auth', ->
+        expect(Auth.phone).toEqual phone
+
+
+  describe 'mixpanel identify', ->
+
+    beforeEach ->
+      Auth.user =
+        id: 1
+      Auth.mixpanelIdentify()
+
+    it 'should identify the user with mixpanel', ->
+      expect($mixpanel.identify).toHaveBeenCalledWith Auth.user.id
+
+
+    describe 'when a user has a name', ->
+      name = null
+
+      beforeEach ->
+        name = 'Jimbo'
+        Auth.user =
+          id: 1
+          name: name
+        Auth.mixpanelIdentify()
+
+      it 'should send the name to mixpanel', ->
+        expect($mixpanel.people.set).toHaveBeenCalledWith {$name: name}
+
+
+    describe 'when a user has an email', ->
+      email = null
+
+      beforeEach ->
+        email = 'ajlin500@gmail.com'
+        Auth.user =
+          id: 1
+          email: email
+        Auth.mixpanelIdentify()
+
+      it 'should sent the email to mixpanel', ->
+        expect($mixpanel.people.set).toHaveBeenCalledWith {$email: email}
+
+
   describe 'set user', ->
     user = null
     expectedUser = null
@@ -84,6 +208,8 @@ describe 'Auth service', ->
         id: 1
       expectedUser = angular.extend({}, Auth.user, user)
 
+      spyOn Auth, 'mixpanelIdentify'
+
       Auth.setUser user
 
     it 'should extend passed in user with auth.user', ->
@@ -91,6 +217,9 @@ describe 'Auth service', ->
 
     it 'should save the user to localstorage', ->
       expect(localStorage.get 'currentUser').toEqual expectedUser
+
+    it 'should identify the user in mixpanel', ->
+      expect(Auth.mixpanelIdentify).toHaveBeenCalled()
 
 
   describe 'set phone', ->

@@ -31,16 +31,17 @@ class VerifyPhoneCtrl
     @$scope.verifyPhoneForm.$valid
 
   meteorLogin: (user) ->
-    @Asteroid.login().then =>
-      # Persist the user to local storage.
-      @Auth.setUser user
-      if user.email is undefined
-        @$state.go 'facebookSync'
-      else
-        # The user has synced with Facebook.
-        @getFacebookFriends()
-    , =>
-      @error = 'Oops, something went wrong.'
+    @Asteroid.login user.id, user.authtoken
+      .then =>
+        # Persist the user to local storage.
+        @Auth.setUser user
+        if user.email is undefined
+          @$state.go 'facebookSync'
+        else
+          # The user has synced with Facebook.
+          @getFacebookFriends()
+      , =>
+        @error = 'Oops, something went wrong.'
 
   getFacebookFriends: ->
     @Auth.getFacebookFriends()
