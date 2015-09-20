@@ -2,17 +2,51 @@ haversine = require 'haversine'
 require '../../ionic/ionic.js'
 
 class Auth
-  @$inject: ['$http', '$q', 'apiRoot', 'User', '$cordovaGeolocation',
+  @$inject: ['$http', '$q', '$mixpanel', 'Asteroid', 'apiRoot', 'User', '$cordovaGeolocation',
              '$state', 'localStorageService']
-  constructor: (@$http, @$q, @apiRoot, @User, @$cordovaGeolocation,
+  constructor: (@$http, @$q, @$mixpanel, @Asteroid, @apiRoot, @User, @$cordovaGeolocation,
                 @$state, localStorageService) ->
     @localStorage = localStorageService
 
   user: {}
 
+  resumeSession: ->
+    # Check local storage for currentUser
+    currentUser = @localStorage.get 'currentUser'
+    if currentUser isnt null
+      @user = new @User currentUser
+
+      # Set friends as instances of User resource
+      if @user.friends isnt undefined
+        for id, friend of @user.friends
+          @user.friends[id] = new @User friend
+      if @user.facebookFriends isnt undefined
+        for id, friend of @user.facebookFriends
+          @user.facebookFriends[id] = new @User friend
+
+      # re-establish asteroid auth
+      @Asteroid.login @user.id, @user.authtoken
+
+      @mixpanelIdentify()
+
+    # Check local storage for currentPhone
+    currentPhone = @localStorage.get 'currentPhone'
+    if currentPhone isnt null
+      @phone = currentPhone
+
+  mixpanelIdentify: ->
+    #identify and set user data with mixpanel
+    @$mixpanel.identify @user.id
+    if @user.name isnt undefined
+      @$mixpanel.people.set {$name: @user.name}
+    if @user.email isnt undefined
+      @$mixpanel.people.set {$email: @user.email}
+
+
   setUser: (user) ->
     @user = angular.extend @user, user
     @localStorage.set 'currentUser', @user
+    @mixpanelIdentify()
 
   setPhone: (phone) ->
     @phone = phone

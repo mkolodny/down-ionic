@@ -2,12 +2,12 @@ window.SockJS = require 'sockjs-client' # asteroid.cordova.js needs this
 AsteroidClient = require 'asteroid/dist/asteroid.cordova.js'
 
 class Asteroid
-  @$inject: ['Auth', 'meteorHost']
-  constructor: (@Auth, @meteorHost) ->
+  @$inject: ['meteorHost']
+  constructor: (@meteorHost) ->
     @_instance = new AsteroidClient(@meteorHost, true)
 
-  login: ->
-    @_instance.loginWithPassword "#{@Auth.user.id}", @Auth.user.authtoken
+  login: (username, password) ->
+    @_instance.loginWithPassword "#{username}", password
 
   subscribe: (name, params...) ->
     args = params

@@ -23,6 +23,7 @@ require './invite-friends/invite-friends-module'
 require './add-by-username/add-by-username-module'
 require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
+require './common/angular-mixpanel/angular-mixpanel-module'
 require './common/auth/auth-module'
 require './common/asteroid/asteroid-module'
 require './common/env/env-module'
@@ -95,20 +96,12 @@ angular.module 'down', [
       maxNumber: 1
       dismissButton: true
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
-        $ionicPlatform, $ionicPopup, $ionicHistory, ngToast,
+        $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel, ngToast,
         $rootScope, $state, $window, Auth, Asteroid, branchKey,
         localStorageService, ionicDeployChannel, PushNotifications, User) ->
-    # Check local storage for currentUser and currentPhone
-    currentUser = localStorageService.get 'currentUser'
-    currentPhone = localStorageService.get 'currentPhone'
-    if currentUser isnt null and currentPhone isnt null
-      Auth.user = new User currentUser
-      Asteroid.login() # re-establish asteroid auth
-      for id, friend of Auth.user.friends
-        Auth.user.friends[id] = new User friend
-      for id, friend of Auth.user.facebookFriends
-        Auth.user.facebookFriends[id] = new User friend
-      Auth.phone = currentPhone
+    
+    # Resume session from localStorage
+    Auth.resumeSession()
 
     ###
     Put anything that touches Cordova in here!

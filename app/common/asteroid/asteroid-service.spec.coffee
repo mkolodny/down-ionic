@@ -4,41 +4,36 @@ require './asteroid-module'
 AsteroidClient = require 'asteroid/dist/asteroid.cordova.js'
 
 describe 'Asteroid service', ->
-  Auth = null
   Asteroid = null
 
   beforeEach angular.mock.module('down.asteroid')
-
-  beforeEach angular.mock.module(($provide) ->
-    Auth =
-      user:
-        id: 1
-        authtoken: 'asdf1234'
-    $provide.value 'Auth', Auth
-    return
-  )
 
   beforeEach inject(($injector) ->
     Asteroid = angular.copy $injector.get('Asteroid')
   )
 
-  fit 'should init an Asteroid instance', ->
+  it 'should init an Asteroid instance', ->
     expect(Asteroid._instance).toEqual jasmine.any(AsteroidClient)
     expect(Asteroid._instance._host).toBe "https://#{Asteroid.meteorHost}"
 
   describe 'logging in', ->
     promise = null
     result = null
+    username = null
+    password = null
 
     beforeEach ->
       promise = 'promise'
       spyOn(Asteroid._instance, 'loginWithPassword').and.returnValue promise
 
-      result = Asteroid.login()
+      username = 1
+      password = 'asdfkjhasdflk'
+
+      result = Asteroid.login username, password
 
     it 'should login the current user', ->
       expect(Asteroid._instance.loginWithPassword).toHaveBeenCalledWith \
-          "#{Auth.user.id}", Auth.user.authtoken
+          "#{username}", password # set username to a string because Meteor
 
     it 'should return a promise', ->
       expect(result).toBe promise
