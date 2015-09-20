@@ -14,9 +14,8 @@ angular.module 'down.env', []
   .constant 'branchKey', 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv'
   .constant 'mixpanelToken', 'd4d37f58ce26f5e423cbc6fa937c621b'
   .constant 'ionicDeployChannel', 'dev'
-  
+
   ## Dev vars
   #.constant 'apiRoot', 'http://10.97.76.29:8000/api'
   #.constant 'branchKey', 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv'
   #.constant 'mixpanelToken', 'd4d37f58ce26f5e423cbc6fa937c621b'
-
