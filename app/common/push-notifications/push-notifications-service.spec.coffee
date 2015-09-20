@@ -200,6 +200,7 @@ describe 'PushNotifications service', ->
         it 'should resolve the promise', ->
           expect(resolved).toBe true
 
+
       describe 'save failed', ->
 
         beforeEach ->
@@ -254,6 +255,7 @@ describe 'PushNotifications service', ->
         it 'should resolve the promise', ->
           expect(resolved).toBe true
 
+
       describe 'save failed', ->
 
         beforeEach ->
@@ -262,6 +264,7 @@ describe 'PushNotifications service', ->
 
         it 'should reject the promise', ->
           expect(rejected).toBe true
+
 
   describe 'listening for notifications', ->
 
@@ -282,12 +285,12 @@ describe 'PushNotifications service', ->
 
     describe 'when using an Android device', ->
 
-      beforeEach ->        
+      beforeEach ->
         $cordovaDevice.getPlatform.and.returnValue 'Android'
         spyOn PushNotifications, 'registerAndroid'
 
         PushNotifications.listen()
-          
+
       it 'should call register', ->
         expect(PushNotifications.registerAndroid).toHaveBeenCalled()
 
@@ -300,7 +303,7 @@ describe 'PushNotifications service', ->
 
       describe 'when notification has an alert', ->
         alert = null
-      
+
         beforeEach ->
           alert = 'Chris MacPherson add you back!'
           notification =
@@ -316,7 +319,7 @@ describe 'PushNotifications service', ->
 
       describe 'when notification is for a new invitation', ->
         alert = null
-      
+
         beforeEach ->
           alert = 'from Chris MacPherson'
           notification =
@@ -352,7 +355,7 @@ describe 'PushNotifications service', ->
           iconColor: '#6A38AB'
       push =
         on: jasmine.createSpy 'push.on'
-      $window.PushNotification = 
+      $window.PushNotification =
         init: jasmine.createSpy('PushNotification.init').and.returnValue push
 
       PushNotifications.registerAndroid()
@@ -361,10 +364,12 @@ describe 'PushNotifications service', ->
       expect($window.PushNotification.init).toHaveBeenCalledWith pushOptions
 
     it 'should listen for notification registration', ->
-      expect(push.on).toHaveBeenCalledWith 'registration', PushNotifications.handleRegistrationAndroid
+      expect(push.on).toHaveBeenCalledWith('registration',
+          PushNotifications.handleRegistrationAndroid)
 
     it 'should listen for notifications', ->
-      expect(push.on).toHaveBeenCalledWith 'notification', PushNotifications.handleNotificationAndroid
+      expect(push.on).toHaveBeenCalledWith('notification',
+          PushNotifications.handleNotificationAndroid)
 
 
   describe 'handle registration android', ->
@@ -400,7 +405,7 @@ describe 'PushNotifications service', ->
 
       describe 'when notification is for a new invitation', ->
         message = null
-      
+
         beforeEach ->
           message = 'from Chris MacPherson'
           data =
