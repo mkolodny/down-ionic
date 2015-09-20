@@ -1,0 +1,42 @@
+[
+  "com.ionic.keyboard",
+  "cordova-plugin-console",
+  "cordova-plugin-device",
+  "cordova-plugin-splashscreen",
+  "cordova-plugin-whitelist",
+  "cordova-plugin-contacts",
+  "org.apache.cordova.statusbar",
+  {
+    "locator": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git",
+    "id": "cordova-plugin-inappbrowser"
+  },
+  {
+    "locator": "https://github.com/VitaliiBlagodir/cordova-plugin-datepicker.git",
+    "id": "cordova-plugin-datepicker"
+  },
+  {
+    "locator": "https://github.com/driftyco/ionic-plugins-deploy",
+    "id": "ionic-plugin-deploy"
+  },
+  {
+    "locator": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-geolocation.git",
+    "id": "cordova-plugin-geolocation"
+  },
+  "cordova-plugin-appavailability",
+  {
+    "locator": "https://github.com/BranchMetrics/Cordova-Ionic-PhoneGap-Deferred-Deep-Linking-SDK",
+    "id": "io.branch.sdk"
+  },
+  {
+    "locator": "https://github.com/phonegap-build/PushPlugin",
+    "id": "com.phonegap.plugins.PushPlugin"
+  },
+  {
+    "locator": "https://github.com/Wizcorp/phonegap-facebook-plugin.git",
+    "id": "com.phonegap.plugins.facebookconnect",
+    "variables": {
+      "APP_ID": "864552050271610",
+      "APP_NAME": "DownDev"
+    }
+  }
+]
