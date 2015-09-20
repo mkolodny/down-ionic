@@ -22,7 +22,7 @@ describe 'Asteroid service', ->
     Asteroid = angular.copy $injector.get('Asteroid')
   )
 
-  fit 'should init an Asteroid instance', ->
+  it 'should init an Asteroid instance', ->
     expect(Asteroid._instance).toEqual jasmine.any(AsteroidClient)
     expect(Asteroid._instance._host).toBe "https://#{Asteroid.meteorHost}"
 
