@@ -41,6 +41,8 @@ class Auth
       @$mixpanel.people.set {$name: @user.name}
     if @user.email isnt undefined
       @$mixpanel.people.set {$email: @user.email}
+    if @user.username isnt undefined
+      @$mixpanel.people.set {$username: @user.username}
 
 
   setUser: (user) ->

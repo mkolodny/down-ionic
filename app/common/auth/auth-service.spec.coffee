@@ -189,8 +189,22 @@ describe 'Auth service', ->
           email: email
         Auth.mixpanelIdentify()
 
-      it 'should sent the email to mixpanel', ->
+      it 'should send the email to mixpanel', ->
         expect($mixpanel.people.set).toHaveBeenCalledWith {$email: email}
+
+
+    describe 'when a user has a username', ->
+      username = null
+
+      beforeEach ->
+        username = 'a'
+        Auth.user =
+          id: 1
+          username: username
+        Auth.mixpanelIdentify()
+
+      it 'should send the username to mixpanel', ->
+        expect($mixpanel.people.set).toHaveBeenCalledWith {$username: username}
 
 
   describe 'set user', ->
