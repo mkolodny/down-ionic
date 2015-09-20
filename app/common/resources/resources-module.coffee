@@ -3,6 +3,7 @@ require 'angular-local-storage'
 require 'angular-resource'
 require '../asteroid/asteroid-module'
 require '../auth/auth-module'
+require '../env/env-module'
 APNSDevice = require './apnsdevice-service'
 Event = require './event-service'
 Friendship = require './friendship-service'
@@ -16,6 +17,7 @@ angular.module 'down.resources', [
     'ngResource'
     'down.asteroid'
     'down.auth'
+    'down.env'
     'LocalStorageModule'
   ]
   .factory 'APNSDevice', APNSDevice

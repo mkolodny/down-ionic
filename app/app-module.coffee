@@ -24,6 +24,7 @@ require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
 require './common/auth/auth-module'
 require './common/asteroid/asteroid-module'
+require './common/env/env-module'
 require './common/resources/resources-module'
 require './common/push-notifications/push-notifications-module'
 require './event/event-module'
@@ -39,6 +40,7 @@ angular.module 'down', [
     'ngToast'
     'down.auth'
     'down.asteroid'
+    'down.env'
     'down.resources'
     'down.login'
     'down.verifyPhone'
@@ -86,13 +88,6 @@ angular.module 'down', [
       animation: 'slide'
       maxNumber: 1
       dismissButton: true
-  .value 'apiRoot', 'https://down-prod.herokuapp.com/api'
-  #.value 'apiRoot', 'http://down-staging.herokuapp.com/api'
-  #.value 'apiRoot', 'http://10.97.76.29:8000/api'
-  .value 'host', 'down-meteor.herokuapp.com'
-  #.value 'host', 'down-meteor-staging.herokuapp.com'
-  .value 'branchKey', 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ'
-  #.value 'branchKey', 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv'
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, ngToast,
         $rootScope, $state, $window, Auth, Asteroid, branchKey,
