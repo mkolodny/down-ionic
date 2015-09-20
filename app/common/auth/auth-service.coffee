@@ -91,7 +91,7 @@ class Auth
       return false
 
   isNearby: (user) ->
-    if not user.location?
+    if user.location is undefined or @user.location is undefined
       return false
 
     start =
