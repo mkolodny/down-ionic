@@ -1,6 +1,7 @@
 require 'angular'
 require 'angular-animate' # for ngToast
 require 'angular-local-storage'
+require 'angular-mixpanel'
 require 'angular-sanitize' # for ngToast
 require 'angular-ui-router'
 require 'ng-toast'
@@ -30,8 +31,10 @@ require './event/event-module'
 require './my-friends/my-friends-module'
 require './add-friends/add-friends-module'
 require './friends/friends-module'
+require './vendor/mixpanel/mixpanel-jslib-snippet'
 
 angular.module 'down', [
+    'analytics.mixpanel'
     'ionic'
     'ionic.service.core'
     'ionic.service.deploy'
@@ -61,7 +64,7 @@ angular.module 'down', [
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]
-  .config ($httpProvider, $ionicConfigProvider, $urlRouterProvider,
+  .config ($httpProvider, $ionicConfigProvider, $mixpanelProvider, $urlRouterProvider,
            ngToastProvider) ->
     acceptHeader = 'application/json; version=2.0'
     $httpProvider.defaults.headers.common['Accept'] = acceptHeader
@@ -80,19 +83,23 @@ angular.module 'down', [
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
 
+    # Init mixpanel
+    $mixpanelProvider.apiKey 'd4d37f58ce26f5e423cbc6fa937c621b'
+    # '14c9d01044b39cc2c5cfc2dc8efbe532' production token
+
     # Toasts
     ngToastProvider.configure
       horizontalPosition: 'center'
       animation: 'slide'
       maxNumber: 1
       dismissButton: true
-  .value 'apiRoot', 'https://down-prod.herokuapp.com/api'
-  #.value 'apiRoot', 'http://down-staging.herokuapp.com/api'
+  # .value 'apiRoot', 'https://down-prod.herokuapp.com/api'
+  .value 'apiRoot', 'http://down-staging.herokuapp.com/api'
   #.value 'apiRoot', 'http://10.97.76.29:8000/api'
-  .value 'host', 'down-meteor.herokuapp.com'
-  #.value 'host', 'down-meteor-staging.herokuapp.com'
-  .value 'branchKey', 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ'
-  #.value 'branchKey', 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv'
+  # .value 'host', 'down-meteor.herokuapp.com'
+  .value 'host', 'down-meteor-staging.herokuapp.com'
+  # .value 'branchKey', 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ'
+  .value 'branchKey', 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv'
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, ngToast,
         $rootScope, $state, $window, Auth, Asteroid, branchKey,
