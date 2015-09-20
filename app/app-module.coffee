@@ -95,6 +95,7 @@ angular.module 'down', [
       animation: 'slide'
       maxNumber: 1
       dismissButton: true
+
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel, ngToast,
         $rootScope, $state, $window, Auth, Asteroid, branchKey,
@@ -143,6 +144,10 @@ angular.module 'down', [
         else
           $ionicHistory.goBack()
       , 100 # override action priority 100 (Return to previous view)
+
+      # Track App Opens
+      $ionicPlatform.on 'resume', ->
+        $mixpanel.track "Opened App"
 
       # Update the user's location while they use the app.
       if localStorageService.get('hasRequestedLocationServices') \
