@@ -180,3 +180,8 @@ angular.module 'down', [
     template: '''
       <ion-spinner icon="bubbles"></ion-spinner>
       '''
+  .value 'apiRoot', 'https://down-prod.herokuapp.com/api'
+  #.value 'apiRoot', 'http://down-staging.herokuapp.com/api'
+  #.value 'apiRoot', 'http://10.97.76.29:8000/api'
+  .value 'host', 'down-meteor.herokuapp.com'
+  #.value 'host', 'down-meteor-staging.herokuapp.com'
