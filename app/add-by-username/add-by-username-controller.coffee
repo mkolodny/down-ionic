@@ -1,7 +1,7 @@
 class AddByUsernameCtrl
   @$inject: ['$timeout', 'Auth', 'User']
   constructor: (@$timeout, @Auth, @User) ->
-    @user = @Auth.user
+    @currentUser = @Auth.user
 
   search: ->
     @isSearching = true
