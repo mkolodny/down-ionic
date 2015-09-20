@@ -135,6 +135,9 @@ describe 'event controller', ->
       scope: scope
       animation: 'slide-in-up'
 
+  it 'should set the current user on the guest list', ->
+    expect(scope.guestList.currentUser).toBe Auth.user
+
   describe 'once the view loads', ->
     Messages = null
     messagesRQ = null

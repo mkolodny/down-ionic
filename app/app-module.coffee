@@ -25,6 +25,7 @@ require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
 require './common/auth/auth-module'
 require './common/asteroid/asteroid-module'
+require './common/env/env-module'
 require './common/resources/resources-module'
 require './common/push-notifications/push-notifications-module'
 require './event/event-module'
@@ -42,6 +43,7 @@ angular.module 'down', [
     'ngToast'
     'down.auth'
     'down.asteroid'
+    'down.env'
     'down.resources'
     'down.login'
     'down.verifyPhone'
@@ -65,7 +67,7 @@ angular.module 'down', [
     'ngIOS9UIWebViewPatch'
   ]
   .config ($httpProvider, $ionicConfigProvider, $mixpanelProvider, $urlRouterProvider,
-           ngToastProvider) ->
+           mixpanelToken, ngToastProvider) ->
     acceptHeader = 'application/json; version=2.0'
     $httpProvider.defaults.headers.common['Accept'] = acceptHeader
     $httpProvider.interceptors.push ($injector) ->
@@ -84,8 +86,7 @@ angular.module 'down', [
       .previousTitleText false
 
     # Init mixpanel
-    $mixpanelProvider.apiKey 'd4d37f58ce26f5e423cbc6fa937c621b'
-    # '14c9d01044b39cc2c5cfc2dc8efbe532' production token
+    $mixpanelProvider.apiKey mixpanelToken
 
     # Toasts
     ngToastProvider.configure
@@ -93,17 +94,10 @@ angular.module 'down', [
       animation: 'slide'
       maxNumber: 1
       dismissButton: true
-  # .value 'apiRoot', 'https://down-prod.herokuapp.com/api'
-  .value 'apiRoot', 'http://down-staging.herokuapp.com/api'
-  #.value 'apiRoot', 'http://10.97.76.29:8000/api'
-  # .value 'host', 'down-meteor.herokuapp.com'
-  .value 'host', 'down-meteor-staging.herokuapp.com'
-  # .value 'branchKey', 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ'
-  .value 'branchKey', 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv'
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, ngToast,
         $rootScope, $state, $window, Auth, Asteroid, branchKey,
-        localStorageService, PushNotifications, User) ->
+        localStorageService, ionicDeployChannel, PushNotifications, User) ->
     # Check local storage for currentUser and currentPhone
     currentUser = localStorageService.get 'currentUser'
     currentPhone = localStorageService.get 'currentPhone'
@@ -169,7 +163,7 @@ angular.module 'down', [
       # return
 
       # Check For Updates
-      $ionicDeploy.setChannel 'staging' # 'dev', 'staging', 'production'
+      $ionicDeploy.setChannel ionicDeployChannel
       $ionicDeploy.check()
         .then (hasUpdate) ->
           if not hasUpdate

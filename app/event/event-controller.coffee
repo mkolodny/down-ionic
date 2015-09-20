@@ -28,6 +28,7 @@ class EventCtrl
     @$scope.guestList =
       hide: =>
         @guestListModal.hide()
+      currentUser: @Auth.user
 
     # Start out at the most recent message.
     @$scope.$on '$ionicView.enter', =>

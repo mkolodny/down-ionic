@@ -30,7 +30,7 @@ describe 'add by username controller', ->
   )
 
   it 'should set the user on the controller', ->
-    expect(ctrl.user).toBe Auth.user
+    expect(ctrl.currentUser).toBe Auth.user
 
   describe 'searching for a user by username', ->
     deferred = null

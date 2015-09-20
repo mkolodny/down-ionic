@@ -20,7 +20,8 @@
           <img class="item-image" ng-src="{{item.user.getImageUrl()}}">
           <h2>{{item.user.name}}</h2>
           <p>{{item.user.username}}</p>
-          <friendship-button user="item.user">
+          <friendship-button user="item.user"
+                             ng-if="item.user.id !== guestList.currentUser.id">
         </div>
       </ion-item>
     </ion-list>
