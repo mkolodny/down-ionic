@@ -42,7 +42,7 @@
               >Can't</button>
     </div>
   </div>
-  <ion-content>
+  <ion-content ng-click="event.toggleIsHeaderExpanded()" ontouchstart>
     <ion-list>
       <!-- We might need to use `track by item.id` to keep this quick. -->
       <ion-item ng-repeat="message in event.messages">
