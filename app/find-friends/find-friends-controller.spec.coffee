@@ -183,6 +183,11 @@ describe 'find friends controller', ->
           username: facebookFriend.username
           imageUrl: facebookFriend.imageUrl
       ]
+      for item in items
+        if item.isDivider
+          item.id = item.title
+        else
+          item.id = item.user.id
       expect(ctrl.items).toEqual items
 
 
@@ -291,3 +296,62 @@ describe 'find friends controller', ->
 
         it 'should return the first two letters of their first name', ->
           expect(ctrl.getInitials 'P ').toBe 'P'
+
+
+  describe 'searching', ->
+    isIncluded = null
+
+    describe 'when there\'s no query', ->
+
+      beforeEach ->
+        ctrl.query = ''
+
+        item =
+          isDivider: true
+        isIncluded = ctrl.search item
+
+      it 'should return true', ->
+        expect(isIncluded).toBe true
+
+
+    describe 'when the item is a divider', ->
+
+      beforeEach ->
+        ctrl.query = 'a'
+
+        item =
+          isDivider: true
+        isIncluded = ctrl.search item
+
+      it 'should return false', ->
+        expect(isIncluded).toBe false
+
+
+    describe 'when the item is a matching user', ->
+
+      beforeEach ->
+        ctrl.query = 'a'
+
+        item =
+          isDivider: false
+          user:
+            name: 'Andrew Plebfoot'
+        isIncluded = ctrl.search item
+
+      it 'should return true', ->
+        expect(isIncluded).toBe true
+
+
+    describe 'when the item is a non-matching user', ->
+
+      beforeEach ->
+        ctrl.query = 'a'
+
+        item =
+          isDivider: false
+          user:
+            name: 'Mike Pleb'
+        isIncluded = ctrl.search item
+
+      it 'should return false', ->
+        expect(isIncluded).toBe false
