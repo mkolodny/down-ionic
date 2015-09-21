@@ -26,7 +26,8 @@
       <i class="fa fa-search"></i>
       <input ng-model="inviteFriends.query" placeholder="Search"
              ng-change="inviteFriends.buildItems()">
-      <i class="fa fa-times" ng-click="inviteFriends.query = null"
+      <i class="fa fa-times"
+         ng-click="inviteFriends.query = null; inviteFriends.buildItems()"
          ng-if="inviteFriends.query"></i>
     </div>
     <!--
