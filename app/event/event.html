@@ -1,7 +1,7 @@
 <ion-view id="event">
   <ion-nav-title id="event-title" ng-click="event.toggleIsHeaderExpanded()"
                  ontouchstart>
-    {{event.event.titleWithLongVariableName}}
+    <span>{{event.event.titleWithLongVariableName}}</span>
     <i class="fa"
        ng-class="{'fa-caret-down': !event.isHeaderExpanded, 'fa-caret-up': event.isHeaderExpanded}"
        ></i>

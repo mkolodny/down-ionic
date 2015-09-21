@@ -269,16 +269,18 @@ body {
   }
 }
 #event-title {
-  display: inline-block;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 100%;
-
+  span {
+    display: inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: calc(100% - 20px);
+  }
   i {
     position: relative;
     padding-left: 2px;
     font-size: 18px;
+    top: -14px;
   }
 }
 
