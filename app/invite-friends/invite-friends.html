@@ -40,7 +40,8 @@
      <ion-item class="item-icon-right"
                ng-click="inviteFriends.toggleAllNearbyFriends()"
                ng-class="{selected: inviteFriends.isAllNearbyFriendsSelected}"
-               ng-if="!inviteFriends.query">
+               ng-if="!inviteFriends.query &&
+                     inviteFriends.items[0].title === 'Nearby Friends'">
        <h2>All Nearby Friends</h2>
        <i class="icon fa" id="all-friends-icon"
           ng-class="{'fa-square-o': !inviteFriends.isAllNearbyFriendsSelected, 'fa-check-square': inviteFriends.isAllNearbyFriendsSelected}"
