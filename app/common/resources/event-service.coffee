@@ -69,10 +69,10 @@ Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
             firstName: Auth.user.firstName
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
-          text: "#{Auth.user.name} might be down."
+          text: "#{Auth.user.name} is down."
           eventId: "#{event.id}" # Meteor likes strings
-          type: 'maybe_action' # We can't use Invitation.maybeAction because it
-                               #   would create a circular dependecy.
+          type: 'accept_action' # We can't use Invitation.acceptAction because it
+                                #   would create a circular dependecy.
           createdAt:
             $date: new Date().getTime()
         .remote.then (messageId) ->
