@@ -5,7 +5,7 @@ require 'angular-ui-router'
 require 'angular-local-storage'
 require 'ng-cordova'
 require './auth-module'
-require '../angular-mixpanel/angular-mixpanel-module'
+require '../mixpanel/mixpanel-module'
 require '../asteroid/asteroid-module'
 
 describe 'Auth service', ->

@@ -1,8 +1,8 @@
 class InviteFriendsCtrl
-  @$inject: ['$ionicHistory', '$ionicLoading', '$scope', '$state', 'Auth',
-             'Event', 'Invitation', 'localStorageService']
-  constructor: (@$ionicHistory, @$ionicLoading, @$scope, @$state, @Auth, @Event,
-                @Invitation, localStorageService) ->
+  @$inject: ['$ionicHistory', '$ionicLoading', '$mixpanel', '$scope',
+             '$state', 'Auth', 'Event', 'Invitation', 'localStorageService']
+  constructor: (@$ionicHistory, @$ionicLoading, @$mixpanel, @$scope, @$state,
+                @Auth, @Event, @Invitation, localStorageService) ->
     @localStorage = localStorageService
 
     @selectedFriends = []
@@ -220,6 +220,7 @@ class InviteFriendsCtrl
 
       @Invitation.bulkCreate eventId, invitations
         .then =>
+          @$mixpanel.track 'Invited friends to existing event'
           @$ionicHistory.clearCache()
         .then =>
           @cleanupView()
@@ -242,6 +243,7 @@ class InviteFriendsCtrl
       @event.invitations = invitations
       @Event.save @event
         .$promise.then =>
+          @$mixpanel.track 'Created an event'
           @$ionicHistory.clearCache()
         .then =>
           @cleanupView()

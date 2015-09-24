@@ -3,9 +3,11 @@ require 'angular-local-storage'
 require 'angular-ui-router'
 require '../common/auth/auth-module'
 require '../common/resources/resources-module'
+require '../common/mixpanel/mixpanel-module'
 InviteFriendsCtrl = require './invite-friends-controller'
 
 angular.module 'down.inviteFriends', [
+    'analytics.mixpanel'
     'ionic'
     'ui.router'
     'down.auth'
