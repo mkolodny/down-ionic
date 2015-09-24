@@ -799,6 +799,7 @@ describe 'event controller', ->
         linkId = null
 
         beforeEach ->
+          spyOn $mixpanel, 'track'
           spyOn $ionicPopup, 'alert'
           linkId = 'mikepleb'
           deferred.resolve {linkId: linkId}
@@ -809,6 +810,9 @@ describe 'event controller', ->
 
         it 'should hide the loading overlay', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
+
+        it 'should track the event in mixpanel', ->
+          expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation'
 
 
       describe 'on error', ->

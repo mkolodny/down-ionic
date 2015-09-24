@@ -219,6 +219,7 @@ class EventCtrl
       fromUserId: @Auth.user.id
     @LinkInvitation.save linkInvitation
       .$promise.then (linkInvitation) =>
+        @$mixpanel.track 'Get Link Invitation'
         @$ionicPopup.alert
           title: 'Copy Group Link'
           template: """
