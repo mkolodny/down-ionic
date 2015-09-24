@@ -1,7 +1,17 @@
 <ion-view id="add-from-address-book" view-title="Address Book">
   <ion-content>
+    <div id="spinner-container" ng-if="addFromAddressBook.isLoading">
+      <ion-spinner icon="bubbles"></ion-spinner>
+    </div>
+    <div class="search-bar" ng-if="!addFromAddressBook.getContactsError">
+      <i class="fa fa-search"></i>
+      <input ng-model="addFromAddressBook.search.user.name" placeholder="Search">
+      <i class="fa fa-times"
+         ng-click="addFromAddressBook.search.user.name = ''"
+         ng-if="addFromAddressBook.search.user.name"></i>
+    </div>
     <ion-list class="list-avatar">
-      <ion-item collection-repeat="item in addFromAddressBook.items"
+      <ion-item collection-repeat="item in addFromAddressBook.items | filter:addFromAddressBook.search"
                 ng-class="{
                   'item-divider': item.isDivider,
                   'item-avatar': !item.isDivider,
@@ -14,7 +24,7 @@
         </div>
 
         <!-- User who signed up -->
-        <div ng-if="item.user">
+        <div ng-if="item.user.username">
           <img class="item-image" ng-src="{{item.user.getImageUrl()}}">
           <h2>{{item.user.name}}</h2>
           <p>{{item.user.username}}</p>
@@ -22,18 +32,15 @@
         </div>
 
         <!-- Contact -->
-        <div ng-if="item.contact">
+        <div ng-if="!item.isDivider && !item.user.username">
           <span class="contact-image item-image"
-                >{{addFromAddressBook.getInitials(item.contact.name)}}</span>
-          <h2>{{item.contact.name}}</h2>
+                >{{addFromAddressBook.getInitials(item.user.name)}}</span>
+          <h2>{{item.user.name}}</h2>
           <p>Add by SMS</p>
-          <friendship-button user="item.contact">
+          <friendship-button user="item.user">
         </div>
       </ion-item>
     </ion-list>
-    <div id="spinner-container" ng-if="addFromAddressBook.isLoading">
-      <ion-spinner icon="bubbles"></ion-spinner>
-    </div>
     <div class="permission-denied" ng-if="addFromAddressBook.getContactsError">
       <div class="message">
         It looks like you didn't give Down permission to access your address book :(

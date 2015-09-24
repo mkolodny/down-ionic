@@ -67,7 +67,7 @@ describe 'add from address book controller', ->
       title: 'B'
     ,
       isDivider: false
-      contact: contacts[1]
+      user: new User contacts[1]
     ]
     expect(ctrl.items).toEqual items
 

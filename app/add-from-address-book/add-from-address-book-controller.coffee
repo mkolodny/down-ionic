@@ -27,14 +27,9 @@ class AddFromAddressBookCtrl
           title: firstLetter
         currentLetter = firstLetter
 
-      if contact.username isnt null
-        @items.push
-          isDivider: false
-          user: new @User contact
-      else
-        @items.push
-          isDivider: false
-          contact: contact
+      @items.push
+        isDivider: false
+        user: new @User contact
 
   refresh: ->
     refreshCompleteEvent = 'scroll.refreshComplete'
