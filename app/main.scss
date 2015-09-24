@@ -346,14 +346,15 @@ body {
   }
 }
 .alert {
-  background-color: $brand-color;
+  background-color: #2a2c2e;
   color: #fff;
   padding: 15px;
+  padding-right: 30px;
 }
 .close {
   position: relative;
-  top: -5px;
-  right: -21px;
+  top: -8px;
+  right: -32px;
   color: #fff;
   float: right;
   font-weight: bold;

@@ -65,8 +65,8 @@ angular.module 'down', [
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]
-  .config ($httpProvider, $ionicConfigProvider, $mixpanelProvider, $urlRouterProvider,
-           mixpanelToken, ngToastProvider) ->
+  .config ($httpProvider, $ionicConfigProvider, $mixpanelProvider,
+           $urlRouterProvider, mixpanelToken, ngToastProvider) ->
     acceptHeader = 'application/json; version=2.0'
     $httpProvider.defaults.headers.common['Accept'] = acceptHeader
     $httpProvider.interceptors.push ($injector) ->
@@ -95,10 +95,9 @@ angular.module 'down', [
       dismissButton: true
 
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
-        $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel, ngToast,
+        $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel,
         $rootScope, $state, $window, Auth, Asteroid, branchKey,
         localStorageService, ionicDeployChannel, PushNotifications, User) ->
-
     # Resume session from localStorage
     Auth.resumeSession()
 

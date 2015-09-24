@@ -232,7 +232,7 @@ describe 'event service', ->
       it 'should get the messages collection', ->
         expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
 
-      it 'should create a maybe action message', ->
+      it 'should create an accept action message', ->
         message =
           creator:
             id: "#{Auth.user.id}" # meteor likes strings
@@ -240,9 +240,9 @@ describe 'event service', ->
             firstName: Auth.user.firstName
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
-          text: "#{Auth.user.name} might be down."
+          text: "#{Auth.user.name} is down."
           eventId: "#{responseData.id}" # meteor likes strings
-          type: Invitation.maybeAction
+          type: Invitation.acceptAction
           createdAt:
             $date: new Date().getTime()
         expect(Messages.insert).toHaveBeenCalledWith message

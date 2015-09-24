@@ -58,9 +58,6 @@
     </ion-list>
     <ion-infinite-scroll on-infinite="event.saveMaxTop()"
                          distance="1%" ng-show="false"></ion-infinite-scroll>
-    <div class="placeholder" ng-if="event.members.length < 2">
-      No one has joined, yet.
-    </div>
   </ion-content>
   <ion-footer-bar class="bar-light" keyboard-attach>
     <textarea ng-model="event.message" placeholder="Type a message..." msd-elastic
