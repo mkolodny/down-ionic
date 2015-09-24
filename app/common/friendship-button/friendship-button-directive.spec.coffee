@@ -1,18 +1,24 @@
 require 'angular'
 require 'angular-mocks'
+require 'angular-ui-router'
 require '../auth/auth-module'
+require '../mixpanel/mixpanel-module'
 require '../resources/resources-module'
 require './friendship-button-module'
 
 describe 'friendship button directive', ->
   $compile = null
   $q = null
+  $state = null
+  $mixpanel = null
   Auth = null
   deferred = null
   element = null
   Friendship = null
   scope = null
   User = null
+
+  beforeEach angular.mock.module('analytics.mixpanel')
 
   beforeEach angular.mock.module('down.friendshipButton')
 
@@ -33,6 +39,8 @@ describe 'friendship button directive', ->
   beforeEach inject(($injector) ->
     $compile = $injector.get '$compile'
     scope = $injector.get '$rootScope'
+    $state = $injector.get '$state'
+    $mixpanel = $injector.get '$mixpanel'
     $q = $injector.get '$q'
     Friendship = $injector.get 'Friendship'
     User = $injector.get 'User'
@@ -87,6 +95,10 @@ describe 'friendship button directive', ->
         beforeEach ->
           Auth.isFriend.and.returnValue false
 
+          $state.current =
+            name: 'find friends'
+          spyOn $mixpanel, 'track'
+
           deferred.resolve()
           scope.$apply()
 
@@ -99,6 +111,10 @@ describe 'friendship button directive', ->
 
         it 'should set the user on auth', ->
           expect(Auth.setUser).toHaveBeenCalledWith Auth.user
+
+        it 'should track the event in mixpanel', ->
+          expect($mixpanel.track).toHaveBeenCalledWith "Remove Friend",
+            'from screen': $state.current.name
 
 
       describe 'when the remove fails', ->
@@ -154,18 +170,54 @@ describe 'friendship button directive', ->
         beforeEach ->
           Auth.isFriend.and.returnValue true
 
-          deferred.resolve()
-          scope.$apply()
+          spyOn $mixpanel, 'track'
+          $state.current =
+            name: 'find friends'
 
-        it 'should show a remove friend button', ->
-          icon = element.find 'i'
-          expect(icon).toHaveClass 'fa-check-square'
+        describe 'when the user has a username', ->
 
-        it 'should add the friend to the user\'s friends', ->
-          expect(Auth.user.friends[scope.friend.id]).toEqual scope.friend
+          beforeEach ->
+            scope.friend.username = 'a'
+            deferred.resolve()
+            scope.$apply()
 
-        it 'should set the user on auth', ->
-          expect(Auth.setUser).toHaveBeenCalledWith Auth.user
+          it 'should show a remove friend button', ->
+            icon = element.find 'i'
+            expect(icon).toHaveClass 'fa-check-square'
+
+          it 'should add the friend to the user\'s friends', ->
+            expect(Auth.user.friends[scope.friend.id]).toEqual scope.friend
+
+          it 'should set the user on auth', ->
+            expect(Auth.setUser).toHaveBeenCalledWith Auth.user
+
+          it 'should track the event in mixpanel', ->
+            expect($mixpanel.track).toHaveBeenCalledWith "Add Friend",
+              'from screen': $state.current.name
+              'via sms': false
+
+
+        describe 'when the user does not have a username', ->
+
+          beforeEach ->
+            delete scope.friend.username
+            deferred.resolve()
+            scope.$apply()
+
+          it 'should show a remove friend button', ->
+            icon = element.find 'i'
+            expect(icon).toHaveClass 'fa-check-square'
+
+          it 'should add the friend to the user\'s friends', ->
+            expect(Auth.user.friends[scope.friend.id]).toEqual scope.friend
+
+          it 'should set the user on auth', ->
+            expect(Auth.setUser).toHaveBeenCalledWith Auth.user
+
+          it 'should track the event in mixpanel', ->
+            expect($mixpanel.track).toHaveBeenCalledWith "Add Friend",
+              'from screen': $state.current.name
+              'via sms': true
 
 
       describe 'when the add fails', ->

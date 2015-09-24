@@ -669,7 +669,7 @@ describe 'invite friends controller', ->
       describe 'successfully', ->
 
         beforeEach ->
-          spyOn $mixpanel, 'track'
+          spyOn ctrl, 'trackSendInvites'
 
           deferredBulkCreate.resolve()
           scope.$apply()
@@ -678,7 +678,7 @@ describe 'invite friends controller', ->
           expect($ionicHistory.clearCache).toHaveBeenCalled()
 
         it 'should track Invited friends to existing event in mixpanel', ->
-          expect($mixpanel.track).toHaveBeenCalledWith 'Invited friends to existing event'
+          expect(ctrl.trackSendInvites).toHaveBeenCalled()
 
         describe 'when the cache is cleared', ->
 
@@ -737,12 +737,12 @@ describe 'invite friends controller', ->
       describe 'successfully', ->
 
         beforeEach ->
-          spyOn $mixpanel, 'track'
+          spyOn ctrl, 'trackSendInvites'
           deferredEventSave.resolve()
           scope.$apply()
 
         it 'should track Created an event in mixpanel', ->
-          expect($mixpanel.track).toHaveBeenCalledWith 'Created an event'
+          expect(ctrl.trackSendInvites).toHaveBeenCalled()
 
         it 'should clear the cache', ->
           expect($ionicHistory.clearCache).toHaveBeenCalled()
@@ -774,6 +774,42 @@ describe 'invite friends controller', ->
 
         it 'should hide the loading indicator', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
+
+
+  describe 'tracking send invites', ->
+
+    beforeEach ->
+      spyOn $mixpanel, 'track'
+      ctrl.selectedFriends = [1, 2, 3]
+      ctrl.isAllNearbyFriendsSelected = true
+
+    describe 'when inviting to an existing event', ->
+
+      beforeEach ->
+        ctrl.event =
+          id: 1
+
+        ctrl.trackSendInvites()
+
+      it 'should track with "existing event" property as true', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Send Invites',
+          'existing event': true
+          'number of invites': ctrl.selectedFriends.length
+          'all nearby': ctrl.isAllNearbyFriendsSelected
+
+
+    describe 'when creating an event', ->
+
+      beforeEach ->
+        ctrl.event = {}
+
+        ctrl.trackSendInvites()
+
+      it 'should track with "existing event" as false', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Send Invites',
+          'existing event': false
+          'number of invites': ctrl.selectedFriends.length
+          'all nearby': ctrl.isAllNearbyFriendsSelected
 
 
   describe 'adding friends', ->

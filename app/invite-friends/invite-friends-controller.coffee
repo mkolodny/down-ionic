@@ -220,7 +220,7 @@ class InviteFriendsCtrl
 
       @Invitation.bulkCreate eventId, invitations
         .then =>
-          @$mixpanel.track 'Invited friends to existing event'
+          @trackSendInvites()
           @$ionicHistory.clearCache()
         .then =>
           @cleanupView()
@@ -243,7 +243,7 @@ class InviteFriendsCtrl
       @event.invitations = invitations
       @Event.save @event
         .$promise.then =>
-          @$mixpanel.track 'Created an event'
+          @trackSendInvites()
           @$ionicHistory.clearCache()
         .then =>
           @cleanupView()
@@ -252,6 +252,12 @@ class InviteFriendsCtrl
           @error = 'inviteError'
         .finally =>
           @$ionicLoading.hide()
+
+  trackSendInvites: =>
+    @$mixpanel.track 'Send Invites',
+      'existing event': 'id' of @event
+      'number of invites': @selectedFriends.length
+      'all nearby': @isAllNearbyFriendsSelected
 
   addFriends: ->
     @cleanupViewAfterLeave = false

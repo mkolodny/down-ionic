@@ -145,7 +145,7 @@ angular.module 'down', [
 
       # Track App Opens
       $ionicPlatform.on 'resume', ->
-        $mixpanel.track 'Opened App'
+        $mixpanel.track 'Open App'
 
       # Update the user's location while they use the app.
       if localStorageService.get('hasRequestedLocationServices') \
