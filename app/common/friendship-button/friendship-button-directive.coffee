@@ -1,4 +1,4 @@
-friendshipButtonDirective = ['Auth', 'Friendship', (Auth, Friendship) ->
+friendshipButtonDirective = ['$state', '$mixpanel', 'Auth', 'Friendship', ($state, $mixpanel, Auth, Friendship) ->
   restrict: 'E'
   scope:
     user: '='
@@ -16,6 +16,7 @@ friendshipButtonDirective = ['Auth', 'Friendship', (Auth, Friendship) ->
     </a>
     """
   controller: ['$scope', ($scope) ->
+
     $scope.isFriend = (user) ->
       Auth.isFriend user.id
 
@@ -28,6 +29,8 @@ friendshipButtonDirective = ['Auth', 'Friendship', (Auth, Friendship) ->
             # Remove the user from the current user's dictionary of friends.
             delete Auth.user.friends[user.id]
             Auth.setUser Auth.user
+            $mixpanel.track 'Remove Friend',
+              'from screen': $state.current.name
           .finally ->
             $scope.isLoading = false
       else
@@ -38,8 +41,12 @@ friendshipButtonDirective = ['Auth', 'Friendship', (Auth, Friendship) ->
           .$promise.then ->
             Auth.user.friends[user.id] = user
             Auth.setUser Auth.user
+            $mixpanel.track 'Add Friend',
+              'from screen': $state.current.name,
+              'via sms': user.username is undefined
           .finally ->
             $scope.isLoading = false
+
   ]
 ]
 

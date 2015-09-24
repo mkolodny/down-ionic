@@ -7,6 +7,7 @@ require 'angular-ui-router'
 require '../ionic/ionic-angular.js'
 require '../common/auth/auth-module'
 require '../common/resources/resources-module'
+require '../common/mixpanel/mixpanel-module'
 InviteFriendsCtrl = require './invite-friends-controller'
 
 describe 'invite friends controller', ->
@@ -15,6 +16,7 @@ describe 'invite friends controller', ->
   $ionicLoading = null
   $q = null
   $state = null
+  $mixpanel = null
   Auth = null
   contacts = null
   ctrl = null
@@ -23,6 +25,8 @@ describe 'invite friends controller', ->
   Invitation = null
   localStorage = null
   scope = null
+
+  beforeEach angular.mock.module('analytics.mixpanel')
 
   beforeEach angular.mock.module('ionic')
 
@@ -40,6 +44,7 @@ describe 'invite friends controller', ->
     $ionicLoading = $injector.get '$ionicLoading'
     $q = $injector.get '$q'
     $state = angular.copy $injector.get('$state')
+    $mixpanel = $injector.get '$mixpanel'
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
@@ -664,11 +669,16 @@ describe 'invite friends controller', ->
       describe 'successfully', ->
 
         beforeEach ->
+          spyOn ctrl, 'trackSendInvites'
+
           deferredBulkCreate.resolve()
           scope.$apply()
 
         it 'should clear the cache', ->
           expect($ionicHistory.clearCache).toHaveBeenCalled()
+
+        it 'should track Invited friends to existing event in mixpanel', ->
+          expect(ctrl.trackSendInvites).toHaveBeenCalled()
 
         describe 'when the cache is cleared', ->
 
@@ -727,8 +737,12 @@ describe 'invite friends controller', ->
       describe 'successfully', ->
 
         beforeEach ->
+          spyOn ctrl, 'trackSendInvites'
           deferredEventSave.resolve()
           scope.$apply()
+
+        it 'should track Created an event in mixpanel', ->
+          expect(ctrl.trackSendInvites).toHaveBeenCalled()
 
         it 'should clear the cache', ->
           expect($ionicHistory.clearCache).toHaveBeenCalled()
@@ -760,6 +774,42 @@ describe 'invite friends controller', ->
 
         it 'should hide the loading indicator', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
+
+
+  describe 'tracking send invites', ->
+
+    beforeEach ->
+      spyOn $mixpanel, 'track'
+      ctrl.selectedFriends = [1, 2, 3]
+      ctrl.isAllNearbyFriendsSelected = true
+
+    describe 'when inviting to an existing event', ->
+
+      beforeEach ->
+        ctrl.event =
+          id: 1
+
+        ctrl.trackSendInvites()
+
+      it 'should track with "existing event" property as true', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Send Invites',
+          'existing event': true
+          'number of invites': ctrl.selectedFriends.length
+          'all nearby': ctrl.isAllNearbyFriendsSelected
+
+
+    describe 'when creating an event', ->
+
+      beforeEach ->
+        ctrl.event = {}
+
+        ctrl.trackSendInvites()
+
+      it 'should track with "existing event" as false', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Send Invites',
+          'existing event': false
+          'number of invites': ctrl.selectedFriends.length
+          'all nearby': ctrl.isAllNearbyFriendsSelected
 
 
   describe 'adding friends', ->
