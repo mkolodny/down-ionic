@@ -1,0 +1,29 @@
+<ion-view id="added-me" view-title="Added Me">
+  <ion-content>
+    <div id="spinner-container" ng-if="addedMe.isLoading">
+      <ion-spinner icon="bubbles"></ion-spinner>
+    </div>
+    <ion-refresher pulling-text="Pull to refresh..." on-refresh="addedMe.refresh()"
+                   ng-if="!addedMe.isLoading" spinner="bubbles">
+    </ion-refresher>
+    <div class="placeholder" ng-if="addedMe.users.length === 0">
+      <div>No new friends <span id="poo">&#128169;</span></div>
+    </div>
+    <ion-list class="list-avatar"
+              ng-if="addedMe.users.length > 0">
+      <ion-item collection-repeat="user in addedMe.users"
+                class="item-avatar item-icon-right"
+                ng-class="{last: $last}"
+                can-swipe="true">
+        <img class="item-image" ng-src="{{user.getImageUrl()}}">
+        <h2>{{user.name}}</h2>
+        <p>{{user.username}}</p>
+        <friendship-button user="user"></friendship-button>
+        <ion-option-button class="button-assertive"
+                           ng-click="addedMe.delete(user)">
+          Delete
+        </ion-option-button>
+      </ion-item>
+    <ion-list>
+  </ion-content>
+</ion-view>

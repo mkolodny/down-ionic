@@ -71,6 +71,17 @@ describe 'add friends controller', ->
       expect($state.go).toHaveBeenCalledWith 'myFriends'
 
 
+  describe 'tapping to view the people who added me', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.showAddedMe()
+
+    it 'should go to the added me view', ->
+      expect($state.go).toHaveBeenCalledWith 'addedMe'
+
+
   describe 'going back', ->
 
     beforeEach ->

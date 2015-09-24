@@ -5,6 +5,9 @@ class FriendsCtrl
   showMyFriends: ->
     @$state.go 'myFriends'
 
+  showAddedMe: ->
+    @$state.go 'addedMe'
+
   addByUsername: ->
     @$state.go 'addByUsername'
 

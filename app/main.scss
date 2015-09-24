@@ -46,6 +46,7 @@ $new-event-margin-left: 5px;
 @import "./add-friends/add-friends";
 @import "./friends/friends";
 @import "./guest-list/guest-list";
+@import "./added-me/added-me";
 
 /*
 Global Sass
@@ -88,6 +89,9 @@ body {
   &.item-divider {
     margin-bottom: 0;
   }
+  &.last {
+    border-bottom-width: 1px !important;
+  }
 }
 .collection-repeat-container {
   & > .item {
@@ -121,8 +125,9 @@ body {
   text-align: center;
   color: $brand-color;
   margin: auto;
-  padding-top: 124px;
+  padding-top: 30px;
   max-width: 216px;
+  font-size: 16px;
 }
 
 // Loading overlay

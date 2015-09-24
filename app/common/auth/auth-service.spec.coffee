@@ -988,3 +988,56 @@ describe 'Auth service', ->
 
       it 'should reject the promise', ->
         expect(error).toBe 'MISSING_SOCIAL_ACCOUNT'
+
+
+  describe 'querying the users who added the current user', ->
+    url = null
+
+    beforeEach ->
+      url = "#{User.listUrl}/added-me"
+
+    describe 'successfully', ->
+      response = null
+      responseData = null
+
+      beforeEach ->
+        responseData = [
+          id: 1
+          email: 'aturing@gmail.com'
+          name: 'Alan Turing'
+          username: 'tdog'
+          image_url: 'https://facebook.com/profile-pic/tdog'
+          location:
+            type: 'Point'
+            coordinates: [40.7265834, -73.9821535]
+        ]
+
+        $httpBackend.expectGET url
+          .respond 200, angular.toJson(responseData)
+
+        response = null
+        Auth.getAddedMe()
+          .$promise.then (_response_) ->
+            response = _response_
+        $httpBackend.flush 1
+
+      it 'should GET the users', ->
+        friend = User.deserialize responseData[0]
+        expect(response).toAngularEqual [friend]
+
+
+    describe 'with a random error', ->
+      rejected = null
+
+      beforeEach ->
+        $httpBackend.expectGET url
+          .respond 500, ''
+
+        rejected = false
+        Auth.getAddedMe()
+          .$promise.then null, ->
+            rejected = true
+        $httpBackend.flush 1
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true

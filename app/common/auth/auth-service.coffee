@@ -2,10 +2,10 @@ haversine = require 'haversine'
 require '../../ionic/ionic.js'
 
 class Auth
-  @$inject: ['$http', '$q', '$mixpanel', 'Asteroid', 'apiRoot', 'User', '$cordovaGeolocation',
-             '$state', 'localStorageService']
-  constructor: (@$http, @$q, @$mixpanel, @Asteroid, @apiRoot, @User, @$cordovaGeolocation,
-                @$state, localStorageService) ->
+  @$inject: ['$http', '$q', '$mixpanel', 'Asteroid', 'apiRoot', 'User',
+             '$cordovaGeolocation', '$state', 'localStorageService']
+  constructor: (@$http, @$q, @$mixpanel, @Asteroid, @apiRoot, @User,
+                @$cordovaGeolocation, @$state, localStorageService) ->
     @localStorage = localStorageService
 
   user: {}
@@ -43,7 +43,6 @@ class Auth
       @$mixpanel.people.set {$email: @user.email}
     if @user.username isnt undefined
       @$mixpanel.people.set {$username: @user.username}
-
 
   setUser: (user) ->
     @user = angular.extend @user, user
@@ -203,6 +202,17 @@ class Auth
       .error (data, status) =>
         if status is 400
           deferred.reject 'MISSING_SOCIAL_ACCOUNT'
+        deferred.reject()
+
+    {$promise: deferred.promise}
+
+  getAddedMe: ->
+    deferred = @$q.defer()
+
+    @$http.get "#{@User.listUrl}/added-me"
+      .success (data, status) =>
+        deferred.resolve (@User.deserialize(user) for user in data)
+      .error (data, status) =>
         deferred.reject()
 
     {$promise: deferred.promise}

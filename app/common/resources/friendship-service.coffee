@@ -18,6 +18,15 @@ Friendship = ['$http', '$q', '$resource', 'apiRoot', 'Auth', \
           friendId: data.friend
         response
 
+    ###*
+     * Acknowledge another user who added the current user as a friend.
+     *
+     * This function expects data in the format: {friend: <friendId>}
+    ###
+    ack:
+      method: 'put'
+      url: "#{listUrl}/ack"
+
   resource.deleteWithFriendId = (friendId) ->
     deferred = $q.defer()
 
