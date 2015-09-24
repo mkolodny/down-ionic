@@ -7,6 +7,7 @@ require 'angular-ui-router'
 require 'ng-toast'
 require '../ionic/ionic-angular.js'
 require '../common/asteroid/asteroid-module'
+require '../common/mixpanel/mixpanel-module'
 require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
@@ -18,6 +19,7 @@ describe 'event controller', ->
   $ionicScrollDelegate = null
   $q = null
   $state = null
+  $mixpanel = null
   Asteroid = null
   Auth = null
   ctrl = null
@@ -33,6 +35,8 @@ describe 'event controller', ->
   ngToast = null
   scope = null
   User = null
+
+  beforeEach angular.mock.module('analytics.mixpanel')
 
   beforeEach angular.mock.module('ionic')
 
@@ -56,6 +60,7 @@ describe 'event controller', ->
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     $stateParams = $injector.get '$stateParams'
+    $mixpanel = $injector.get '$mixpanel'
     Asteroid = $injector.get 'Asteroid'
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
@@ -719,10 +724,15 @@ describe 'event controller', ->
       ctrl.message = message
       spyOn Event, 'sendMessage'
 
+      spyOn $mixpanel, 'track'
+
       ctrl.sendMessage()
 
     it 'should send the message', ->
       expect(Event.sendMessage).toHaveBeenCalledWith event, message
+
+    it 'should track Sent message in Mixpanel', ->
+      expect($mixpanel.track).toHaveBeenCalledWith 'Sent a message'
 
     it 'should clear the message', ->
       expect(ctrl.message).toBeNull()
