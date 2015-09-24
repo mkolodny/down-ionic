@@ -897,10 +897,10 @@ describe 'event controller', ->
         expect($ionicLoading.show).toHaveBeenCalled()
 
       it 'should edit the muted property', ->
-        expect(ctrl.invitation.muted).toBe true
+        expect(ctrl.invitation.muted).toBe false
 
       it 'should update the invitation', ->
-        originalInvitation.muted = true
+        originalInvitation.muted = false
         expect(Invitation.update).toHaveBeenCalledWith originalInvitation
 
       describe 'when the update succeeds', ->
@@ -924,7 +924,7 @@ describe 'event controller', ->
           scope.$apply()
 
         it 'should reset the invitation', ->
-          expect(ctrl.invitation.muted).toBe false
+          expect(ctrl.invitation.muted).toBe true
 
         it 'show an error', ->
           error = 'For some reason, that didn\'t work.'
@@ -945,10 +945,10 @@ describe 'event controller', ->
         expect($ionicLoading.show).toHaveBeenCalled()
 
       it 'should edit the muted property', ->
-        expect(ctrl.invitation.muted).toBe false
+        expect(ctrl.invitation.muted).toBe true
 
       it 'should update the invitation', ->
-        originalInvitation.muted = false
+        originalInvitation.muted = true
         expect(Invitation.update).toHaveBeenCalledWith originalInvitation
 
       describe 'when the update succeeds', ->
@@ -972,7 +972,7 @@ describe 'event controller', ->
           scope.$apply()
 
         it 'should reset the invitation', ->
-          expect(ctrl.invitation.muted).toBe true
+          expect(ctrl.invitation.muted).toBe false
 
         it 'should hide the loading overlay', ->
           expect($ionicLoading.hide).toHaveBeenCalled()

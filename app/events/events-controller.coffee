@@ -1,10 +1,10 @@
 class EventsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$scope', '$state', '$timeout', 'Asteroid', 'Invitation', 'ngToast',
-             'Auth']
+             '$ionicPlatform', '$scope', '$state', '$timeout', 'Asteroid',
+             'Invitation', 'ngToast', 'Auth']
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$scope, @$state, @$timeout, @Asteroid, @Invitation, @ngToast,
-                @Auth) ->
+                @$ionicPlatform, @$scope, @$state, @$timeout, @Asteroid,
+                @Invitation, @ngToast, @Auth) ->
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
         scope: @$scope
@@ -31,10 +31,12 @@ class EventsCtrl
       @setPlaceModal.remove()
 
     # Fetch the invitations to show on the view.
-    @isLoading = true
-    @getInvitations()
+    @manualRefresh()
 
     @newEvent = {}
+
+    # Refresh the feed when the user comes back to the app.
+    @$ionicPlatform.on 'resume', @manualRefresh
 
   toggleHasDate: ->
     if not @newEvent.hasDate
@@ -330,6 +332,10 @@ class EventsCtrl
         @isLoading = false
 
   refresh: ->
+    @getInvitations()
+
+  manualRefresh: =>
+    @isLoading = true
     @getInvitations()
 
 module.exports = EventsCtrl

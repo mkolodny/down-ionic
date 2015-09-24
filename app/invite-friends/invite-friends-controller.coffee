@@ -31,11 +31,16 @@ class InviteFriendsCtrl
         # We're inviting more people to an existing event.
         @$ionicLoading.show()
 
-        @Event.getInvitedIds(@event)
+        @Event.getInvitedIds @event
           .then (invitedUserIds) =>
             for id in invitedUserIds
               @invitedUserIds[id] = true
             @buildItems()
+
+            if @items.length is 0
+              # Set a flag marking the fact that there were no items when the view
+              #   loaded.
+              @noItems = true
           , =>
             @error = 'getInvitedIdsError'
           .finally =>
@@ -43,6 +48,11 @@ class InviteFriendsCtrl
       else
         # We're creating a new event.
         @buildItems()
+
+        if @items.length is 0
+          # Set a flag marking the fact that there were no items when the view
+          #   loaded.
+          @noItems = true
 
     @$scope.$on '$ionicView.afterLeave', =>
       if @cleanupViewAfterLeave
@@ -55,97 +65,104 @@ class InviteFriendsCtrl
     @invitedUserIds = {}
 
   buildItems: ->
-    # Build the list of alphabetically sorted nearby friends.
-    @nearbyFriends = (friend for id, friend of @Auth.user.friends \
-      when @Auth.isNearby friend)
-    @nearbyFriends.sort (a, b) ->
-      if a.name.toLowerCase() < b.name.toLowerCase()
-        return -1
-      else
-        return 1
+    if @query
+      # Only show unique users.
+      friendsDict = {}
+      for id, friend of @Auth.user.friends
+        friendsDict[id] = friend
+      for id, friend of @Auth.user.facebookFriends
+        friendsDict[id] = friend
+      for id, contact of @localStorage.get 'contacts'
+        friendsDict[id] = contact
+      friends = (friend for id, friend of friendsDict \
+          when friend.name.toLowerCase().indexOf(@query.toLowerCase()) isnt -1)
+      friends.sort (a, b) ->
+        if a.name.toLowerCase() < b.name.toLowerCase()
+          return -1
+        else
+          return 1
 
-    # Save nearby friends' ids.
-    @nearbyFriendIds = {}
-    for nearbyFriend in @nearbyFriends
-      @nearbyFriendIds[nearbyFriend.id] = true
+      @items = ({isDivider: false, friend: friend} \
+          for friend in friends)
+    else
+      # Build the list of alphabetically sorted nearby friends.
+      @nearbyFriends = (friend for id, friend of @Auth.user.friends \
+          when @Auth.isNearby friend)
+      @nearbyFriends.sort (a, b) ->
+        if a.name.toLowerCase() < b.name.toLowerCase()
+          return -1
+        else
+          return 1
 
-    # Build the list of alphabetically sorted items.
-    friends = (friend for id, friend of @Auth.user.friends)
-    friends.sort (a, b) ->
-      if a.name.toLowerCase() < b.name.toLowerCase()
-        return -1
-      else
-        return 1
-    alphabeticalItems = []
-    currentLetter = null
-    for friend in friends
-      if angular.isDefined @nearbyFriendIds[friend.id]
-        continue
+      # Save nearby friends' ids.
+      @nearbyFriendIds = {}
+      for nearbyFriend in @nearbyFriends
+        @nearbyFriendIds[nearbyFriend.id] = true
 
-      if friend.name[0] != currentLetter
+      # Build the list of alphabetically sorted items.
+      friends = (friend for id, friend of @Auth.user.friends)
+      friends.sort (a, b) ->
+        if a.name.toLowerCase() < b.name.toLowerCase()
+          return -1
+        else
+          return 1
+      alphabeticalItems = []
+      currentLetter = null
+      for friend in friends
+        if friend.name[0] != currentLetter
+          alphabeticalItems.push
+            isDivider: true
+            title: friend.name[0]
+          currentLetter = friend.name[0]
+
         alphabeticalItems.push
+          isDivider: false
+          friend: friend
+
+      # Build the list of facebook friends.
+      facebookFriends = (friend for id, friend of @Auth.user.facebookFriends)
+      facebookFriends.sort (a, b) ->
+        if a.name.toLowerCase() < b.name.toLowerCase()
+          return -1
+        else
+          return 1
+      facebookFriendsItems = ({isDivider: false, friend: friend} \
+          for friend in facebookFriends)
+
+      # Build the list of contacts.
+      contacts = (contact for id, contact of @localStorage.get 'contacts')
+      contacts.sort (a, b) ->
+        if a.name.toLowerCase() < b.name.toLowerCase()
+          return -1
+        else
+          return 1
+      contactsItems = ({isDivider: false, friend: friend} \
+          for friend in contacts)
+
+      # Build the list of items to show in the collection.
+      @items = []
+      if @nearbyFriends.length > 0
+        @items.push
           isDivider: true
-          title: friend.name[0]
-        currentLetter = friend.name[0]
-
-      alphabeticalItems.push
-        isDivider: false
-        friend: friend
-
-    # Build the list of facebook friends.
-    facebookFriends = (friend for id, friend of @Auth.user.facebookFriends \
-        when @Auth.user.friends[id] is undefined)
-    facebookFriends.sort (a, b) ->
-      if a.name.toLowerCase() < b.name.toLowerCase()
-        return -1
-      else
-        return 1
-    facebookFriendsItems = ({isDivider: false, friend: friend} \
-        for friend in facebookFriends)
-
-    # Build the list of contacts.
-    contacts = (contact for id, contact of @localStorage.get 'contacts')
-    contacts.sort (a, b) ->
-      if a.name.toLowerCase() < b.name.toLowerCase()
-        return -1
-      else
-        return 1
-    contactsItems = ({isDivider: false, friend: friend} \
-        for friend in contacts \
-        when @Auth.user.friends[friend.id] is undefined \
-        and @Auth.user.facebookFriends[friend.id] is undefined)
-
-    # Build the list of items to show in the collection.
-    @items = []
-    if @nearbyFriends.length > 0
-      @items.push
-        isDivider: true
-        title: 'Nearby Friends'
-    for friend in @nearbyFriends
-      @items.push
-        isDivider: false
-        friend: friend
-    for item in alphabeticalItems
-      @items.push item
-    if facebookFriendsItems.length > 0
-      @items.push
-        isDivider: true
-        title: 'Facebook Friends'
-    for item in facebookFriendsItems
-      @items.push item
-    if contactsItems.length > 0
-      @items.push
-        isDivider: true
-        title: 'Contacts'
-    for item in contactsItems
-      @items.push item
-
-    # Give each item an id so that we can use `track by` to improve performance.
-    for item in @items
-      if item.isDivider
-        item.id = item.title
-      else
-        item.id = item.friend.id
+          title: 'Nearby Friends'
+      for friend in @nearbyFriends
+        @items.push
+          isDivider: false
+          friend: friend
+      for item in alphabeticalItems
+        @items.push item
+      if facebookFriendsItems.length > 0
+        @items.push
+          isDivider: true
+          title: 'Facebook Friends'
+      for item in facebookFriendsItems
+        @items.push item
+      if contactsItems.length > 0
+        @items.push
+          isDivider: true
+          title: 'Contacts'
+      for item in contactsItems
+        @items.push item
 
   toggleSelected: (friend) ->
     if @getWasSelected friend
@@ -243,14 +260,5 @@ class InviteFriendsCtrl
 
   getWasInvited: (friend) ->
     @invitedUserIds[friend.id] is true
-
-  search: (item) =>
-    if not @query
-      return true
-
-    if item.isDivider
-      return false
-
-    item.friend.name.toLowerCase().indexOf(@query.toLowerCase()) isnt -1
 
 module.exports = InviteFriendsCtrl

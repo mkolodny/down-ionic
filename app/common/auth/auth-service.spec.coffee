@@ -189,8 +189,22 @@ describe 'Auth service', ->
           email: email
         Auth.mixpanelIdentify()
 
-      it 'should sent the email to mixpanel', ->
+      it 'should send the email to mixpanel', ->
         expect($mixpanel.people.set).toHaveBeenCalledWith {$email: email}
+
+
+    describe 'when a user has a username', ->
+      username = null
+
+      beforeEach ->
+        username = 'a'
+        Auth.user =
+          id: 1
+          username: username
+        Auth.mixpanelIdentify()
+
+      it 'should send the username to mixpanel', ->
+        expect($mixpanel.people.set).toHaveBeenCalledWith {$username: username}
 
 
   describe 'set user', ->
@@ -861,6 +875,19 @@ describe 'Auth service', ->
 
       it 'should return false', ->
         expect(Auth.isNearby user).toBe false
+
+
+    describe 'when the authenticated user doesn\'t have a location', ->
+
+      beforeEach ->
+        user.location =
+          lat: 40.7265834
+          long: -73.9821535
+        Auth.user.location = undefined
+
+      it 'should return false', ->
+        expect(Auth.isNearby user).toBe false
+
 
     describe 'when the user is at most 5 mi away', ->
 

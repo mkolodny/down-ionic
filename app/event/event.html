@@ -1,7 +1,7 @@
 <ion-view id="event">
   <ion-nav-title id="event-title" ng-click="event.toggleIsHeaderExpanded()"
                  ontouchstart>
-    {{event.event.titleWithLongVariableName}}
+    <span>{{event.event.titleWithLongVariableName}}</span>
     <i class="fa"
        ng-class="{'fa-caret-down': !event.isHeaderExpanded, 'fa-caret-up': event.isHeaderExpanded}"
        ></i>
@@ -42,7 +42,7 @@
               >Can't</button>
     </div>
   </div>
-  <ion-content>
+  <ion-content ng-click="event.toggleIsHeaderExpanded()" ontouchstart>
     <ion-list>
       <!-- We might need to use `track by item.id` to keep this quick. -->
       <ion-item ng-repeat="message in event.messages">

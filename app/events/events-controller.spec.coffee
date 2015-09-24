@@ -18,6 +18,7 @@ describe 'events controller', ->
   $httpBackend = null
   $ionicHistory = null
   $ionicModal = null
+  $ionicPlatform = null
   $q = null
   $state = null
   $timeout = null
@@ -58,6 +59,7 @@ describe 'events controller', ->
     $httpBackend = $injector.get '$httpBackend'
     $ionicHistory = $injector.get '$ionicHistory'
     $ionicModal = $injector.get '$ionicModal'
+    $ionicPlatform = $injector.get '$ionicPlatform'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
@@ -122,6 +124,7 @@ describe 'events controller', ->
 
     deferredTemplate = $q.defer()
     spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
+    spyOn $ionicPlatform, 'on'
 
     ctrl = $controller EventsCtrl,
       $scope: scope
@@ -139,6 +142,9 @@ describe 'events controller', ->
 
   it 'should set a loading flag', ->
     expect(ctrl.isLoading).toBe true
+
+  it 'should listen for when the user comes back to the app', ->
+    expect($ionicPlatform.on).toHaveBeenCalledWith 'resume', ctrl.manualRefresh
 
   describe 'when the events request returns', ->
     refreshComplete = null
@@ -793,3 +799,18 @@ describe 'events controller', ->
 
     it 'should save the new items on the controller', ->
       expect(ctrl.items).toBe builtItems
+
+
+  describe 'manually refreshing', ->
+
+    beforeEach ->
+      ctrl.isLoading = false
+      spyOn ctrl, 'getInvitations'
+
+      ctrl.manualRefresh()
+
+    it 'should set a loading flag', ->
+      expect(ctrl.isLoading).toBe true
+
+    it 'should get the invitations', ->
+      expect(ctrl.getInvitations).toHaveBeenCalled()

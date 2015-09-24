@@ -58,8 +58,7 @@ class AddFromAddressBookCtrl
     else if (words.length is 1 or words[1] is '') # Their name is only one letter.
       initials = firstName[0]
     else # Their name has multiple words.
-      words.reverse()
-      lastName = words[0]
+      lastName = words[1]
       initials = "#{firstName[0]}#{lastName[0]}"
     initials.toUpperCase()
 

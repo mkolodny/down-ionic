@@ -10,7 +10,7 @@
       <div>Oops.. Looks like an error occurred. Please try again later.</div>
     </div>
     <div class="placeholder"
-         ng-if="inviteFriends.items.length === 0 &&
+         ng-if="inviteFriends.noItems &&
                 inviteFriends.error === false">
       <div>You don't have any friends on Down, yet...</div>
       <div>
@@ -21,11 +21,13 @@
       </div>
     </div>
     <div class="search-bar"
-         ng-if="inviteFriends.items.length > 0 &&
+         ng-if="!inviteFriends.noItems &&
                 inviteFriends.error === false">
       <i class="fa fa-search"></i>
-      <input ng-model="inviteFriends.query" placeholder="Search">
-      <i class="fa fa-times" ng-click="inviteFriends.query = null"
+      <input ng-model="inviteFriends.query" placeholder="Search"
+             ng-change="inviteFriends.buildItems()">
+      <i class="fa fa-times"
+         ng-click="inviteFriends.query = null; inviteFriends.buildItems()"
          ng-if="inviteFriends.query"></i>
     </div>
     <!--
@@ -34,18 +36,19 @@
       No results.
     </div>
     -->
-    <ion-list ng-if="inviteFriends.items.length > 0 &&
+    <ion-list ng-if="!inviteFriends.noItems &&
                      inviteFriends.error === false">
      <ion-item class="item-icon-right"
                ng-click="inviteFriends.toggleAllNearbyFriends()"
                ng-class="{selected: inviteFriends.isAllNearbyFriendsSelected}"
-               ng-if="!inviteFriends.query">
+               ng-if="!inviteFriends.query &&
+                     inviteFriends.items[0].title === 'Nearby Friends'">
        <h2>All Nearby Friends</h2>
        <i class="icon fa" id="all-friends-icon"
           ng-class="{'fa-square-o': !inviteFriends.isAllNearbyFriendsSelected, 'fa-check-square': inviteFriends.isAllNearbyFriendsSelected}"
           ></i>
      </ion-item>
-     <ion-item collection-repeat="item in inviteFriends.items | filter:inviteFriends.search track by item.id"
+     <ion-item collection-repeat="item in inviteFriends.items"
                item-width="100%"
                ng-click="inviteFriends.toggleSelected(item.friend)"
                ng-class="{
