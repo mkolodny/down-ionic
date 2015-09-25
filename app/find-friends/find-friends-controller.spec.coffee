@@ -269,7 +269,7 @@ describe 'find friends controller', ->
     describe 'when they have multiple words in their name', ->
 
       it 'should return the first letter of their first and last name', ->
-        expect(ctrl.getInitials 'Alan Turing').toBe 'AT'
+        expect(ctrl.getInitials 'Alan Danger Turing').toBe 'AT'
 
 
     describe 'when they have one word in their name', ->
@@ -302,6 +302,12 @@ describe 'find friends controller', ->
 
         it 'should return the first letter of the first and second words', ->
           expect(ctrl.getInitials 'Jazzy Jeff ').toBe 'JJ'
+
+
+    describe 'when their name starts with whitespace', ->
+
+      it 'should ignore the whitespace', ->
+        expect(ctrl.getInitials ' Jazzy Jeff').toBe 'JJ'
 
 
   describe 'searching', ->
