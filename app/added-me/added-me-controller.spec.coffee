@@ -29,7 +29,7 @@ describe 'AddedMe controller', ->
     beforeEach ->
       spyOn ctrl, 'refresh'
 
-      scope.$broadcast '$ionicView.enter'
+      scope.$emit '$ionicView.enter'
       scope.$apply()
 
     it 'should refresh the view', ->
