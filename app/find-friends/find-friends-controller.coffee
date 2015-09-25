@@ -85,10 +85,8 @@ class FindFriendsCtrl
 
     items
 
-  whitespaceRe: /^\s+|\s+$/g
-
   getInitials: (name) ->
-    name = name.replace @whitespaceRe, ''
+    name = name.trim()
     words = name.split ' '
     firstName = words[0]
     if words.length is 1 and firstName.length > 1
