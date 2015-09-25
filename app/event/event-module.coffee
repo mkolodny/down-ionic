@@ -4,11 +4,13 @@ require 'angular-ui-router'
 require 'ng-toast'
 require '../common/asteroid/asteroid-module'
 require '../common/auth/auth-module'
+require '../common/mixpanel/mixpanel-module'
 require '../common/resources/resources-module'
 require '../common/view-place/view-place-module'
 EventCtrl = require './event-controller'
 
 angular.module 'down.event', [
+    'analytics.mixpanel'
     'ionic'
     'ui.router'
     'monospaced.elastic'

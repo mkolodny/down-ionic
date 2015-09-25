@@ -1,9 +1,11 @@
 require 'angular'
 require 'angular-mocks'
 require './resources-module'
+require '../mixpanel/mixpanel-module'
 
 describe 'invitation service', ->
   $httpBackend = null
+  $mixpanel = null
   $q = null
   $rootScope = null
   Asteroid = null
@@ -13,6 +15,8 @@ describe 'invitation service', ->
   Invitation = null
   Messages = null
   User = null
+
+  beforeEach angular.mock.module('analytics.mixpanel')
 
   beforeEach angular.mock.module('down.resources')
 
@@ -40,6 +44,7 @@ describe 'invitation service', ->
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
+    $mixpanel = $injector.get '$mixpanel'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     apiRoot = $injector.get 'apiRoot'
@@ -311,6 +316,8 @@ describe 'invitation service', ->
       messagesDeferred = $q.defer()
       Messages.insert.and.returnValue {remote: messagesDeferred.promise}
 
+      spyOn $mixpanel, 'track'
+
       # Mock the current date.
       jasmine.clock().install()
       date = new Date 1438195002656
@@ -355,6 +362,10 @@ describe 'invitation service', ->
         it 'should resolve the promise', ->
           expect(resolved).toBe true
 
+        it 'should track the response in mixpanel', ->
+          expect($mixpanel.track).toHaveBeenCalledWith 'Update Response',
+            status: 'accepted'
+
         it 'should save the message on the meteor server', ->
           message =
             creator:
@@ -396,6 +407,10 @@ describe 'invitation service', ->
 
         it 'should get the messages collection', ->
           expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+
+        it 'should track the response in mixpanel', ->
+          expect($mixpanel.track).toHaveBeenCalledWith 'Update Response',
+            status: 'maybe'
 
         it 'should save the message on the meteor server', ->
           message =
@@ -444,6 +459,10 @@ describe 'invitation service', ->
 
         it 'should get the messages collection', ->
           expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+
+        it 'should track the response in mixpanel', ->
+          expect($mixpanel.track).toHaveBeenCalledWith 'Update Response',
+            status: 'declined'
 
         it 'should save the message on the meteor server', ->
           message =

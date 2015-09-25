@@ -1,9 +1,9 @@
 class EventCtrl
   @$inject: ['$ionicActionSheet', '$ionicLoading', '$ionicModal', '$ionicPopup',
-             '$ionicScrollDelegate', '$scope', '$state', '$stateParams', 'Asteroid',
+             '$ionicScrollDelegate', '$mixpanel', '$scope', '$state', '$stateParams', 'Asteroid',
              'Auth', 'Event',  'Invitation', 'LinkInvitation', 'ngToast', 'User']
   constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicModal, @$ionicPopup,
-                @$ionicScrollDelegate, @$scope, @$state, @$stateParams, @Asteroid,
+                @$ionicScrollDelegate, @$mixpanel, @$scope, @$state, @$stateParams, @Asteroid,
                 @Auth, @Event, @Invitation, @LinkInvitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
@@ -181,6 +181,7 @@ class EventCtrl
 
   sendMessage: ->
     @Event.sendMessage @event, @message
+    @$mixpanel.track 'Send Message'
     @message = null
 
   showMoreOptions: ->
@@ -218,6 +219,7 @@ class EventCtrl
       fromUserId: @Auth.user.id
     @LinkInvitation.save linkInvitation
       .$promise.then (linkInvitation) =>
+        @$mixpanel.track 'Get Link Invitation'
         @$ionicPopup.alert
           title: 'Copy Group Link'
           template: """

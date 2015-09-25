@@ -1,6 +1,6 @@
-Invitation = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event', \
+Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event', \
               'User', \
-              ($http, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
+              ($http, $mixpanel, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
   listUrl = "#{apiRoot}/invitations"
   detailUrl =
   serializeInvitation = (invitation) ->
@@ -131,12 +131,16 @@ Invitation = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event'
       if _invitation.response is @accepted
         text = "#{Auth.user.name} is down."
         type = @acceptAction
+        status = 'accepted'
       else if _invitation.response is @maybe
         text = "#{Auth.user.name} might be down."
         type = @maybeAction
+        status = 'maybe'
       else if _invitation.response is @declined
         text = "#{Auth.user.name} can't make it."
         type = @declineAction
+        status = 'declined'
+      $mixpanel.track 'Update Response', {status: status}
       Messages = Asteroid.getCollection 'messages'
       Messages.insert
         creator:

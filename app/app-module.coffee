@@ -1,7 +1,6 @@
 require 'angular'
 require 'angular-animate' # for ngToast
 require 'angular-local-storage'
-require 'angular-mixpanel'
 require 'angular-sanitize' # for ngToast
 require 'angular-ui-router'
 require 'ng-toast'
@@ -24,7 +23,7 @@ require './invite-friends/invite-friends-module'
 require './add-by-username/add-by-username-module'
 require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
-require './common/angular-mixpanel/angular-mixpanel-module'
+require './common/mixpanel/mixpanel-module'
 require './common/auth/auth-module'
 require './common/asteroid/asteroid-module'
 require './common/env/env-module'
@@ -148,7 +147,7 @@ angular.module 'down', [
 
       # Track App Opens
       $ionicPlatform.on 'resume', ->
-        $mixpanel.track 'Opened App'
+        $mixpanel.track 'Open App'
 
       # Update the user's location while they use the app.
       if localStorageService.get('hasRequestedLocationServices') \

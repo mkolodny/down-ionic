@@ -1,8 +1,8 @@
 class InviteFriendsCtrl
-  @$inject: ['$ionicHistory', '$ionicLoading', '$scope', '$state', 'Auth',
-             'Event', 'Invitation', 'localStorageService']
-  constructor: (@$ionicHistory, @$ionicLoading, @$scope, @$state, @Auth, @Event,
-                @Invitation, localStorageService) ->
+  @$inject: ['$ionicHistory', '$ionicLoading', '$mixpanel', '$scope',
+             '$state', 'Auth', 'Event', 'Invitation', 'localStorageService']
+  constructor: (@$ionicHistory, @$ionicLoading, @$mixpanel, @$scope, @$state,
+                @Auth, @Event, @Invitation, localStorageService) ->
     @localStorage = localStorageService
 
     @selectedFriends = []
@@ -220,6 +220,7 @@ class InviteFriendsCtrl
 
       @Invitation.bulkCreate eventId, invitations
         .then =>
+          @trackSendInvites()
           @$ionicHistory.clearCache()
         .then =>
           @cleanupView()
@@ -242,6 +243,7 @@ class InviteFriendsCtrl
       @event.invitations = invitations
       @Event.save @event
         .$promise.then =>
+          @trackSendInvites()
           @$ionicHistory.clearCache()
         .then =>
           @cleanupView()
@@ -250,6 +252,12 @@ class InviteFriendsCtrl
           @error = 'inviteError'
         .finally =>
           @$ionicLoading.hide()
+
+  trackSendInvites: =>
+    @$mixpanel.track 'Send Invites',
+      'existing event': 'id' of @event
+      'number of invites': @selectedFriends.length
+      'all nearby': @isAllNearbyFriendsSelected
 
   addFriends: ->
     @cleanupViewAfterLeave = false
