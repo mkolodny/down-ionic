@@ -78,9 +78,10 @@
               <a href view-place place="item.invitation.event.place"
                  ><i class="fa fa-map-marker"></i>{{item.invitation.event.place.name}}</a>
             </div>
-            <div class="event-detail" ng-if="item.invitation.event.comment">
-              <i class="fa fa-comment-o"></i>
-              <span>{{item.invitation.event.comment}}</span>
+            <div class="event-detail"
+                 id="event-comment"
+                 ng-if="item.invitation.event.comment">
+              <i class="fa fa-comment-o"></i>{{item.invitation.event.comment}}
             </div>
             <div class="respond-buttons">
               <button class="respond"

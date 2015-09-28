@@ -139,6 +139,9 @@
       font-weight: 500;
     }
   }
+  #event-comment {
+    white-space: normal;
+  }
   .ng-leave-active {
     display: none; // TODO: Figure out why the old events stick around.
   }

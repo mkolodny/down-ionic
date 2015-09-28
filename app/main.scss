@@ -296,7 +296,7 @@ body {
   }
 }
 
-// Events
+// Event
 .respond {
   color: $brand-color;
   border: 1px solid $brand-color;
@@ -320,6 +320,17 @@ body {
   #expanded-header {
     // Offset for ios-status-bar
     top: $bar-height + $ios-statusbar-height !important;
+  }
+}
+
+// Events
+.platform-ios {
+  #events {
+    #event-comment {
+      & > i {
+        margin-right: 28px;
+      }
+    }
   }
 }
 
