@@ -66,7 +66,7 @@ describe 'Contacts service', ->
       options =
         filter: ''
         multiple: true
-        fields: [
+        desiredFields: [
           'id'
           'name'
           'phoneNumbers'

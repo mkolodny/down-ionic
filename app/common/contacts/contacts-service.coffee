@@ -13,7 +13,7 @@ class Contacts
     options =
       filter: ''
       multiple: true
-      fields: [
+      desiredFields: [
         'id'
         'name'
         'phoneNumbers'
