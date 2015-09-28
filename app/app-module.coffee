@@ -100,7 +100,8 @@ angular.module 'down', [
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel,
         $rootScope, $state, $window, Auth, Asteroid, branchKey,
-        localStorageService, ionicDeployChannel, PushNotifications, User) ->
+        localStorageService, ionicDeployChannel, PushNotifications,
+        skipIonicDeploy, User) ->
     # Resume session from localStorage
     Auth.resumeSession()
 
@@ -157,8 +158,11 @@ angular.module 'down', [
       Auth.redirectForAuthState()
 
     $ionicPlatform.ready ->
-      # bootstrap()
-      # return
+      # Skip Downloading Updates During Development
+      if skipIonicDeploy
+        console.log "Skipping Ionic Deploy"
+        bootstrap()
+        return
 
       # Check For Updates
       $ionicDeploy.setChannel ionicDeployChannel
