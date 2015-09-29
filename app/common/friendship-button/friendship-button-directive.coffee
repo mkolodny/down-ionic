@@ -43,7 +43,7 @@ friendshipButtonDirective = ['$state', '$mixpanel', 'Auth', 'Friendship', ($stat
             Auth.setUser Auth.user
             $mixpanel.track 'Add Friend',
               'from screen': $state.current.name,
-              'via sms': user.username is undefined
+              'via sms': user.username is null
           .finally ->
             $scope.isLoading = false
 
