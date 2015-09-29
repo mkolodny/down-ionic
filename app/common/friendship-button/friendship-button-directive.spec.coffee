@@ -200,7 +200,7 @@ describe 'friendship button directive', ->
         describe 'when the user does not have a username', ->
 
           beforeEach ->
-            delete scope.friend.username
+            scope.friend.username = null
             deferred.resolve()
             scope.$apply()
 
