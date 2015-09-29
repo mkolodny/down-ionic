@@ -17,6 +17,7 @@ minifyCss = require 'gulp-minify-css'
 ngAnnotate = require 'gulp-ng-annotate'
 preprocess = require 'gulp-preprocess'
 rename = require 'gulp-rename'
+runSequence = require 'run-sequence'
 sass = require 'gulp-sass'
 sh = require 'shelljs'
 streamify = require 'gulp-streamify'
@@ -24,6 +25,7 @@ source = require 'vinyl-source-stream'
 uglify = require 'gulp-uglify'
 watchify = require 'watchify'
 protractor = require('gulp-protractor').protractor
+prompt = require 'prompt'
 
 buildDir = './www'
 appDir = './app'
@@ -58,12 +60,10 @@ scripts = (watch) ->
     bundler.on 'update', bundle
 
   bundle()
-  return
 
 
 gulp.task 'scripts', ->
   scripts false
-  return
 
 
 gulp.task 'styles', ->
@@ -75,13 +75,11 @@ gulp.task 'styles', ->
     #.pipe minifyCss(keepSpecialComments: 0)
     #.pipe rename(extname: '.min.css')
     #.pipe gulp.dest("#{buildDir}/app")
-  return
 
 
 gulp.task 'data', ->
   gulp.src "#{dataDir}/**/*", {base: "#{dataDir}"}
     .pipe gulp.dest(buildDir)
-  return
 
 
 gulp.task 'templates', ->
@@ -97,13 +95,11 @@ gulp.task 'templates', ->
 
   gulp.src "#{appDir}/index.html"
     .pipe gulp.dest(buildDir)
-  return
 
 
 gulp.task 'vendor', ->
   gulp.src "#{vendorDir}/**/*", {base: "#{appDir}"}
     .pipe gulp.dest("#{buildDir}/app")
-  return
 
 
 gulp.task 'minify-js', ->
@@ -111,21 +107,18 @@ gulp.task 'minify-js', ->
     .pipe ngAnnotate()
     .pipe uglify()
     .pipe gulp.dest("#{buildDir}/app")
-  return
 
 
 gulp.task 'minify-css', ->
   gulp.src "#{buildDir}/app/main.css"
     .pipe minifyCss()
     .pipe gulp.dest("#{buildDir}/app")
-  return
 
 
 gulp.task 'minify-images', ->
   gulp.src "#{buildDir}/images/**/*"
     .pipe imagemin()
     .pipe gulp.dest("#{buildDir}/images")
-  return
 
 
 gulp.task 'minify', [
@@ -156,13 +149,11 @@ gulp.task 'unit', ->
 
     # run the unit tests using karma
     karma.start karmaConf
-  return
 
 
 gulp.task 'webdriver-update', (done) ->
   childProcess.spawn 'webdriver-manager', ['update'], stdio: 'inherit'
     .once 'close', done
-  return
 
 
 gulp.task 'e2e', ['webdriver-update'], ->
@@ -170,12 +161,10 @@ gulp.task 'e2e', ['webdriver-update'], ->
     .pipe protractor(configFile: './config/protractor.conf.coffee')
     .on 'error', (error) ->
       throw error
-  return
 
 
 gulp.task 'clean', ->
   del 'www'
-  return
 
 
 gulp.task 'build', [
@@ -202,7 +191,46 @@ gulp.task 'watch', [
   livereload.listen()
   gulp.watch "#{buildDir}/**/*"
     .on 'change', livereload.changed
-  return
 
 
 gulp.task 'default', ['watch']
+
+gulp.task 'ionic-upload', (done) ->
+  # Prompt for upload note
+  prompt.message = "Enter an upload note!".green;
+
+  prompt.start()
+  prompt.get [{name: 'note', required: true}], (err, result) ->
+    if err then return console.log "Error with prompt"
+
+    # Set Ionic deploy tag
+    if argv.e is 'prod'
+      deployTag = 'staging'
+    else if argv.e is 'staging'
+      deployTag = 'dev'
+    else
+      deployTag = 'dev'
+
+    cmdArgs = ['upload', '--note', "'#{result.note}'", "--deploy=#{deployTag}"]
+    # childProcess.spawn 'ionic', cmdArgs, stdio: 'inherit'
+    #   .once 'close', done
+
+gulp.task 'deploy-staging', (done) ->
+  argv.e = 'staging' # set env to staging
+
+  runSequence(
+    'build',
+    'minify',
+    'ionic-upload',
+    done
+  )
+
+gulp.task 'deploy-prod', (done) ->
+  argv.e = 'prod' # set env to prod
+
+  runSequence(
+    'build',
+    'minify',
+    'ionic-upload',
+    done
+  )
