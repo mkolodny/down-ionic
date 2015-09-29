@@ -1,5 +1,6 @@
 require 'coffee-script/register'
 autoprefixer = require 'gulp-autoprefixer'
+argv = require('yargs').argv
 browserify = require 'browserify'
 bower = require 'bower'
 childProcess = require 'child_process'
@@ -14,9 +15,11 @@ karma = require('karma').server
 karmaConf = require './config/karma.conf'
 minifyCss = require 'gulp-minify-css'
 ngAnnotate = require 'gulp-ng-annotate'
+preprocess = require 'gulp-preprocess'
 rename = require 'gulp-rename'
 sass = require 'gulp-sass'
 sh = require 'shelljs'
+streamify = require 'gulp-streamify'
 source = require 'vinyl-source-stream'
 uglify = require 'gulp-uglify'
 watchify = require 'watchify'
@@ -37,11 +40,15 @@ scripts = (watch) ->
   if watch
     bundler = watchify bundler
 
+  # Check enviroment
+  env = argv.e or 'staging'
+
   bundle = ->
     bundleStream = bundler.bundle()
       # use vinyl-source-stream to make the stream gulp compatible
       # specifiy the desired output filename here
       .pipe source('bundle.js')
+      .pipe streamify(preprocess({context: {BUILD_ENV: env}}))
       # wrap plugins to support streams
       # i.e. .pipe streamify(plugin())
       .pipe gulp.dest("#{buildDir}/app")
