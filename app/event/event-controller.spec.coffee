@@ -11,8 +11,9 @@ require '../common/mixpanel/mixpanel-module'
 require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
-describe 'event controller', ->
+fdescribe 'event controller', ->
   $ionicActionSheet = null
+  $ionicHistory = null
   $ionicLoading = null
   $ionicModal = null
   $ionicPopup = null
@@ -53,6 +54,7 @@ describe 'event controller', ->
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $ionicActionSheet = $injector.get '$ionicActionSheet'
+    $ionicHistory = $injector.get '$ionicHistory'
     $ionicLoading = $injector.get '$ionicLoading'
     $ionicModal = $injector.get '$ionicModal'
     $ionicPopup = $injector.get '$ionicPopup'
@@ -590,7 +592,7 @@ describe 'event controller', ->
 
   describe 'declining the invitation', ->
     response = null
-    deferred = null
+    deferredUpdateResponse = null
 
     beforeEach ->
       # Mock the current invitation response.
@@ -599,10 +601,9 @@ describe 'event controller', ->
 
       spyOn $ionicLoading, 'show'
       spyOn $ionicLoading, 'hide'
-      deferred = $q.defer()
+      deferredUpdateResponse = $q.defer()
       spyOn(Invitation, 'updateResponse').and.returnValue
-        $promise: deferred.promise
-      spyOn $state, 'go'
+        $promise: deferredUpdateResponse.promise
 
       ctrl.declineInvitation()
 
@@ -610,20 +611,34 @@ describe 'event controller', ->
       expect($ionicLoading.show).toHaveBeenCalled()
 
     describe 'successfully', ->
+      deferredCacheClear = null
 
       beforeEach ->
-        deferred.resolve()
+        spyOn $state, 'go'
+        deferredCacheClear = $q.defer()
+        spyOn $ionicHistory, 'clearCache'
+
+        deferredUpdateResponse.resolve()
         scope.$apply()
 
-      it 'should update the invitation', ->
-        expect(Invitation.updateResponse).toHaveBeenCalledWith invitation, \
-            Invitation.declined
+      it 'should clear the cache', ->
+        expect($ionicHistory.clearCache).toHaveBeenCalled()
 
-      it 'should hide the loading overlay', ->
-        expect($ionicLoading.hide).toHaveBeenCalled()
+      describe 'when the cache is cleared', ->
 
-      it 'should go to the events view', ->
-        expect($state.go).toHaveBeenCalledWith 'events'
+        beforeEach ->
+          deferredCacheClear.resolve()
+          scope.$apply()
+
+        it 'should update the invitation', ->
+          expect(Invitation.updateResponse).toHaveBeenCalledWith invitation, \
+              Invitation.declined
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
+        it 'should go to the events view', ->
+          expect($state.go).toHaveBeenCalledWith 'events'
 
 
     describe 'unsuccessfully', ->
@@ -631,7 +646,7 @@ describe 'event controller', ->
       beforeEach ->
         spyOn ngToast, 'create'
 
-        deferred.reject()
+        deferredUpdateResponse.reject()
         scope.$apply()
 
       it 'show an error', ->

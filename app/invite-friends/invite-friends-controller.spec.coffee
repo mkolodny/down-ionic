@@ -665,7 +665,6 @@ describe 'invite friends controller', ->
         eventId = ctrl.event.id
         expect(Invitation.bulkCreate).toHaveBeenCalledWith eventId, invitations
 
-
       describe 'successfully', ->
 
         beforeEach ->
