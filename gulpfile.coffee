@@ -193,15 +193,13 @@ gulp.task 'watch', [
     .on 'change', livereload.changed
 
 
-gulp.task 'default', ['watch']
-
 gulp.task 'ionic-upload', (done) ->
   # Prompt for upload note
-  prompt.message = "Enter an upload note!".green;
+  prompt.message = 'Enter an upload note!'.green
 
   prompt.start()
   prompt.get [{name: 'note', required: true}], (err, result) ->
-    if err then return console.log "Error with prompt"
+    if err then return console.log 'Error with prompt'
 
     # Set Ionic deploy tag
     if argv.e is 'prod'
@@ -211,9 +209,10 @@ gulp.task 'ionic-upload', (done) ->
     else
       deployTag = 'dev'
 
-    cmdArgs = ['upload', '--note', "'#{result.note}'", "--deploy=#{deployTag}"]
-    # childProcess.spawn 'ionic', cmdArgs, stdio: 'inherit'
-    #   .once 'close', done
+    cmdArgs = ['upload', '--note', result.note, "--deploy=#{deployTag}"]
+    childProcess.spawn 'ionic', cmdArgs, stdio: 'inherit'
+      .once 'close', done
+
 
 gulp.task 'deploy-staging', (done) ->
   argv.e = 'staging' # set env to staging
@@ -225,6 +224,7 @@ gulp.task 'deploy-staging', (done) ->
     done
   )
 
+
 gulp.task 'deploy-prod', (done) ->
   argv.e = 'prod' # set env to prod
 
@@ -234,3 +234,6 @@ gulp.task 'deploy-prod', (done) ->
     'ionic-upload',
     done
   )
+
+
+gulp.task 'default', ['watch']
