@@ -234,3 +234,8 @@ gulp.task 'deploy-prod', (done) ->
     'ionic-upload',
     done
   )
+
+# TODO:
+# gulp run android
+# gulp build android
+# gulp build ios
