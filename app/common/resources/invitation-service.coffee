@@ -11,7 +11,6 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
       event: 'eventId'
       from_user: 'fromUserId'
       response: 'response'
-      previously_accepted: 'previouslyAccepted'
       muted: 'muted'
     for serializedField, deserializedField of optionalFields
       if invitation[deserializedField]?
@@ -21,7 +20,6 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
     invitation =
       id: response.id
       response: response.response
-      previouslyAccepted: response.previously_accepted
       muted: response.muted
       createdAt: new Date response.created_at
       updatedAt: new Date response.updated_at

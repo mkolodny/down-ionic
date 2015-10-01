@@ -41,8 +41,6 @@ angular.module 'down.event', [
               long: -73.9919324
             comment: 'It\'s too nice outside.'
           response: 1
-          previouslyAccepted: false
-          toUserMessaged: false
           muted: false
           lastViewed: new Date()
           createdAt: new Date()

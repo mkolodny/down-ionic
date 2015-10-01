@@ -100,7 +100,6 @@ describe 'events controller', ->
           long: -73.9821535
       toUser: 4
       response: Invitation.noResponse
-      previouslyAccepted: false
       open: false
       muted: false
       lastViewed: later

@@ -99,7 +99,6 @@ fdescribe 'event controller', ->
           lat: 40.7265834
           long: -73.9821535
       response: Invitation.Accepted
-      previouslyAccepted: false
       muted: false
       createdAt: new Date()
       updatedAt: new Date()

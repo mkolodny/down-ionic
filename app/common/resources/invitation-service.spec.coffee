@@ -103,7 +103,6 @@ describe 'invitation service', ->
           eventId: 2
           fromUserId: 4
           response: Invitation.accepted
-          previouslyAccepted: false
           muted: false
 
       it 'should return the serialized invitation', ->
@@ -113,7 +112,6 @@ describe 'invitation service', ->
           to_user: invitation.toUserId
           from_user: invitation.fromUserId
           response: invitation.response
-          previously_accepted: invitation.previouslyAccepted
           muted: invitation.muted
         expect(Invitation.serialize invitation).toEqual expectedInvitation
 
@@ -129,8 +127,6 @@ describe 'invitation service', ->
       response =
         id: 1
         response: Invitation.accepted
-        previously_accepted: false
-        to_user_messaged: false
         muted: false
         created_at: new Date().toISOString()
         updated_at: new Date().toISOString()
@@ -176,7 +172,6 @@ describe 'invitation service', ->
         toUserId: toUser.id
         fromUserId: fromUser.id
         response: response.response
-        previouslyAccepted: response.previously_accepted
         muted: response.muted
         createdAt: new Date response.created_at
         updatedAt: new Date response.updated_at
@@ -235,8 +230,6 @@ describe 'invitation service', ->
           event: eventId
           from_user: 3
           response: Invitation.noResponse
-          previously_accepted: false
-          to_user_messaged: false
           muted: false
           created_at: new Date()
           updated_at: new Date()
@@ -269,7 +262,6 @@ describe 'invitation service', ->
         toUserId: 2
         fromUserId: 3
         response: Invitation.noResponse
-        previouslyAccepted: false
         muted: false
       putData = Invitation.serialize invitation
       responseData = angular.extend {}, putData,
@@ -307,7 +299,6 @@ describe 'invitation service', ->
         toUserId: 2
         fromUserId: 3
         response: Invitation.noResponse
-        previouslyAccepted: false
         muted: false
 
       deferred = $q.defer()
@@ -546,8 +537,6 @@ describe 'invitation service', ->
             coordinates: [40.7265834, -73.9821535]
         from_user: 4
         response: Invitation.accepted
-        previously_accepted: false
-        to_user_messaged: false
         muted: false
         created_at: new Date()
         updated_at: new Date()
@@ -603,8 +592,6 @@ describe 'invitation service', ->
               type: 'Point'
               coordinates: [40.7265836, -73.9821539]
           response: Invitation.accepted
-          previously_accepted: false
-          to_user_messaged: false
           muted: false
           created_at: new Date().toISOString()
           updated_at: new Date().toISOString()
