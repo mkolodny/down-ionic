@@ -6,9 +6,9 @@ require 'angular-sanitize'
 require 'angular-ui-router'
 require 'ng-toast'
 require '../ionic/ionic-angular.js'
-require '../common/asteroid/asteroid-module'
 require '../common/mixpanel/mixpanel-module'
 require '../common/resources/resources-module'
+require '../common/meteor/meteor-mocks'
 EventCtrl = require './event-controller'
 
 describe 'event controller', ->
@@ -20,8 +20,8 @@ describe 'event controller', ->
   $ionicScrollDelegate = null
   $q = null
   $state = null
+  $meteor = null
   $mixpanel = null
-  Asteroid = null
   Auth = null
   ctrl = null
   currentDate = null
@@ -37,13 +37,13 @@ describe 'event controller', ->
   scope = null
   User = null
 
+  beforeEach angular.mock.module('angular-meteor')
+
   beforeEach angular.mock.module('analytics.mixpanel')
 
   beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('down.resources')
-
-  beforeEach angular.mock.module('down.asteroid')
 
   beforeEach angular.mock.module('ui.router')
 
@@ -63,7 +63,7 @@ describe 'event controller', ->
     $state = $injector.get '$state'
     $stateParams = $injector.get '$stateParams'
     $mixpanel = $injector.get '$mixpanel'
-    Asteroid = $injector.get 'Asteroid'
+    $meteor = $injector.get '$meteor'
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
@@ -155,7 +155,8 @@ describe 'event controller', ->
       spyOn $ionicScrollDelegate, 'scrollBottom'
       spyOn ctrl, 'prepareMessages'
 
-      spyOn Asteroid, 'subscribe'
+      scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
+
       # Create mocks/spies for getting the messages for this event, and the event
       #   itself.
       messagesRQ =
@@ -185,8 +186,8 @@ describe 'event controller', ->
     it 'should call prepare messages', ->
       expect(ctrl.prepareMessages).toHaveBeenCalled()
 
-    it 'should subscribe to the events messages', ->
-      expect(Asteroid.subscribe).toHaveBeenCalledWith 'event', event.id
+    fit 'should subscribe to the events messages', ->
+      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'event', event.id
 
     it 'should get the messages collection', ->
       expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'

@@ -24,7 +24,7 @@ class Auth
         for id, friend of @user.facebookFriends
           @user.facebookFriends[id] = new @User friend
 
-      # re-establish asteroid auth
+      # re-establish Meteor auth
       @$meteor.loginWithPassword "#{@user.id}", @user.authtoken
 
       @mixpanelIdentify()

@@ -1,11 +1,11 @@
 class EventCtrl
   @$inject: ['$ionicActionSheet', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$ionicPopup', '$ionicScrollDelegate', '$mixpanel', '$scope',
-             '$state', '$stateParams', 'Asteroid', 'Auth', 'Event',  'Invitation',
+             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel', '$scope',
+             '$state', '$stateParams', 'Auth', 'Event',  'Invitation',
              'LinkInvitation', 'ngToast', 'User']
   constructor: (@$ionicActionSheet, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$ionicPopup, @$ionicScrollDelegate, @$mixpanel, @$scope, @$state,
-                @$stateParams, @Asteroid, @Auth, @Event, @Invitation,
+                @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel, @$scope, @$state,
+                @$stateParams, @Auth, @Event, @Invitation,
                 @LinkInvitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
@@ -35,29 +35,43 @@ class EventCtrl
     # Start out at the most recent message.
     @$scope.$on '$ionicView.enter', =>
       # Subscribe to this event.
-      @Asteroid.subscribe 'event', @event.id
+      @$scope.$meteorSubscribe 'event', @event.id
 
-      # Show the messages posted so far.
-      @Messages = @Asteroid.getCollection 'messages'
-      @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}"}
-      @prepareMessages()
-      @$ionicScrollDelegate.scrollBottom true
+      Messages = @$meteor.getCollectionByName 'messages'
+      
+      @messages = @$meteor.collection =>
+        Messages.find
+          eventId: "#{@event.id}"
+        ,
+          sort:
+            createdAt: 1
+          transform: (message) =>
+            message.creator = new @User message.creator
+            message
+      , false
 
-      # Watch for new messages.
-      @messagesRQ.on 'change', @updateMessages
+      
+      # # Show the messages posted so far.
+      # @Messages = @Asteroid.getCollection 'messages'
+      # @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}"}
+      # @prepareMessages()
+      # @$ionicScrollDelegate.scrollBottom true
 
-      # Watch for new members
-      @Events = @Asteroid.getCollection 'events'
-      @eventsRQ = @Events.reactiveQuery {_id: "#{@event.id}"}
-      @eventsRQ.on 'change', @updateMembers
+      # # Watch for new messages.
+      # @messagesRQ.on 'change', @updateMessages
 
-      # Show the members on the view.
-      @updateMembers()
+      # # Watch for new members
+      # @Events = @Asteroid.getCollection 'events'
+      # @eventsRQ = @Events.reactiveQuery {_id: "#{@event.id}"}
+      # @eventsRQ.on 'change', @updateMembers
+
+      # # Show the members on the view.
+      # @updateMembers()
 
     # Stop listening for new messages and members.
     @$scope.$on '$ionicView.leave', =>
-      @messagesRQ.off 'change', @updateMessages
-      @eventsRQ.off 'change', @updateMembers
+      # @messagesRQ.off 'change', @updateMessages
+      # @eventsRQ.off 'change', @updateMembers
 
   updateMessages: =>
     @prepareMessages()

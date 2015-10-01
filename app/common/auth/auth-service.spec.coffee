@@ -6,7 +6,7 @@ require 'angular-local-storage'
 require 'ng-cordova'
 require './auth-module'
 require '../mixpanel/mixpanel-module'
-require '../meteor/angular-meteor-mocks'
+require '../meteor/meteor-mocks'
 
 describe 'Auth service', ->
   $cordovaGeolocation = null
