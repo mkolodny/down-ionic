@@ -2,9 +2,9 @@ haversine = require 'haversine'
 require '../../ionic/ionic.js'
 
 class Auth
-  @$inject: ['$http', '$q', '$mixpanel', 'Asteroid', 'apiRoot', 'User',
+  @$inject: ['$http', '$q', '$meteor', '$mixpanel', 'apiRoot', 'User',
              '$cordovaGeolocation', '$state', 'localStorageService']
-  constructor: (@$http, @$q, @$mixpanel, @Asteroid, @apiRoot, @User,
+  constructor: (@$http, @$q, @$meteor, @$mixpanel, @apiRoot, @User,
                 @$cordovaGeolocation, @$state, localStorageService) ->
     @localStorage = localStorageService
 
@@ -25,7 +25,7 @@ class Auth
           @user.facebookFriends[id] = new @User friend
 
       # re-establish asteroid auth
-      @Asteroid.login @user.id, @user.authtoken
+      @$meteor.loginWithPassword "#{@user.id}", @user.authtoken
 
       @mixpanelIdentify()
 

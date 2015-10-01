@@ -34,6 +34,7 @@ require './my-friends/my-friends-module'
 require './add-friends/add-friends-module'
 require './friends/friends-module'
 require './added-me/added-me-module'
+require './common/meteor/meteor' # Must be required after env-module
 
 angular.module 'down', [
     'analytics.mixpanel'
@@ -99,7 +100,7 @@ angular.module 'down', [
 
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel,
-        $rootScope, $state, $window, Auth, Asteroid, branchKey,
+        $rootScope, $state, $window, Auth, branchKey,
         localStorageService, ionicDeployChannel, PushNotifications,
         skipIonicDeploy, User) ->
     # Resume session from localStorage
