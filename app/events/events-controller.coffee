@@ -93,7 +93,8 @@ class EventsCtrl
           invitation: invitation
           id: invitation.id
 
-    friends = (friend for id, friend of @Auth.user.friends)
+    friends = (friend for id, friend of @Auth.user.friends \
+        when friend.username isnt null)
     if friends.length > 0
       title = 'Friends'
       items.push

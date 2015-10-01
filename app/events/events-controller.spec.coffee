@@ -247,6 +247,7 @@ describe 'events controller', ->
     acceptedInvitation = null
     maybeInvitation = null
     invitations = null
+    friendWithUsername = null
     builtItems = null
 
     beforeEach ->
@@ -277,14 +278,21 @@ describe 'events controller', ->
         invitations[invitation.id] = invitation
 
       # Mock the user's friends.
-      friend =
+      friendWithUsername =
         id: 2
+        username: 'a$ap'
         name: 'A$AP Rocky'
         firstName: 'A$AP'
         lastName: 'Rocky'
         imageUrl: 'https://facebook.com/a$ap/pic'
+      friendWithoutUsername =
+        id: 3
+        username: null
+        name: 'Stephan Curry'
+      friends = [friendWithUsername, friendWithoutUsername]
       Auth.user.friends = {}
-      Auth.user.friends[friend.id] = friend
+      for friend in friends
+        Auth.user.friends[friend.id] = friend
       # TODO: Sort the friends by latest message, then distance.
 
       builtItems = ctrl.buildItems invitations
@@ -306,11 +314,10 @@ describe 'events controller', ->
         isDivider: true
         title: title
         id: title
-      for id, friend of Auth.user.friends
-        items.push angular.extend
-          isDivider: false
-          friend: new User friend
-          id: friend.id
+      items.push angular.extend
+        isDivider: false
+        friend: new User friendWithUsername
+        id: friendWithUsername.id
       expect(builtItems).toEqual items
 
 
