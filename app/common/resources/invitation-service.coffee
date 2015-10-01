@@ -1,6 +1,6 @@
-Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event', \
+Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', 'apiRoot', 'Auth', 'Event', \
               'User', \
-              ($http, $mixpanel, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
+              ($http, $meteor, $mixpanel, $q, $resource, apiRoot, Auth, Event, User) ->
   listUrl = "#{apiRoot}/invitations"
   detailUrl =
   serializeInvitation = (invitation) ->
@@ -125,7 +125,7 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
     invitation.response = newResponse
     @update(invitation).$promise.then (_invitation) =>
       # Re-subscribe to event messages
-      Asteroid.subscribe 'event', "#{_invitation.eventId}" # Meteor likes strings
+      $meteor.subscribe 'event', "#{_invitation.eventId}" # Meteor likes strings
 
       # Post an action message.
       if _invitation.response is @accepted
@@ -141,7 +141,7 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
         type = @declineAction
         status = 'declined'
       $mixpanel.track 'Update Response', {status: status}
-      Messages = Asteroid.getCollection 'messages'
+      Messages = $meteor.getCollectionByName 'messages'
       Messages.insert
         creator:
           id: "#{Auth.user.id}" # Meteor likes strings
@@ -152,11 +152,8 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
         text: text
         eventId: "#{_invitation.eventId}" # Meteor likes strings
         type: type
-        createdAt:
-          $date: new Date().getTime()
-      .remote.then (messageId) ->
-        # Mark message as read
-        Asteroid.call 'readMessage', messageId
+        createdAt: new Date()
+      , @readMessage
 
       deferred.resolve invitation
     , ->
@@ -164,6 +161,9 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
       deferred.reject()
 
     {$promise: deferred.promise}
+
+  resource.readMessage = (messageId) ->
+    $meteor.call 'readMessage', messageId
 
   resource
 ]

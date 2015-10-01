@@ -4,7 +4,7 @@ require '../auth/auth-module'
 require './resources-module'
 require '../meteor/meteor-mocks'
 
-fdescribe 'event service', ->
+describe 'event service', ->
   $httpBackend = null
   $rootScope = null
   $meteor = null

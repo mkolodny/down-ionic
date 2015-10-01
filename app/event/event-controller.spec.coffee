@@ -184,9 +184,6 @@ describe 'event controller', ->
       scope.$emit '$ionicView.enter'
       scope.$apply()
 
-    it 'should scroll to the bottom of the view', ->
-      expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
-
     it 'should subscribe to the events messages', ->
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'event', event.id
 
