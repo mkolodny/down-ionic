@@ -1,5 +1,5 @@
-Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
-         ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
+Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
+         ($http, $meteor, $q, $resource, apiRoot, Auth, User) ->
   listUrl = "#{apiRoot}/events"
   detailUrl = "#{listUrl}/:id"
   serializeEvent = (event) ->
@@ -61,7 +61,7 @@ Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
         event = deserializeEvent data
 
         # Create the first action message.
-        Messages = Asteroid.getCollection 'messages'
+        Messages = $meteor.getCollectionByName 'messages'
         Messages.insert
           creator:
             id: "#{Auth.user.id}" # Meteor likes strings
@@ -75,8 +75,7 @@ Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
                                 #   would create a circular dependecy.
           createdAt:
             $date: new Date().getTime()
-        .remote.then (messageId) ->
-          Asteroid.call 'readMessage', messageId
+        , @readMessage
 
         deferred.resolve event
       .error (data, status) =>
@@ -84,9 +83,12 @@ Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
 
     {$promise: deferred.promise}
 
+  resource.readMessage = (messageId) ->
+    $meteor.call 'readMessage', messageId
+
   resource.sendMessage = (event, text) ->
     # Save the message on the meteor server.
-    Messages = Asteroid.getCollection 'messages'
+    Messages = $meteor.getCollectionByName 'messages'
     Messages.insert
       creator:
         id: "#{Auth.user.id}" # Meteor likes strings
