@@ -237,3 +237,9 @@ gulp.task 'deploy-prod', (done) ->
 
 
 gulp.task 'default', ['watch']
+
+
+# TODO:
+# gulp run android
+# gulp build android
+# gulp build ios
