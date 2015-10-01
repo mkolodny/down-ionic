@@ -107,7 +107,6 @@ describe 'events controller', ->
       updatedAt: new Date()
     item =
       isDivider: false
-      wasJoined: true
       invitation: invitation
       id: invitation.id
 
@@ -245,160 +244,74 @@ describe 'events controller', ->
 
 
   describe 'building the items list', ->
-    newNoResponseInvitation = null
-    oldNoResponseInvitation = null
-    newAcceptedInvitation = null
-    oldAcceptedInvitation = null
-    newMaybeInvitation = null
-    oldMaybeInvitation = null
-    newDeclinedInvitation = null
-    oldDeclinedInvitation = null
+    acceptedInvitation = null
+    maybeInvitation = null
     invitations = null
     builtItems = null
 
     beforeEach ->
+      # Mock invitations to events the user has joined.
       event = invitation.event
       oldTimestamp = 1
       newTimestamp = 2
-      newNoResponseInvitation = angular.extend {}, invitation,
+      acceptedInvitation = angular.extend {}, invitation,
         id: 2
-        response: Invitation.noResponse
+        response: Invitation.accepted
         event: angular.extend {}, event,
           id: 2
           latestMessage:
             createdAt: newTimestamp
-      oldNoResponseInvitation = angular.extend {}, invitation,
+      maybeInvitation = angular.extend {}, invitation,
         id: 3
-        response: Invitation.noResponse
+        response: Invitation.maybe
         event: angular.extend {}, event,
           id: 3
           latestMessage:
             createdAt: oldTimestamp
-      newAcceptedInvitation = angular.extend {}, invitation,
-        id: 4
-        response: Invitation.accepted
-        event: angular.extend {}, event,
-          id: 4
-          latestMessage:
-            createdAt: newTimestamp
-      oldAcceptedInvitation = angular.extend {}, invitation,
-        id: 5
-        response: Invitation.accepted
-        event: angular.extend {}, event,
-          id: 5
-          createdAt: oldTimestamp
-      delete oldAcceptedInvitation.event.latestMessage
-      newMaybeInvitation = angular.extend {}, invitation,
-        id: 6
-        response: Invitation.maybe
-        event: angular.extend {}, event,
-          id: 6
-          createdAt: newTimestamp
-      delete newMaybeInvitation.event.latestMessage
-      oldMaybeInvitation = angular.extend {}, invitation,
-        id: 7
-        response: Invitation.maybe
-        event: angular.extend {}, event,
-          id: 7
-          latestMessage:
-            createdAt: oldTimestamp
-      newDeclinedInvitation = angular.extend {}, invitation,
-        id: 8
-        response: Invitation.declined
-        event: angular.extend {}, event,
-          id: 8
-          createdAt: newTimestamp
-      oldDeclinedInvitation = angular.extend {}, invitation,
-        id: 9
-        response: Invitation.declined
-        event: angular.extend {}, event,
-          id: 9
-          createdAt: oldTimestamp
       invitationsArray = [
-        oldNoResponseInvitation
-        newNoResponseInvitation
-        newAcceptedInvitation
-        oldAcceptedInvitation
-        oldMaybeInvitation
-        newMaybeInvitation
-        oldDeclinedInvitation
-        newDeclinedInvitation
+        acceptedInvitation
+        maybeInvitation
       ]
       invitations = {}
       for invitation in invitationsArray
         invitations[invitation.id] = invitation
 
+      # Mock the user's friends.
+      friend =
+        id: 2
+        name: 'A$AP Rocky'
+        firstName: 'A$AP'
+        lastName: 'Rocky'
+        imageUrl: 'https://facebook.com/a$ap/pic'
+      Auth.user.friends = {}
+      Auth.user.friends[friend.id] = friend
+      # TODO: Sort the friends by latest message, then distance.
+
       builtItems = ctrl.buildItems invitations
 
     it 'should return the items', ->
       items = []
+      title = 'Plans'
       items.push
         isDivider: true
-        title: 'New'
-        id: 'New'
-      for invitation in [newNoResponseInvitation, oldNoResponseInvitation]
+        title: title
+        id: title
+      for id, invitation of invitations
         items.push angular.extend
           isDivider: false
-          wasJoined: false
           invitation: invitation
           id: invitation.id
-      joinedInvitations =
-        'Down':
-          newInvitation: newAcceptedInvitation
-          oldInvitation: oldAcceptedInvitation
-        'Maybe':
-          newInvitation: newMaybeInvitation
-          oldInvitation: oldMaybeInvitation
-      for title, _invitations of joinedInvitations
-        items.push
-          isDivider: true
-          title: title
-          id: title
-        items.push angular.extend
-          isDivider: false
-          wasJoined: true
-          invitation: _invitations.newInvitation
-          id: _invitations.newInvitation.id
-        items.push angular.extend
-          isDivider: false
-          wasJoined: true
-          invitation: _invitations.oldInvitation
-          id: _invitations.oldInvitation.id
+      title = 'Friends'
       items.push
         isDivider: true
-        title: 'Can\'t'
-        id: 'Can\'t'
-      for invitation in [newDeclinedInvitation, oldDeclinedInvitation]
+        title: title
+        id: title
+      for id, friend of Auth.user.friends
         items.push angular.extend
           isDivider: false
-          wasJoined: false
-          invitation: invitation
-          id: invitation.id
+          friend: new User friend
+          id: friend.id
       expect(builtItems).toEqual items
-
-
-  describe 'toggling whether an item is expanded', ->
-
-    describe 'when the item is expanded', ->
-
-      beforeEach ->
-        item.isExpanded = true
-
-        ctrl.toggleIsExpanded(item)
-
-      it 'should shrink the item', ->
-        expect(item.isExpanded).toBe false
-
-
-    describe 'when the item isn\'t expanded', ->
-
-      beforeEach ->
-        item.isExpanded = false
-
-        ctrl.toggleIsExpanded(item)
-
-      it 'should expand the item', ->
-        expect(item.isExpanded).toBe true
 
 
   describe 'subscribing to events\' messages', ->
@@ -456,7 +369,6 @@ describe 'events controller', ->
 
     it 'should listen for new messages', ->
       expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)
-
 
     describe 'when a message gets posted', ->
       changedDocId = null
@@ -813,3 +725,36 @@ describe 'events controller', ->
 
     it 'should get the invitations', ->
       expect(ctrl.getInvitations).toHaveBeenCalled()
+
+
+  describe 'tapping to add by username', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.addByUsername()
+
+    it 'should go to the add by username view', ->
+      expect($state.go).toHaveBeenCalledWith 'addByUsername'
+
+
+  describe 'tapping to add from address book', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.addFromAddressBook()
+
+    it 'should go to the add from address book view', ->
+      expect($state.go).toHaveBeenCalledWith 'addFromAddressBook'
+
+
+  describe 'tapping to add from facebook', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.addFromFacebook()
+
+    it 'should go to the add from facebook view', ->
+      expect($state.go).toHaveBeenCalledWith 'addFromFacebook'

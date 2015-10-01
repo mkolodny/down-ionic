@@ -1,10 +1,10 @@
 class EventsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$ionicPlatform', '$scope', '$state', '$timeout', 'Asteroid',
-             'Invitation', 'ngToast', 'Auth']
+             '$ionicPlatform', '$scope', '$state', '$timeout', 'Asteroid', 'Auth',
+             'Invitation', 'ngToast', 'User']
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$ionicPlatform, @$scope, @$state, @$timeout, @Asteroid,
-                @Invitation, @ngToast, @Auth) ->
+                @$ionicPlatform, @$scope, @$state, @$timeout, @Asteroid, @Auth,
+                @Invitation, @ngToast, @User) ->
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
         scope: @$scope
@@ -69,84 +69,43 @@ class EventsCtrl
     else
       @newEvent.hasComment = false
 
-  buildItems: (invitations) ->
+  buildItems: (invitationsDict) ->
     # Build the list of items to show on the view.
     items = []
 
-    # Save the section titles.
-    sections = {}
-    sections[@Invitation.noResponse] = {title: 'New'}
-    sections[@Invitation.accepted] = {title: 'Down'}
-    sections[@Invitation.maybe] = {title: 'Maybe'}
-    sections[@Invitation.declined] = {title: 'Can\'t'}
-
-    noResponseInvitations = (invitation for id, invitation of invitations \
-        when invitation.response is @Invitation.noResponse)
-    noResponseInvitations.sort (a, b) ->
+    invitations = (invitation for id, invitation of invitationsDict)
+    invitations.sort (a, b) ->
       aCreatedAt = a.event.latestMessage?.createdAt or a.event.createdAt
       bCreatedAt = b.event.latestMessage?.createdAt or b.event.createdAt
       if aCreatedAt > bCreatedAt
         return -1
       else
         return 1
-    if noResponseInvitations.length > 0
+    if invitations.length > 0
+      title = 'Plans'
       items.push
         isDivider: true
-        title: sections[@Invitation.noResponse].title
-        id: sections[@Invitation.noResponse].title
-      for invitation in noResponseInvitations
+        title: title
+        id: title
+      for invitation in invitations
         items.push angular.extend
           isDivider: false
-          wasJoined: false
           invitation: invitation
           id: invitation.id
 
-    for response in [@Invitation.accepted, @Invitation.maybe]
-      title = sections[response].title
-      sectionInvitations = (invitation for id, invitation of invitations \
-          when invitation.response is response)
-
-      # Sort by latestMessage time.
-      sectionInvitations.sort (a, b) ->
-        aCreatedAt = a.event.latestMessage?.createdAt or a.event.createdAt
-        bCreatedAt = b.event.latestMessage?.createdAt or b.event.createdAt
-        if aCreatedAt > bCreatedAt
-          return -1
-        else
-          return 1
-
-      if sectionInvitations.length > 0
-        items.push
-          isDivider: true
-          title: title
-          id: title
-        for invitation in sectionInvitations
-          items.push angular.extend
-            isDivider: false
-            wasJoined: true
-            invitation: invitation
-            id: invitation.id
-
-    declinedInvitations = (invitation for id, invitation of invitations \
-        when invitation.response is @Invitation.declined)
-    declinedInvitations.sort (a, b) ->
-      aCreatedAt = a.event.latestMessage?.createdAt or a.event.createdAt
-      bCreatedAt = b.event.latestMessage?.createdAt or b.event.createdAt
-      if aCreatedAt > bCreatedAt
-        return -1
-      else
-        return 1
-    if declinedInvitations.length > 0
+    friends = (friend for id, friend of @Auth.user.friends)
+    if friends.length > 0
+      title = 'Friends'
       items.push
         isDivider: true
-        title: sections[@Invitation.declined].title
-        id: sections[@Invitation.declined].title
-      for invitation in declinedInvitations
+        title: title
+        id: title
+      for friend in friends
         items.push angular.extend
           isDivider: false
-          wasJoined: false
-          invitation: invitation
-          id: invitation.id
+          friend: new @User friend
+          id: friend.id
+
     items
 
   eventsMessagesSubscribe: (events) ->
@@ -248,9 +207,6 @@ class EventsCtrl
 
     currentUser.lastRead.$date >= message.createdAt.$date
 
-  toggleIsExpanded: (item) ->
-    item.isExpanded = not item.isExpanded
-
   acceptInvitation: (item, $event) ->
     @respondToInvitation item, $event, @Invitation.accepted
 
@@ -271,9 +227,6 @@ class EventsCtrl
         @ngToast.create 'For some reason, that didn\'t work.'
 
     @items = @buildItems @invitations
-
-  itemWasDeclined: (item) ->
-    item.invitation.response is @Invitation.declined
 
   inviteFriends: ->
     # Don't animate the transition to the invite friends view.
@@ -337,5 +290,14 @@ class EventsCtrl
   manualRefresh: =>
     @isLoading = true
     @getInvitations()
+
+  addByUsername: ->
+    @$state.go 'addByUsername'
+
+  addFromAddressBook: ->
+    @$state.go 'addFromAddressBook'
+
+  addFromFacebook: ->
+    @$state.go 'addFromFacebook'
 
 module.exports = EventsCtrl
