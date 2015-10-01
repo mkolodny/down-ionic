@@ -160,7 +160,7 @@ angular.module 'down', [
     $ionicPlatform.ready ->
       # Skip Downloading Updates During Development
       if skipIonicDeploy
-        console.log "Skipping Ionic Deploy"
+        console.log 'Skipping Ionic Deploy'
         bootstrap()
         return
 
