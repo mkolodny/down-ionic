@@ -147,10 +147,6 @@ class EventCtrl
   showGuestList: ->
     @guestListModal.show()
 
-  saveMaxTop: ->
-    # TODO: use angularjs-scroll-glue
-    @maxTop = @$ionicScrollDelegate.getScrollPosition().top
-
   toggleIsHeaderExpanded: ->
     if @isHeaderExpanded
       @isHeaderExpanded = false

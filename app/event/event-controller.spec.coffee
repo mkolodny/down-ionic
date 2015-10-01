@@ -423,20 +423,6 @@ describe 'event controller', ->
       expect(ctrl.guestListModal.show).toHaveBeenCalled()
 
 
-  xdescribe 'when the user hits the bottom of the view', ->
-    top = null
-
-    beforeEach ->
-      top = 20
-      spyOn($ionicScrollDelegate, 'getScrollPosition').and.returnValue
-        top: top
-
-      ctrl.saveMaxTop()
-
-    it 'should save the current top', ->
-      expect(ctrl.maxTop).toBe top
-
-
   describe 'updating the members array', ->
     deferred = null
 
