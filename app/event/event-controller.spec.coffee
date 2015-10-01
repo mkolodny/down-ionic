@@ -26,13 +26,13 @@ describe 'event controller', ->
   ctrl = null
   currentDate = null
   deferredTemplate = null
-  earlierMessage = null
   Event = null
   event = null
+  eventsCollection = null
   invitation = null
   Invitation = null
   LinkInvitation = null
-  laterMessage = null
+  messagesCollection = null
   ngToast = null
   scope = null
   User = null
@@ -119,6 +119,12 @@ describe 'event controller', ->
     deferredTemplate = $q.defer()
     spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
 
+    messagesCollection = 'messagesCollection'
+    eventsCollection = 'eventsCollection'
+    $meteor.getCollectionByName.and.callFake (collectionName) ->
+      if collectionName is 'messages' then return messagesCollection
+      if collectionName is 'events' then return eventsCollection
+
     ctrl = $controller EventCtrl,
       $scope: scope
       Auth: Auth
@@ -145,37 +151,35 @@ describe 'event controller', ->
   it 'should set the current user on the guest list', ->
     expect(scope.guestList.currentUser).toBe Auth.user
 
+  it 'should set the messages collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
+    expect(ctrl.Messages).toBe messagesCollection
+
+  it 'should set the events collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'events'
+    expect(ctrl.Events).toBe eventsCollection
+
   describe 'once the view loads', ->
-    Messages = null
-    messagesRQ = null
-    Events = null
-    eventsRQ = null
+    newestMessage = null
+    meteorEvent = null
 
     beforeEach ->
       spyOn $ionicScrollDelegate, 'scrollBottom'
-      spyOn ctrl, 'prepareMessages'
 
       scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
 
-      # Create mocks/spies for getting the messages for this event, and the event
-      #   itself.
-      messagesRQ =
-        on: jasmine.createSpy 'messagesRQ.on'
-      Messages =
-        reactiveQuery: jasmine.createSpy('Messages.reactiveQuery') \
-            .and.returnValue messagesRQ
-      eventsRQ =
-        on: jasmine.createSpy 'eventsRQ.on'
-      Events =
-        reactiveQuery: jasmine.createSpy('Messages.reactiveQuery') \
-            .and.returnValue eventsRQ
-      spyOn(Asteroid, 'getCollection').and.callFake (collection) ->
-        if collection is 'messages'
-          Messages
-        else if collection is 'events'
-          Events
-
       spyOn ctrl, 'updateMembers'
+      spyOn ctrl, 'getMessages'
+
+      meteorEvent = 'meteorEvent'
+      spyOn(ctrl, 'getMeteorEvent').and.returnValue meteorEvent
+      
+      newestMessage = 'newestMessage'
+      spyOn(ctrl, 'getNewestMessage').and.returnValue newestMessage
+
+      spyOn scope, '$watch'
+      spyOn ctrl, 'handleNewMessage'
+      spyOn ctrl, 'handleMembersChange'
 
       scope.$emit '$ionicView.enter'
       scope.$apply()
@@ -183,144 +187,161 @@ describe 'event controller', ->
     it 'should scroll to the bottom of the view', ->
       expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
-    it 'should call prepare messages', ->
-      expect(ctrl.prepareMessages).toHaveBeenCalled()
-
-    fit 'should subscribe to the events messages', ->
+    it 'should subscribe to the events messages', ->
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'event', event.id
 
-    it 'should get the messages collection', ->
-      expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+    it 'should bind the messages to the controller', ->
+      # TODO: Check that controller property is set
+      expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
 
-    it 'should set the messages collection on the controller', ->
-      expect(ctrl.Messages).toBe Messages
+    it 'should bind the newest message to the controller', ->
+      expect(ctrl.getNewestMessage).toHaveBeenCalled()
+      expect(ctrl.newestMessage).toEqual newestMessage
 
-    it 'should ask for the messages for the event', ->
-      expect(Messages.reactiveQuery).toHaveBeenCalledWith {eventId: "#{event.id}"}
-
-    it 'should set the messages reactive query on the controller', ->
-      expect(ctrl.messagesRQ).toBe messagesRQ
-
-    it 'should listen for new messages', ->
-      expect(messagesRQ.on).toHaveBeenCalledWith 'change', \
-          ctrl.updateMessages
-
-    it 'should get the events collection', ->
-      expect(Asteroid.getCollection).toHaveBeenCalledWith 'events'
-
-    it 'should set the events collection on the controller', ->
-      expect(ctrl.Events).toBe Events
-
-    it 'should ask for the event', ->
-      expect(Events.reactiveQuery).toHaveBeenCalledWith {_id: "#{event.id}"}
-
-    it 'should set the events reactive query on the controller', ->
-      expect(ctrl.eventsRQ).toBe eventsRQ
-
-    it 'should listen for changes to the event', ->
-      expect(eventsRQ.on).toHaveBeenCalledWith 'change', \
-          ctrl.updateMembers
+    it 'should bind the meteor event members to the controller', ->
+      expect(ctrl.meteorEvent).toEqual meteorEvent
+      expect(ctrl.getMeteorEvent).toHaveBeenCalled()
 
     it 'should update the members array', ->
       expect(ctrl.updateMembers).toHaveBeenCalled()
 
-    describe 'when new messages get posted', ->
-      top = null
+    it 'should watch for new messages', ->
+      expect(scope.$watch).toHaveBeenCalledWith ctrl.newestMessage, ctrl.handleNewMessage
 
-      beforeEach ->
-        top = 20
-        ctrl.maxTop = top + 40
-        spyOn($ionicScrollDelegate, 'getScrollPosition').and.returnValue
-          top: top
-
-        ctrl.updateMessages()
-
-      it 'should prepare messages', ->
-        expect(ctrl.prepareMessages).toHaveBeenCalled()
-
-      describe 'and the user was at the bottom of the view', ->
-
-        beforeEach ->
-          ctrl.maxTop = top
-
-        it 'should scroll to the new bottom of the view', ->
-          expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
+    it 'should watch for members changes', ->
+      expect(scope.$watch).toHaveBeenCalledWith ctrl.meteorEvent, ctrl.handleMembersChange
 
 
   describe 'when leaving the view', ->
 
     beforeEach ->
-      messagesRQ =
-        off: jasmine.createSpy 'messagesRQ.off'
-      ctrl.messagesRQ = messagesRQ
-      eventsRQ =
-        off: jasmine.createSpy 'eventsRQ.off'
-      ctrl.eventsRQ = eventsRQ
+      ctrl.messages =
+        stop: jasmine.createSpy 'messages.stop'
+      ctrl.newestMessage =
+        stop: jasmine.createSpy 'newestMessage.stop'
+      ctrl.meteorEvent =
+        stop: jasmine.createSpy 'meteorEvent.stop'
 
       scope.$broadcast '$ionicView.leave'
       scope.$apply()
 
-    it 'should stop listening for new messages', ->
-      expect(ctrl.messagesRQ.off).toHaveBeenCalledWith(
-        'change', ctrl.updateMessages)
-
-    it 'should stop listening for new members', ->
-      expect(ctrl.eventsRQ.off).toHaveBeenCalledWith(
-        'change', ctrl.updateMembers)
+    it 'should stop remove angular-meteor bindings', ->
+      expect(ctrl.messages.stop).toHaveBeenCalled()
+      expect(ctrl.newestMessage.stop).toHaveBeenCalled()
+      expect(ctrl.meteorEvent.stop).toHaveBeenCalled()
 
 
-  describe 'prepare messages', ->
-    messages = null
+  describe 'getting messages', ->
+    cursor = null
+    result = null
 
     beforeEach ->
-      # Mock the current date.
-      jasmine.clock().install()
-      currentDate = new Date 1438195002656
-      jasmine.clock().mockDate currentDate
+      cursor = 'messagesCursor'
+      ctrl.Messages =
+        find: jasmine.createSpy('Messages.find').and.returnValue cursor
+      result = ctrl.getMessages()
 
-      earlier = new Date()
-      later = new Date earlier.getTime()+1
-      creator =
-        id: 2
-        name: 'Guido van Rossum'
-        imageUrl: 'http://facebook.com/profile-pics/vrawesome'
-      earlierMessage =
-        _id: 1
-        creator: creator
-        createdAt:
-          $date: new Date().getTime()
-        text: 'I\'m in love with a robot.'
-        eventId: event.id
-        type: 'text'
-      laterMessage =
-        _id: 1
-        creator: creator
-        createdAt:
-          $date: new Date().getTime()
-        text: 'Michael Jordan is down'
-        eventId: event.id
-        type: 'action'
-      messages = [earlierMessage, laterMessage]
+    it 'should return a messages reactive cursor', ->
+      expect(result).toBe cursor
 
-      spyOn Asteroid, 'call'
+    it 'should query, sort and transform messages', ->
+      selector =
+        eventId: "#{ctrl.event.id}"
+      options =
+        sort:
+          createdAt: 1
+        transform: ctrl.transformMessage
+      expect(ctrl.Messages.find).toHaveBeenCalledWith selector, options
 
-      messagesRQ =
-        result: messages
-      ctrl.messagesRQ = messagesRQ
 
-      ctrl.messagesRQ
-      ctrl.prepareMessages()
+  describe 'getting the newest message', ->
+    result = null
+    newestMessage = null
 
-    afterEach ->
-      jasmine.clock().uninstall()
+    beforeEach ->
+      newestMessage = 'newestMessage'
+      $meteor.object.and.returnValue newestMessage
+      result = ctrl.getNewestMessage()
 
-    it 'should set the messages on the event from oldest to newest', ->
-      laterMessage.creator = new User laterMessage.creator
-      earlierMessage.creator = new User earlierMessage.creator
-      expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
+    it 'should return a AngularMeteorObject', ->
+      expect(result).toEqual newestMessage
 
-    it 'should mark the newest message as read', ->
-      expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', laterMessage._id
+    it 'should filter object by event id and sort by created at', ->      
+      selector =
+        eventId: "#{ctrl.event.id}"
+      options =
+        sort:
+          createdAt: 1
+      expect($meteor.object).toHaveBeenCalledWith ctrl.Messages, selector, false, options
+
+
+  describe 'getting meteor members', ->
+    result = null
+    meteorEvent = null
+
+    beforeEach ->
+      meteorEvent = 'meteorEvent'
+      $meteor.object.and.returnValue meteorEvent
+      result = ctrl.getMeteorEvent()
+
+    it 'should return an AngularMeteorObject', ->
+      expect(result).toEqual meteorEvent
+
+    it 'should filter for the current event', ->
+      selector =
+        _id: "#{ctrl.event.id}"
+      expect($meteor.object).toHaveBeenCalledWith ctrl.Events, selector, false
+
+
+  describe 'transforming messages', ->
+    message = null
+    result = null
+
+    beforeEach ->
+      message =
+        creator: {}
+      result = ctrl.transformMessage message
+
+    it 'should create a new User object with the message.creator', ->
+      expectedResult = angular.copy message
+      expectedResult.creator = new User expectedResult.creator
+
+      expect(result).toEqual expectedResult
+
+
+  describe 'handling new messages', ->
+
+    beforeEach ->
+      ctrl.newestMessage =
+        _id: 'asdfasdf'
+      ctrl.handleNewMessage()
+
+    it 'should mark the message as read', ->
+      expect($meteor.call).toHaveBeenCalledWith 'readMessage', ctrl.newestMessage._id
+
+
+  describe 'handling members changes', ->
+
+    describe 'when users are added or removed', ->
+      member1 = null
+      member2 = null
+
+      beforeEach ->
+        member1 =
+          id: 1
+          name: 'Jim Bob'
+        member2 =
+          id: 2
+          name: 'The Other Guy'
+        ctrl.members = [member1, member2]
+        ctrl.meteorEvent =
+          members: [{userId: 1}]
+
+        spyOn ctrl, 'updateMembers'
+        ctrl.handleMembersChange()
+
+      it 'should update members', ->
+        expect(ctrl.updateMembers).toHaveBeenCalled()
 
 
   describe 'when the modal loads', ->
@@ -402,7 +423,7 @@ describe 'event controller', ->
       expect(ctrl.guestListModal.show).toHaveBeenCalled()
 
 
-  describe 'when the user hits the bottom of the view', ->
+  xdescribe 'when the user hits the bottom of the view', ->
     top = null
 
     beforeEach ->
@@ -662,7 +683,18 @@ describe 'event controller', ->
     message = null
 
     beforeEach ->
-      message = earlierMessage
+      creator =
+        id: 2
+        name: 'Guido van Rossum'
+        imageUrl: 'http://facebook.com/profile-pics/vrawesome'
+      message =
+        _id: 1
+        creator: new User creator
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        eventId: event.id
+        type: 'text'
 
     describe 'when it is an accept action', ->
 
@@ -704,7 +736,20 @@ describe 'event controller', ->
     message = null
 
     beforeEach ->
-      message = earlierMessage
+      creator =
+        id: 2
+        name: 'Guido van Rossum'
+        imageUrl: 'http://facebook.com/profile-pics/vrawesome'
+
+      message =
+        _id: 1
+        creator: new User creator
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        eventId: event.id
+        type: 'text'
+
       Auth.user =
         id: 1
         name: 'Alan Turing'

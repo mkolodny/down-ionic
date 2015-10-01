@@ -7,8 +7,7 @@ class Cursor
   observeChanges: jasmine.createSpy 'Cursor.observeChanges'
 
 class Collection
-  find: ->
-    new Cursor()
+  find: jasmine.createSpy 'Collection.find'
   findOne: jasmine.createSpy 'Collection.findOne'
   insert: jasmine.createSpy 'Collection.insert'
   update: jasmine.createSpy 'Collection.update'
@@ -44,6 +43,12 @@ angular.module('angular-meteor', [])
   @logoutOtherClients = jasmine.createSpy '$meteorUser.logoutOtherClients'
   @session = jasmine.createSpy '$meteorSession'
   @autorun = jasmine.createSpy '$meteorUtils.autorun'
-  @getCollectionByName = jasmine.createSpy('$meteorUtils.getCollectionByName').and.returnValue new Collection()
+  @getCollectionByName = jasmine.createSpy('$meteorUtils.getCollectionByName')
   @getPicture = jasmine.createSpy '$meteorCamera.getPicture'
+  return
+.service '$meteorMocks', ->
+  @mockCollection = ->
+    new Collection()
+  @mockCursor = ->
+    new Cursor()
   return

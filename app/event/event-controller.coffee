@@ -10,6 +10,10 @@ class EventCtrl
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
+    # Set Meteor collections on controller
+    @Messages = @$meteor.getCollectionByName 'messages'
+    @Events = @$meteor.getCollectionByName 'events'
+
     # Give the event a long title variable name as a workaround for:
     #   https://github.com/driftyco/ionic/issues/2881
     @event.titleWithLongVariableName = @event.title
@@ -34,68 +38,64 @@ class EventCtrl
 
     # Start out at the most recent message.
     @$scope.$on '$ionicView.enter', =>
+      # Get the members invitations.
+      @updateMembers()
+
       # Subscribe to this event.
       @$scope.$meteorSubscribe 'event', @event.id
 
-      Messages = @$meteor.getCollectionByName 'messages'
-      
-      @messages = @$meteor.collection =>
-        Messages.find
-          eventId: "#{@event.id}"
-        ,
-          sort:
-            createdAt: 1
-          transform: (message) =>
-            message.creator = new @User message.creator
-            message
-      , false
+      # Bind reactive variables
+      @messages = @$meteor.collection @getMessages, false
+      @newestMessage = @getNewestMessage()
+      @meteorEvent = @getMeteorEvent()
 
-      
-      # # Show the messages posted so far.
-      # @Messages = @Asteroid.getCollection 'messages'
-      # @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}"}
-      # @prepareMessages()
-      # @$ionicScrollDelegate.scrollBottom true
+      # Watch for changes
+      @$scope.$watch @newestMessage, @handleNewMessage
+      @$scope.$watch @meteorEvent, @handleMembersChange
 
-      # # Watch for new messages.
-      # @messagesRQ.on 'change', @updateMessages
-
-      # # Watch for new members
-      # @Events = @Asteroid.getCollection 'events'
-      # @eventsRQ = @Events.reactiveQuery {_id: "#{@event.id}"}
-      # @eventsRQ.on 'change', @updateMembers
-
-      # # Show the members on the view.
-      # @updateMembers()
-
-    # Stop listening for new messages and members.
+    # Remove angular-meteor bindings
     @$scope.$on '$ionicView.leave', =>
-      # @messagesRQ.off 'change', @updateMessages
-      # @eventsRQ.off 'change', @updateMembers
+      @messages.stop()
+      @newestMessage.stop()
+      @meteorEvent.stop()
 
-  updateMessages: =>
-    @prepareMessages()
-    if not @$scope.$$phase
-      @$scope.$digest()
-    if @maxTop is @$ionicScrollDelegate.getScrollPosition().top
-      @$ionicScrollDelegate.scrollBottom true
+  getMessages: =>
+    @Messages.find
+      eventId: "#{@event.id}"
+    ,
+      sort:
+        createdAt: 1
+      transform: @transformMessage
 
-  prepareMessages: ->
-    @messages = angular.copy @messagesRQ.result
-    for message in @messages
-      message.creator = new @User message.creator
+  transformMessage: (message) =>
+    message.creator = new @User message.creator
+    message
 
-    # Sort the messages from oldest to newest.
-    @messages.sort (a, b) ->
-      if a.createdAt.$date < b.createdAt.$date
-        return -1
-      else
-        return 1
+  getNewestMessage: =>
+    selector =
+      eventId: "#{@event.id}"
+    options =
+      sort:
+        createdAt: 1
+    @$meteor.object @Messages, selector, false, options
 
-    # Mark newest message as read
-    if @messages.length > 0
-      newestMessage = @messages[@messages.length - 1]
-      @Asteroid.call 'readMessage', newestMessage._id
+  getMeteorEvent: =>
+    selector =
+      _id: "#{@event.id}"
+    @$meteor.object @Events, selector, false
+
+  handleNewMessage: =>
+    @$meteor.call 'readMessage', @newestMessage._id
+
+  handleMembersChange: =>
+    meteorMembers = @meteorEvent.members or []
+    members = @members or []
+    meteorMemberIds = (member.userId for member in meteorMembers)
+    currentMemberIds = (member.id for member in members)
+    meteorMemberIds.sort()
+    currentMemberIds.sort()
+    if not angular.equals meteorMemberIds, currentMemberIds
+      @updateMembers()
 
   updateMembers: =>
     @Invitation.getMemberInvitations {id: @event.id}
