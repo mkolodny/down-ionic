@@ -8,6 +8,7 @@ describe 'invitation service', ->
   $mixpanel = null
   $q = null
   $rootScope = null
+  apiRoot = null
   Asteroid = null
   Auth = null
   Event = null
@@ -79,6 +80,9 @@ describe 'invitation service', ->
 
   it 'should have a maybe action property', ->
     expect(Invitation.maybeAction).toBe 'maybe_action'
+
+  it 'should have a list url property', ->
+    expect(Invitation.listUrl).toBe "#{apiRoot}/invitations"
 
   describe 'serializing an invitation', ->
     invitation = null
@@ -624,3 +628,53 @@ describe 'invitation service', ->
 
       it 'should reject the promise', ->
         expect(rejected).toBe true
+
+
+  describe 'getting invitations to/from a user', ->
+    user = null
+    url = null
+
+    beforeEach ->
+      user =
+        id: 1
+      url = "#{Invitation.listUrl}?user=#{user.id}"
+
+    describe 'successfully', ->
+      responseData = null
+      response = null
+
+      beforeEach ->
+        responseData = [
+          id: 1
+          event:
+            id: 2
+            title: 'bars?!??!'
+            creator: 3
+            canceled: false
+            datetime: new Date().toISOString()
+            created_at: new Date().toISOString()
+            updated_at: new Date().toISOString()
+            place:
+              name: 'Fuku'
+              geo:
+                type: 'Point'
+                coordinates: [40.7285098, -73.9871264]
+          to_user: Auth.user.id
+          from_user: user.id
+          response: Invitation.accepted
+          muted: false
+          created_at: new Date().toISOString()
+          updated_at: new Date().toISOString()
+        ]
+
+        $httpBackend.expectGET url
+          .respond 200, angular.toJson(responseData)
+
+        Invitation.getUserInvitations user.id
+          .$promise.then (_response_) ->
+            response = _response_
+        $httpBackend.flush 1
+
+      it 'should GET the invitations', ->
+        expectedInvitations = [Invitation.deserialize responseData[0]]
+        expect(response).toAngularEqual expectedInvitations

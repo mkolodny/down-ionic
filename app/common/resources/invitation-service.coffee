@@ -1,6 +1,7 @@
-Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event', \
-              'User', \
-              ($http, $mixpanel, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
+Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', \
+              'Auth', 'Event', 'User', \
+              ($http, $mixpanel, $q, $resource, apiRoot, Asteroid, Auth, Event,
+               User) ->
   listUrl = "#{apiRoot}/invitations"
   detailUrl =
   serializeInvitation = (invitation) ->
@@ -58,6 +59,13 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
         data = angular.fromJson data
         deserializeInvitation data
 
+    query:
+      method: 'get'
+      isArray: true
+      transformResponse: (data, headersGetter) ->
+        data = angular.fromJson data
+        (deserializeInvitation(invitation) for invitation in data)
+
     ###
     Get an array of invitations with responses.
     ###
@@ -71,6 +79,10 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
         data = angular.fromJson data
         (deserializeInvitation(invitation) for invitation in data)
 
+  # URLs
+  resource.listUrl = listUrl
+
+  # Tranform data to/from the server.
   resource.serialize = serializeInvitation
   resource.deserialize = deserializeInvitation
 
@@ -162,6 +174,9 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
       deferred.reject()
 
     {$promise: deferred.promise}
+
+  resource.getUserInvitations = (userId) ->
+    @query {user: userId}
 
   resource
 ]
