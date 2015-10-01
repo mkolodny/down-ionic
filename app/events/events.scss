@@ -140,6 +140,9 @@
     white-space: normal;
   }
   #add-friends {
+    .item-divider {
+      margin-top: -13px;
+    }
     .item-avatar {
       img {
         border-radius: 50%;  
@@ -147,11 +150,6 @@
       h2 {
         padding-top: 7px;
       }
-    }
-  }
-  .below-items {
-    &.item-divider {
-      margin-top: -13px;
     }
   }
   ion-footer-bar {

@@ -75,9 +75,8 @@
         </div>
       </ion-item>
     </ion-list>
-    <ion-list id="add-friends">
-      <ion-item class="item-divider"
-                ng-class="{'below-items': events.items.length > 0}">
+    <ion-list id="add-friends" ng-if="!events.isLoading">
+      <ion-item class="item-divider">
         <span class="divider-title">Add Friends</span>
         <div class="divider-line"></div>
       </ion-item>
