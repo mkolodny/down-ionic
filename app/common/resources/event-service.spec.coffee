@@ -245,8 +245,7 @@ fdescribe 'event service', ->
           text: "#{Auth.user.name} is down."
           eventId: "#{responseData.id}" # meteor likes strings
           type: Invitation.acceptAction
-          createdAt:
-            $date: new Date().getTime()
+          createdAt: new Date()
 
         expect(Messages.insert).toHaveBeenCalledWith message, Event.readMessage
 
@@ -336,8 +335,7 @@ fdescribe 'event service', ->
           text: text
           eventId: "#{event.id}"
           type: 'text'
-          createdAt:
-            $date: new Date().getTime()
+          createdAt: new Date()
         expect(Messages.insert).toHaveBeenCalledWith message
 
 

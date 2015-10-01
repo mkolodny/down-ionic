@@ -73,8 +73,7 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
           eventId: "#{event.id}" # Meteor likes strings
           type: 'accept_action' # We can't use Invitation.acceptAction because it
                                 #   would create a circular dependecy.
-          createdAt:
-            $date: new Date().getTime()
+          createdAt: new Date()
         , @readMessage
 
         deferred.resolve event
@@ -99,8 +98,7 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
       text: text
       eventId: "#{event.id}" # Meteor likes strings
       type: 'text'
-      createdAt:
-        $date: new Date().getTime()
+      createdAt: new Date()
 
     # Save the message on the django server.
     url = "#{listUrl}/#{event.id}/messages"
