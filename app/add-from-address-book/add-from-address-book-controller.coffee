@@ -12,6 +12,8 @@ class AddFromAddressBookCtrl
 
   showContacts: (contacts) ->
     contactsArray = (contact for id, contact of contacts)
+    for contact in contactsArray
+      contact.name = contact.name.trim()
     contactsArray.sort (a, b) ->
       if a.name.toLowerCase() < b.name.toLowerCase()
         return -1
@@ -45,7 +47,6 @@ class AddFromAddressBookCtrl
         @isLoading = false
 
   getInitials: (name) ->
-    name = name.trim()
     words = name.split ' '
     firstName = words[0]
     if words.length is 1 and firstName.length > 1

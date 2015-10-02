@@ -43,7 +43,7 @@ describe 'add from address book controller', ->
     contacts =
       1:
         id: 1
-        name: 'Bruce Lee'
+        name: ' Bruce Lee' # Test a space in there
         username: null
       2: user
     localStorage.set 'contacts', contacts
@@ -56,6 +56,8 @@ describe 'add from address book controller', ->
     localStorage.clearAll()
 
   it 'should set the contacts on the controller', ->
+    contact = contacts[1]
+    contact.name = contact.name.trim()
     items = [
       isDivider: true
       title: 'A'
@@ -67,7 +69,7 @@ describe 'add from address book controller', ->
       title: 'B'
     ,
       isDivider: false
-      user: new User contacts[1]
+      user: new User contact
     ]
     expect(ctrl.items).toEqual items
 
@@ -194,29 +196,3 @@ describe 'add from address book controller', ->
 
       it 'should return the first letter of their name', ->
         expect(ctrl.getInitials 'p').toBe 'P'
-
-
-    describe 'when they have no last name', ->
-
-      describe 'and multiple letters in their first name', ->
-
-        it 'should return the first two letters of their first name', ->
-          expect(ctrl.getInitials 'Pele ').toBe 'PE'
-
-
-      describe 'and one letter in their first name', ->
-
-        it 'should return the first two letters of their first name', ->
-          expect(ctrl.getInitials 'P ').toBe 'P'
-
-
-      describe 'and multiple words in their first name', ->
-
-        it 'should return the first letter of the first and second words', ->
-          expect(ctrl.getInitials 'Jazzy Jeff ').toBe 'JJ'
-
-
-    describe 'when their name starts with whitespace', ->
-
-      it 'should ignore the whitespace', ->
-        expect(ctrl.getInitials ' Jazzy Jeff').toBe 'JJ'
