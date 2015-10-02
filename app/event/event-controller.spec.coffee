@@ -170,13 +170,15 @@ describe 'event controller', ->
       spyOn ctrl, 'updateMembers'
       spyOn ctrl, 'getMessages'
 
-      meteorEvent = 'meteorEvent'
+
+      meteorEvent =
+        _id: 'meteorEvent'
       spyOn(ctrl, 'getMeteorEvent').and.returnValue meteorEvent
       
-      newestMessage = 'newestMessage'
+      newestMessage =
+        _id: 'newestMessage'
       spyOn(ctrl, 'getNewestMessage').and.returnValue newestMessage
 
-      spyOn scope, '$watch'
       spyOn ctrl, 'handleNewMessage'
       spyOn ctrl, 'handleMembersChange'
 
@@ -201,11 +203,28 @@ describe 'event controller', ->
     it 'should update the members array', ->
       expect(ctrl.updateMembers).toHaveBeenCalled()
 
-    it 'should watch for new messages', ->
-      expect(scope.$watch).toHaveBeenCalledWith ctrl.newestMessage, ctrl.handleNewMessage
+    describe 'when the newestMessage changes', ->
+      
+      beforeEach ->
+        ctrl.newestMessage =
+          _id: 'someotherid'
+        ctrl.handleNewMessage.calls.reset()
+        scope.$apply()
 
-    it 'should watch for members changes', ->
-      expect(scope.$watch).toHaveBeenCalledWith ctrl.meteorEvent, ctrl.handleMembersChange
+      it 'should handle the change', ->
+        expect(ctrl.handleNewMessage).toHaveBeenCalled()
+
+
+    describe 'when the meteorEvent changes', ->
+
+      beforeEach ->
+        ctrl.meteorEvent =
+          _id: 'someotherid'
+        ctrl.handleMembersChange.calls.reset()
+        scope.$apply()
+
+      it 'should handle the change', ->
+        expect(ctrl.handleMembersChange).toHaveBeenCalled()
 
 
   describe 'when leaving the view', ->
@@ -267,7 +286,7 @@ describe 'event controller', ->
         eventId: "#{ctrl.event.id}"
       options =
         sort:
-          createdAt: 1
+          createdAt: -1
       expect($meteor.object).toHaveBeenCalledWith ctrl.Messages, selector, false, options
 
 

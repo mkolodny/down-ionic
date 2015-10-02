@@ -7,8 +7,8 @@ require 'angular-ui-router'
 require '../ionic/ionic-angular.js' # for ionic module
 require 'ng-cordova'
 require 'ng-toast'
-require '../common/asteroid/asteroid-module'
 require '../common/auth/auth-module'
+require '../common/meteor/meteor-mocks'
 require './events-module'
 EventsCtrl = require './events-controller'
 
@@ -19,28 +19,30 @@ describe 'events controller', ->
   $ionicHistory = null
   $ionicModal = null
   $ionicPlatform = null
+  $meteor = null
   $q = null
   $state = null
   $timeout = null
   $window = null
-  Asteroid = null
   Auth = null
   ctrl = null
   deferredGetInvitations = null
   deferredTemplate = null
   earlier = null
   Event = null
+  eventsCollection = null
   item = null
   invitation = null
   later = null
   Invitation = null
+  messagesCollection = null
   ngToast = null
   scope = null
   User = null
 
-  beforeEach angular.mock.module('ui.router')
+  beforeEach angular.mock.module('angular-meteor')
 
-  beforeEach angular.mock.module('down.asteroid')
+  beforeEach angular.mock.module('ui.router')
 
   beforeEach angular.mock.module('down.auth')
 
@@ -60,12 +62,12 @@ describe 'events controller', ->
     $ionicHistory = $injector.get '$ionicHistory'
     $ionicModal = $injector.get '$ionicModal'
     $ionicPlatform = $injector.get '$ionicPlatform'
+    $meteor = $injector.get '$meteor'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     $timeout = $injector.get '$timeout'
     $window = $injector.get '$window'
-    Asteroid = $injector.get 'Asteroid'
     Auth = angular.copy $injector.get 'Auth'
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
@@ -124,6 +126,12 @@ describe 'events controller', ->
     spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
     spyOn $ionicPlatform, 'on'
 
+    messagesCollection = 'messagesCollection'
+    eventsCollection = 'eventsCollection'
+    $meteor.getCollectionByName.and.callFake (collectionName) ->
+      if collectionName is 'messages' then return messagesCollection
+      if collectionName is 'events' then return eventsCollection
+
     ctrl = $controller EventsCtrl,
       $scope: scope
       Auth: Auth
@@ -143,6 +151,14 @@ describe 'events controller', ->
 
   it 'should listen for when the user comes back to the app', ->
     expect($ionicPlatform.on).toHaveBeenCalledWith 'resume', ctrl.manualRefresh
+
+  it 'should set the messages collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
+    expect(ctrl.Messages).toBe messagesCollection
+
+  it 'should set the events collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'events'
+    expect(ctrl.Events).toBe eventsCollection
 
   describe 'when the events request returns', ->
     refreshComplete = null
@@ -249,6 +265,7 @@ describe 'events controller', ->
     invitations = null
     friendWithUsername = null
     builtItems = null
+    newestMessage = null
 
     beforeEach ->
       # Mock invitations to events the user has joined.
@@ -294,6 +311,9 @@ describe 'events controller', ->
       for friend in friends
         Auth.user.friends[friend.id] = friend
       # TODO: Sort the friends by latest message, then distance.
+      
+      newestMessage = 'newestMessage'
+      spyOn(ctrl, 'getNewestMessage').and.returnValue newestMessage
 
       builtItems = ctrl.buildItems invitations
 
@@ -309,6 +329,7 @@ describe 'events controller', ->
           isDivider: false
           invitation: invitation
           id: invitation.id
+          newestMessage: newestMessage
       title = 'Friends'
       items.push
         isDivider: true
@@ -322,348 +343,113 @@ describe 'events controller', ->
 
 
   describe 'subscribing to events\' messages', ->
-    onChange = null
-    messagesRQ = null
-    eventsOnChange = null
-    eventsRQ = null
-    Events = null
-    messages = null
     event = null
-    events = null
 
     beforeEach ->
-      spyOn Asteroid, 'subscribe'
-
-      messagesRQ =
-        result: 'messagesRQ.result'
-        on: jasmine.createSpy('messagesRQ.on').and.callFake (name, _onChange_) ->
-          onChange = _onChange_
-      messages =
-        reactiveQuery: jasmine.createSpy('messages.reactiveQuery') \
-            .and.returnValue messagesRQ
-
-      eventsRQ =
-        result: 'eventsRQ.result'
-        on: jasmine.createSpy('eventsRQ.on').and.callFake (name, _onChange_) ->
-          eventsOnChange = _onChange_
-      Events =
-        reactiveQuery: jasmine.createSpy('events.reactiveQuery') \
-            .and.returnValue eventsRQ
-
-      spyOn(Asteroid, 'getCollection').and.callFake (collectionName) ->
-        if collectionName is 'messages' then return messages
-        if collectionName is 'events' then return Events
-
-      spyOn ctrl, 'setLatestMessage'
-
+      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
       event = invitation.event
       events = [event]
+
       ctrl.eventsMessagesSubscribe events
 
-    it 'should subscribe to each events\' messages', ->
-      for event in events
-        expect(Asteroid.subscribe).toHaveBeenCalledWith 'event', event.id
-
-    it 'should get the messages collection', ->
-      expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
-
-    it 'should ask for the messages for each event', ->
-      for event in events
-        expect(messages.reactiveQuery).toHaveBeenCalledWith {eventId: "#{event.id}"}
-
-    it 'should show each event\'s latest message on the event', ->
-      expect(ctrl.setLatestMessage).toHaveBeenCalledWith event, messagesRQ.result
-
-    it 'should listen for new messages', ->
-      expect(messagesRQ.on).toHaveBeenCalledWith 'change', jasmine.any(Function)
-
-    describe 'when a message gets posted', ->
-      changedDocId = null
-
-      beforeEach ->
-        ctrl.setLatestMessage.calls.reset()
-        changedDocId = 'asdf'
-
-      describe 'and the message is new', ->
-
-        beforeEach ->
-          spyOn(ctrl, 'isNewMessage').and.returnValue true
-          onChange changedDocId
-
-        it 'should call isNewMessage with doc _id', ->
-          expect(ctrl.isNewMessage).toHaveBeenCalledWith event, changedDocId
-
-        it 'should set the latest message on the event', ->
-          expect(ctrl.setLatestMessage).toHaveBeenCalledWith(
-              event, messagesRQ.result)
+    it 'should subscribe to the events messages', ->
+      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'event', "#{event.id}"
 
 
-      describe 'and the message is not new', ->
-
-        beforeEach ->
-          spyOn(ctrl, 'isNewMessage').and.returnValue false
-          onChange changedDocId
-
-        it 'should call isNewMessage with doc _id', ->
-          expect(ctrl.isNewMessage).toHaveBeenCalledWith event, changedDocId
-
-
-    describe 'when a meteor event changes', ->
-
-      beforeEach ->
-        spyOn(ctrl, 'getWasRead').and.returnValue true
-
-        event.latestMessage = {}
-        event.latestMessage.wasRead = false
-
-        eventsOnChange()
-
-      it 'should set wasRead for the latest message', ->
-        expect(event.latestMessage.wasRead).toBe true
-
-
-  describe 'is new message for event', ->
-    oldMessage = null
-    newMessage = null
-    messagesRQ = null
-    messages = null
-    isNewMessage = null
+  describe 'getting the newest message', ->
+    eventId = null
+    meteorObject = null
+    result = null
 
     beforeEach ->
-      oldMessage =
-        _id: 1
-        createdAt:
-          $date: 1
-      newMessage =
-        _id: 2
-        createdAt:
-          $date: 2
+      eventId = "3"
+      meteorObject = 'meteorObject'
+      scope.$meteorObject = jasmine.createSpy('scope.$meteorObject')
+        .and.returnValue meteorObject
+      result = ctrl.getNewestMessage eventId
 
-      messagesRQ =
-        result: 'messagesRQ.result'
-      messages =
-        reactiveQuery: jasmine.createSpy('messages.reactiveQuery') \
-            .and.returnValue messagesRQ
-      spyOn(Asteroid, 'getCollection').and.returnValue messages
+    it 'should return an AngularMeteorObject', ->
+      expect(result).toBe meteorObject
 
-    describe 'when the message is new', ->
+    it 'should query, sort and transform the message', ->
+      selector =
+        eventId: eventId
+      options =
+        sort:
+          createdAt: -1
+        transform: ctrl.transformMessage
+      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.Messages, selector, false, options
+
+  describe 'transforming a message', ->
+
+    describe 'when the message is of type text', ->
+      message = null
+      result = null
+      meteorEvent = null
 
       beforeEach ->
-        messagesRQ.result = [newMessage]
-        event =
-          latestMessage:
-            text: 'asdf'
-            createdAt: new Date oldMessage.createdAt.$date
-        isNewMessage = ctrl.isNewMessage event, newMessage._id
+        meteorEvent = 'meteorEvent'
+        scope.$meteorObject = jasmine.createSpy('scope.$meteorObject')
+          .and.returnValue meteorEvent
 
-      it 'should query for message object by _id', ->
-        expect(messages.reactiveQuery).toHaveBeenCalledWith {_id: newMessage._id}
+        message = 
+          type: 'text'
+          text: 'Hi Guys!'
+          creator:
+            firstName: 'Jimbo'
+
+        result = ctrl.transformMessage angular.copy(message)
+
+      it 'should update the message text', ->
+        expectedText = "#{message.creator.firstName}: #{message.text}"
+        expect(result.text).toEqual expectedText
+
+      it 'should bind the meteor event to the message', ->
+        expect(result.meteorEvent).toEqual meteorEvent
+
+
+  describe 'checking if a message was read', ->
+
+    describe 'when a message has been read', ->
+      message = null
+      result = null
+
+      beforeEach ->
+        Auth.user =
+          id: 1
+        message =
+          createdAt: new Date 10
+          meteorEvent:
+            members: [
+              userId: "1",
+              lastRead: new Date 1000
+            ]
+
+        result = ctrl.wasRead message
 
       it 'should return true', ->
-        expect(isNewMessage).toBe true
+        expect(result).toBe true
 
 
-    describe 'when the message is not new', ->
+    describe 'when a message has not been read', ->
+      message = null
+      result = null
 
       beforeEach ->
-        messagesRQ.result = [oldMessage]
-        event =
-          latestMessage:
-            createdAt: new Date newMessage.createdAt.$date
-            text: 'asdf'
-        isNewMessage = ctrl.isNewMessage event, oldMessage._id
+        Auth.user =
+          id: 1
+        message =
+          createdAt: new Date 1000
+          meteorEvent:
+            members: [
+              userId: "1",
+              lastRead: new Date 10
+            ]
 
-      it 'should query for message object by _id', ->
-        expect(messages.reactiveQuery).toHaveBeenCalledWith {_id: oldMessage._id}
+        result = ctrl.wasRead message
 
       it 'should return false', ->
-        expect(isNewMessage).toBe false
-
-
-    describe 'when event doesn\'t have a latest message set', ->
-
-      beforeEach ->
-        event = {}
-        isNewMessage = ctrl.isNewMessage event, 'asdf'
-
-      it 'should return true', ->
-        expect(isNewMessage).toBe true
-
-
-  describe 'setting an event\'s latest message', ->
-    event = null
-    textMessage = null
-    actionMessage = null
-    earlier = null
-    later = null
-    messages = null
-    builtItems = null
-
-    beforeEach ->
-      event = invitation.event
-      creator =
-        id: 2
-        name: 'Guido van Rossum'
-        firstName: 'Guido'
-        lastName: 'van Rossum'
-        imageUrl: 'http://facebook.com/profile-pics/vrawesome'
-      textMessage =
-        _id: 1
-        creator: creator
-        createdAt:
-          $date: new Date().getTime()
-        text: 'I\'m in love with a robot.'
-        eventId: invitation.event.id
-        type: 'text'
-      actionMessage =
-        _id: 1
-        creator: creator
-        createdAt:
-          $date: new Date().getTime()
-        text: 'Michael Jordan is down'
-        eventId: invitation.event.id
-        type: 'action'
-      messages = [textMessage, actionMessage]
-
-      # Reset the current items in case they were updated somewhere else.
-      ctrl.items = [item]
-
-      spyOn(ctrl, 'getWasRead').and.returnValue true
-      builtItems = []
-      spyOn(ctrl, 'buildItems').and.returnValue builtItems
-
-    describe 'when the latest message is a text', ->
-
-      beforeEach ->
-        textMessage.createdAt.$date = later.getTime()
-        actionMessage.createdAt.$date = earlier.getTime()
-
-        ctrl.setLatestMessage event, messages
-
-      it 'should set the most recent message on the event', ->
-        message = "#{textMessage.creator.firstName}: #{textMessage.text}"
-        expect(event.latestMessage.text).toBe message
-
-      it 'should set unread or read for latest message', ->
-        expect(event.latestMessage.wasRead).toBe true
-        expect(ctrl.getWasRead).toHaveBeenCalledWith textMessage
-
-      it 'should update the messages createdAt time', ->
-        createdAt = new Date textMessage.createdAt.$date
-        expect(event.latestMessage.createdAt).toEqual createdAt
-
-      it 'should rebuild the items list', ->
-        expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
-
-      it 'should save the new items on the controller', ->
-        expect(ctrl.items).toBe builtItems
-
-
-    describe 'when the latest message is an action', ->
-
-      beforeEach ->
-        actionMessage.createdAt.$date = later.getTime()
-        textMessage.createdAt.$date = earlier.getTime()
-
-        ctrl.setLatestMessage event, messages
-
-      it 'should set the most recent message on the event', ->
-        expect(event.latestMessage.text).toBe actionMessage.text
-
-      it 'should update the messages createdAt time', ->
-        createdAt = new Date actionMessage.createdAt.$date
-        expect(event.latestMessage.createdAt).toEqual createdAt
-
-      it 'should set unread or read for latest message', ->
-        expect(event.latestMessage.wasRead).toBe true
-        expect(ctrl.getWasRead).toHaveBeenCalledWith actionMessage
-
-
-    describe 'when messages is an empty array', ->
-
-      it 'should return null', ->
-        expect(ctrl.setLatestMessage event, []).toBeUndefined()
-
-
-  describe 'checking is a message is unread', ->
-    message = null
-    eventsRQ = null
-    wasRead = null
-
-    beforeEach ->
-      Auth.user =
-        id: 1
-      message =
-        createdAt:
-          $date: 10
-
-      eventsRQ =
-        result: 'eventsRQ.result'
-      events =
-        reactiveQuery: jasmine.createSpy('events.reactiveQuery') \
-            .and.returnValue eventsRQ
-      spyOn(Asteroid, 'getCollection').and.returnValue events
-
-    describe 'when the message has been read', ->
-
-      beforeEach ->
-        event =
-          members: [
-            userId: "#{Auth.user.id}"
-            lastRead:
-              $date: message.createdAt.$date + 1
-          ]
-        eventsRQ.result = [event]
-
-        wasRead = ctrl.getWasRead message
-
-      it 'should return true', ->
-        expect(wasRead).toBe true
-
-
-    describe 'when the message hasn\'t been read', ->
-
-      beforeEach ->
-        event =
-          members: [
-            userId: "#{Auth.user.id}"
-            lastRead:
-              $date: message.createdAt.$date - 1
-          ]
-        eventsRQ.result = [event]
-
-        wasRead = ctrl.getWasRead message
-
-      it 'should return false', ->
-        expect(wasRead).toBe false
-
-
-    describe 'when the event hasn\'t been returned yet', ->
-
-      beforeEach ->
-        eventsRQ.result = [undefined]
-
-        wasRead = ctrl.getWasRead message
-
-      it 'should return true', ->
-        expect(wasRead).toBe true
-
-
-    describe 'when the user isn\'t a member', ->
-
-      beforeEach ->
-        event =
-          members: [
-            userId: "#{Auth.user.id+1}"
-            lastRead:
-              $date: message.createdAt.$date - 1
-          ]
-        eventsRQ.result = [event]
-
-        wasRead = ctrl.getWasRead message
-
-      it 'should return true', ->
-        expect(wasRead).toBe true
+        expect(result).toBe false
 
 
   describe 'responding to an invitation', ->
