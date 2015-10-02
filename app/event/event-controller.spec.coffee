@@ -11,7 +11,7 @@ require '../common/mixpanel/mixpanel-module'
 require '../common/resources/resources-module'
 EventCtrl = require './event-controller'
 
-fdescribe 'event controller', ->
+describe 'event controller', ->
   $ionicActionSheet = null
   $ionicHistory = null
   $ionicLoading = null

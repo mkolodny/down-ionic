@@ -1,0 +1,65 @@
+#create-event {
+  background-color: #eee;
+
+  .list {
+    margin: auto;
+    width: 256px;
+  }
+  #details {
+    margin-top: 40px;
+  }
+  #button-list {
+    margin-top: 10px;
+  }
+  .item {
+    padding: 0;
+    border-color: #bbb;
+  }
+  input {
+    border: none;  
+    padding-top: 16px;
+    padding-bottom: 16px;
+    padding-left: 30px;
+    padding-right: 30px;
+    text-align: center;
+    width: 100%;
+    font-size: 16px;
+  }
+  .fa-times {
+    color: #bbb;
+    position: absolute;
+    right: 15px;
+    top: 20px;
+  }
+  #what {
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    border-top: 1px solid #bbb;
+  }
+  #what,
+  #when,
+  #where {
+    border-left: 1px solid #bbb;
+    border-right: 1px solid #bbb;
+  }
+  #where {
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    border-bottom: 1px solid #bbb;
+  }
+  #invite-friends {
+    background-color: $link-color;
+    border: 1px solid $link-hover-color;
+    padding-top: 11px;
+    padding-bottom: 11px;
+    border-radius: 30px;
+    color: #fff;
+    text-align: center;
+    width: 80%;
+    margin: auto;
+
+    &.activated {
+      background-color: $link-hover-color;
+    }
+  }
+}

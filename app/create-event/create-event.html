@@ -1,0 +1,35 @@
+<ion-view id="create-event" view-title="Create Plan">
+  <ion-content>
+    <div class="list" id="details">
+      <div class="item" id="what">
+        <input ng-model="createEvent.title" placeholder="What?">
+      </div>
+      <div class="item" id="when">
+        <input ng-model="createEvent.dateString"
+               placeholder="When?"
+               ng-click="createEvent.showDatePicker()"
+               readonly>
+        <i class="fa fa-times"
+           ng-if="createEvent.datetime"
+           ng-click="createEvent.datetime = null; createEvent.dateString = null"></i>
+      </div>
+      <div class="item" id="where">
+        <input ng-model="createEvent.place.name"
+               placeholder="Where?"
+               ng-click="createEvent.showSetPlaceModal()"
+               readonly>
+        <i class="fa fa-times"
+           ng-if="createEvent.place"
+           ng-click="createEvent.place = null"></i>
+      </div>
+    </div>
+    <div class="list" id="button-list">
+      <button class="item"
+              id="invite-friends"
+              ng-click="createEvent.inviteFriends()"
+              ontouchstart>
+        <i class="fa fa-arrow-right fa-2x"></i>
+      </button>
+    </div>
+  </ion-content>
+</ion-view>

@@ -1,73 +1,13 @@
 class EventsCtrl
-  @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$ionicPlatform', '$scope', '$state', '$timeout', 'Asteroid',
-             'Invitation', 'ngToast', 'Auth']
-  constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$ionicPlatform, @$scope, @$state, @$timeout, @Asteroid,
-                @Invitation, @ngToast, @Auth) ->
-    # Init the set place modal.
-    @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
-        scope: @$scope
-        animation: 'slide-in-up'
-      .then (modal) =>
-        @setPlaceModal = modal
-
-    # Set functions to control the place modal on the scope so that they can be
-    # called from inside the modal.
-    @$scope.hidePlaceModal = =>
-      @setPlaceModal.hide()
-
-    # Update the new event's place when the user selects a place.
-    @$scope.$on 'placeAutocomplete:placeChanged', (event, place) =>
-      @newEvent.hasPlace = true
-      @newEvent.place =
-        name: place.name
-        lat: place.geometry.location.lat()
-        long: place.geometry.location.lng()
-      @$scope.hidePlaceModal()
-
-    # Clean up the set place modal after hiding it.
-    @$scope.$on '$destroy', =>
-      @setPlaceModal.remove()
-
+  @$inject: ['$ionicHistory', '$ionicLoading', '$ionicPlatform', '$scope',
+             '$state', '$timeout', 'Asteroid','Invitation', 'ngToast', 'Auth']
+  constructor: (@$ionicHistory, @$ionicLoading, @$ionicPlatform, @$scope, @$state,
+                @$timeout, @Asteroid, @Invitation, @ngToast, @Auth) ->
     # Fetch the invitations to show on the view.
     @manualRefresh()
 
-    @newEvent = {}
-
     # Refresh the feed when the user comes back to the app.
     @$ionicPlatform.on 'resume', @manualRefresh
-
-  toggleHasDate: ->
-    if not @newEvent.hasDate
-      options =
-        mode: 'datetime' # This can be anything other than 'date' or 'time'
-        allowOldDates: false
-        doneButtonLabel: 'Set Date'
-      # If the user has set the date before, use the previous date they set.
-      if angular.isDate @newEvent.datetime
-        options.date = @newEvent.datetime
-      else
-        options.date = new Date()
-      @$cordovaDatePicker.show options
-        .then (date) =>
-          if date?
-            @newEvent.datetime = date
-            @newEvent.hasDate = true
-    else
-      @newEvent.hasDate = false
-
-  toggleHasPlace: ->
-    if not @newEvent.hasPlace
-      @setPlaceModal.show()
-    else
-      @newEvent.hasPlace = false
-
-  toggleHasComment: ->
-    if not @newEvent.hasComment
-      @newEvent.hasComment = true
-    else
-      @newEvent.hasComment = false
 
   buildItems: (invitations) ->
     # Build the list of items to show on the view.
@@ -275,30 +215,19 @@ class EventsCtrl
   itemWasDeclined: (item) ->
     item.invitation.response is @Invitation.declined
 
-  inviteFriends: ->
-    # Don't animate the transition to the invite friends view.
-    @$ionicHistory.nextViewOptions
-      disableAnimate: true
-
-    newEvent = @getNewEvent()
-    @$state.go 'inviteFriends', {event: newEvent}
-
-  getNewEvent: ->
-    event = {title: @newEvent.title}
-    if @newEvent.hasDate
-      event.datetime = @newEvent.datetime
-    if @newEvent.hasPlace
-      event.place = @newEvent.place
-    if @newEvent.hasComment
-      event.comment = @newEvent.comment
-    event
-
   myFriends: ->
     # Don't animate the transition to the invite friends view.
     @$ionicHistory.nextViewOptions
       disableAnimate: true
 
     @$state.go 'friends'
+
+  createEvent: ->
+    # Don't animate the transition to the create event view.
+    @$ionicHistory.nextViewOptions
+      disableAnimate: true
+
+    @$state.go 'createEvent'
 
   viewEvent: (item) ->
     @$state.go 'event',

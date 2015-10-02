@@ -112,8 +112,6 @@ describe 'invite friends controller', ->
         long: -73.9919324
     $state.params.event = event
 
-    spyOn $ionicHistory, 'nextViewOptions'
-
     spyOn(Auth, 'isNearby').and.callFake (friend) ->
       friend.id in [Auth.user.friends[2].id, Auth.user.friends[3].id]
 
@@ -136,10 +134,12 @@ describe 'invite friends controller', ->
     expect(ctrl.invitedUserIds).toEqual {}
 
   describe 'when entering the view', ->
+
     beforeEach ->
       ctrl.error = 'inviteError'
 
     describe 'with items', ->
+
       beforeEach ->
         spyOn(ctrl, 'buildItems').and.callFake ->
           # Mock there being items.
@@ -147,6 +147,7 @@ describe 'invite friends controller', ->
             isDivider: false
             friend: Auth.user.friends[2]
           ]
+        spyOn $ionicHistory, 'nextViewOptions'
 
         scope.$broadcast '$ionicView.enter'
         scope.$apply()
@@ -169,10 +170,12 @@ describe 'invite friends controller', ->
 
 
     describe 'with no items', ->
+
       beforeEach ->
         spyOn(ctrl, 'buildItems').and.callFake ->
           # Mock there being items.
           ctrl.items = []
+        spyOn $ionicHistory, 'nextViewOptions'
 
         scope.$broadcast '$ionicView.enter'
         scope.$apply()
@@ -313,6 +316,7 @@ describe 'invite friends controller', ->
   describe 'after leaving the view', ->
 
     describe 'when cleanupViewAfterLeave is true', ->
+
       beforeEach ->
         ctrl.cleanupViewAfterLeave = true
         spyOn ctrl, 'cleanupView'
