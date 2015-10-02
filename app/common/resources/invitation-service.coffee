@@ -1,7 +1,7 @@
-Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', \
-              'Auth', 'Event', 'User', \
-              ($http, $mixpanel, $q, $resource, apiRoot, Asteroid, Auth, Event,
-               User) ->
+Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
+              'apiRoot', 'Auth', 'Event', 'User', \
+              ($http, $meteor, $mixpanel, $q, $resource, 
+               apiRoot, Auth, Event, User) ->
   listUrl = "#{apiRoot}/invitations"
   detailUrl =
   serializeInvitation = (invitation) ->
@@ -135,7 +135,7 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', \
     invitation.response = newResponse
     @update(invitation).$promise.then (_invitation) =>
       # Re-subscribe to event messages
-      Asteroid.subscribe 'event', "#{_invitation.eventId}" # Meteor likes strings
+      $meteor.subscribe 'event', "#{_invitation.eventId}" # Meteor likes strings
 
       # Post an action message.
       if _invitation.response is @accepted
@@ -151,7 +151,7 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', \
         type = @declineAction
         status = 'declined'
       $mixpanel.track 'Update Response', {status: status}
-      Messages = Asteroid.getCollection 'messages'
+      Messages = $meteor.getCollectionByName 'messages'
       Messages.insert
         creator:
           id: "#{Auth.user.id}" # Meteor likes strings
@@ -162,11 +162,8 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', \
         text: text
         eventId: "#{_invitation.eventId}" # Meteor likes strings
         type: type
-        createdAt:
-          $date: new Date().getTime()
-      .remote.then (messageId) ->
-        # Mark message as read
-        Asteroid.call 'readMessage', messageId
+        createdAt: new Date()
+      , @readMessage
 
       deferred.resolve invitation
     , ->
@@ -177,6 +174,9 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', \
 
   resource.getUserInvitations = (userId) ->
     @query {user: userId}
+
+  resource.readMessage = (messageId) ->
+    $meteor.call 'readMessage', messageId
 
   resource
 ]

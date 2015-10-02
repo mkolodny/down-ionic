@@ -2,14 +2,13 @@ require 'angular'
 require 'angular-local-storage'
 require 'angular-ui-router'
 require '../common/auth/auth-module'
-require '../common/asteroid/asteroid-module'
 VerifyPhoneCtrl = require './verify-phone-controller'
 
 angular.module 'down.verifyPhone', [
+    'angular-meteor' # required in app-module for tests
     'ui.router'
     'down.auth'
     'LocalStorageModule'
-    'down.asteroid'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'verifyPhone',

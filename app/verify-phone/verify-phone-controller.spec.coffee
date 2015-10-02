@@ -5,18 +5,20 @@ require 'angular-mocks'
 require 'angular-sanitize'
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js'
-Asteroid = require '../common/asteroid/asteroid-module'
+require '../common/meteor/meteor-mocks'
 VerifyPhoneCtrl = require './verify-phone-controller'
 
 describe 'verify phone controller', ->
   $ionicLoading = null
+  $meteor = null
   $q = null
   $rootScope = null
   $state = null
   ctrl = null
   Auth = null
-  Asteroid = null
   scope = null
+
+  beforeEach angular.mock.module('angular-meteor')
 
   beforeEach angular.mock.module('ionic')
 
@@ -24,16 +26,14 @@ describe 'verify phone controller', ->
 
   beforeEach angular.mock.module('down.auth')
 
-  beforeEach angular.mock.module('down.asteroid')
-
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $ionicLoading = $injector.get '$ionicLoading'
+    $meteor = $injector.get '$meteor'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     Auth = angular.copy $injector.get('Auth')
-    Asteroid = $injector.get 'Asteroid'
     scope = $rootScope.$new()
 
     Auth.phone = '+15555555555'
@@ -151,7 +151,7 @@ describe 'verify phone controller', ->
 
     beforeEach ->
       deferred = $q.defer()
-      spyOn(Asteroid, 'login').and.returnValue deferred.promise
+      $meteor.loginWithPassword.and.returnValue deferred.promise
 
       user =
         id: 1
@@ -160,7 +160,7 @@ describe 'verify phone controller', ->
       ctrl.meteorLogin user
 
     it 'should attempt to login', ->
-      expect(Asteroid.login).toHaveBeenCalledWith user.id, user.authtoken
+      expect($meteor.loginWithPassword).toHaveBeenCalledWith "#{user.id}", user.authtoken
 
     describe 'successfully', ->
 

@@ -6,29 +6,29 @@ require 'angular-local-storage'
 require 'ng-cordova'
 require './auth-module'
 require '../mixpanel/mixpanel-module'
-require '../asteroid/asteroid-module'
+require '../meteor/meteor-mocks'
 
 describe 'Auth service', ->
   $cordovaGeolocation = null
   $cordovaDevice = null
   $httpBackend = null
   $mixpanel = null
+  $meteor = null
   scope = null
   $state = null
   $q = null
   apiRoot = null
   Auth = null
-  Asteroid = null
   Invitation = null
   User = null
   deserializedUser = null
   localStorage = null
 
+  beforeEach angular.mock.module('angular-meteor')
+
   beforeEach angular.mock.module('analytics.mixpanel')
 
   beforeEach angular.mock.module('down.auth')
-
-  beforeEach angular.mock.module('down.asteroid')
 
   beforeEach angular.mock.module('ngCordova.plugins.geolocation')
 
@@ -68,10 +68,6 @@ describe 'Auth service', ->
         set: jasmine.createSpy '$mixpanel.people.set'
     $provide.value '$mixpanel', $mixpanel
 
-    Asteroid =
-      login: jasmine.createSpy 'Asteroid.login'
-    $provide.value 'Asteroid', Asteroid
-
     return
   )
 
@@ -80,6 +76,7 @@ describe 'Auth service', ->
     $httpBackend = $injector.get '$httpBackend'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
+    $meteor = $injector.get '$meteor'
     apiRoot = $injector.get 'apiRoot'
     Auth = angular.copy $injector.get('Auth')
     Invitation = $injector.get 'Invitation'
@@ -124,8 +121,8 @@ describe 'Auth service', ->
       it 'should set the user on Auth', ->
         expect(Auth.user).toAngularEqual user
 
-      it 'should log in to Asteroid', ->
-        expect(Asteroid.login).toHaveBeenCalledWith user.id, user.authtoken
+      it 'should log in to meteor', ->
+        expect($meteor.loginWithPassword).toHaveBeenCalledWith "#{user.id}", user.authtoken
 
       it 'should identify the user with mixpanel', ->
         expect(Auth.mixpanelIdentify).toHaveBeenCalled()

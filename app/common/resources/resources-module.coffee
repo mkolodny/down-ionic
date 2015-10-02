@@ -1,7 +1,6 @@
 require 'angular'
 require 'angular-local-storage'
 require 'angular-resource'
-require '../asteroid/asteroid-module'
 require '../auth/auth-module'
 require '../env/env-module'
 require '../mixpanel/mixpanel-module'
@@ -15,9 +14,9 @@ User = require './user-service'
 UserPhone = require './userphone-service'
 
 angular.module 'down.resources', [
+    'angular-meteor' # required in app-module for tests
     'analytics.mixpanel'
     'ngResource'
-    'down.asteroid'
     'down.auth'
     'down.env'
     'LocalStorageModule'

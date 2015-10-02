@@ -43,7 +43,7 @@
     </div>
   </div>
   <ion-content ng-click="event.toggleIsHeaderExpanded()" ontouchstart>
-    <ion-list>
+    <ion-list scroll-glue>
       <!-- We might need to use `track by item.id` to keep this quick. -->
       <ion-item ng-repeat="message in event.messages">
         <div class="action-message" ng-if="event.isActionMessage(message)">
@@ -56,8 +56,6 @@
         </div>
       </ion-item>
     </ion-list>
-    <ion-infinite-scroll on-infinite="event.saveMaxTop()"
-                         distance="1%" ng-show="false"></ion-infinite-scroll>
   </ion-content>
   <ion-footer-bar class="bar-light" keyboard-attach>
     <textarea ng-model="event.message" placeholder="Type a message..." msd-elastic
