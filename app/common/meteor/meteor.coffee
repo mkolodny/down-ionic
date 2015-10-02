@@ -9,4 +9,4 @@ require './angular-meteor.js'
 # Define Local Mongo Collections
 #   In controllers use $meteor.getCollectionByName 'messages'
 new Mongo.Collection 'events'
-new Mongo.Collection 'messages'
+new Mongo.Collection 'eventMessages'

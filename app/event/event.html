@@ -45,7 +45,7 @@
   <ion-content ng-click="event.toggleIsHeaderExpanded()" ontouchstart>
     <ion-list scroll-glue>
       <!-- We might need to use `track by item.id` to keep this quick. -->
-      <ion-item ng-repeat="message in event.messages">
+      <ion-item ng-repeat="message in event.eventMessages">
         <div class="action-message" ng-if="event.isActionMessage(message)">
           {{message.text}}
         </div>

@@ -6,7 +6,7 @@ class EventsCtrl
                 @$ionicPlatform, @$meteor, @$scope, @$state, @$timeout, @Auth,
                 @Invitation, @ngToast, @User) ->
     # Set Meteor collections on controller
-    @Messages = @$meteor.getCollectionByName 'messages'
+    @EventMessages = @$meteor.getCollectionByName 'eventMessages'
     @Events = @$meteor.getCollectionByName 'events'
 
     # Init the set place modal.
@@ -118,8 +118,8 @@ class EventsCtrl
 
     items
 
-  eventsMessagesSubscribe: (events) ->
-    # Subscribe to the messages posted in each event.
+  eventsEventMessagesSubscribe: (events) ->
+    # Subscribe to the eventMessages posted in each event.
     for event in events
       @$scope.$meteorSubscribe 'event', "#{event.id}"
 
@@ -130,7 +130,7 @@ class EventsCtrl
       sort:
         createdAt: -1
       transform: @transformMessage
-    @$scope.$meteorObject @Messages, selector, false, options
+    @$scope.$meteorObject @EventMessages, selector, false, options
 
   transformMessage: (message) =>
     # Show senders first name
@@ -216,9 +216,9 @@ class EventsCtrl
         # Build the list of items to show in the view.
         @items = @buildItems @invitations
 
-        # Subscribe to the messages for each event.
+        # Subscribe to the eventMessages for each event.
         events = (invitation.event for invitation in invitations)
-        @eventsMessagesSubscribe events
+        @eventsEventMessagesSubscribe events
 
         # Set `percentRemaining` as a property on each event as a workaround for
         #   stopping angular-chart.js from calling `getPercentRemaining` too many
