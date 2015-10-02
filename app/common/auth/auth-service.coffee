@@ -217,4 +217,31 @@ class Auth
 
     {$promise: deferred.promise}
 
+  getDistanceAway: (location) ->
+    start =
+      latitude: @user.location.lat
+      longitude: @user.location.long
+    end =
+      latitude: location.lat
+      longitude: location.long
+    distanceAway = haversine start, end, {unit: 'mile'}
+    if distanceAway < .094697 # 500 feet
+      '< 500 feet'
+    else if distanceAway < 1
+      '< 1 mile'
+    else if distanceAway < 2
+      '< 2 miles'
+    else if distanceAway < 5
+      '< 5 miles'
+    else if distanceAway < 10
+      '< 10 miles'
+    else if distanceAway < 25
+      '< 25 miles'
+    else if distanceAway < 50
+      '< 50 miles'
+    else if distanceAway < 100
+      '< 100 miles'
+    else
+      'really far'
+
 module.exports = Auth
