@@ -1,10 +1,14 @@
 class EventsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$ionicPlatform', '$scope', '$state', '$timeout', 'Asteroid', 'Auth',
+             '$ionicPlatform', '$meteor', '$scope', '$state', '$timeout', 'Auth',
              'Invitation', 'ngToast', 'User']
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$ionicPlatform, @$scope, @$state, @$timeout, @Asteroid, @Auth,
+                @$ionicPlatform, @$meteor, @$scope, @$state, @$timeout, @Auth,
                 @Invitation, @ngToast, @User) ->
+    # Set Meteor collections on controller
+    @Messages = @$meteor.getCollectionByName 'messages'
+    @Events = @$meteor.getCollectionByName 'events'
+
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
         scope: @$scope
@@ -92,6 +96,11 @@ class EventsCtrl
           isDivider: false
           invitation: invitation
           id: invitation.id
+          # DON'T SET THE METEOR ANGULAR VARIABLES ON THE EVENT ITSELF!!
+          #   AngularMeteorObject.getRawObject() breaks... not sure why...
+          #   When passing an AngularMeteorObject into $state.go, AngularMeteor.getRawObject()
+          #   is automatically called. Therefore, do not pass AngularMeteorObjects into $state.go.
+          newestMessage: @getNewestMessage "#{invitation.event.id}"
 
     friends = (friend for id, friend of @Auth.user.friends \
         when friend.username isnt null)
@@ -112,101 +121,38 @@ class EventsCtrl
   eventsMessagesSubscribe: (events) ->
     # Subscribe to the messages posted in each event.
     for event in events
-      @Asteroid.subscribe 'event', event.id
+      @$scope.$meteorSubscribe 'event', "#{event.id}"
 
-    Messages = @Asteroid.getCollection 'messages'
-    Events = @Asteroid.getCollection 'events'
-    for event in events
-      messagesRQ = Messages.reactiveQuery {eventId: "#{event.id}" }
-      eventsRQ = Events.reactiveQuery {_id: "#{event.id}" }
+  getNewestMessage: (eventId) =>
+    selector =
+      eventId: eventId
+    options =
+      sort:
+        createdAt: -1
+      transform: @transformMessage
+    @$scope.$meteorObject @Messages, selector, false, options
 
-      # Keep the same value of `messagesRQ` even after the variable changes
-      #   next time through the loop.
-      do (event, messagesRQ, eventsRQ) =>
-        # Set the latest message on the event.
-        messages = angular.copy messagesRQ.result
-        @setLatestMessage event, messages
+  transformMessage: (message) =>
+    # Show senders first name
+    if message.type is 'text'
+      firstName = message.creator.firstName
+      message.text = "#{firstName}: #{message.text}"
 
-        # Whenever a new message gets posted on the event, set the
-        # latest message on the event.
-        messagesRQ.on 'change', (_id) =>
-          messages = angular.copy messagesRQ.result
-          if @isNewMessage event, _id
-            @setLatestMessage event, messages
+    # Bind meteorEvent for checking wasRead
+    message.meteorEvent = @$scope.$meteorObject @Events, message.eventId, false
 
-        # Whenever an event changes, check is the lastest message has been read
-        eventsRQ.on 'change', =>
-          latestMessage = messages[0]
-          if event.latestMessage isnt undefined and latestMessage isnt undefined
-            event.latestMessage.wasRead = @getWasRead latestMessage
+    message
 
-  # mongo _id's are randomly generated client side via
-  # Asteroid and therefore are not chronological
-  # use the message.createdAt for determining new messages
-  isNewMessage: (event, messageId) ->
-    # latest message hasn't been set yet
-    if not event.latestMessage? then return true
+  wasRead: (message) =>
+    members = message.meteorEvent?.members or []
+    lastRead = (member.lastRead for member in members when "#{@Auth.user.id}" is member.userId)[0]
+    lastRead >= message.createdAt
 
-    # get message object by _id
-    Messages = @Asteroid.getCollection 'messages'
-    messagesRQ = Messages.reactiveQuery {_id: messageId}
-    message = messagesRQ.result[0]
-    if message isnt undefined
-      message.createdAt.$date > event.latestMessage?.createdAt?.getTime()
+  #   # Move the event's updated item.
+  #   for item in @items
+  #     if item.invitation?.event.id is event.id
+  #       @items = @buildItems @invitations
 
-  setLatestMessage: (event, messages) ->
-    if messages.length is 0 then return
-
-    # Sort the messages from newest to oldest.
-    messages.sort (a, b) ->
-      if a.createdAt.$date > b.createdAt.$date
-        return -1
-      else
-        return 1
-
-    latestMessage = messages[0]
-
-    # Only update the event if the latest message is newer than the updatedAt.
-    if latestMessage.createdAt.$date <= event.latestMessage?.createdAt?.getTime()
-      return
-
-    # Update the latest message text
-    event.latestMessage = {}
-    if latestMessage.type is 'text'
-      firstName = latestMessage.creator.firstName
-      event.latestMessage.text = "#{firstName}: #{latestMessage.text}"
-    else
-      event.latestMessage.text = latestMessage.text
-
-    # Set unread or not for message
-    event.latestMessage.wasRead = @getWasRead latestMessage
-
-    # Update the latest message createdAt date.
-    event.latestMessage.createdAt = new Date latestMessage.createdAt.$date
-
-    # Move the event's updated item.
-    for item in @items
-      if item.invitation?.event.id is event.id
-        @items = @buildItems @invitations
-
-  getWasRead: (message) ->
-    Events = @Asteroid.getCollection 'events'
-    eventsRQ = Events.reactiveQuery {_id: message.eventId}
-    event = eventsRQ.result[0]
-
-    # Have to check if event exists in case the
-    # subscribe hasn't returned the event yet
-    if event is undefined
-      return true
-
-    currentUser = (member for member in event.members \
-        when member.userId is "#{@Auth.user.id}")[0]
-
-    # Make sure the current user is still a member.
-    if currentUser is undefined
-      return true
-
-    currentUser.lastRead.$date >= message.createdAt.$date
 
   acceptInvitation: (item, $event) ->
     @respondToInvitation item, $event, @Invitation.accepted

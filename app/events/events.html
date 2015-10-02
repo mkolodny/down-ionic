@@ -22,7 +22,7 @@
                   'item-divider': item.isDivider,
                   'item-avatar': !item.isDivider,
                   'item-icon-right': !item.isDivider,
-                  updated: !item.isDivider && item.invitation.event.latestMessage && !item.invitation.event.latestMessage.wasRead,
+                  updated: !item.isDivider && item.newestMessage && !events.wasRead(item.newestMessage),
                   last: $last
                 }"
                 ng-click="item.isDivider ? null : events.viewEvent(item)">
@@ -52,9 +52,9 @@
                   ></canvas>
           <h2>{{item.invitation.event.title}}</h2>
           <p class="latest-message">
-            <span ng-if="item.invitation.event.latestMessage.text"
-                  >{{item.invitation.event.latestMessage.text}}</span>
-            <span ng-if="!item.invitation.event.latestMessage.text"
+            <span ng-if="item.newestMessage.text"
+                  >{{item.newestMessage.text}}</span>
+            <span ng-if="!item.newestMessage.text"
                   >with {{item.invitation.fromUser.name}}</span>
           </p>
         </div>
@@ -65,10 +65,10 @@
                ng-src="{{item.friend.getImageUrl()}}">
           <h2>{{item.friend.name}}</h2>
           <p class="latest-message">
-            <span ng-if="item.friend.latestMessage.text"
-                  >{{item.friend.latestMessage.text}}</span>
+            <span n.newestMessage.text"
+               .newestMessage.text}}</span>
             <!-- TODO:
-            <span ng-if="!item.friend.latestMessage.text"
+            <span ng.newestMessage.text"
                   >{{item.friend.getDistanceAway()}} away</span>
             -->
           </p>

@@ -76,7 +76,7 @@ class EventCtrl
       eventId: "#{@event.id}"
     options =
       sort:
-        createdAt: 1
+        createdAt: -1
     @$meteor.object @Messages, selector, false, options
 
   getMeteorEvent: =>

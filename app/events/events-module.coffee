@@ -3,7 +3,6 @@ require 'angular-chart.js'
 require 'angular-elastic'
 require 'angular-ui-router'
 require 'ng-toast'
-require '../common/asteroid/asteroid-module'
 require '../common/auth/auth-module'
 require '../common/place-autocomplete/place-autocomplete-module'
 require '../common/resources/resources-module'
@@ -11,8 +10,8 @@ require '../common/view-place/view-place-module'
 EventsCtrl = require './events-controller'
 
 angular.module 'down.events', [
+    'angular-meteor' # required in app-module for tests
     'chart.js'
-    'down.asteroid'
     'down.auth'
     'down.placeAutocomplete'
     'down.resources'
