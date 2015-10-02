@@ -2,9 +2,11 @@ require 'angular'
 require 'angular-mocks'
 require './resources-module'
 require '../mixpanel/mixpanel-module'
+require '../meteor/meteor-mocks'
 
 describe 'invitation service', ->
   $httpBackend = null
+  $meteor = null
   $mixpanel = null
   $q = null
   $rootScope = null
@@ -16,6 +18,8 @@ describe 'invitation service', ->
   Invitation = null
   Messages = null
   User = null
+
+  beforeEach angular.mock.module('angular-meteor')
 
   beforeEach angular.mock.module('analytics.mixpanel')
 
@@ -30,21 +34,12 @@ describe 'invitation service', ->
         lastName: 'Turing'
         imageUrl: 'http://facebook.com/profile-pic/tdog'
     $provide.value 'Auth', Auth
-
-    # Mock Asteroid.
-    Messages =
-      insert: jasmine.createSpy 'Messages.insert'
-    Asteroid =
-      getCollection: jasmine.createSpy('Asteroid.getCollection').and.returnValue \
-          Messages
-      call: jasmine.createSpy 'Asteroid.call'
-      subscribe: jasmine.createSpy 'Asteroid.subscribe'
-    $provide.value 'Asteroid', Asteroid
     return
   )
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
+    $meteor = $injector.get '$meteor'
     $mixpanel = $injector.get '$mixpanel'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
@@ -52,6 +47,11 @@ describe 'invitation service', ->
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
     User = $injector.get 'User'
+
+    # Mock Messages collection
+    Messages =
+      insert: jasmine.createSpy 'Messages.insert'
+    $meteor.getCollectionByName.and.returnValue Messages
 
     listUrl = "#{apiRoot}/invitations"
   )
@@ -348,10 +348,10 @@ describe 'invitation service', ->
           expect(invitationCopy.response).toBe Invitation.accepted
 
         it 'should get the messages collection', ->
-          expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
         it 'should re-subscribe to the event messages', ->
-          expect(Asteroid.subscribe).toHaveBeenCalledWith(
+          expect($meteor.subscribe).toHaveBeenCalledWith(
               'event', "#{invitation.eventId}")
 
         it 'should resolve the promise', ->
@@ -372,20 +372,8 @@ describe 'invitation service', ->
             text: "#{Auth.user.name} is down."
             eventId: "#{invitation.eventId}"
             type: Invitation.acceptAction
-            createdAt:
-              $date: date.getTime()
-          expect(Messages.insert).toHaveBeenCalledWith message
-
-        describe 'meteor message saved successfully', ->
-          messageId = null
-
-          beforeEach ->
-            messageId = 'asdf'
-            messagesDeferred.resolve messageId
-            $rootScope.$apply()
-
-          it 'should mark action message as read', ->
-            expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', messageId
+            createdAt: date
+          expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
 
 
       describe 'to maybe', ->
@@ -401,7 +389,7 @@ describe 'invitation service', ->
           $rootScope.$apply()
 
         it 'should get the messages collection', ->
-          expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
         it 'should track the response in mixpanel', ->
           expect($mixpanel.track).toHaveBeenCalledWith 'Update Response',
@@ -418,26 +406,14 @@ describe 'invitation service', ->
             text: "#{Auth.user.name} might be down."
             eventId: "#{invitation.eventId}"
             type: Invitation.maybeAction
-            createdAt:
-              $date: date.getTime()
-          expect(Messages.insert).toHaveBeenCalledWith message
+            createdAt: date
+          expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.maybe
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true
-
-        describe 'meteor message saved successfully', ->
-          messageId = null
-
-          beforeEach ->
-            messageId = 'asdf'
-            messagesDeferred.resolve messageId
-            $rootScope.$apply()
-
-          it 'should mark action message as read', ->
-            expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', messageId
 
 
       describe 'from accepted to declined', ->
@@ -453,7 +429,7 @@ describe 'invitation service', ->
           $rootScope.$apply()
 
         it 'should get the messages collection', ->
-          expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
         it 'should track the response in mixpanel', ->
           expect($mixpanel.track).toHaveBeenCalledWith 'Update Response',
@@ -470,26 +446,14 @@ describe 'invitation service', ->
             text: "#{Auth.user.name} can\'t make it."
             eventId: "#{invitation.eventId}"
             type: Invitation.declineAction
-            createdAt:
-              $date: date.getTime()
-          expect(Messages.insert).toHaveBeenCalledWith message
+            createdAt: date
+          expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.declined
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true
-
-        describe 'meteor message saved successfully', ->
-          messageId = null
-
-          beforeEach ->
-            messageId = 'asdf'
-            messagesDeferred.resolve messageId
-            $rootScope.$apply()
-
-          it 'should mark action message as read', ->
-            expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', messageId
 
 
     describe 'unsuccessfully', ->
