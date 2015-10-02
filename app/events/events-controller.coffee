@@ -247,4 +247,7 @@ class EventsCtrl
   addFromFacebook: ->
     @$state.go 'addFromFacebook'
 
+  getDistanceAway: (friend) ->
+    @Auth.getDistanceAway friend.location
+
 module.exports = EventsCtrl

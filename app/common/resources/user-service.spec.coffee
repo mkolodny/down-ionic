@@ -4,15 +4,15 @@ require './resources-module'
 
 describe 'user service', ->
   $httpBackend = null
-  User = null
   listUrl = null
+  User = null
 
   beforeEach angular.mock.module('down.resources')
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
     apiRoot = $injector.get 'apiRoot'
-    User = $injector.get 'User'
+    User = angular.copy $injector.get('User')
 
     listUrl = "#{apiRoot}/users"
   )

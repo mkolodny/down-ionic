@@ -1038,3 +1038,129 @@ describe 'Auth service', ->
 
       it 'should reject the promise', ->
         expect(rejected).toBe true
+
+
+  describe 'getting how far away a location is', ->
+    user = null
+    distanceAway = null
+
+    beforeEach ->
+      Auth.user.location =
+        lat: 40.7138251
+        long: -73.9897481
+
+    describe 'when it\'s < 500 ft away', ->
+
+      beforeEach ->
+        location =
+          lat: 40.7151
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 500 feet'
+
+
+    describe 'when it\'s < 1 mile away', ->
+
+      beforeEach ->
+        location =
+          lat: 40.7281
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 1 mile'
+
+
+    describe 'when it\'s < 2 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 40.7421
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 2 miles'
+
+
+    describe 'when it\'s < 5 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 40.78
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 5 miles'
+
+
+    describe 'when it\'s < 10 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 40.85
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 10 miles'
+
+
+    describe 'when it\'s < 25 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 41.05
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 25 miles'
+
+
+    describe 'when it\'s < 50 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 41.4
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 50 miles'
+
+
+    describe 'when it\'s < 100 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 42.1
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 100 miles'
+
+
+    describe 'when it\'s > 100 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 42.2
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe 'really far'

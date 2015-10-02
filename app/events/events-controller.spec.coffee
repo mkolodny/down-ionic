@@ -311,7 +311,7 @@ describe 'events controller', ->
       for friend in friends
         Auth.user.friends[friend.id] = friend
       # TODO: Sort the friends by latest message, then distance.
-      
+
       newestMessage = 'newestMessage'
       spyOn(ctrl, 'getNewestMessage').and.returnValue newestMessage
 
@@ -378,7 +378,9 @@ describe 'events controller', ->
         sort:
           createdAt: -1
         transform: ctrl.transformMessage
-      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.EventMessages, selector, false, options
+      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.Messages, selector,
+          false, options)
+
 
   describe 'transforming a message', ->
 
@@ -392,7 +394,7 @@ describe 'events controller', ->
         scope.$meteorObject = jasmine.createSpy('scope.$meteorObject')
           .and.returnValue meteorEvent
 
-        message = 
+        message =
           type: 'text'
           text: 'Hi Guys!'
           creator:
@@ -551,3 +553,26 @@ describe 'events controller', ->
 
     it 'should go to the add from facebook view', ->
       expect($state.go).toHaveBeenCalledWith 'addFromFacebook'
+
+
+  describe 'checking how far away a friend is', ->
+    distanceAway = null
+    friend = null
+    returnedDistanceAway = null
+
+    beforeEach ->
+      distanceAway = 'distanceAway'
+      spyOn(Auth, 'getDistanceAway').and.returnValue distanceAway
+      friend =
+        id: 2
+        location:
+          lat: 40.7138251
+          long: -73.9897481
+
+      returnedDistanceAway = ctrl.getDistanceAway friend
+
+    it 'should check how far away they are', ->
+      expect(Auth.getDistanceAway).toHaveBeenCalledWith friend.location
+
+    it 'should return the distance away', ->
+      expect(returnedDistanceAway).toBe distanceAway

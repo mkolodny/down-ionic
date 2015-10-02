@@ -65,12 +65,10 @@
                ng-src="{{item.friend.getImageUrl()}}">
           <h2>{{item.friend.name}}</h2>
           <p class="latest-message">
-            <span n.newestMessage.text"
-               .newestMessage.text}}</span>
-            <!-- TODO:
-            <span ng.newestMessage.text"
-                  >{{item.friend.getDistanceAway()}} away</span>
-            -->
+            <span ng-if="item.newestMessage.text"
+                  >{{item.newestMessage.text}}</span>
+            <span ng-if="!item.newestMessage.text"
+                  >{{events.getDistanceAway(item.friend)}} away</span>
           </p>
         </div>
       </ion-item>
