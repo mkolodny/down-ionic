@@ -50,8 +50,12 @@ class EventCtrl
       @meteorEvent = @getMeteorEvent()
 
       # Watch for changes
-      @$scope.$watch @newestMessage, @handleNewMessage
-      @$scope.$watch @meteorEvent, @handleMembersChange
+      @$scope.$watch =>
+        @newestMessage._id
+      , @handleNewMessage
+      @$scope.$watch =>
+        @meteorEvent._id
+      , @handleMembersChange
 
     # Remove angular-meteor bindings
     @$scope.$on '$ionicView.leave', =>
