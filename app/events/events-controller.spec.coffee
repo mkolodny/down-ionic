@@ -378,7 +378,7 @@ describe 'events controller', ->
         sort:
           createdAt: -1
         transform: ctrl.transformMessage
-      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.Messages, selector,
+      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.EventMessages, selector,
           false, options)
 
 
