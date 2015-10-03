@@ -532,6 +532,41 @@ describe 'events controller', ->
       expect(ctrl.getInvitations).toHaveBeenCalled()
 
 
+  describe 'viewing an event chat', ->
+    invitation = null
+
+    beforeEach ->
+      spyOn $state, 'go'
+      invitation =
+        event:
+          id: 1
+      item =
+        invitation: invitation
+      ctrl.viewEventChat item
+
+    it 'should go to the event chat', ->
+      expect($state.go).toHaveBeenCalledWith 'event',
+        invitation: invitation
+        id: invitation.event.id
+
+
+  describe 'viewing an friend chat', ->
+    friend = null
+
+    beforeEach ->
+      spyOn $state, 'go'
+      friend =
+        id: 1
+      item =
+        friend: friend
+      ctrl.viewFriendChat item
+
+    it 'should go to the friend chat', ->
+      expect($state.go).toHaveBeenCalledWith 'friend',
+        friend: friend
+        id: friend.id
+
+
   describe 'tapping to add by username', ->
 
     beforeEach ->

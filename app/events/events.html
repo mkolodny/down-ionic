@@ -24,8 +24,7 @@
                   'item-icon-right': !item.isDivider,
                   updated: !item.isDivider && !events.wasRead(item.newestMessage),
                   last: $last
-                }"
-                ng-click="item.isDivider ? null : events.viewEvent(item)">
+                }">
         <!-- Divider -->
         <div ng-if="item.isDivider">
           <span class="divider-title">{{item.title}}</span>
@@ -33,7 +32,8 @@
         </div>
 
         <!-- Event -->
-        <div ng-if="item.invitation">
+        <div ng-if="item.invitation"
+             ng-click="events.viewEventChat(item)">
           <img class="item-image"
                ng-src="{{item.invitation.fromUser.getImageUrl()}}">
           <canvas class="chart chart-pie"
@@ -60,7 +60,8 @@
         </div>
 
         <!-- Friend -->
-        <div ng-if="item.friend">
+        <div ng-if="item.friend"
+             ng-click="events.viewFriendChat(item)">
           <img class="item-image"
                ng-src="{{item.friend.getImageUrl()}}">
           <h2>{{item.friend.name}}</h2>
