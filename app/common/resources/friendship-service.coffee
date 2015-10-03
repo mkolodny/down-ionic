@@ -44,7 +44,8 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
 
     {$promise: deferred.promise}
 
-  resource.sendMessage = (friendId, text) ->
+  resource.sendMessage = (friend, text) ->
+    friendId = friend.id
     # Save the message on the meteor server.
     Messages = $meteor.getCollectionByName 'messages'
     Messages.insert
@@ -55,7 +56,7 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
         lastName: Auth.user.lastName
         imageUrl: Auth.user.imageUrl
       text: text
-      groupId: "#{Auth.user.id},#{friendId}"
+      chatId: @getChatId friendId
       type: 'text'
       createdAt: new Date()
 
@@ -66,9 +67,9 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
 
   resource.getChatId = (friendId) ->
     if Auth.user.id < friendId
-      "#{Auth.user.id},#{friendId}"
+      return "#{Auth.user.id},#{friendId}"
     else
-      "#{friendId},#{Auth.user.id}"
+      return "#{friendId},#{Auth.user.id}"
 
   resource
 ]

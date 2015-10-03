@@ -5,6 +5,10 @@ class FriendshipCtrl
                 @Friendship, @User) ->
     @friend = @$stateParams.friend
 
+    # Set Meteor collections on controller
+    @Messages = @$meteor.getCollectionByName 'messages'
+    @Chats = @$meteor.getCollectionByName 'chats'
+
     @$scope.$on '$ionicView.enter', =>
       # Subscribe to the chat messages.
       @chatId = @Friendship.getChatId @friend.id
@@ -21,7 +25,6 @@ class FriendshipCtrl
     @$scope.$on '$ionicView.leave', =>
       # Remove angular-meteor bindings.
       @messages.stop()
-      @chat.stop()
 
   getMessages: =>
     @Messages.find
