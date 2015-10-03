@@ -5,12 +5,20 @@ require 'angular-sanitize' # for ngToast
 require 'angular-ui-router'
 require 'ng-toast'
 require 'ng-cordova'
+# Lib
 require './ionic/angular-ios9-uiwebview.patch.js'
 require './ionic/ionic.js' # for ionic global object
 require './ionic/ionic-core.js'
 require './ionic/ionic-deploy.js'
 require './vendor/mixpanel/mixpanel-jslib-snippet'
+# Common
+require './common/mixpanel/mixpanel-module'
+require './common/auth/auth-module'
+require './common/env/env-module'
 require './common/meteor/meteor' # Must be required after env-module
+require './common/resources/resources-module'
+require './common/push-notifications/push-notifications-module'
+# Views
 require './login/login-module'
 require './verify-phone/verify-phone-module'
 require './facebook-sync/facebook-sync-module'
@@ -24,11 +32,6 @@ require './invite-friends/invite-friends-module'
 require './add-by-username/add-by-username-module'
 require './add-from-address-book/add-from-address-book-module'
 require './add-from-facebook/add-from-facebook-module'
-require './common/mixpanel/mixpanel-module'
-require './common/auth/auth-module'
-require './common/env/env-module'
-require './common/resources/resources-module'
-require './common/push-notifications/push-notifications-module'
 require './event/event-module'
 require './my-friends/my-friends-module'
 require './add-friends/add-friends-module'
