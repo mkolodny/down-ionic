@@ -28,7 +28,7 @@ describe 'event controller', ->
   deferredTemplate = null
   Event = null
   event = null
-  eventsCollection = null
+  groupsCollection = null
   invitation = null
   Invitation = null
   LinkInvitation = null
@@ -119,10 +119,10 @@ describe 'event controller', ->
     spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
 
     messagesCollection = 'messagesCollection'
-    eventsCollection = 'eventsCollection'
+    groupsCollection = 'groupsCollection'
     $meteor.getCollectionByName.and.callFake (collectionName) ->
       if collectionName is 'messages' then return messagesCollection
-      if collectionName is 'events' then return eventsCollection
+      if collectionName is 'groups' then return groupsCollection
 
     ctrl = $controller EventCtrl,
       $scope: scope
@@ -155,12 +155,12 @@ describe 'event controller', ->
     expect(ctrl.Messages).toBe messagesCollection
 
   it 'should set the events collection on the controller', ->
-    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'events'
-    expect(ctrl.Events).toBe eventsCollection
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'groups'
+    expect(ctrl.Groups).toBe groupsCollection
 
   describe 'once the view loads', ->
     newestMessage = null
-    meteorEvent = null
+    group = null
 
     beforeEach ->
       spyOn $ionicScrollDelegate, 'scrollBottom'
@@ -171,9 +171,9 @@ describe 'event controller', ->
       spyOn ctrl, 'getMessages'
 
 
-      meteorEvent =
-        _id: 'meteorEvent'
-      spyOn(ctrl, 'getMeteorEvent').and.returnValue meteorEvent
+      group =
+        _id: 'group'
+      spyOn(ctrl, 'getGroup').and.returnValue group
       
       newestMessage =
         _id: 'newestMessage'
@@ -186,7 +186,7 @@ describe 'event controller', ->
       scope.$apply()
 
     it 'should subscribe to the events messages', ->
-      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'event', event.id
+      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'group', "#{event.id}"
 
     it 'should bind the messages to the controller', ->
       # TODO: Check that controller property is set
@@ -197,8 +197,8 @@ describe 'event controller', ->
       expect(ctrl.newestMessage).toEqual newestMessage
 
     it 'should bind the meteor event members to the controller', ->
-      expect(ctrl.meteorEvent).toEqual meteorEvent
-      expect(ctrl.getMeteorEvent).toHaveBeenCalled()
+      expect(ctrl.group).toEqual group
+      expect(ctrl.getGroup).toHaveBeenCalled()
 
     it 'should update the members array', ->
       expect(ctrl.updateMembers).toHaveBeenCalled()
@@ -215,10 +215,10 @@ describe 'event controller', ->
         expect(ctrl.handleNewMessage).toHaveBeenCalled()
 
 
-    describe 'when the meteorEvent changes', ->
+    describe 'when the group changes', ->
 
       beforeEach ->
-        ctrl.meteorEvent =
+        ctrl.group =
           _id: 'someotherid'
         ctrl.handleMembersChange.calls.reset()
         scope.$apply()
@@ -234,8 +234,8 @@ describe 'event controller', ->
         stop: jasmine.createSpy 'messages.stop'
       ctrl.newestMessage =
         stop: jasmine.createSpy 'newestMessage.stop'
-      ctrl.meteorEvent =
-        stop: jasmine.createSpy 'meteorEvent.stop'
+      ctrl.group =
+        stop: jasmine.createSpy 'group.stop'
 
       scope.$broadcast '$ionicView.leave'
       scope.$apply()
@@ -243,7 +243,7 @@ describe 'event controller', ->
     it 'should stop remove angular-meteor bindings', ->
       expect(ctrl.messages.stop).toHaveBeenCalled()
       expect(ctrl.newestMessage.stop).toHaveBeenCalled()
-      expect(ctrl.meteorEvent.stop).toHaveBeenCalled()
+      expect(ctrl.group.stop).toHaveBeenCalled()
 
 
   describe 'getting messages', ->
@@ -261,7 +261,7 @@ describe 'event controller', ->
 
     it 'should query, sort and transform messages', ->
       selector =
-        eventId: "#{ctrl.event.id}"
+        groupId: "#{ctrl.event.id}"
       options =
         sort:
           createdAt: 1
@@ -283,7 +283,7 @@ describe 'event controller', ->
 
     it 'should filter object by event id and sort by created at', ->      
       selector =
-        eventId: "#{ctrl.event.id}"
+        groupId: "#{ctrl.event.id}"
       options =
         sort:
           createdAt: -1
@@ -292,20 +292,20 @@ describe 'event controller', ->
 
   describe 'getting meteor members', ->
     result = null
-    meteorEvent = null
+    group = null
 
     beforeEach ->
-      meteorEvent = 'meteorEvent'
-      $meteor.object.and.returnValue meteorEvent
-      result = ctrl.getMeteorEvent()
+      group = 'group'
+      $meteor.object.and.returnValue group
+      result = ctrl.getGroup()
 
     it 'should return an AngularMeteorObject', ->
-      expect(result).toEqual meteorEvent
+      expect(result).toEqual group
 
     it 'should filter for the current event', ->
       selector =
-        _id: "#{ctrl.event.id}"
-      expect($meteor.object).toHaveBeenCalledWith ctrl.Events, selector, false
+        groupId: "#{ctrl.event.id}"
+      expect($meteor.object).toHaveBeenCalledWith ctrl.Groups, selector, false
 
 
   describe 'transforming messages', ->
@@ -349,7 +349,7 @@ describe 'event controller', ->
           id: 2
           name: 'The Other Guy'
         ctrl.members = [member1, member2]
-        ctrl.meteorEvent =
+        ctrl.group =
           members: [{userId: 1}]
 
         spyOn ctrl, 'updateMembers'
@@ -694,7 +694,7 @@ describe 'event controller', ->
         createdAt:
           $date: new Date().getTime()
         text: 'I\'m in love with a robot.'
-        eventId: event.id
+        groupId: event.id
         type: 'text'
 
     describe 'when it is an accept action', ->
@@ -748,7 +748,7 @@ describe 'event controller', ->
         createdAt:
           $date: new Date().getTime()
         text: 'I\'m in love with a robot.'
-        eventId: event.id
+        groupId: event.id
         type: 'text'
 
       Auth.user =

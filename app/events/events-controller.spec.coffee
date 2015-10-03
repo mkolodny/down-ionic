@@ -30,7 +30,7 @@ describe 'events controller', ->
   deferredTemplate = null
   earlier = null
   Event = null
-  eventsCollection = null
+  groupsCollection = null
   item = null
   invitation = null
   later = null
@@ -127,10 +127,10 @@ describe 'events controller', ->
     spyOn $ionicPlatform, 'on'
 
     messagesCollection = 'messagesCollection'
-    eventsCollection = 'eventsCollection'
+    groupsCollection = 'groupsCollection'
     $meteor.getCollectionByName.and.callFake (collectionName) ->
       if collectionName is 'messages' then return messagesCollection
-      if collectionName is 'events' then return eventsCollection
+      if collectionName is 'groups' then return groupsCollection
 
     ctrl = $controller EventsCtrl,
       $scope: scope
@@ -157,8 +157,8 @@ describe 'events controller', ->
     expect(ctrl.Messages).toBe messagesCollection
 
   it 'should set the events collection on the controller', ->
-    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'events'
-    expect(ctrl.Events).toBe eventsCollection
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'groups'
+    expect(ctrl.Groups).toBe groupsCollection
 
   describe 'when the events request returns', ->
     refreshComplete = null
@@ -353,27 +353,27 @@ describe 'events controller', ->
       ctrl.eventsMessagesSubscribe events
 
     it 'should subscribe to the events messages', ->
-      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'event', "#{event.id}"
+      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'group', "#{event.id}"
 
 
   describe 'getting the newest message', ->
-    eventId = null
+    groupId = null
     meteorObject = null
     result = null
 
     beforeEach ->
-      eventId = "3"
+      groupId = "3"
       meteorObject = 'meteorObject'
       scope.$meteorObject = jasmine.createSpy('scope.$meteorObject')
         .and.returnValue meteorObject
-      result = ctrl.getNewestMessage eventId
+      result = ctrl.getNewestMessage groupId
 
     it 'should return an AngularMeteorObject', ->
       expect(result).toBe meteorObject
 
     it 'should query, sort and transform the message', ->
       selector =
-        eventId: eventId
+        groupId: groupId
       options =
         sort:
           createdAt: -1
@@ -387,12 +387,12 @@ describe 'events controller', ->
     describe 'when the message is of type text', ->
       message = null
       result = null
-      meteorEvent = null
+      group = null
 
       beforeEach ->
-        meteorEvent = 'meteorEvent'
+        group = 'group'
         scope.$meteorObject = jasmine.createSpy('scope.$meteorObject')
-          .and.returnValue meteorEvent
+          .and.returnValue group
 
         message =
           type: 'text'
@@ -406,8 +406,8 @@ describe 'events controller', ->
         expectedText = "#{message.creator.firstName}: #{message.text}"
         expect(result.text).toEqual expectedText
 
-      it 'should bind the meteor event to the message', ->
-        expect(result.meteorEvent).toEqual meteorEvent
+      it 'should bind the group to the message', ->
+        expect(result.group).toEqual group
 
 
   describe 'checking if a message was read', ->
@@ -421,7 +421,7 @@ describe 'events controller', ->
           id: 1
         message =
           createdAt: new Date 10
-          meteorEvent:
+          group:
             members: [
               userId: "1",
               lastRead: new Date 1000
@@ -442,7 +442,7 @@ describe 'events controller', ->
           id: 1
         message =
           createdAt: new Date 1000
-          meteorEvent:
+          group:
             members: [
               userId: "1",
               lastRead: new Date 10

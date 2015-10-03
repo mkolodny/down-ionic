@@ -1,4 +1,4 @@
-class EventsCtrl
+class GroupsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading', '$ionicModal',
              '$ionicPlatform', '$meteor', '$scope', '$state', '$timeout', 'Auth',
              'Invitation', 'ngToast', 'User']
@@ -7,7 +7,7 @@ class EventsCtrl
                 @Invitation, @ngToast, @User) ->
     # Set Meteor collections on controller
     @Messages = @$meteor.getCollectionByName 'messages'
-    @Events = @$meteor.getCollectionByName 'events'
+    @Groups = @$meteor.getCollectionByName 'groups'
 
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
@@ -121,11 +121,11 @@ class EventsCtrl
   eventsMessagesSubscribe: (events) ->
     # Subscribe to the messages posted in each event.
     for event in events
-      @$scope.$meteorSubscribe 'event', "#{event.id}"
+      @$scope.$meteorSubscribe 'group', "#{event.id}"
 
-  getNewestMessage: (eventId) =>
+  getNewestMessage: (groupId) =>
     selector =
-      eventId: eventId
+      groupId: groupId
     options =
       sort:
         createdAt: -1
@@ -138,13 +138,13 @@ class EventsCtrl
       firstName = message.creator.firstName
       message.text = "#{firstName}: #{message.text}"
 
-    # Bind meteorEvent for checking wasRead
-    message.meteorEvent = @$scope.$meteorObject @Events, message.eventId, false
+    # Bind group for checking wasRead
+    message.group = @$scope.$meteorObject @Groups, message.groupId, false
 
     message
 
   wasRead: (message) =>
-    members = message.meteorEvent?.members or []
+    members = message.group?.members or []
     lastRead = (member.lastRead for member in members when "#{@Auth.user.id}" is member.userId)[0]
     lastRead >= message.createdAt
 
@@ -250,4 +250,4 @@ class EventsCtrl
   getDistanceAway: (friend) ->
     @Auth.getDistanceAway friend.location
 
-module.exports = EventsCtrl
+module.exports = GroupsCtrl
