@@ -3,6 +3,9 @@
     <div class="list" id="details">
       <div class="item" id="what">
         <input ng-model="createEvent.title" placeholder="What?">
+        <i class="fa fa-times"
+           ng-if="createEvent.title"
+           ng-click="createEvent.title = null"></i>
       </div>
       <div class="item" id="when">
         <input ng-model="createEvent.dateString"
