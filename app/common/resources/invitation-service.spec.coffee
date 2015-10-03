@@ -15,7 +15,7 @@ describe 'invitation service', ->
   Event = null
   listUrl = null
   Invitation = null
-  EventMessages = null
+  Messages = null
   User = null
 
   beforeEach angular.mock.module('angular-meteor')
@@ -47,10 +47,10 @@ describe 'invitation service', ->
     Invitation = $injector.get 'Invitation'
     User = $injector.get 'User'
 
-    # Mock EventMessages collection
-    EventMessages =
-      insert: jasmine.createSpy 'EventMessages.insert'
-    $meteor.getCollectionByName.and.returnValue EventMessages
+    # Mock Messages collection
+    Messages =
+      insert: jasmine.createSpy 'Messages.insert'
+    $meteor.getCollectionByName.and.returnValue Messages
 
     listUrl = "#{apiRoot}/invitations"
   )
@@ -293,7 +293,7 @@ describe 'invitation service', ->
     date = null
     originalResponse = null
     newResponse = null
-    eventMessagesDeferred = null
+    messagesDeferred = null
 
     beforeEach ->
       invitation =
@@ -307,8 +307,8 @@ describe 'invitation service', ->
       deferred = $q.defer()
       spyOn(Invitation, 'update').and.returnValue {$promise: deferred.promise}
 
-      eventMessagesDeferred = $q.defer()
-      EventMessages.insert.and.returnValue {remote: eventMessagesDeferred.promise}
+      messagesDeferred = $q.defer()
+      Messages.insert.and.returnValue {remote: messagesDeferred.promise}
 
       spyOn $mixpanel, 'track'
 
@@ -346,12 +346,12 @@ describe 'invitation service', ->
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.accepted
 
-        it 'should get the eventMessages collection', ->
-          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'eventMessages'
+        it 'should get the messages collection', ->
+          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
-        it 'should re-subscribe to the event eventMessages', ->
+        it 'should re-subscribe to the event messages', ->
           expect($meteor.subscribe).toHaveBeenCalledWith(
-              'event', "#{invitation.eventId}")
+              'chat', "#{invitation.eventId}")
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true
@@ -369,10 +369,10 @@ describe 'invitation service', ->
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} is down."
-            eventId: "#{invitation.eventId}"
+            chatId: "#{invitation.eventId}"
             type: Invitation.acceptAction
             createdAt: date
-          expect(EventMessages.insert).toHaveBeenCalledWith message, Invitation.readMessage
+          expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
 
 
       describe 'to maybe', ->
@@ -387,8 +387,8 @@ describe 'invitation service', ->
           deferred.resolve invitation
           $rootScope.$apply()
 
-        it 'should get the eventMessages collection', ->
-          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'eventMessages'
+        it 'should get the messages collection', ->
+          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
         it 'should track the response in mixpanel', ->
           expect($mixpanel.track).toHaveBeenCalledWith 'Update Response',
@@ -403,10 +403,10 @@ describe 'invitation service', ->
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} might be down."
-            eventId: "#{invitation.eventId}"
+            chatId: "#{invitation.eventId}"
             type: Invitation.maybeAction
             createdAt: date
-          expect(EventMessages.insert).toHaveBeenCalledWith message, Invitation.readMessage
+          expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.maybe
@@ -427,8 +427,8 @@ describe 'invitation service', ->
           deferred.resolve invitation
           $rootScope.$apply()
 
-        it 'should get the eventMessages collection', ->
-          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'eventMessages'
+        it 'should get the messages collection', ->
+          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
         it 'should track the response in mixpanel', ->
           expect($mixpanel.track).toHaveBeenCalledWith 'Update Response',
@@ -443,10 +443,10 @@ describe 'invitation service', ->
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} can\'t make it."
-            eventId: "#{invitation.eventId}"
+            chatId: "#{invitation.eventId}"
             type: Invitation.declineAction
             createdAt: date
-          expect(EventMessages.insert).toHaveBeenCalledWith message, Invitation.readMessage
+          expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.declined

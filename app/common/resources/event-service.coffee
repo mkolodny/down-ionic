@@ -61,8 +61,8 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
         event = deserializeEvent data
 
         # Create the first action message.
-        EventMessages = $meteor.getCollectionByName 'eventMessages'
-        EventMessages.insert
+        Messages = $meteor.getCollectionByName 'messages'
+        Messages.insert
           creator:
             id: "#{Auth.user.id}" # Meteor likes strings
             name: Auth.user.name
@@ -70,7 +70,7 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: "#{Auth.user.name} is down."
-          eventId: "#{event.id}" # Meteor likes strings
+          chatId: "#{event.id}" # Meteor likes strings
           type: 'accept_action' # We can't use Invitation.acceptAction because it
                                 #   would create a circular dependecy.
           createdAt: new Date()
@@ -87,8 +87,8 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
 
   resource.sendMessage = (event, text) ->
     # Save the message on the meteor server.
-    EventMessages = $meteor.getCollectionByName 'eventMessages'
-    EventMessages.insert
+    Messages = $meteor.getCollectionByName 'messages'
+    Messages.insert
       creator:
         id: "#{Auth.user.id}" # Meteor likes strings
         name: Auth.user.name
@@ -96,7 +96,7 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
         lastName: Auth.user.lastName
         imageUrl: Auth.user.imageUrl
       text: text
-      eventId: "#{event.id}" # Meteor likes strings
+      chatId: "#{event.id}" # Meteor likes strings
       type: 'text'
       createdAt: new Date()
 

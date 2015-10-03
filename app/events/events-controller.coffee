@@ -1,4 +1,4 @@
-class EventsCtrl
+class ChatsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading', '$ionicModal',
              '$ionicPlatform', '$meteor', '$scope', '$state', '$timeout', 'Auth',
              'Invitation', 'ngToast', 'User']
@@ -6,8 +6,8 @@ class EventsCtrl
                 @$ionicPlatform, @$meteor, @$scope, @$state, @$timeout, @Auth,
                 @Invitation, @ngToast, @User) ->
     # Set Meteor collections on controller
-    @EventMessages = @$meteor.getCollectionByName 'eventMessages'
-    @Events = @$meteor.getCollectionByName 'events'
+    @Messages = @$meteor.getCollectionByName 'messages'
+    @Chats = @$meteor.getCollectionByName 'chats'
 
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
@@ -118,19 +118,19 @@ class EventsCtrl
 
     items
 
-  eventsEventMessagesSubscribe: (events) ->
-    # Subscribe to the eventMessages posted in each event.
+  eventsMessagesSubscribe: (events) ->
+    # Subscribe to the messages posted in each event.
     for event in events
-      @$scope.$meteorSubscribe 'event', "#{event.id}"
+      @$scope.$meteorSubscribe 'chat', "#{event.id}"
 
-  getNewestMessage: (eventId) =>
+  getNewestMessage: (chatId) =>
     selector =
-      eventId: eventId
+      chatId: chatId
     options =
       sort:
         createdAt: -1
       transform: @transformMessage
-    @$scope.$meteorObject @EventMessages, selector, false, options
+    @$scope.$meteorObject @Messages, selector, false, options
 
   transformMessage: (message) =>
     # Show senders first name
@@ -138,13 +138,13 @@ class EventsCtrl
       firstName = message.creator.firstName
       message.text = "#{firstName}: #{message.text}"
 
-    # Bind meteorEvent for checking wasRead
-    message.meteorEvent = @$scope.$meteorObject @Events, message.eventId, false
+    # Bind chat for checking wasRead
+    message.chat = @$scope.$meteorObject @Chats, {chatId: message.chatId}, false
 
     message
 
   wasRead: (message) =>
-    members = message.meteorEvent?.members or []
+    members = message.chat?.members or []
     lastRead = (member.lastRead for member in members when "#{@Auth.user.id}" is member.userId)[0]
     lastRead >= message.createdAt
 
@@ -216,9 +216,9 @@ class EventsCtrl
         # Build the list of items to show in the view.
         @items = @buildItems @invitations
 
-        # Subscribe to the eventMessages for each event.
+        # Subscribe to the messages for each event.
         events = (invitation.event for invitation in invitations)
-        @eventsEventMessagesSubscribe events
+        @eventsMessagesSubscribe events
 
         # Set `percentRemaining` as a property on each event as a workaround for
         #   stopping angular-chart.js from calling `getPercentRemaining` too many
@@ -250,4 +250,4 @@ class EventsCtrl
   getDistanceAway: (friend) ->
     @Auth.getDistanceAway friend.location
 
-module.exports = EventsCtrl
+module.exports = ChatsCtrl

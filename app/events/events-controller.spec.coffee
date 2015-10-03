@@ -30,12 +30,12 @@ describe 'events controller', ->
   deferredTemplate = null
   earlier = null
   Event = null
-  eventsCollection = null
+  chatsCollection = null
   item = null
   invitation = null
   later = null
   Invitation = null
-  eventMessagesCollection = null
+  messagesCollection = null
   ngToast = null
   scope = null
   User = null
@@ -126,11 +126,11 @@ describe 'events controller', ->
     spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
     spyOn $ionicPlatform, 'on'
 
-    eventMessagesCollection = 'eventMessagesCollection'
-    eventsCollection = 'eventsCollection'
+    messagesCollection = 'messagesCollection'
+    chatsCollection = 'chatsCollection'
     $meteor.getCollectionByName.and.callFake (collectionName) ->
-      if collectionName is 'eventMessages' then return eventMessagesCollection
-      if collectionName is 'events' then return eventsCollection
+      if collectionName is 'messages' then return messagesCollection
+      if collectionName is 'chats' then return chatsCollection
 
     ctrl = $controller EventsCtrl,
       $scope: scope
@@ -152,13 +152,13 @@ describe 'events controller', ->
   it 'should listen for when the user comes back to the app', ->
     expect($ionicPlatform.on).toHaveBeenCalledWith 'resume', ctrl.manualRefresh
 
-  it 'should set the eventMessages collection on the controller', ->
-    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'eventMessages'
-    expect(ctrl.EventMessages).toBe eventMessagesCollection
+  it 'should set the messages collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
+    expect(ctrl.Messages).toBe messagesCollection
 
   it 'should set the events collection on the controller', ->
-    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'events'
-    expect(ctrl.Events).toBe eventsCollection
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
+    expect(ctrl.Chats).toBe chatsCollection
 
   describe 'when the events request returns', ->
     refreshComplete = null
@@ -178,7 +178,7 @@ describe 'events controller', ->
       beforeEach ->
         items = []
         spyOn(ctrl, 'buildItems').and.returnValue items
-        spyOn ctrl, 'eventsEventMessagesSubscribe'
+        spyOn ctrl, 'eventsMessagesSubscribe'
         percentRemaining = 16
         spyOn(invitation.event, 'getPercentRemaining').and.returnValue \
             percentRemaining
@@ -197,9 +197,9 @@ describe 'events controller', ->
           invitations[invitation.id] = invitation
         expect(ctrl.buildItems).toHaveBeenCalledWith invitations
 
-      it 'should subscribe to eventMessages for each event', ->
+      it 'should subscribe to messages for each event', ->
         events = [invitation.event]
-        expect(ctrl.eventsEventMessagesSubscribe).toHaveBeenCalledWith events
+        expect(ctrl.eventsMessagesSubscribe).toHaveBeenCalledWith events
 
       it 'should clear a loading flag', ->
         expect(ctrl.isLoading).toBe false
@@ -342,7 +342,7 @@ describe 'events controller', ->
       expect(builtItems).toEqual items
 
 
-  describe 'subscribing to events\' eventMessages', ->
+  describe 'subscribing to events\' messages', ->
     event = null
 
     beforeEach ->
@@ -350,35 +350,35 @@ describe 'events controller', ->
       event = invitation.event
       events = [event]
 
-      ctrl.eventsEventMessagesSubscribe events
+      ctrl.eventsMessagesSubscribe events
 
-    it 'should subscribe to the events eventMessages', ->
-      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'event', "#{event.id}"
+    it 'should subscribe to the events messages', ->
+      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', "#{event.id}"
 
 
   describe 'getting the newest message', ->
-    eventId = null
+    chatId = null
     meteorObject = null
     result = null
 
     beforeEach ->
-      eventId = "3"
+      chatId = "3"
       meteorObject = 'meteorObject'
       scope.$meteorObject = jasmine.createSpy('scope.$meteorObject')
         .and.returnValue meteorObject
-      result = ctrl.getNewestMessage eventId
+      result = ctrl.getNewestMessage chatId
 
     it 'should return an AngularMeteorObject', ->
       expect(result).toBe meteorObject
 
     it 'should query, sort and transform the message', ->
       selector =
-        eventId: eventId
+        chatId: chatId
       options =
         sort:
           createdAt: -1
         transform: ctrl.transformMessage
-      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.EventMessages, selector,
+      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.Messages, selector,
           false, options)
 
 
@@ -387,12 +387,12 @@ describe 'events controller', ->
     describe 'when the message is of type text', ->
       message = null
       result = null
-      meteorEvent = null
+      chat = null
 
       beforeEach ->
-        meteorEvent = 'meteorEvent'
+        chat = 'chat'
         scope.$meteorObject = jasmine.createSpy('scope.$meteorObject')
-          .and.returnValue meteorEvent
+          .and.returnValue chat
 
         message =
           type: 'text'
@@ -406,8 +406,8 @@ describe 'events controller', ->
         expectedText = "#{message.creator.firstName}: #{message.text}"
         expect(result.text).toEqual expectedText
 
-      it 'should bind the meteor event to the message', ->
-        expect(result.meteorEvent).toEqual meteorEvent
+      it 'should bind the chat to the message', ->
+        expect(result.chat).toEqual chat
 
 
   describe 'checking if a message was read', ->
@@ -421,7 +421,7 @@ describe 'events controller', ->
           id: 1
         message =
           createdAt: new Date 10
-          meteorEvent:
+          chat:
             members: [
               userId: "1",
               lastRead: new Date 1000
@@ -442,7 +442,7 @@ describe 'events controller', ->
           id: 1
         message =
           createdAt: new Date 1000
-          meteorEvent:
+          chat:
             members: [
               userId: "1",
               lastRead: new Date 10

@@ -12,7 +12,7 @@ describe 'event service', ->
   Auth = null
   Event = null
   Invitation = null
-  EventMessages = null
+  Messages = null
   User = null
   listUrl = null
 
@@ -45,10 +45,10 @@ describe 'event service', ->
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
 
-    # Mock EventMessages collection
-    EventMessages =
-      insert: jasmine.createSpy 'EventMessages.insert'
-    $meteor.getCollectionByName.and.returnValue EventMessages
+    # Mock Messages collection
+    Messages =
+      insert: jasmine.createSpy 'Messages.insert'
+    $meteor.getCollectionByName.and.returnValue Messages
 
     listUrl = "#{apiRoot}/events"
   )
@@ -193,11 +193,11 @@ describe 'event service', ->
       requestData = Event.serialize event
 
     describe 'successfully', ->
-      eventMessagesDeferred = null
+      messagesDeferred = null
 
       beforeEach ->
-        eventMessagesDeferred = $q.defer()
-        EventMessages.insert.and.returnValue {remote: eventMessagesDeferred.promise}
+        messagesDeferred = $q.defer()
+        Messages.insert.and.returnValue {remote: messagesDeferred.promise}
 
         jasmine.clock().install()
         date = new Date 1438195002656
@@ -231,8 +231,8 @@ describe 'event service', ->
         expectedEvent = Event.deserialize responseData
         expect(response).toAngularEqual expectedEvent
 
-      it 'should get the eventMessages collection', ->
-        expect($meteor.getCollectionByName).toHaveBeenCalledWith 'eventMessages'
+      it 'should get the messages collection', ->
+        expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
       it 'should create an accept action message', ->
         message =
@@ -243,11 +243,11 @@ describe 'event service', ->
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: "#{Auth.user.name} is down."
-          eventId: "#{responseData.id}" # meteor likes strings
+          chatId: "#{responseData.id}" # meteor likes strings
           type: Invitation.acceptAction
           createdAt: new Date()
 
-        expect(EventMessages.insert).toHaveBeenCalledWith message, Event.readMessage
+        expect(Messages.insert).toHaveBeenCalledWith message, Event.readMessage
 
 
     describe 'unsuccessfully', ->
@@ -322,8 +322,8 @@ describe 'event service', ->
       it 'should resolve the promise', ->
         expect(resolved).toBe true
 
-      it 'should get the eventMessages collection', ->
-        expect($meteor.getCollectionByName).toHaveBeenCalledWith 'eventMessages'
+      it 'should get the messages collection', ->
+        expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
       it 'should save the message in the meteor server', ->
         message =
@@ -334,10 +334,10 @@ describe 'event service', ->
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: text
-          eventId: "#{event.id}"
+          chatId: "#{event.id}"
           type: 'text'
           createdAt: new Date()
-        expect(EventMessages.insert).toHaveBeenCalledWith message
+        expect(Messages.insert).toHaveBeenCalledWith message
 
 
     describe 'unsuccessfully', ->

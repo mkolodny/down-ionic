@@ -11,8 +11,8 @@ class EventCtrl
     @event = @invitation.event
 
     # Set Meteor collections on controller
-    @EventMessages = @$meteor.getCollectionByName 'eventMessages'
-    @Events = @$meteor.getCollectionByName 'events'
+    @Messages = @$meteor.getCollectionByName 'messages'
+    @Chats = @$meteor.getCollectionByName 'chats'
 
     # Give the event a long title variable name as a workaround for:
     #   https://github.com/driftyco/ionic/issues/2881
@@ -41,31 +41,31 @@ class EventCtrl
       # Get the members invitations.
       @updateMembers()
 
-      # Subscribe to this event.
-      @$scope.$meteorSubscribe 'event', @event.id
+      # Subscribe to the event's chat.
+      @$scope.$meteorSubscribe 'chat', "#{@event.id}"
 
       # Bind reactive variables
-      @eventMessages = @$meteor.collection @getEventMessages, false
+      @messages = @$meteor.collection @getMessages, false
       @newestMessage = @getNewestMessage()
-      @meteorEvent = @getMeteorEvent()
+      @chat = @getChat()
 
       # Watch for changes
       @$scope.$watch =>
         @newestMessage._id
       , @handleNewMessage
       @$scope.$watch =>
-        @meteorEvent._id
+        @chat._id
       , @handleMembersChange
 
     # Remove angular-meteor bindings
     @$scope.$on '$ionicView.leave', =>
-      @eventMessages.stop()
+      @messages.stop()
       @newestMessage.stop()
-      @meteorEvent.stop()
+      @chat.stop()
 
-  getEventMessages: =>
-    @EventMessages.find
-      eventId: "#{@event.id}"
+  getMessages: =>
+    @Messages.find
+      chatId: "#{@event.id}"
     ,
       sort:
         createdAt: 1
@@ -77,22 +77,22 @@ class EventCtrl
 
   getNewestMessage: =>
     selector =
-      eventId: "#{@event.id}"
+      chatId: "#{@event.id}"
     options =
       sort:
         createdAt: -1
-    @$meteor.object @EventMessages, selector, false, options
+    @$meteor.object @Messages, selector, false, options
 
-  getMeteorEvent: =>
+  getChat: =>
     selector =
-      _id: "#{@event.id}"
-    @$meteor.object @Events, selector, false
+      chatId: "#{@event.id}"
+    @$meteor.object @Chats, selector, false
 
   handleNewMessage: =>
     @$meteor.call 'readMessage', @newestMessage._id
 
   handleMembersChange: =>
-    meteorMembers = @meteorEvent.members or []
+    meteorMembers = @chat.members or []
     members = @members or []
     meteorMemberIds = (member.userId for member in meteorMembers)
     currentMemberIds = (member.id for member in members)
