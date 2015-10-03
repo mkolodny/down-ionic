@@ -1,5 +1,5 @@
-Friendship = ['$http', '$q', '$resource', 'apiRoot', 'Auth', \
-              ($http, $q, $resource, apiRoot, Auth) ->
+Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
+              ($http, $meteor, $q, $resource, apiRoot, Auth) ->
   listUrl = "#{apiRoot}/friendships"
 
   resource = $resource "#{listUrl}/:id", null,
@@ -43,6 +43,26 @@ Friendship = ['$http', '$q', '$resource', 'apiRoot', 'Auth', \
       deferred.reject()
 
     {$promise: deferred.promise}
+
+  resource.sendMessage = (friendId, text) ->
+    # Save the message on the meteor server.
+    Messages = $meteor.getCollectionByName 'messages'
+    Messages.insert
+      creator:
+        id: "#{Auth.user.id}" # Meteor likes strings
+        name: Auth.user.name
+        firstName: Auth.user.firstName
+        lastName: Auth.user.lastName
+        imageUrl: Auth.user.imageUrl
+      text: text
+      groupId: "#{Auth.user.id},#{friendId}"
+      type: 'text'
+      createdAt: new Date()
+
+    # Save the message on the django server.
+    url = "#{listUrl}/#{friendId}/messages"
+    requestData = {text: text}
+    $http.post url, requestData
 
   resource
 ]

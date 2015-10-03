@@ -6,6 +6,7 @@ require 'angular-sanitize'
 require 'angular-ui-router'
 require 'ng-toast'
 require '../ionic/ionic-angular.js'
+require '../common/auth/auth-module'
 require '../common/mixpanel/mixpanel-module'
 require '../common/resources/resources-module'
 require '../common/meteor/meteor-mocks'
@@ -61,7 +62,7 @@ describe 'event controller', ->
     $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
-    $stateParams = $injector.get '$stateParams'
+    $stateParams = angular.copy $injector.get('$stateParams')
     $mixpanel = $injector.get '$mixpanel'
     $meteor = $injector.get '$meteor'
     Auth = angular.copy $injector.get('Auth')
@@ -126,6 +127,7 @@ describe 'event controller', ->
 
     ctrl = $controller EventCtrl,
       $scope: scope
+      $stateParams: $stateParams
       Auth: Auth
   )
 
@@ -170,11 +172,10 @@ describe 'event controller', ->
       spyOn ctrl, 'updateMembers'
       spyOn ctrl, 'getMessages'
 
-
       chat =
         _id: 'chat'
       spyOn(ctrl, 'getChat').and.returnValue chat
-      
+
       newestMessage =
         _id: 'newestMessage'
       spyOn(ctrl, 'getNewestMessage').and.returnValue newestMessage
@@ -204,7 +205,7 @@ describe 'event controller', ->
       expect(ctrl.updateMembers).toHaveBeenCalled()
 
     describe 'when the newestMessage changes', ->
-      
+
       beforeEach ->
         ctrl.newestMessage =
           _id: 'someotherid'
@@ -281,7 +282,7 @@ describe 'event controller', ->
     it 'should return a AngularMeteorObject', ->
       expect(result).toEqual newestMessage
 
-    it 'should filter object by event id and sort by created at', ->      
+    it 'should filter object by event id and sort by created at', ->
       selector =
         chatId: "#{ctrl.event.id}"
       options =

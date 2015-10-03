@@ -311,8 +311,9 @@ describe 'event service', ->
         $httpBackend.expectPOST url, requestData
           .respond 201, null
 
-        Event.sendMessage(event, text).then ->
-          resolved = true
+        Event.sendMessage event, text
+          .then ->
+            resolved = true
         $httpBackend.flush 1
 
       afterEach ->
@@ -346,8 +347,9 @@ describe 'event service', ->
         $httpBackend.expectPOST url, requestData
           .respond 500, null
 
-        Event.sendMessage(event, text).then null, ->
-          rejected = true
+        Event.sendMessage event, text
+          .then null, ->
+            rejected = true
         $httpBackend.flush 1
 
       it 'should reject the promise', ->
@@ -456,8 +458,9 @@ describe 'event service', ->
           .respond 400
 
         rejected = null
-        Event.getInvitedIds(event).then null, ->
-          rejected = true
+        Event.getInvitedIds event
+          .then null, ->
+            rejected = true
         $httpBackend.flush 1
 
         expect(rejected).toBe true

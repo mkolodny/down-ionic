@@ -46,7 +46,6 @@ friendshipButtonDirective = ['$state', '$mixpanel', 'Auth', 'Friendship', ($stat
               'via sms': user.username is null
           .finally ->
             $scope.isLoading = false
-
   ]
 ]
 
