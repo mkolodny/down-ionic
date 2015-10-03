@@ -562,9 +562,9 @@ describe 'events controller', ->
       ctrl.viewFriendChat item
 
     it 'should go to the friend chat', ->
-      expect($state.go).toHaveBeenCalledWith 'friend',
+      expect($state.go).toHaveBeenCalledWith 'friendship',
         friend: friend
-        id: friend.id
+        id: item.friend.id
 
 
   describe 'tapping to add by username', ->

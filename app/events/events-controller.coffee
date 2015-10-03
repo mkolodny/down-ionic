@@ -209,7 +209,7 @@ class ChatsCtrl
       id: item.invitation.event.id
 
   viewFriendChat: (item) ->
-    @$state.go 'friend',
+    @$state.go 'friendship',
       friend: item.friend
       id: item.friend.id
 
