@@ -248,6 +248,10 @@ class ChatsCtrl
     @$state.go 'addFromFacebook'
 
   getDistanceAway: (friend) ->
-    @Auth.getDistanceAway friend.location
+    distanceAway = @Auth.getDistanceAway friend.location
+    if distanceAway is null
+      return 'Start a chat'
+    else
+      return distanceAway
 
 module.exports = ChatsCtrl

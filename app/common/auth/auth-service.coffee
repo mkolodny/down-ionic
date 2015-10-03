@@ -126,7 +126,8 @@ class Auth
       return false
 
   isNearby: (user) ->
-    if user.location is undefined or @user.location is undefined
+    if user.location is undefined or \
+       @user.location is undefined
       return false
 
     start =
@@ -218,6 +219,12 @@ class Auth
     {$promise: deferred.promise}
 
   getDistanceAway: (location) ->
+    # Return null if either a user's location
+    #   isn't set or the friend's location isn't set
+    if location is undefined or \
+       @user.location is undefined
+      return null
+
     start =
       latitude: @user.location.lat
       longitude: @user.location.long

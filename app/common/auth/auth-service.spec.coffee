@@ -1049,6 +1049,7 @@ describe 'Auth service', ->
         lat: 40.7138251
         long: -73.9897481
 
+
     describe 'when it\'s < 500 ft away', ->
 
       beforeEach ->
@@ -1164,3 +1165,27 @@ describe 'Auth service', ->
 
       it 'should show the distance away', ->
         expect(distanceAway).toBe 'really far'
+
+
+    describe 'when user\'s location isn\'t set', ->
+
+      beforeEach ->
+        location =
+          lat: 40.7151
+          long: -73.9897481
+        delete Auth.user.location
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should default to really far', ->
+        expect(distanceAway).toBeNull()
+
+
+    describe 'when no location is passed in', ->
+
+      beforeEach ->
+        location = undefined
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should default to really far', ->
+        expect(distanceAway).toBeNull()

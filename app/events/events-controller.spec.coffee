@@ -560,19 +560,32 @@ describe 'events controller', ->
     friend = null
     returnedDistanceAway = null
 
-    beforeEach ->
-      distanceAway = 'distanceAway'
-      spyOn(Auth, 'getDistanceAway').and.returnValue distanceAway
-      friend =
-        id: 2
-        location:
-          lat: 40.7138251
-          long: -73.9897481
+    describe 'when distance can be calculated', ->
 
-      returnedDistanceAway = ctrl.getDistanceAway friend
+      beforeEach ->
+        distanceAway = 'distanceAway'
+        spyOn(Auth, 'getDistanceAway').and.returnValue distanceAway
+        friend =
+          id: 2
+          location:
+            lat: 40.7138251
+            long: -73.9897481
 
-    it 'should check how far away they are', ->
-      expect(Auth.getDistanceAway).toHaveBeenCalledWith friend.location
+        returnedDistanceAway = ctrl.getDistanceAway friend
 
-    it 'should return the distance away', ->
-      expect(returnedDistanceAway).toBe distanceAway
+      it 'should check how far away they are', ->
+        expect(Auth.getDistanceAway).toHaveBeenCalledWith friend.location
+
+      it 'should return the distance away', ->
+        expect(returnedDistanceAway).toBe distanceAway
+
+    describe 'when distance is unknown', ->
+
+      beforeEach ->
+        spyOn(Auth, 'getDistanceAway').and.returnValue null
+        friend =
+          id: 2
+        returnedDistanceAway = ctrl.getDistanceAway friend
+
+      it 'should show the default message', ->
+        expect(returnedDistanceAway).toBe 'Start a chat'
