@@ -412,6 +412,16 @@ describe 'events controller', ->
 
   describe 'checking if a message was read', ->
 
+    describe 'when message the data has\'t loaded yet', ->
+      result = null
+
+      beforeEach ->
+        result = ctrl.wasRead undefined
+
+      it 'should default to true', ->
+        expect(result).toBe true
+
+
     describe 'when a message has been read', ->
       message = null
       result = null
