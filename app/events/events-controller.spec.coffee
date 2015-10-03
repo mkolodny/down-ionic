@@ -35,7 +35,7 @@ describe 'events controller', ->
   invitation = null
   later = null
   Invitation = null
-  eventMessagesCollection = null
+  messagesCollection = null
   ngToast = null
   scope = null
   User = null
@@ -126,10 +126,10 @@ describe 'events controller', ->
     spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
     spyOn $ionicPlatform, 'on'
 
-    eventMessagesCollection = 'eventMessagesCollection'
+    messagesCollection = 'messagesCollection'
     eventsCollection = 'eventsCollection'
     $meteor.getCollectionByName.and.callFake (collectionName) ->
-      if collectionName is 'eventMessages' then return eventMessagesCollection
+      if collectionName is 'messages' then return messagesCollection
       if collectionName is 'events' then return eventsCollection
 
     ctrl = $controller EventsCtrl,
@@ -152,9 +152,9 @@ describe 'events controller', ->
   it 'should listen for when the user comes back to the app', ->
     expect($ionicPlatform.on).toHaveBeenCalledWith 'resume', ctrl.manualRefresh
 
-  it 'should set the eventMessages collection on the controller', ->
-    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'eventMessages'
-    expect(ctrl.EventMessages).toBe eventMessagesCollection
+  it 'should set the messages collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
+    expect(ctrl.Messages).toBe messagesCollection
 
   it 'should set the events collection on the controller', ->
     expect($meteor.getCollectionByName).toHaveBeenCalledWith 'events'
@@ -178,7 +178,7 @@ describe 'events controller', ->
       beforeEach ->
         items = []
         spyOn(ctrl, 'buildItems').and.returnValue items
-        spyOn ctrl, 'eventsEventMessagesSubscribe'
+        spyOn ctrl, 'eventsMessagesSubscribe'
         percentRemaining = 16
         spyOn(invitation.event, 'getPercentRemaining').and.returnValue \
             percentRemaining
@@ -197,9 +197,9 @@ describe 'events controller', ->
           invitations[invitation.id] = invitation
         expect(ctrl.buildItems).toHaveBeenCalledWith invitations
 
-      it 'should subscribe to eventMessages for each event', ->
+      it 'should subscribe to messages for each event', ->
         events = [invitation.event]
-        expect(ctrl.eventsEventMessagesSubscribe).toHaveBeenCalledWith events
+        expect(ctrl.eventsMessagesSubscribe).toHaveBeenCalledWith events
 
       it 'should clear a loading flag', ->
         expect(ctrl.isLoading).toBe false
@@ -342,7 +342,7 @@ describe 'events controller', ->
       expect(builtItems).toEqual items
 
 
-  describe 'subscribing to events\' eventMessages', ->
+  describe 'subscribing to events\' messages', ->
     event = null
 
     beforeEach ->
@@ -350,9 +350,9 @@ describe 'events controller', ->
       event = invitation.event
       events = [event]
 
-      ctrl.eventsEventMessagesSubscribe events
+      ctrl.eventsMessagesSubscribe events
 
-    it 'should subscribe to the events eventMessages', ->
+    it 'should subscribe to the events messages', ->
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'event', "#{event.id}"
 
 
@@ -378,7 +378,7 @@ describe 'events controller', ->
         sort:
           createdAt: -1
         transform: ctrl.transformMessage
-      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.EventMessages, selector,
+      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.Messages, selector,
           false, options)
 
 

@@ -32,7 +32,7 @@ describe 'event controller', ->
   invitation = null
   Invitation = null
   LinkInvitation = null
-  eventMessagesCollection = null
+  messagesCollection = null
   ngToast = null
   scope = null
   User = null
@@ -118,10 +118,10 @@ describe 'event controller', ->
     deferredTemplate = $q.defer()
     spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
 
-    eventMessagesCollection = 'eventMessagesCollection'
+    messagesCollection = 'messagesCollection'
     eventsCollection = 'eventsCollection'
     $meteor.getCollectionByName.and.callFake (collectionName) ->
-      if collectionName is 'eventMessages' then return eventMessagesCollection
+      if collectionName is 'messages' then return messagesCollection
       if collectionName is 'events' then return eventsCollection
 
     ctrl = $controller EventCtrl,
@@ -150,9 +150,9 @@ describe 'event controller', ->
   it 'should set the current user on the guest list', ->
     expect(scope.guestList.currentUser).toBe Auth.user
 
-  it 'should set the eventMessages collection on the controller', ->
-    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'eventMessages'
-    expect(ctrl.EventMessages).toBe eventMessagesCollection
+  it 'should set the messages collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
+    expect(ctrl.Messages).toBe messagesCollection
 
   it 'should set the events collection on the controller', ->
     expect($meteor.getCollectionByName).toHaveBeenCalledWith 'events'
@@ -168,7 +168,7 @@ describe 'event controller', ->
       scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
 
       spyOn ctrl, 'updateMembers'
-      spyOn ctrl, 'getEventMessages'
+      spyOn ctrl, 'getMessages'
 
 
       meteorEvent =
@@ -185,12 +185,12 @@ describe 'event controller', ->
       scope.$emit '$ionicView.enter'
       scope.$apply()
 
-    it 'should subscribe to the events eventMessages', ->
+    it 'should subscribe to the events messages', ->
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'event', event.id
 
-    it 'should bind the eventMessages to the controller', ->
+    it 'should bind the messages to the controller', ->
       # TODO: Check that controller property is set
-      expect($meteor.collection).toHaveBeenCalledWith ctrl.getEventMessages, false
+      expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
 
     it 'should bind the newest message to the controller', ->
       expect(ctrl.getNewestMessage).toHaveBeenCalled()
@@ -230,8 +230,8 @@ describe 'event controller', ->
   describe 'when leaving the view', ->
 
     beforeEach ->
-      ctrl.eventMessages =
-        stop: jasmine.createSpy 'eventMessages.stop'
+      ctrl.messages =
+        stop: jasmine.createSpy 'messages.stop'
       ctrl.newestMessage =
         stop: jasmine.createSpy 'newestMessage.stop'
       ctrl.meteorEvent =
@@ -241,32 +241,32 @@ describe 'event controller', ->
       scope.$apply()
 
     it 'should stop remove angular-meteor bindings', ->
-      expect(ctrl.eventMessages.stop).toHaveBeenCalled()
+      expect(ctrl.messages.stop).toHaveBeenCalled()
       expect(ctrl.newestMessage.stop).toHaveBeenCalled()
       expect(ctrl.meteorEvent.stop).toHaveBeenCalled()
 
 
-  describe 'getting eventMessages', ->
+  describe 'getting messages', ->
     cursor = null
     result = null
 
     beforeEach ->
-      cursor = 'eventMessagesCursor'
-      ctrl.EventMessages =
-        find: jasmine.createSpy('EventMessages.find').and.returnValue cursor
-      result = ctrl.getEventMessages()
+      cursor = 'messagesCursor'
+      ctrl.Messages =
+        find: jasmine.createSpy('Messages.find').and.returnValue cursor
+      result = ctrl.getMessages()
 
-    it 'should return a eventMessages reactive cursor', ->
+    it 'should return a messages reactive cursor', ->
       expect(result).toBe cursor
 
-    it 'should query, sort and transform eventMessages', ->
+    it 'should query, sort and transform messages', ->
       selector =
         eventId: "#{ctrl.event.id}"
       options =
         sort:
           createdAt: 1
         transform: ctrl.transformMessage
-      expect(ctrl.EventMessages.find).toHaveBeenCalledWith selector, options
+      expect(ctrl.Messages.find).toHaveBeenCalledWith selector, options
 
 
   describe 'getting the newest message', ->
@@ -287,7 +287,7 @@ describe 'event controller', ->
       options =
         sort:
           createdAt: -1
-      expect($meteor.object).toHaveBeenCalledWith ctrl.EventMessages, selector, false, options
+      expect($meteor.object).toHaveBeenCalledWith ctrl.Messages, selector, false, options
 
 
   describe 'getting meteor members', ->
@@ -308,7 +308,7 @@ describe 'event controller', ->
       expect($meteor.object).toHaveBeenCalledWith ctrl.Events, selector, false
 
 
-  describe 'transforming eventMessages', ->
+  describe 'transforming messages', ->
     message = null
     result = null
 
@@ -324,7 +324,7 @@ describe 'event controller', ->
       expect(result).toEqual expectedResult
 
 
-  describe 'handling new eventMessages', ->
+  describe 'handling new messages', ->
 
     beforeEach ->
       ctrl.newestMessage =

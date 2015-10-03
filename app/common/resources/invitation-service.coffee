@@ -134,7 +134,7 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
     originalResponse = invitation.response
     invitation.response = newResponse
     @update(invitation).$promise.then (_invitation) =>
-      # Re-subscribe to event eventMessages
+      # Re-subscribe to event messages
       $meteor.subscribe 'event', "#{_invitation.eventId}" # Meteor likes strings
 
       # Post an action message.
@@ -151,8 +151,8 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
         type = @declineAction
         status = 'declined'
       $mixpanel.track 'Update Response', {status: status}
-      EventMessages = $meteor.getCollectionByName 'eventMessages'
-      EventMessages.insert
+      Messages = $meteor.getCollectionByName 'messages'
+      Messages.insert
         creator:
           id: "#{Auth.user.id}" # Meteor likes strings
           name: Auth.user.name

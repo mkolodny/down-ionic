@@ -61,8 +61,8 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
         event = deserializeEvent data
 
         # Create the first action message.
-        EventMessages = $meteor.getCollectionByName 'eventMessages'
-        EventMessages.insert
+        Messages = $meteor.getCollectionByName 'messages'
+        Messages.insert
           creator:
             id: "#{Auth.user.id}" # Meteor likes strings
             name: Auth.user.name
@@ -87,8 +87,8 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
 
   resource.sendMessage = (event, text) ->
     # Save the message on the meteor server.
-    EventMessages = $meteor.getCollectionByName 'eventMessages'
-    EventMessages.insert
+    Messages = $meteor.getCollectionByName 'messages'
+    Messages.insert
       creator:
         id: "#{Auth.user.id}" # Meteor likes strings
         name: Auth.user.name

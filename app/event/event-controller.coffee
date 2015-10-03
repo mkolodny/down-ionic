@@ -11,7 +11,7 @@ class EventCtrl
     @event = @invitation.event
 
     # Set Meteor collections on controller
-    @EventMessages = @$meteor.getCollectionByName 'eventMessages'
+    @Messages = @$meteor.getCollectionByName 'messages'
     @Events = @$meteor.getCollectionByName 'events'
 
     # Give the event a long title variable name as a workaround for:
@@ -45,7 +45,7 @@ class EventCtrl
       @$scope.$meteorSubscribe 'event', @event.id
 
       # Bind reactive variables
-      @eventMessages = @$meteor.collection @getEventMessages, false
+      @messages = @$meteor.collection @getMessages, false
       @newestMessage = @getNewestMessage()
       @meteorEvent = @getMeteorEvent()
 
@@ -59,12 +59,12 @@ class EventCtrl
 
     # Remove angular-meteor bindings
     @$scope.$on '$ionicView.leave', =>
-      @eventMessages.stop()
+      @messages.stop()
       @newestMessage.stop()
       @meteorEvent.stop()
 
-  getEventMessages: =>
-    @EventMessages.find
+  getMessages: =>
+    @Messages.find
       eventId: "#{@event.id}"
     ,
       sort:
@@ -81,7 +81,7 @@ class EventCtrl
     options =
       sort:
         createdAt: -1
-    @$meteor.object @EventMessages, selector, false, options
+    @$meteor.object @Messages, selector, false, options
 
   getMeteorEvent: =>
     selector =
