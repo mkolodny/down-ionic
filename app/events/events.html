@@ -22,7 +22,7 @@
                   'item-divider': item.isDivider,
                   'item-avatar': !item.isDivider,
                   'item-icon-right': !item.isDivider,
-                  updated: !item.isDivider && item.newestMessage && !events.wasRead(item.newestMessage),
+                  updated: !item.isDivider && !events.wasRead(item.newestMessage),
                   last: $last
                 }"
                 ng-click="item.isDivider ? null : events.viewEvent(item)">
@@ -65,8 +65,12 @@
                ng-src="{{item.friend.getImageUrl()}}">
           <h2>{{item.friend.name}}</h2>
           <p class="latest-message">
-            <span ng-if="item.newestMessage.text"
-                  >{{item.newestMessage.text}}</span>
+            <span ng-if="item.newestMessage.text">
+              {{item.newestMessage.text}}
+            </span>
+            <span ng-if="!item.newestMessage.text">
+              {{events.getDistanceAway(item.friend)}} away
+            </span>
           </p>
         </div>
       </ion-item>

@@ -412,6 +412,16 @@ describe 'events controller', ->
 
   describe 'checking if a message was read', ->
 
+    describe 'when message the data has\'t loaded yet', ->
+      result = null
+
+      beforeEach ->
+        result = ctrl.wasRead undefined
+
+      it 'should default to true', ->
+        expect(result).toBe true
+
+
     describe 'when a message has been read', ->
       message = null
       result = null
@@ -560,19 +570,32 @@ describe 'events controller', ->
     friend = null
     returnedDistanceAway = null
 
-    beforeEach ->
-      distanceAway = 'distanceAway'
-      spyOn(Auth, 'getDistanceAway').and.returnValue distanceAway
-      friend =
-        id: 2
-        location:
-          lat: 40.7138251
-          long: -73.9897481
+    describe 'when distance can be calculated', ->
 
-      returnedDistanceAway = ctrl.getDistanceAway friend
+      beforeEach ->
+        distanceAway = 'distanceAway'
+        spyOn(Auth, 'getDistanceAway').and.returnValue distanceAway
+        friend =
+          id: 2
+          location:
+            lat: 40.7138251
+            long: -73.9897481
 
-    it 'should check how far away they are', ->
-      expect(Auth.getDistanceAway).toHaveBeenCalledWith friend.location
+        returnedDistanceAway = ctrl.getDistanceAway friend
 
-    it 'should return the distance away', ->
-      expect(returnedDistanceAway).toBe distanceAway
+      it 'should check how far away they are', ->
+        expect(Auth.getDistanceAway).toHaveBeenCalledWith friend.location
+
+      it 'should return the distance away', ->
+        expect(returnedDistanceAway).toBe distanceAway
+
+    describe 'when distance is unknown', ->
+
+      beforeEach ->
+        spyOn(Auth, 'getDistanceAway').and.returnValue null
+        friend =
+          id: 2
+        returnedDistanceAway = ctrl.getDistanceAway friend
+
+      it 'should show the default message', ->
+        expect(returnedDistanceAway).toBe 'Start a chat'

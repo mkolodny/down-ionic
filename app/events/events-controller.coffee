@@ -144,6 +144,9 @@ class ChatsCtrl
     message
 
   wasRead: (message) =>
+    # Default to read to stop flicker
+    if message?.chat is undefined then return true
+
     members = message.chat?.members or []
     lastRead = (member.lastRead for member in members when "#{@Auth.user.id}" is member.userId)[0]
     lastRead >= message.createdAt
@@ -248,6 +251,10 @@ class ChatsCtrl
     @$state.go 'addFromFacebook'
 
   getDistanceAway: (friend) ->
-    @Auth.getDistanceAway friend.location
+    distanceAway = @Auth.getDistanceAway friend.location
+    if distanceAway is null
+      return 'Start a chat'
+    else
+      return distanceAway
 
 module.exports = ChatsCtrl

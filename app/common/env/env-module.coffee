@@ -1,6 +1,5 @@
 require 'angular'
 
-
 ### @if BUILD_ENV='prod' ###
 meteorHost = 'https://down-meteor.herokuapp.com'
 angular.module 'down.env', []
