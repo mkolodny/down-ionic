@@ -351,7 +351,7 @@ describe 'invitation service', ->
 
         it 'should re-subscribe to the event messages', ->
           expect($meteor.subscribe).toHaveBeenCalledWith(
-              'group', "#{invitation.eventId}")
+              'chat', "#{invitation.eventId}")
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true
@@ -369,7 +369,7 @@ describe 'invitation service', ->
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} is down."
-            groupId: "#{invitation.eventId}"
+            chatId: "#{invitation.eventId}"
             type: Invitation.acceptAction
             createdAt: date
           expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
@@ -403,7 +403,7 @@ describe 'invitation service', ->
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} might be down."
-            groupId: "#{invitation.eventId}"
+            chatId: "#{invitation.eventId}"
             type: Invitation.maybeAction
             createdAt: date
           expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
@@ -443,7 +443,7 @@ describe 'invitation service', ->
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} can\'t make it."
-            groupId: "#{invitation.eventId}"
+            chatId: "#{invitation.eventId}"
             type: Invitation.declineAction
             createdAt: date
           expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage

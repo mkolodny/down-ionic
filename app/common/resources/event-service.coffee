@@ -70,7 +70,7 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: "#{Auth.user.name} is down."
-          groupId: "#{event.id}" # Meteor likes strings
+          chatId: "#{event.id}" # Meteor likes strings
           type: 'accept_action' # We can't use Invitation.acceptAction because it
                                 #   would create a circular dependecy.
           createdAt: new Date()
@@ -96,7 +96,7 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
         lastName: Auth.user.lastName
         imageUrl: Auth.user.imageUrl
       text: text
-      groupId: "#{event.id}" # Meteor likes strings
+      chatId: "#{event.id}" # Meteor likes strings
       type: 'text'
       createdAt: new Date()
 

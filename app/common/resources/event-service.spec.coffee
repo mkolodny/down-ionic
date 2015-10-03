@@ -243,7 +243,7 @@ describe 'event service', ->
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: "#{Auth.user.name} is down."
-          groupId: "#{responseData.id}" # meteor likes strings
+          chatId: "#{responseData.id}" # meteor likes strings
           type: Invitation.acceptAction
           createdAt: new Date()
 
@@ -333,7 +333,7 @@ describe 'event service', ->
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: text
-          groupId: "#{event.id}"
+          chatId: "#{event.id}"
           type: 'text'
           createdAt: new Date()
         expect(Messages.insert).toHaveBeenCalledWith message

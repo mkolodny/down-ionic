@@ -135,7 +135,7 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
     invitation.response = newResponse
     @update(invitation).$promise.then (_invitation) =>
       # Re-subscribe to event messages
-      $meteor.subscribe 'group', "#{_invitation.eventId}" # Meteor likes strings
+      $meteor.subscribe 'chat', "#{_invitation.eventId}" # Meteor likes strings
 
       # Post an action message.
       if _invitation.response is @accepted
@@ -160,7 +160,7 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
           lastName: Auth.user.lastName
           imageUrl: Auth.user.imageUrl
         text: text
-        groupId: "#{_invitation.eventId}" # Meteor likes strings
+        chatId: "#{_invitation.eventId}" # Meteor likes strings
         type: type
         createdAt: new Date()
       , @readMessage

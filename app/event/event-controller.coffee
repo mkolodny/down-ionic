@@ -12,7 +12,7 @@ class EventCtrl
 
     # Set Meteor collections on controller
     @Messages = @$meteor.getCollectionByName 'messages'
-    @Groups = @$meteor.getCollectionByName 'groups'
+    @Chats = @$meteor.getCollectionByName 'chats'
 
     # Give the event a long title variable name as a workaround for:
     #   https://github.com/driftyco/ionic/issues/2881
@@ -41,31 +41,31 @@ class EventCtrl
       # Get the members invitations.
       @updateMembers()
 
-      # Subscribe to the event's group.
-      @$scope.$meteorSubscribe 'group', "#{@event.id}"
+      # Subscribe to the event's chat.
+      @$scope.$meteorSubscribe 'chat', "#{@event.id}"
 
       # Bind reactive variables
       @messages = @$meteor.collection @getMessages, false
       @newestMessage = @getNewestMessage()
-      @group = @getGroup()
+      @chat = @getChat()
 
       # Watch for changes
       @$scope.$watch =>
         @newestMessage._id
       , @handleNewMessage
       @$scope.$watch =>
-        @group._id
+        @chat._id
       , @handleMembersChange
 
     # Remove angular-meteor bindings
     @$scope.$on '$ionicView.leave', =>
       @messages.stop()
       @newestMessage.stop()
-      @group.stop()
+      @chat.stop()
 
   getMessages: =>
     @Messages.find
-      groupId: "#{@event.id}"
+      chatId: "#{@event.id}"
     ,
       sort:
         createdAt: 1
@@ -77,22 +77,22 @@ class EventCtrl
 
   getNewestMessage: =>
     selector =
-      groupId: "#{@event.id}"
+      chatId: "#{@event.id}"
     options =
       sort:
         createdAt: -1
     @$meteor.object @Messages, selector, false, options
 
-  getGroup: =>
+  getChat: =>
     selector =
-      groupId: "#{@event.id}"
-    @$meteor.object @Groups, selector, false
+      chatId: "#{@event.id}"
+    @$meteor.object @Chats, selector, false
 
   handleNewMessage: =>
     @$meteor.call 'readMessage', @newestMessage._id
 
   handleMembersChange: =>
-    meteorMembers = @group.members or []
+    meteorMembers = @chat.members or []
     members = @members or []
     meteorMemberIds = (member.userId for member in meteorMembers)
     currentMemberIds = (member.id for member in members)
