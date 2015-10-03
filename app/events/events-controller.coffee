@@ -139,7 +139,7 @@ class GroupsCtrl
       message.text = "#{firstName}: #{message.text}"
 
     # Bind group for checking wasRead
-    message.group = @$scope.$meteorObject @Groups, message.groupId, false
+    message.group = @$scope.$meteorObject @Groups, {groupId: message.groupId}, false
 
     message
 
