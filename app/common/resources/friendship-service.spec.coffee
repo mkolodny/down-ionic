@@ -245,3 +245,29 @@ describe 'friendship service', ->
 
       it 'should reject the promise', ->
         expect(rejected).toBe true
+
+
+  describe 'getting a friend chat id', ->
+    friendId = null
+    chatId = null
+
+    describe 'when the user\'s id is less than the friend\'s id', ->
+
+      beforeEach ->
+        Auth.user = {id: 1}
+        friendId = 2
+        chatId = Friendship.getChatId friendId
+
+      it 'should return the user\'s id first', ->
+        expect(chatId).toBe "#{Auth.user.id},#{friendId}"
+
+
+    describe 'when the user\'s id is less than the friend\'s id', ->
+
+      beforeEach ->
+        Auth.user = {id: 2}
+        friendId = 1
+        chatId = Friendship.getChatId friendId
+
+      it 'should return the friend\'s id first', ->
+        expect(chatId).toBe "#{friendId},#{Auth.user.id}"

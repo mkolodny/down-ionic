@@ -152,6 +152,11 @@
       }
     }
   }
+  .empty-feed {
+    .item-divider {
+      margin-top: 0 !important;
+    }
+  }
   ion-footer-bar {
     height: auto;
     display: block;

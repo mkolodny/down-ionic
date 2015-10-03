@@ -288,7 +288,8 @@ describe 'event controller', ->
       options =
         sort:
           createdAt: -1
-      expect($meteor.object).toHaveBeenCalledWith ctrl.Messages, selector, false, options
+      expect($meteor.object).toHaveBeenCalledWith(ctrl.Messages, selector, false,
+          options)
 
 
   describe 'getting meteor members', ->
@@ -333,7 +334,8 @@ describe 'event controller', ->
       ctrl.handleNewMessage()
 
     it 'should mark the message as read', ->
-      expect($meteor.call).toHaveBeenCalledWith 'readMessage', ctrl.newestMessage._id
+      expect($meteor.call).toHaveBeenCalledWith('readMessage',
+          ctrl.newestMessage._id)
 
 
   describe 'handling members changes', ->
