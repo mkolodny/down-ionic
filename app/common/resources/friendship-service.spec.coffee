@@ -1,5 +1,6 @@
 require 'angular'
 require 'angular-mocks'
+require '../meteor/meteor-mocks'
 require './resources-module'
 
 describe 'friendship service', ->
@@ -7,8 +8,11 @@ describe 'friendship service', ->
   Auth = null
   Friendship = null
   listUrl = null
+  $meteor = null
 
   beforeEach angular.mock.module('down.resources')
+
+  beforeEach angular.mock.module('angular-meteor')
 
   beforeEach angular.mock.module(($provide) ->
     Auth =
@@ -24,6 +28,7 @@ describe 'friendship service', ->
     $httpBackend = $injector.get '$httpBackend'
     apiRoot = $injector.get 'apiRoot'
     Friendship = $injector.get 'Friendship'
+    $meteor = $injector.get '$meteor'
 
     listUrl = "#{apiRoot}/friendships"
   )
@@ -147,6 +152,94 @@ describe 'friendship service', ->
         rejected = false
         Friendship.ack {friend: friendId}
           .$promise.then null, ->
+            rejected = true
+        $httpBackend.flush 1
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
+
+
+  describe 'sending a message', ->
+    friend = null
+    text = null
+    url = null
+    requestData = null
+    Messages = null
+
+    beforeEach ->
+      # Mock the mongo messages collection.
+      Messages =
+        insert: jasmine.createSpy 'Messages.insert'
+      $meteor.getCollectionByName.and.returnValue Messages
+
+      Auth.user =
+        id: 1
+        name: 'Ice Cube'
+        firstName: 'Ice'
+        lastName: 'Cube'
+        username: 'cube'
+        imageUrl: 'https://facebook.com/profile-pics/easye'
+      friend =
+        id: 2
+        name: 'Easy E'
+        firstName: 'Easy'
+        lastName: 'E'
+        username: 'easye'
+        imageUrl: 'https://facebook.com/profile-pics/easye'
+      text = 'I\'m in love with a robot.'
+      url = "#{listUrl}/#{friend.id}/messages"
+      requestData = {text: text}
+
+    describe 'successfully', ->
+      resolved = false
+
+      beforeEach ->
+        # Mock the current time.
+        jasmine.clock().install()
+        currentDate = new Date 1438195002656
+        jasmine.clock().mockDate currentDate
+
+        $httpBackend.expectPOST url, requestData
+          .respond 201, null
+
+        Friendship.sendMessage friend.id, text
+          .then ->
+            resolved = true
+        $httpBackend.flush 1
+
+      afterEach ->
+        jasmine.clock().uninstall()
+
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
+
+      it 'should get the eventMessages collection', ->
+        expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
+
+      it 'should save the message in the meteor server', ->
+        message =
+          creator:
+            id: "#{Auth.user.id}"
+            name: Auth.user.name
+            firstName: Auth.user.firstName
+            lastName: Auth.user.lastName
+            imageUrl: Auth.user.imageUrl
+          text: text
+          groupId: "#{Auth.user.id},#{friend.id}"
+          type: 'text'
+          createdAt: new Date()
+        expect(Messages.insert).toHaveBeenCalledWith message
+
+
+    describe 'unsuccessfully', ->
+      rejected = false
+
+      beforeEach ->
+        $httpBackend.expectPOST url, requestData
+          .respond 500, null
+
+        Friendship.sendMessage friend.id, text
+          .then null, ->
             rejected = true
         $httpBackend.flush 1
 

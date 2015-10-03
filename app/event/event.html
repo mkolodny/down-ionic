@@ -57,11 +57,16 @@
       </ion-item>
     </ion-list>
   </ion-content>
-  <ion-footer-bar class="bar-light" keyboard-attach>
-    <textarea ng-model="event.message" placeholder="Type a message..." msd-elastic
-              rows="1"></textarea>
-    <button id="send-message" class="button button-clear"
-            ng-disabled="!event.message" ng-click="event.sendMessage()" ontouchstart
+  <ion-footer-bar class="bar-light new-message" keyboard-attach>
+    <textarea ng-model="event.message"
+              placeholder="Type a message..."
+              msd-elastic
+              rows="1"
+              ></textarea>
+    <button class="button button-clear new-message"
+            ng-disabled="!event.message"
+            ng-click="event.sendMessage()"
+            ontouchstart
             >Send</button>
   </ion-footer-bar>
 </ion-view>

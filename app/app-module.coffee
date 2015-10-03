@@ -10,6 +10,7 @@ require './ionic/ionic.js' # for ionic global object
 require './ionic/ionic-core.js'
 require './ionic/ionic-deploy.js'
 require './vendor/mixpanel/mixpanel-jslib-snippet'
+require './common/meteor/meteor' # Must be required after env-module
 require './login/login-module'
 require './verify-phone/verify-phone-module'
 require './facebook-sync/facebook-sync-module'
@@ -33,7 +34,7 @@ require './my-friends/my-friends-module'
 require './add-friends/add-friends-module'
 require './friends/friends-module'
 require './added-me/added-me-module'
-require './common/meteor/meteor' # Must be required after env-module
+require './friendship/friendship-module'
 
 angular.module 'down', [
     'analytics.mixpanel'
@@ -64,6 +65,7 @@ angular.module 'down', [
     'down.addFriends'
     'down.friends'
     'down.pushNotifications'
+    'down.friendship'
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]

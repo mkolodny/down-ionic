@@ -1,11 +1,11 @@
 class EventCtrl
   @$inject: ['$ionicActionSheet', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel', '$scope',
-             '$state', '$stateParams', 'Auth', 'Event',  'Invitation',
+             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel',
+             '$scope', '$state', '$stateParams', 'Auth', 'Event',  'Invitation',
              'LinkInvitation', 'ngToast', 'User']
   constructor: (@$ionicActionSheet, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel, @$scope, @$state,
-                @$stateParams, @Auth, @Event, @Invitation,
+                @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel, @$scope,
+                @$state, @$stateParams, @Auth, @Event, @Invitation,
                 @LinkInvitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event

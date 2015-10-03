@@ -1,0 +1,27 @@
+<ion-view id="friendship" view-title="{{friendship.friend.name}}">
+  <ion-content>
+    <ion-list scroll-glue>
+      <ion-item ng-repeat="message in friendship.messages">
+        <div class="action-message" ng-if="friendship.isActionMessage(message)">
+          {{message.text}}
+        </div>
+        <div class="text-message" ng-if="!friendship.isActionMessage(message)"
+             ng-class="{'mine': friendship.isMyMessage(message)}">
+          <div class="text">{{message.text}}</div>
+        </div>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+  <ion-footer-bar class="bar-light new-message" keyboard-attach>
+    <textarea ng-model="friendship.message"
+              placeholder="Type a message..."
+              msd-elastic
+              rows="1"
+              ></textarea>
+    <button class="button button-clear"
+            ng-disabled="!friendship.message"
+            ng-click="friendship.sendMessage()"
+            ontouchstart
+            >Send</button>
+  </ion-footer-bar>
+</ion-view>
