@@ -258,21 +258,21 @@ describe 'friendship controller', ->
           message2 = angular.extend {}, message,
             _id: message._id+1
             type: Invitation.acceptAction
-          messages.push message2
+          ctrl.messages.push message2
           scope.$apply()
 
         it 'should mark the message as read', ->
           expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
 
-      describe 'when the message isn\'t an invite action', ->
+      describe 'when the message is an invite action', ->
 
         beforeEach ->
           ctrl.getFriendInvitations.calls.reset()
 
           message2 = angular.extend {}, message,
             _id: message._id+1
-            type: Invitation.errorAction
-          messages.push message2
+            type: Invitation.inviteAction
+          ctrl.messages.push message2
           scope.$apply()
 
         it 'should mark the message as read', ->

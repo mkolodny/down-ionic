@@ -23,8 +23,16 @@ class FriendshipCtrl
         if angular.isDefined newestMessage
           newestMessage._id
       , (newValue, oldValue) =>
+        if newValue is undefined
+          return
+
         @$meteor.call 'readMessage', newValue
-        @getFriendInvitations()
+
+        # If the newest message is an invite action, attach the invitation to the
+        #   message.
+        newestMessage = @messages[@messages.length-1]
+        if newestMessage.type is @Invitation.inviteAction
+          @getFriendInvitations()
 
     @$scope.$on '$ionicView.leave', =>
       # Remove angular-meteor bindings.
