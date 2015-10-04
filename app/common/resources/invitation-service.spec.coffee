@@ -80,6 +80,12 @@ describe 'invitation service', ->
   it 'should have a maybe action property', ->
     expect(Invitation.maybeAction).toBe 'maybe_action'
 
+  it 'should have a invite action property', ->
+    expect(Invitation.inviteAction).toBe 'invite_action'
+
+  it 'should have a error action property', ->
+    expect(Invitation.errorAction).toBe 'error_action'
+
   it 'should have a list url property', ->
     expect(Invitation.listUrl).toBe "#{apiRoot}/invitations"
 

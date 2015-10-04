@@ -8,6 +8,7 @@ FriendshipCtrl = require './friendship-controller'
 describe 'friendship controller', ->
   $meteor = null
   $mixpanel = null
+  $q = null
   Auth = null
   chatsCollection = null
   ctrl = null
@@ -30,6 +31,7 @@ describe 'friendship controller', ->
     $controller = $injector.get '$controller'
     $meteor = $injector.get '$meteor'
     $mixpanel = $injector.get '$mixpanel'
+    $q = $injector.get '$q'
     $stateParams = angular.copy $injector.get('$stateParams')
     Auth = angular.copy $injector.get('Auth')
     Invitation = $injector.get 'Invitation'
@@ -211,6 +213,7 @@ describe 'friendship controller', ->
         type: 'text'
       messages = [message]
       $meteor.collection.and.returnValue messages
+      spyOn ctrl, 'getFriendInvitations'
 
       scope.$emit '$ionicView.enter'
       scope.$apply()
@@ -234,6 +237,9 @@ describe 'friendship controller', ->
     it 'should bind the messages to the controller', ->
       expect(ctrl.messages).toBe messages
 
+    it 'should request the invitations to/from the friend', ->
+      expect(ctrl.getFriendInvitations).toHaveBeenCalled()
+
     describe 'when no messages were posted yet', ->
 
       beforeEach ->
@@ -246,14 +252,36 @@ describe 'friendship controller', ->
     describe 'when new messages get posted', ->
       message2 = null
 
-      beforeEach ->
-        message2 = angular.extend {}, message,
-          _id: message._id+1
-        messages.push message2
-        scope.$apply()
+      describe 'when the message isn\'t an invite action', ->
 
-      it 'should mark the message as read', ->
-        expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
+        beforeEach ->
+          message2 = angular.extend {}, message,
+            _id: message._id+1
+            type: Invitation.acceptAction
+          ctrl.messages.push message2
+          scope.$apply()
+
+        it 'should mark the message as read', ->
+          expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
+
+      describe 'when the message is an invite action', ->
+
+        beforeEach ->
+          ctrl.getFriendInvitations.calls.reset()
+
+          message2 = angular.extend {}, message,
+            _id: message._id+1
+            type: Invitation.inviteAction
+          ctrl.messages.push message2
+          scope.$apply()
+
+        it 'should mark the message as read', ->
+          # TODO: Don't mark invite action messages as read until we fetch the
+          #   invitation
+          expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
+
+        it 'should refresh the invitations', ->
+          expect(ctrl.getFriendInvitations).toHaveBeenCalled()
 
 
   describe 'when leaving the view', ->
@@ -267,6 +295,75 @@ describe 'friendship controller', ->
 
     it 'should stop the angular-meteor bindings', ->
       expect(ctrl.messages.stop).toHaveBeenCalled()
+
+
+  describe 'getting the invitations to/from the friend', ->
+    deferred = null
+    eventId = null
+    message1 = null
+    message2 = null
+    message3 = null
+
+    beforeEach ->
+      deferred = $q.defer()
+      spyOn(Invitation, 'getUserInvitations').and.returnValue
+        $promise: deferred.promise
+
+      # Mock invite action messages.
+      message =
+        _id: 1
+        creator: new User {id: 1}
+        createdAt:
+          $date: new Date().getTime()
+        text: 'Down?'
+        groupId: '1,2'
+        type: Invitation.inviteAction
+      eventId = 2
+      message1 = angular.extend {}, message,
+        meta:
+          eventId: eventId
+      message2 = angular.extend {}, message,
+        meta:
+          eventId: eventId+1 # This event is expired.
+      message3 = angular.extend {}, message,
+        type: Invitation.acceptAction
+      ctrl.messages = [message1, message2, message3]
+
+      ctrl.getFriendInvitations()
+
+    it 'should request the invitations from the server', ->
+      expect(Invitation.getUserInvitations).toHaveBeenCalledWith ctrl.friend.id
+
+    describe 'successfully', ->
+      invitation = null
+
+      beforeEach ->
+        invitation = new Invitation
+          id: 1
+          eventId: eventId
+          fromUserId: Auth.user.id
+          toUserId: friend.id
+        deferred.resolve [invitation]
+        scope.$apply()
+
+      it 'should set the invitation on the message', ->
+        message1Copy = angular.copy message1
+        message1Copy.invitation = invitation
+        expect(ctrl.messages).toEqual [message1Copy, message3]
+
+
+    describe 'unsuccessfully', ->
+
+      beforeEach ->
+        deferred.reject()
+        scope.$apply()
+
+      it 'should update the messages\' types', ->
+        message1Copy = angular.extend {}, message1,
+          type: Invitation.errorAction
+        message2Copy = angular.extend {}, message2,
+          type: Invitation.errorAction
+        expect(ctrl.messages).toEqual [message1Copy, message2Copy, message3]
 
 
   describe 'getting messages', ->

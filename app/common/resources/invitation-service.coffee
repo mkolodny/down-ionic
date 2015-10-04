@@ -1,6 +1,6 @@
 Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
               'apiRoot', 'Auth', 'Event', 'User', \
-              ($http, $meteor, $mixpanel, $q, $resource, 
+              ($http, $meteor, $mixpanel, $q, $resource,
                apiRoot, Auth, Event, User) ->
   listUrl = "#{apiRoot}/invitations"
   detailUrl =
@@ -96,6 +96,8 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
   resource.acceptAction = 'accept_action'
   resource.declineAction = 'decline_action'
   resource.maybeAction = 'maybe_action'
+  resource.inviteAction = 'invite_action'
+  resource.errorAction = 'error_action'
 
   resource.bulkCreate = (eventId, invitations) ->
     deferred = $q.defer()
