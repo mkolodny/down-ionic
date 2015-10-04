@@ -67,9 +67,9 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
 
   resource.getChatId = (friendId) ->
     if Auth.user.id < friendId
-      return "#{Auth.user.id},#{friendId}"
+      "#{Auth.user.id},#{friendId}"
     else
-      return "#{friendId},#{Auth.user.id}"
+      "#{friendId},#{Auth.user.id}"
 
   resource
 ]
