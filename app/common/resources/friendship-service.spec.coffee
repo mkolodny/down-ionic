@@ -202,7 +202,7 @@ describe 'friendship service', ->
         $httpBackend.expectPOST url, requestData
           .respond 201, null
 
-        Friendship.sendMessage friend.id, text
+        Friendship.sendMessage friend, text
           .then ->
             resolved = true
         $httpBackend.flush 1
@@ -225,7 +225,7 @@ describe 'friendship service', ->
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: text
-          groupId: "#{Auth.user.id},#{friend.id}"
+          chatId: "#{Auth.user.id},#{friend.id}"
           type: 'text'
           createdAt: new Date()
         expect(Messages.insert).toHaveBeenCalledWith message
@@ -238,7 +238,7 @@ describe 'friendship service', ->
         $httpBackend.expectPOST url, requestData
           .respond 500, null
 
-        Friendship.sendMessage friend.id, text
+        Friendship.sendMessage friend, text
           .then null, ->
             rejected = true
         $httpBackend.flush 1

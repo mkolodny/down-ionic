@@ -10,10 +10,12 @@ describe 'friendship controller', ->
   $mixpanel = null
   $q = null
   Auth = null
+  chatsCollection = null
   ctrl = null
   friend = null
   Friendship = null
   Invitation = null
+  messagesCollection = null
   scope = null
   User = null
 
@@ -56,6 +58,12 @@ describe 'friendship controller', ->
         long: -73.9821535
     $stateParams.friend = friend
 
+    messagesCollection = 'messagesCollection'
+    chatsCollection = 'chatsCollection'
+    $meteor.getCollectionByName.and.callFake (collectionName) ->
+      if collectionName is 'messages' then return messagesCollection
+      if collectionName is 'chats' then return chatsCollection
+
     ctrl = $controller FriendshipCtrl,
       $scope: scope
       $stateParams: $stateParams
@@ -64,6 +72,14 @@ describe 'friendship controller', ->
 
   it 'should set the friend on the controller', ->
     expect(ctrl.friend).toBe friend
+
+  it 'should set the messages collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
+    expect(ctrl.Messages).toBe messagesCollection
+
+  it 'should set the events collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
+    expect(ctrl.Chats).toBe chatsCollection
 
   describe 'checking whether a message is an action message', ->
     message = null
@@ -273,15 +289,12 @@ describe 'friendship controller', ->
     beforeEach ->
       ctrl.messages =
         stop: jasmine.createSpy 'messages.stop'
-      ctrl.chat =
-        stop: jasmine.createSpy 'chat.stop'
 
       scope.$broadcast '$ionicView.leave'
       scope.$apply()
 
     it 'should stop the angular-meteor bindings', ->
       expect(ctrl.messages.stop).toHaveBeenCalled()
-      expect(ctrl.chat.stop).toHaveBeenCalled()
 
 
   describe 'getting the invitations to/from the friend', ->

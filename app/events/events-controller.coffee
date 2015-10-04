@@ -203,10 +203,15 @@ class ChatsCtrl
 
     @$state.go 'friends'
 
-  viewEvent: (item) ->
+  viewEventChat: (item) ->
     @$state.go 'event',
       invitation: item.invitation
       id: item.invitation.event.id
+
+  viewFriendChat: (item) ->
+    @$state.go 'friendship',
+      friend: item.friend
+      id: item.friend.id
 
   getInvitations: ->
     @Invitation.getMyInvitations()
