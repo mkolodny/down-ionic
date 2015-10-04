@@ -11,10 +11,13 @@ class FriendshipCtrl
 
     @$scope.$on '$ionicView.enter', =>
       @getFriendInvitations()
-
-      # Subscribe to the chat messages.
+      
       @chatId = @Friendship.getChatId @friend.id
-      @chat = @$scope.$meteorSubscribe 'chat', @chatId
+
+      # Subscribe to the event's chat.
+      @$scope.$meteorSubscribe 'chat', @chatId
+
+      # Bind reactive variables
       @messages = @$meteor.collection @getMessages, false
 
       # Mark messages as read as they come in.
@@ -51,16 +54,15 @@ class FriendshipCtrl
         for invitation in invitations
           events[invitation.eventId] = invitation
 
-        messages = []
+
         for message in @messages
           if message.type is @Invitation.inviteAction
             invitation = events[message.meta.eventId]
             if angular.isDefined invitation
               message.invitation = invitation
-              messages.push message
-          else
-            messages.push message
-        @messages = messages
+            else
+              # Delete expired invite_action message
+              @messages.remove message._id
       , =>
         # Change all invitation action messages to error action messages.
         for message in @messages

@@ -193,16 +193,13 @@ describe 'friendship controller', ->
 
   describe 'once the view loads', ->
     chatId = null
-    chat = null
     message = null
     messages = null
 
     beforeEach ->
       chatId = '1,2'
       spyOn(Friendship, 'getChatId').and.returnValue chatId
-      chat = 'chat'
       scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
-        .and.returnValue chat
       message =
         _id: 1
         creator: new User Auth.user
@@ -227,9 +224,6 @@ describe 'friendship controller', ->
     it 'should subscribe to the events messages', ->
       chatId = "#{friend.id},#{Auth.user.id}"
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', chatId
-
-    it 'should set the chat subscription on the controller', ->
-      expect(ctrl.chat).toBe chat
 
     it 'should get the messages', ->
       expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
@@ -338,6 +332,8 @@ describe 'friendship controller', ->
       invitation = null
 
       beforeEach ->
+        ctrl.messages.remove = jasmine.createSpy 'messages.remove'
+
         invitation = new Invitation
           id: 1
           eventId: eventId
@@ -347,10 +343,10 @@ describe 'friendship controller', ->
         scope.$apply()
 
       it 'should set the invitation on the message', ->
-        message1Copy = angular.copy message1
-        message1Copy.invitation = invitation
-        expect(ctrl.messages).toEqual [message1Copy, message3]
+        expect(message1.invitation).toBe invitation
 
+      it 'should delete expired invite_action messages', ->
+        expect(ctrl.messages.remove).toHaveBeenCalledWith message2._id
 
     describe 'unsuccessfully', ->
 

@@ -11,6 +11,7 @@ describe 'event service', ->
   $q = null
   Auth = null
   Event = null
+  Friendship = null
   Invitation = null
   Messages = null
   User = null
@@ -43,6 +44,7 @@ describe 'event service', ->
     apiRoot = $injector.get 'apiRoot'
     User = $injector.get 'User'
     Event = $injector.get 'Event'
+    Friendship = $injector.get 'Friendship'
     Invitation = $injector.get 'Invitation'
 
     # Mock Messages collection
@@ -176,11 +178,14 @@ describe 'event service', ->
 
   describe 'creating', ->
     event = null
+    invitation = null
     response = null
     responseData = null
     requestData = null
 
     beforeEach ->
+      invitation =
+        to_user_id: 2
       event =
         title: 'bars?!?!!?'
         creatorId: 1
@@ -190,6 +195,8 @@ describe 'event service', ->
           lat: 40.7270718
           long: -73.9919324
         comment: 'awwww yisssss'
+        invitations: [invitation]
+
       requestData = Event.serialize event
 
     describe 'successfully', ->
@@ -249,6 +256,20 @@ describe 'event service', ->
 
         expect(Messages.insert).toHaveBeenCalledWith message, Event.readMessage
 
+      it 'should create invite_action messages', ->
+        inviteMessage =
+          creator:
+            id: "#{Auth.user.id}" # meteor likes strings
+            name: Auth.user.name
+            firstName: Auth.user.firstName
+            lastName: Auth.user.lastName
+            imageUrl: Auth.user.imageUrl
+          text: 'Down?'
+          chatId: Friendship.getChatId invitation.to_user_id # meteor likes strings
+          type: Invitation.inviteAction
+          createdAt: new Date()
+
+        expect(Messages.insert).toHaveBeenCalledWith inviteMessage
 
     describe 'unsuccessfully', ->
       rejected = null
