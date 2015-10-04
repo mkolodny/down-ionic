@@ -5,9 +5,46 @@
         <div class="action-message" ng-if="friendship.isActionMessage(message)">
           {{message.text}}
         </div>
-        <div class="text-message" ng-if="!friendship.isActionMessage(message)"
+        <div class="text-message"
+             ng-if="friendship.isTextMessage(message)"
              ng-class="{'mine': friendship.isMyMessage(message)}">
-          <div class="text">{{message.text}}</div>
+          <div class="text">
+            <div ng-if="!friendship.isInviteAction(message)">{{message.text}}</div>
+            <div ng-if="message.invitation">
+              <span>{{message.invitation.event.title}}</span>
+              <span ng-if="message.invitation.event.place">
+                <a href view-place place="message.invitation.event.place">
+                  {{message.invitation.event.place.name}}
+                </a>
+              </span>
+              <span ng-if="message.invitation.event.datetime">
+                &mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}
+              </span>
+              <div class="respond-buttons" ng-if="!friendship.isMyMessage(message)">
+                <button class="respond"
+                        ng-click="friendship.acceptInvitation(message.invitation)"
+                        ontouchstart
+                        ng-disabled="friendship.isAccepted(message.invitation)"
+                        >Down</button>
+                <button class="respond"
+                        ng-click="friendship.maybeInvitation(message.invitation)"
+                        ontouchstart
+                        ng-disabled="friendship.isMaybe(message.invitation)"
+                        >Chat</button>
+                <button class="respond"
+                        ng-click="friendship.declineInvitation(message.invitation)"
+                        ontouchstart
+                        ng-disabled="friendship.isDeclined(message.invitation)"
+                        >Pass</button>
+              </div>
+            </div>
+            <div ng-if="friendship.isLoadingInvitation(message)">
+              <ion-spinner icon="bubbles"></ion-spinner>
+            </div>
+          </div>
+        </div>
+        <div class="error-message" ng-if="friendship.isErrorMessage(message)">
+          <i class="fa fa-exclamation-triangle"></i> Error fetching message.
         </div>
       </ion-item>
     </ion-list>
