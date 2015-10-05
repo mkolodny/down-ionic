@@ -1,7 +1,7 @@
 class FriendshipCtrl
-  @$inject: ['$ionicLoading', '$meteor', '$mixpanel', '$scope', '$state',
+  @$inject: ['$ionicLoading', '$ionicScrollDelegate', '$meteor', '$mixpanel', '$scope', '$state',
              '$stateParams', 'Auth', 'Invitation', 'Friendship', 'ngToast', 'User']
-  constructor: (@$ionicLoading, @$meteor, @$mixpanel, @$scope, @$state,
+  constructor: (@$ionicLoading, @$ionicScrollDelegate, @$meteor, @$mixpanel, @$scope, @$state,
                 @$stateParams, @Auth, @Invitation, @Friendship, @ngToast, @User) ->
     @friend = @$stateParams.friend
 
@@ -9,7 +9,7 @@ class FriendshipCtrl
     @Messages = @$meteor.getCollectionByName 'messages'
     @Chats = @$meteor.getCollectionByName 'chats'
 
-    @$scope.$on '$ionicView.enter', =>
+    @$scope.$on '$ionicView.beforeEnter', =>
       @getFriendInvitations()
 
       @chatId = @Friendship.getChatId @friend.id
@@ -30,6 +30,7 @@ class FriendshipCtrl
           return
 
         @$meteor.call 'readMessage', newValue
+        @$ionicScrollDelegate.scrollBottom true
 
         # If the newest message is an invite action, attach the invitation to the
         #   message.
@@ -63,6 +64,8 @@ class FriendshipCtrl
             else
               # Delete expired invite_action message
               @messages.remove message._id
+        
+        @$ionicScrollDelegate.scrollBottom true
       , =>
         # Change all invitation action messages to error action messages.
         for message in @messages
@@ -151,5 +154,6 @@ class FriendshipCtrl
     @$mixpanel.track 'Send Message',
       to: 'friend'
     @message = null
+
 
 module.exports = FriendshipCtrl

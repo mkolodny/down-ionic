@@ -161,7 +161,8 @@ describe 'event controller', ->
     expect(ctrl.Chats).toBe chatsCollection
 
   describe 'once the view loads', ->
-    newestMessage = null
+    message = null
+    messages = null
     chat = null
 
     beforeEach ->
@@ -172,18 +173,24 @@ describe 'event controller', ->
       spyOn ctrl, 'updateMembers'
       spyOn ctrl, 'getMessages'
 
+      message =
+        _id: 1
+        creator: new User Auth.user
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        chatId: "#{event.id}"
+        type: 'text'
+      messages = [message]
+      $meteor.collection.and.returnValue messages
+
       chat =
         _id: 'chat'
       spyOn(ctrl, 'getChat').and.returnValue chat
 
-      newestMessage =
-        _id: 'newestMessage'
-      spyOn(ctrl, 'getNewestMessage').and.returnValue newestMessage
-
-      spyOn ctrl, 'handleNewMessage'
       spyOn ctrl, 'handleMembersChange'
 
-      scope.$emit '$ionicView.enter'
+      scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
 
     it 'should subscribe to the events messages', ->
@@ -193,10 +200,6 @@ describe 'event controller', ->
       # TODO: Check that controller property is set
       expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
 
-    it 'should bind the newest message to the controller', ->
-      expect(ctrl.getNewestMessage).toHaveBeenCalled()
-      expect(ctrl.newestMessage).toEqual newestMessage
-
     it 'should bind the meteor event members to the controller', ->
       expect(ctrl.chat).toEqual chat
       expect(ctrl.getChat).toHaveBeenCalled()
@@ -204,16 +207,23 @@ describe 'event controller', ->
     it 'should update the members array', ->
       expect(ctrl.updateMembers).toHaveBeenCalled()
 
-    describe 'when the newestMessage changes', ->
+    describe 'when a new message is posted', ->
+      message2 = null
 
       beforeEach ->
-        ctrl.newestMessage =
-          _id: 'someotherid'
-        ctrl.handleNewMessage.calls.reset()
+        ctrl.messages = []
+        message2 = angular.extend {}, message,
+          _id: message._id+1
+          type: Invitation.acceptAction
+        ctrl.messages.push message2
+
         scope.$apply()
 
-      it 'should handle the change', ->
-        expect(ctrl.handleNewMessage).toHaveBeenCalled()
+      it 'should mark the message as read', ->
+        expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
+
+      it 'should scroll to the bottom', ->
+        expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
 
     describe 'when the chat changes', ->
@@ -233,8 +243,6 @@ describe 'event controller', ->
     beforeEach ->
       ctrl.messages =
         stop: jasmine.createSpy 'messages.stop'
-      ctrl.newestMessage =
-        stop: jasmine.createSpy 'newestMessage.stop'
       ctrl.chat =
         stop: jasmine.createSpy 'chat.stop'
 
@@ -243,7 +251,6 @@ describe 'event controller', ->
 
     it 'should stop remove angular-meteor bindings', ->
       expect(ctrl.messages.stop).toHaveBeenCalled()
-      expect(ctrl.newestMessage.stop).toHaveBeenCalled()
       expect(ctrl.chat.stop).toHaveBeenCalled()
 
 
@@ -324,18 +331,6 @@ describe 'event controller', ->
       expectedResult.creator = new User expectedResult.creator
 
       expect(result).toEqual expectedResult
-
-
-  describe 'handling new messages', ->
-
-    beforeEach ->
-      ctrl.newestMessage =
-        _id: 'asdfasdf'
-      ctrl.handleNewMessage()
-
-    it 'should mark the message as read', ->
-      expect($meteor.call).toHaveBeenCalledWith('readMessage',
-          ctrl.newestMessage._id)
 
 
   describe 'handling members changes', ->
