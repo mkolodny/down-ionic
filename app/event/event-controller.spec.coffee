@@ -194,9 +194,6 @@ describe 'event controller', ->
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
 
-    it 'should init shouldScrollBottom to false', ->
-      expect(ctrl.shouldScrollBottom).toBe false
-
     it 'should subscribe to the events messages', ->
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', "#{event.id}"
 
@@ -239,21 +236,6 @@ describe 'event controller', ->
         expect(ctrl.handleChatChange).toHaveBeenCalled()
 
 
-  describe 'when view enters', ->
-
-    beforeEach ->
-      spyOn $ionicScrollDelegate, 'scrollBottom'
-
-      scope.$broadcast '$ionicView.enter'
-      scope.$apply()
-
-    it 'should enable scrolling to the bottom', ->
-      expect(ctrl.shouldScrollBottom).toBe true
-
-    it 'should scroll to the bottom', ->
-      expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
-
-
   describe 'when leaving the view', ->
 
     beforeEach ->
@@ -277,7 +259,7 @@ describe 'event controller', ->
     newMessageId = null
 
     beforeEach ->
-      spyOn $ionicScrollDelegate, 'scrollBottom'
+      spyOn ctrl, 'scrollBottom'
       newMessageId = '1jkhkgfjgfhftxhgdxf'
 
       ctrl.handleNewMessage newMessageId
@@ -285,15 +267,8 @@ describe 'event controller', ->
     it 'should mark the message as read', ->
       expect($meteor.call).toHaveBeenCalledWith 'readMessage', newMessageId
 
-    describe 'when scrolling to the bottom is enabled', ->
-      
-      beforeEach ->
-        ctrl.shouldScrollBottom = true        
-
-        ctrl.handleNewMessage newMessageId, 'oldValue'
-
-      it 'should scroll to the bottom', ->
-        expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
+    it 'should scroll to the bottom', ->
+      expect(ctrl.scrollBottom).toHaveBeenCalled()
 
 
   describe 'getting messages', ->
@@ -1098,3 +1073,19 @@ describe 'event controller', ->
 
         it 'should hide the loading overlay', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
+
+
+  describe 'scrolling to the bottom', ->
+    scrollHandle = null
+
+    describe 'when scrolling bottom is enabled', ->
+
+      beforeEach ->
+        scrollHandle = 
+          scrollBottom: jasmine.createSpy 'scrollHandle.scrollBottom'
+        spyOn($ionicScrollDelegate, '$getByHandle').and.returnValue scrollHandle
+
+        ctrl.scrollBottom()
+
+      it 'should scroll to the bottom', ->
+        expect(scrollHandle.scrollBottom).toHaveBeenCalledWith true

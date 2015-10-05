@@ -29,10 +29,6 @@ class FriendshipCtrl
         if angular.isDefined newestMessage
           newestMessage._id
       , @handleNewMessage
-        
-    @$scope.$on '$ionicView.enter', =>
-      @shouldScrollBottom = true
-      @$ionicScrollDelegate.scrollBottom true
 
     @$scope.$on '$ionicView.leave', =>
       # Remove angular-meteor bindings.
@@ -43,8 +39,7 @@ class FriendshipCtrl
       return
 
     @$meteor.call 'readMessage', newMessageId
-    if @shouldScrollBottom
-      @$ionicScrollDelegate.scrollBottom true
+    @scrollBottom()
 
     # If the newest message is an invite action, attach the invitation to the
     #   message.
@@ -75,8 +70,7 @@ class FriendshipCtrl
               # Delete expired invite_action message
               @messages.remove message._id
         
-        if @shouldScrollBottom
-          @$ionicScrollDelegate.scrollBottom true
+        @scrollBottom()
       , =>
         # Change all invitation action messages to error action messages.
         for message in @messages
@@ -165,6 +159,10 @@ class FriendshipCtrl
     @$mixpanel.track 'Send Message',
       to: 'friend'
     @message = null
+
+  scrollBottom: ->
+    @$ionicScrollDelegate.$getByHandle('friendship')
+      .scrollBottom true
 
 
 module.exports = FriendshipCtrl
