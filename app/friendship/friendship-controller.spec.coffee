@@ -755,3 +755,21 @@ describe 'friendship controller', ->
       messageCopy = angular.copy message
       messageCopy.creator = new User messageCopy.creator
       expect(transformedMessage).toEqual messageCopy
+
+
+  describe 'viewing an event', ->
+    invitation = null
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      invitation =
+        id: 1
+        event:
+          id: 2
+      ctrl.viewEvent invitation
+
+    it 'should go to the event', ->
+      expect($state.go).toHaveBeenCalledWith 'event',
+        invitation: invitation
+        id: invitation.event.id

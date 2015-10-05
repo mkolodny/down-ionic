@@ -298,25 +298,6 @@ body {
 }
 
 // Event
-.respond {
-  color: $brand-color;
-  border: 1px solid $brand-color;
-  background-color: #fff;
-  border-radius: 16px;
-  height: 26px;
-  width: 76px;
-  line-height: 20px;
-
-  &.activated {
-    color: #fff;
-    background-color: $brand-color;
-  }
-}
-#events-content {
-  bottom: 81px; // the height of the footer w/o event details
-  // TODO: Figure out how to set the bottom dynamically based on the footer's
-  //   contents.
-}
 .platform-ios {
   #expanded-header {
     // Offset for ios-status-bar
