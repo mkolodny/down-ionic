@@ -1,5 +1,5 @@
-Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
-         ($http, $meteor, $q, $resource, apiRoot, Auth, User) ->
+Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship', 'User', \
+         ($http, $meteor, $q, $resource, apiRoot, Auth, Friendship, User) ->
   listUrl = "#{apiRoot}/events"
   detailUrl = "#{listUrl}/:id"
   serializeEvent = (event) ->
@@ -53,9 +53,13 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
   resource.deserialize = deserializeEvent
 
   resource.save = (event) ->
-    deferred = $q.defer()
+    deferred = $q.defer()    
+    eventCopy = angular.copy event
 
     data = serializeEvent event
+
+    # needed to create invite action messages because 
+    #   DJANGO! server doesn't return the invitations
     $http.post listUrl, data
       .success (data, status) =>
         event = deserializeEvent data
@@ -75,6 +79,26 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'User', \
                                 #   would create a circular dependecy.
           createdAt: new Date()
         , @readMessage
+
+        # Create invite_action messages
+        for invitation in eventCopy.invitations
+          toUser = invitation.to_user # they are serialized for the server
+          if toUser is Auth.user.id then continue 
+          
+          Messages.insert
+            creator:
+              id: "#{Auth.user.id}" # Meteor likes strings
+              name: Auth.user.name
+              firstName: Auth.user.firstName
+              lastName: Auth.user.lastName
+              imageUrl: Auth.user.imageUrl
+            text: 'Down?'
+            chatId: Friendship.getChatId toUser # Meteor likes strings
+            type: 'invite_action' # We can't use Invitation.invite_action because it
+                                  #   would create a circular dependecy.
+            createdAt: new Date()
+            meta:
+              eventId: "#{event.id}"
 
         deferred.resolve event
       .error (data, status) =>
