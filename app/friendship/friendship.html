@@ -12,8 +12,7 @@
         </div>
         <div class="text-message"
              ng-if="friendship.isTextMessage(message) || friendship.isInviteAction(message)"
-             ng-class="{mine: friendship.isMyMessage(message)}"
-             ng-click="friendship.isMyMessage(message) ? friendship.viewEvent(message.invitation) : null">
+             ng-class="{mine: friendship.isMyMessage(message)}">
           <div class="text" ng-if="friendship.isTextMessage(message)">{{message.text}}</div>
           <div class="text invite-action"
                ng-if="message.invitation"
@@ -38,8 +37,13 @@
                       ontouchstart
                       ng-disabled="friendship.isDeclined(message.invitation)"
                       >Pass</button>
+          </div><div
+              class="respond-section"
+              ng-if="friendship.isMyMessage(message)">
+            <button class="respond" disabled>Joined</button>
           </div></div>
-          <div class="text" ng-if="friendship.isLoadingInvitation(message)"
+          <div class="text invite-action"
+               ng-if="friendship.isLoadingInvitation(message)"
                ><ion-spinner icon="bubbles"></ion-spinner></div>
         </div>
         <div class="error-message" ng-if="friendship.isErrorAction(message)">

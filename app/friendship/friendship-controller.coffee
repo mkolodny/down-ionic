@@ -11,7 +11,7 @@ class FriendshipCtrl
 
     @$scope.$on '$ionicView.enter', =>
       @getFriendInvitations()
-
+      
       @chatId = @Friendship.getChatId @friend.id
 
       # Subscribe to the event's chat.
@@ -53,6 +53,7 @@ class FriendshipCtrl
         events = {}
         for invitation in invitations
           events[invitation.eventId] = invitation
+
 
         for message in @messages
           if message.type is @Invitation.inviteAction
@@ -134,11 +135,6 @@ class FriendshipCtrl
 
   declineInvitation: (invitation) ->
     @respondToInvitation invitation, @Invitation.declined
-
-  viewEvent: (invitation) ->
-    @$state.go 'event',
-      invitation: invitation
-      id: invitation.event.id
 
   sendMessage: ->
     @Friendship.sendMessage @friend, @message

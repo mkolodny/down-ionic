@@ -261,7 +261,7 @@ body {
   border-bottom-width: 0 !important;
   border-bottom-color: transparent !important;
   background-image: none;
-  border-bottom: none;
+  border-bottom: 1px solid darken($brand-color, 12%) !important;
 }
 .bar {
   background-color: $brand-color;

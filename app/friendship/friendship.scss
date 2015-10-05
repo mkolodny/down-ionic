@@ -4,51 +4,43 @@
     border-top: 1px solid #ccc;
     margin-top: 10px;
     padding-top: 10px;
-  }
-  .mine {
-    .respond-section {
-      border-top-color: #fff;
-      text-align: center;
-    }
-    .respond:disabled {
-      background-color: #fff !important;
-      color: #08f !important;
-    }
-    ion-spinner {
-      stroke: #fff;
-      fill: #fff;
-    }
-    .invite-action {
-      font-weight: 700;
-    }
+    text-align: center;
   }
   .respond {
-    background-color: transparent;
-    border: none;
-    color: #08f;
-    font-weight: 700;
+    background-color: #fff;
+    border: 1px solid #fff;
+    border-radius: 4px;
+    color: $brand-color;
+    font-weight: 600;
+    padding-top: 1px;
+    padding-bottom: 2px;
 
     &:disabled {
       color: #fff !important;
-      background-color: #08f;
-      border-radius: 4px;
+      background-color: transparent;
+      border: 1px solid #fff;
     }
   }
-//  .invite-action {
-//    background-color: $brand-color;
-//    border-color: $brand-color;
-//    color: //fff;
-//
-//    &::before {
-//      border-right-color: $brand-color;
-//    }
-//  }
-//  .mine {
-//    .invite-action {
-//      &::before {
-//        border-left-color: $brand-color;
-//        border-right-color: transparent;
-//      }
-//    }
-//  }
+  .invite-action {
+    background-color: $brand-color;
+    border-color: $brand-color;
+    color: #fff;
+    font-weight: 600;
+
+    &::before {
+      border-right-color: $brand-color;
+    }
+  }
+  .mine {
+    .invite-action {
+      &::before {
+        border-left-color: $brand-color;
+        border-right-color: transparent;
+      }
+    }
+  }
+  ion-spinner {
+    stroke: #fff;
+    fill: #fff;
+  }
 }
