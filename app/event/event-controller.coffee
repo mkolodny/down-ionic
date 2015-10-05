@@ -1,11 +1,11 @@
 class EventCtrl
   @$inject: ['$ionicActionSheet', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel',
+             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel', '$rootScope',
              '$scope', '$state', '$stateParams', 'Auth', 'Event',  'Invitation',
              'LinkInvitation', 'ngToast', 'User']
   constructor: (@$ionicActionSheet, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel, @$scope,
-                @$state, @$stateParams, @Auth, @Event, @Invitation,
+                @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel, @$rootScope,
+                @$scope, @$state, @$stateParams, @Auth, @Event, @Invitation,
                 @LinkInvitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
@@ -38,6 +38,9 @@ class EventCtrl
 
     # Start out at the most recent message.
     @$scope.$on '$ionicView.beforeEnter', =>
+      # Don't scroll to the bottom until view fully enters
+      @shouldScrollBottom = false
+
       # Get the members invitations.
       @updateMembers()
 
@@ -54,22 +57,30 @@ class EventCtrl
         newestMessage = @messages[@messages.length-1]
         if angular.isDefined newestMessage
           newestMessage._id
-      , (newValue, oldValue) =>
-        if newValue is undefined
-          return
-
-        @$meteor.call 'readMessage', newValue
-        @$ionicScrollDelegate.scrollBottom true
+      , @handleNewMessage
 
       # Watch for changes in chat members
       @$scope.$watch =>
         @chat._id
-      , @handleMembersChange
+      , @handleChatChange
+
+    @$scope.$on '$ionicView.enter', =>
+      @shouldScrollBottom = true
+      @$ionicScrollDelegate.scrollBottom true
 
     # Remove angular-meteor bindings
     @$scope.$on '$ionicView.leave', =>
       @messages.stop()
       @chat.stop()
+      @$rootScope.hideNavBottomBorder = false
+
+  handleNewMessage: (newMessageId) =>
+    if newMessageId is undefined
+      return
+
+    @$meteor.call 'readMessage', newMessageId
+    if @shouldScrollBottom
+      @$ionicScrollDelegate.scrollBottom true
 
   getMessages: =>
     @Messages.find
@@ -96,7 +107,7 @@ class EventCtrl
       chatId: "#{@event.id}"
     @$meteor.object @Chats, selector, false
 
-  handleMembersChange: =>
+  handleChatChange: =>
     meteorMembers = @chat.members or []
     members = @members or []
     meteorMemberIds = (member.userId for member in meteorMembers)
@@ -159,7 +170,9 @@ class EventCtrl
   toggleIsHeaderExpanded: ->
     if @isHeaderExpanded
       @isHeaderExpanded = false
+      @$rootScope.hideNavBottomBorder = false
     else
+      @$rootScope.hideNavBottomBorder = true
       @isHeaderExpanded = true
 
   isAccepted: ->

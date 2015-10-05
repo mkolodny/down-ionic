@@ -20,6 +20,7 @@ describe 'event controller', ->
   $ionicPopup = null
   $ionicScrollDelegate = null
   $q = null
+  $rootScope = null
   $state = null
   $meteor = null
   $mixpanel = null
@@ -61,6 +62,7 @@ describe 'event controller', ->
     $ionicPopup = $injector.get '$ionicPopup'
     $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
     $q = $injector.get '$q'
+    $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     $stateParams = angular.copy $injector.get('$stateParams')
     $mixpanel = $injector.get '$mixpanel'
@@ -166,12 +168,11 @@ describe 'event controller', ->
     chat = null
 
     beforeEach ->
-      spyOn $ionicScrollDelegate, 'scrollBottom'
-
       scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
 
       spyOn ctrl, 'updateMembers'
       spyOn ctrl, 'getMessages'
+      spyOn ctrl, 'handleNewMessage'
 
       message =
         _id: 1
@@ -188,10 +189,13 @@ describe 'event controller', ->
         _id: 'chat'
       spyOn(ctrl, 'getChat').and.returnValue chat
 
-      spyOn ctrl, 'handleMembersChange'
+      spyOn ctrl, 'handleChatChange'
 
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
+
+    it 'should init shouldScrollBottom to false', ->
+      expect(ctrl.shouldScrollBottom).toBe false
 
     it 'should subscribe to the events messages', ->
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', "#{event.id}"
@@ -211,31 +215,43 @@ describe 'event controller', ->
       message2 = null
 
       beforeEach ->
-        ctrl.messages = []
+        ctrl.handleNewMessage.calls.reset()
+
+        # Trigger @$scope.watch
         message2 = angular.extend {}, message,
           _id: message._id+1
           type: Invitation.acceptAction
         ctrl.messages.push message2
-
         scope.$apply()
 
-      it 'should mark the message as read', ->
-        expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
-
-      it 'should scroll to the bottom', ->
-        expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
-
+      it 'should handle the message', ->
+        expect(ctrl.handleNewMessage).toHaveBeenCalled()
 
     describe 'when the chat changes', ->
 
       beforeEach ->
         ctrl.chat =
           _id: 'someotherid'
-        ctrl.handleMembersChange.calls.reset()
+        ctrl.handleChatChange.calls.reset()
         scope.$apply()
 
       it 'should handle the change', ->
-        expect(ctrl.handleMembersChange).toHaveBeenCalled()
+        expect(ctrl.handleChatChange).toHaveBeenCalled()
+
+
+  describe 'when view enters', ->
+
+    beforeEach ->
+      spyOn $ionicScrollDelegate, 'scrollBottom'
+
+      scope.$broadcast '$ionicView.enter'
+      scope.$apply()
+
+    it 'should enable scrolling to the bottom', ->
+      expect(ctrl.shouldScrollBottom).toBe true
+
+    it 'should scroll to the bottom', ->
+      expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
 
   describe 'when leaving the view', ->
@@ -252,6 +268,32 @@ describe 'event controller', ->
     it 'should stop remove angular-meteor bindings', ->
       expect(ctrl.messages.stop).toHaveBeenCalled()
       expect(ctrl.chat.stop).toHaveBeenCalled()
+
+    it 'should show the bottom border', ->
+      expect($rootScope.hideNavBottomBorder).toBe false
+
+
+  describe 'handling a new message', ->
+    newMessageId = null
+
+    beforeEach ->
+      spyOn $ionicScrollDelegate, 'scrollBottom'
+      newMessageId = '1jkhkgfjgfhftxhgdxf'
+
+      ctrl.handleNewMessage newMessageId
+
+    it 'should mark the message as read', ->
+      expect($meteor.call).toHaveBeenCalledWith 'readMessage', newMessageId
+
+    describe 'when scrolling to the bottom is enabled', ->
+      
+      beforeEach ->
+        ctrl.shouldScrollBottom = true        
+
+        ctrl.handleNewMessage newMessageId, 'oldValue'
+
+      it 'should scroll to the bottom', ->
+        expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
 
   describe 'getting messages', ->
@@ -299,7 +341,7 @@ describe 'event controller', ->
           options)
 
 
-  describe 'getting meteor members', ->
+  describe 'getting meteor chat', ->
     result = null
     chat = null
 
@@ -333,7 +375,7 @@ describe 'event controller', ->
       expect(result).toEqual expectedResult
 
 
-  describe 'handling members changes', ->
+  describe 'handling chat changes', ->
 
     describe 'when users are added or removed', ->
       member1 = null
@@ -351,7 +393,7 @@ describe 'event controller', ->
           members: [{userId: 1}]
 
         spyOn ctrl, 'updateMembers'
-        ctrl.handleMembersChange()
+        ctrl.handleChatChange()
 
       it 'should update members', ->
         expect(ctrl.updateMembers).toHaveBeenCalled()
@@ -495,6 +537,9 @@ describe 'event controller', ->
       it 'should collapse the header', ->
         expect(ctrl.isHeaderExpanded).toBe false
 
+      it 'should show the nav bottom border', ->
+        expect($rootScope.hideNavBottomBorder).toBe false
+
 
     describe 'when the header is collapsed', ->
 
@@ -505,6 +550,9 @@ describe 'event controller', ->
 
       it 'should unexpand the header', ->
         expect(ctrl.isHeaderExpanded).toBe true
+
+      it 'should hide the nav bottom border', ->
+        expect($rootScope.hideNavBottomBorder).toBe true
 
 
   describe 'checking whether the user accepted their invitation', ->

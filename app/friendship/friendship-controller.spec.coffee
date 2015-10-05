@@ -590,7 +590,7 @@ describe 'friendship controller', ->
     message = null
     messages = null
 
-    beforeEach ->
+    beforeEach ->      
       chatId = '1,2'
       spyOn(Friendship, 'getChatId').and.returnValue chatId
       scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
@@ -606,8 +606,13 @@ describe 'friendship controller', ->
       $meteor.collection.and.returnValue messages
       spyOn ctrl, 'getFriendInvitations'
 
+      spyOn ctrl, 'handleNewMessage'
+
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
+
+    it 'should init shouldScrollBottom to false', ->
+      expect(ctrl.shouldScrollBottom).toBe false
 
     it 'should get the chat id', ->
       expect(Friendship.getChatId).toHaveBeenCalledWith ctrl.friend.id
@@ -640,42 +645,80 @@ describe 'friendship controller', ->
     describe 'when new messages get posted', ->
       message2 = null
 
-      describe 'when the message isn\'t an invite action', ->
+      beforeEach ->
+        ctrl.handleNewMessage.calls.reset()
 
-        beforeEach ->
-          message2 = angular.extend {}, message,
-            _id: message._id+1
-            type: Invitation.acceptAction
-          ctrl.messages.push message2
-          scope.$apply()
+        message2 = angular.extend {}, message,
+          _id: message._id+1
+          type: Invitation.acceptAction
+        ctrl.messages.push message2
+        scope.$apply()
 
-        it 'should mark the message as read', ->
-          expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
+      it 'should handle the new message', ->
+        expect(ctrl.handleNewMessage).toHaveBeenCalled()
 
-      describe 'when the message is an invite action', ->
 
-        beforeEach ->
-          ctrl.getFriendInvitations.calls.reset()
+  describe 'handling a new message', ->
+    newMessageId = null
+    message = null
 
-          message2 = angular.extend {}, message,
-            _id: message._id+1
-            type: Invitation.inviteAction
-          ctrl.messages.push message2
+    beforeEach ->
+      newMessageId = '2341sadfas'
+      message =
+        _id: 1
+        creator: new User Auth.user
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        chatId: '1,2'
+        type: 'text'
+      ctrl.messages = [message]
 
-          spyOn $ionicScrollDelegate, 'scrollBottom'
+    describe 'when the message is an invite action', ->
 
-          scope.$apply()
+      beforeEach ->
+        message2 = angular.extend {}, message,
+          _id: newMessageId
+          type: Invitation.inviteAction
+        ctrl.messages.push message2
+        spyOn ctrl, 'getFriendInvitations'
 
-        it 'should mark the message as read', ->
-          # TODO: Don't mark invite action messages as read until we fetch the
-          #   invitation
-          expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
+        ctrl.handleNewMessage newMessageId
 
-        it 'should scroll to the bottom', ->
-          expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
+      it 'should mark the message as read', ->
+        # TODO: Don't mark invite action messages as read until we fetch the
+        #   invitation
+        expect($meteor.call).toHaveBeenCalledWith 'readMessage', newMessageId
 
-        it 'should refresh the invitations', ->
-          expect(ctrl.getFriendInvitations).toHaveBeenCalled()
+      it 'should refresh the invitations', ->
+        expect(ctrl.getFriendInvitations).toHaveBeenCalled()
+      
+
+    describe 'when scrolling to the bottom is enabled', ->
+
+      beforeEach ->
+        ctrl.shouldScrollBottom = true
+        spyOn $ionicScrollDelegate, 'scrollBottom'
+
+        ctrl.handleNewMessage newMessageId
+
+      it 'should scroll to the bottom', ->
+        expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
+
+
+  describe 'when view enters', ->
+
+    beforeEach ->
+      spyOn $ionicScrollDelegate, 'scrollBottom'
+
+      scope.$broadcast '$ionicView.enter'
+      scope.$apply()
+
+    it 'should enable scrolling to the bottom', ->
+      expect(ctrl.shouldScrollBottom).toBe true
+
+    it 'should scroll to the bottom', ->
+      expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
 
   describe 'when leaving the view', ->
@@ -734,6 +777,7 @@ describe 'friendship controller', ->
       invitation = null
 
       beforeEach ->
+        ctrl.shouldScrollBottom = true
         ctrl.messages.remove = jasmine.createSpy 'messages.remove'
 
         invitation = new Invitation
@@ -750,8 +794,10 @@ describe 'friendship controller', ->
       it 'should delete expired invite_action messages', ->
         expect(ctrl.messages.remove).toHaveBeenCalledWith message2._id
 
-      it 'should scroll to the bottom of the view', ->
-        expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
+      describe 'when scrolling to bottom is enabled', ->
+        
+        it 'should scroll to the bottom of the view', ->
+          expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
     describe 'unsuccessfully', ->
 
