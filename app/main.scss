@@ -510,7 +510,6 @@ body {
   height: auto;
   display: block;
   background-image: none;
-  border-top: 1px solid #b2b2b2;
 }
 .new-message {
   border: none;
@@ -524,6 +523,8 @@ body {
   padding-top: 12px;
   padding-bottom: 12px;
   padding-left: 12px;
+  -webkit-appearance: none; // remove the inset on ios
+  border-top: 1px solid #b2b2b2;
 }
 .send-message {
   position: absolute;
