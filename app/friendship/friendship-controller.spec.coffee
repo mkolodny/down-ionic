@@ -609,6 +609,9 @@ describe 'friendship controller', ->
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
 
+    it 'should init shouldScrollBottom to false', ->
+      expect(ctrl.shouldScrollBottom).toBe false
+
     it 'should get the chat id', ->
       expect(Friendship.getChatId).toHaveBeenCalledWith ctrl.friend.id
 
@@ -652,6 +655,7 @@ describe 'friendship controller', ->
         it 'should mark the message as read', ->
           expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
 
+
       describe 'when the message is an invite action', ->
 
         beforeEach ->
@@ -662,8 +666,6 @@ describe 'friendship controller', ->
             type: Invitation.inviteAction
           ctrl.messages.push message2
 
-          spyOn $ionicScrollDelegate, 'scrollBottom'
-
           scope.$apply()
 
         it 'should mark the message as read', ->
@@ -671,11 +673,39 @@ describe 'friendship controller', ->
           #   invitation
           expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
 
+        it 'should refresh the invitations', ->
+          expect(ctrl.getFriendInvitations).toHaveBeenCalled()
+        
+
+      describe 'when scrolling to the bottom is enabled', ->
+      
+        beforeEach ->
+          ctrl.shouldScrollBottom = true
+          spyOn $ionicScrollDelegate, 'scrollBottom'
+
+          message2 = angular.extend {}, message,
+            _id: message._id+1
+            type: Invitation.acceptAction
+          ctrl.messages.push message2
+          scope.$apply()    
+
         it 'should scroll to the bottom', ->
           expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
-        it 'should refresh the invitations', ->
-          expect(ctrl.getFriendInvitations).toHaveBeenCalled()
+
+  describe 'when view enters', ->
+
+    beforeEach ->
+      spyOn $ionicScrollDelegate, 'scrollBottom'
+
+      scope.$broadcast '$ionicView.enter'
+      scope.$apply()
+
+    it 'should enable scrolling to the bottom', ->
+      expect(ctrl.shouldScrollBottom).toBe true
+
+    it 'should scroll to the bottom', ->
+      expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
 
   describe 'when leaving the view', ->

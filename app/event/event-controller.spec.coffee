@@ -190,10 +190,13 @@ describe 'event controller', ->
         _id: 'chat'
       spyOn(ctrl, 'getChat').and.returnValue chat
 
-      spyOn ctrl, 'handleMembersChange'
+      spyOn ctrl, 'handleChatChange'
 
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
+
+    it 'should init shouldScrollBottom to false', ->
+      expect(ctrl.shouldScrollBottom).toBe false
 
     it 'should subscribe to the events messages', ->
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', "#{event.id}"
@@ -213,19 +216,32 @@ describe 'event controller', ->
       message2 = null
 
       beforeEach ->
+        # Trigger @$scope.watch
         ctrl.messages = []
         message2 = angular.extend {}, message,
           _id: message._id+1
           type: Invitation.acceptAction
         ctrl.messages.push message2
-
         scope.$apply()
 
       it 'should mark the message as read', ->
         expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
 
-      it 'should scroll to the bottom', ->
-        expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
+      describe 'when scrolling to the bottom is enabled', ->
+        
+        beforeEach ->
+          ctrl.shouldScrollBottom = true        
+
+          # Trigger @$scope.watch
+          ctrl.messages = []
+          message2 = angular.extend {}, message,
+            _id: message._id+4
+            type: Invitation.acceptAction
+          ctrl.messages.push message2
+          scope.$apply()
+
+        it 'should scroll to the bottom', ->
+          expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
 
     describe 'when the chat changes', ->
@@ -233,11 +249,26 @@ describe 'event controller', ->
       beforeEach ->
         ctrl.chat =
           _id: 'someotherid'
-        ctrl.handleMembersChange.calls.reset()
+        ctrl.handleChatChange.calls.reset()
         scope.$apply()
 
       it 'should handle the change', ->
-        expect(ctrl.handleMembersChange).toHaveBeenCalled()
+        expect(ctrl.handleChatChange).toHaveBeenCalled()
+
+
+  describe 'when view enters', ->
+
+    beforeEach ->
+      spyOn $ionicScrollDelegate, 'scrollBottom'
+
+      scope.$broadcast '$ionicView.enter'
+      scope.$apply()
+
+    it 'should enable scrolling to the bottom', ->
+      expect(ctrl.shouldScrollBottom).toBe true
+
+    it 'should scroll to the bottom', ->
+      expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
 
   describe 'when leaving the view', ->
@@ -304,7 +335,7 @@ describe 'event controller', ->
           options)
 
 
-  describe 'getting meteor members', ->
+  describe 'getting meteor chat', ->
     result = null
     chat = null
 
@@ -338,7 +369,7 @@ describe 'event controller', ->
       expect(result).toEqual expectedResult
 
 
-  describe 'handling members changes', ->
+  describe 'handling chat changes', ->
 
     describe 'when users are added or removed', ->
       member1 = null
@@ -356,7 +387,7 @@ describe 'event controller', ->
           members: [{userId: 1}]
 
         spyOn ctrl, 'updateMembers'
-        ctrl.handleMembersChange()
+        ctrl.handleChatChange()
 
       it 'should update members', ->
         expect(ctrl.updateMembers).toHaveBeenCalled()

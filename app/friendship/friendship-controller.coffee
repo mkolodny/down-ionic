@@ -10,6 +10,9 @@ class FriendshipCtrl
     @Chats = @$meteor.getCollectionByName 'chats'
 
     @$scope.$on '$ionicView.beforeEnter', =>
+      # Don't scroll to the bottom until view fully enters
+      @shouldScrollBottom = false
+
       @getFriendInvitations()
 
       @chatId = @Friendship.getChatId @friend.id
@@ -30,13 +33,18 @@ class FriendshipCtrl
           return
 
         @$meteor.call 'readMessage', newValue
-        @$ionicScrollDelegate.scrollBottom true
+        if @shouldScrollBottom
+          @$ionicScrollDelegate.scrollBottom true
 
         # If the newest message is an invite action, attach the invitation to the
         #   message.
         newestMessage = @messages[@messages.length-1]
         if newestMessage.type is @Invitation.inviteAction
           @getFriendInvitations()
+
+    @$scope.$on '$ionicView.enter', =>
+      @shouldScrollBottom = true
+      @$ionicScrollDelegate.scrollBottom true
 
     @$scope.$on '$ionicView.leave', =>
       # Remove angular-meteor bindings.

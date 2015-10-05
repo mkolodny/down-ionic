@@ -38,6 +38,9 @@ class EventCtrl
 
     # Start out at the most recent message.
     @$scope.$on '$ionicView.beforeEnter', =>
+      # Don't scroll to the bottom until view fully enters
+      @shouldScrollBottom = false
+
       # Get the members invitations.
       @updateMembers()
 
@@ -59,12 +62,17 @@ class EventCtrl
           return
 
         @$meteor.call 'readMessage', newValue
-        @$ionicScrollDelegate.scrollBottom true
+        if @shouldScrollBottom
+          @$ionicScrollDelegate.scrollBottom true
 
       # Watch for changes in chat members
       @$scope.$watch =>
         @chat._id
-      , @handleMembersChange
+      , @handleChatChange
+
+    @$scope.$on '$ionicView.enter', =>
+      @shouldScrollBottom = true
+      @$ionicScrollDelegate.scrollBottom true
 
     # Remove angular-meteor bindings
     @$scope.$on '$ionicView.leave', =>
@@ -97,7 +105,7 @@ class EventCtrl
       chatId: "#{@event.id}"
     @$meteor.object @Chats, selector, false
 
-  handleMembersChange: =>
+  handleChatChange: =>
     meteorMembers = @chat.members or []
     members = @members or []
     meteorMemberIds = (member.userId for member in meteorMembers)
