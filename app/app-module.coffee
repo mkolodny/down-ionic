@@ -38,6 +38,7 @@ require './add-friends/add-friends-module'
 require './friends/friends-module'
 require './added-me/added-me-module'
 require './friendship/friendship-module'
+require './create-event/create-event-module'
 
 angular.module 'down', [
     'analytics.mixpanel'
@@ -69,6 +70,7 @@ angular.module 'down', [
     'down.friends'
     'down.pushNotifications'
     'down.friendship'
+    'down.createEvent'
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]

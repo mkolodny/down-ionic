@@ -48,6 +48,7 @@ $new-event-margin-left: 5px;
 @import "./guest-list/guest-list";
 @import "./added-me/added-me";
 @import "./friendship/friendship";
+@import "./create-event/create-event";
 
 /*
 Global Sass
@@ -57,6 +58,8 @@ Global Sass
 body {
   -webkit-font-smoothing: antialiased;
 }
+
+// Buttons
 .button {
   border-radius: 4px;
 }
@@ -294,6 +297,9 @@ body {
     font-size: 18px;
     top: -14px;
   }
+}
+#create-event-nav {
+  font-size: 20px;
 }
 .platform-ios {
   #event-title {

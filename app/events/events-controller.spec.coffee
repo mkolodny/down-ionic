@@ -5,7 +5,6 @@ require 'angular-mocks'
 require 'angular-sanitize' # for ionic module
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js' # for ionic module
-require 'ng-cordova'
 require 'ng-toast'
 require '../common/auth/auth-module'
 require '../common/meteor/meteor-mocks'
@@ -14,10 +13,8 @@ EventsCtrl = require './events-controller'
 
 describe 'events controller', ->
   $compile = null
-  $cordovaDatePicker = null
   $httpBackend = null
   $ionicHistory = null
-  $ionicModal = null
   $ionicPlatform = null
   $meteor = null
   $q = null
@@ -51,17 +48,13 @@ describe 'events controller', ->
 
   beforeEach angular.mock.module('ionic')
 
-  beforeEach angular.mock.module('ngCordova')
-
   beforeEach angular.mock.module('ngToast')
 
   beforeEach inject(($injector) ->
     $compile = $injector.get '$compile'
     $controller = $injector.get '$controller'
-    $cordovaDatePicker = $injector.get '$cordovaDatePicker'
     $httpBackend = $injector.get '$httpBackend'
     $ionicHistory = $injector.get '$ionicHistory'
-    $ionicModal = $injector.get '$ionicModal'
     $ionicPlatform = $injector.get '$ionicPlatform'
     $meteor = $injector.get '$meteor'
     $rootScope = $injector.get '$rootScope'
@@ -123,9 +116,6 @@ describe 'events controller', ->
     deferredGetInvitations = $q.defer()
     spyOn(Invitation, 'getMyInvitations').and.returnValue \
         deferredGetInvitations.promise
-
-    deferredTemplate = $q.defer()
-    spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
     spyOn $ionicPlatform, 'on'
 
     messagesCollection = 'messagesCollection'
@@ -141,15 +131,6 @@ describe 'events controller', ->
 
   it 'should init added me', ->
     expect(ctrl.addedMe).toEqual []
-
-  it 'should init a new event', ->
-    expect(ctrl.newEvent).toEqual {}
-
-  it 'should init a set place modal', ->
-    templateUrl = 'app/set-place/set-place.html'
-    expect($ionicModal.fromTemplateUrl).toHaveBeenCalledWith templateUrl,
-      scope: scope
-      animation: 'slide-in-up'
 
   it 'should listen for when the user comes back to the app', ->
     expect($ionicPlatform.on).toHaveBeenCalledWith 'resume', ctrl.manualRefresh
@@ -242,38 +223,6 @@ describe 'events controller', ->
 
       it 'should stop the spinner', ->
         expect(refreshComplete).toBe true
-
-
-  describe 'when the modal loads', ->
-    modal = null
-
-    beforeEach ->
-      modal =
-        remove: jasmine.createSpy 'modal.remove'
-        hide: jasmine.createSpy 'modal.hide'
-      deferredTemplate.resolve modal
-      scope.$apply()
-
-    it 'should save the modal on the controller', ->
-      expect(ctrl.setPlaceModal).toBe modal
-
-    describe 'then the modal is hidden', ->
-
-      beforeEach ->
-        scope.$broadcast '$destroy'
-        scope.$apply()
-
-      it 'should clean up the modal', ->
-        expect(modal.remove).toHaveBeenCalled()
-
-
-    describe 'hiding the guest list modal', ->
-
-      beforeEach ->
-        scope.hidePlaceModal()
-
-      it 'should hide the modal', ->
-        expect(modal.hide).toHaveBeenCalled()
 
 
   describe 'building the items list', ->
@@ -829,3 +778,35 @@ describe 'events controller', ->
         friendsList = {}
         friendsList[friend.id] = true
         expect(ctrl.friendsList).toEqual friendsList
+
+
+  describe 'viewing the friends view', ->
+
+    beforeEach ->
+      spyOn $ionicHistory, 'nextViewOptions'
+      spyOn $state, 'go'
+
+      ctrl.myFriends()
+
+    it 'should disable the transition animation', ->
+      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith
+        disableAnimate: true
+
+    it 'should go to the friends view', ->
+      expect($state.go).toHaveBeenCalledWith 'friends'
+
+
+  describe 'creating an event', ->
+
+    beforeEach ->
+      spyOn $ionicHistory, 'nextViewOptions'
+      spyOn $state, 'go'
+
+      ctrl.createEvent()
+
+    it 'should disable the transition animation', ->
+      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith
+        disableAnimate: true
+
+    it 'should go to the create event view', ->
+      expect($state.go).toHaveBeenCalledWith 'createEvent'
