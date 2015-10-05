@@ -517,6 +517,54 @@ describe 'events controller', ->
       expect(ctrl.items).toBe builtItems
 
 
+  describe 'accepting an invitation', ->
+    invitation = null
+    event = null
+
+    beforeEach ->
+      spyOn ctrl, 'respondToInvitation'
+
+      invitation = {id: 1}
+      event = 'event'
+      ctrl.acceptInvitation invitation, event
+
+    it 'should respond to the invitation', ->
+      expect(ctrl.respondToInvitation).toHaveBeenCalledWith(invitation, event,
+          Invitation.accepted)
+
+
+  describe 'responding maybe an invitation', ->
+    invitation = null
+    event = null
+
+    beforeEach ->
+      spyOn ctrl, 'respondToInvitation'
+
+      invitation = {id: 1}
+      event = 'event'
+      ctrl.maybeInvitation invitation, event
+
+    it 'should respond to the invitation', ->
+      expect(ctrl.respondToInvitation).toHaveBeenCalledWith(invitation, event,
+          Invitation.maybe)
+
+
+  describe 'declining an invitation', ->
+    invitation = null
+    event = null
+
+    beforeEach ->
+      spyOn ctrl, 'respondToInvitation'
+
+      invitation = {id: 1}
+      event = 'event'
+      ctrl.declineInvitation invitation, event
+
+    it 'should respond to the invitation', ->
+      expect(ctrl.respondToInvitation).toHaveBeenCalledWith(invitation, event,
+          Invitation.declined)
+
+
   describe 'manually refreshing', ->
 
     beforeEach ->

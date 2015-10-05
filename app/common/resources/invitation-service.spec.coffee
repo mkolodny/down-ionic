@@ -86,6 +86,9 @@ describe 'invitation service', ->
   it 'should have a error action property', ->
     expect(Invitation.errorAction).toBe 'error_action'
 
+  it 'should have a text message property', ->
+    expect(Invitation.textMessage).toBe 'text'
+
   it 'should have a list url property', ->
     expect(Invitation.listUrl).toBe "#{apiRoot}/invitations"
 
@@ -378,7 +381,8 @@ describe 'invitation service', ->
             chatId: "#{invitation.eventId}"
             type: Invitation.acceptAction
             createdAt: date
-          expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
+          expect(Messages.insert).toHaveBeenCalledWith(message,
+              Invitation.readMessage)
 
 
       describe 'to maybe', ->

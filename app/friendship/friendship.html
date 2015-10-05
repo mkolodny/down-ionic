@@ -6,20 +6,18 @@
           {{message.text}}
         </div>
         <div class="text-message"
-             ng-if="friendship.isTextMessage(message)"
+             ng-if="friendship.isTextMessage(message) || friendship.isInviteAction(message)"
              ng-class="{'mine': friendship.isMyMessage(message)}">
           <div class="text">
-            <div ng-if="!friendship.isInviteAction(message)">{{message.text}}</div>
+            <div ng-if="friendship.isTextMessage(message)">
+              {{message.text}}
+            </div>
             <div ng-if="message.invitation">
               <span>{{message.invitation.event.title}}</span>
-              <span ng-if="message.invitation.event.place">
-                <a href view-place place="message.invitation.event.place">
-                  {{message.invitation.event.place.name}}
-                </a>
-              </span>
-              <span ng-if="message.invitation.event.datetime">
-                &mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}
-              </span>
+              <span ng-if="message.invitation.event.place"
+                    ><a href view-place place="message.invitation.event.place"
+                        >{{message.invitation.event.place.name}}</a></span>
+              <span ng-if="message.invitation.event.datetime">&mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
               <div class="respond-buttons" ng-if="!friendship.isMyMessage(message)">
                 <button class="respond"
                         ng-click="friendship.acceptInvitation(message.invitation)"
@@ -43,7 +41,7 @@
             </div>
           </div>
         </div>
-        <div class="error-message" ng-if="friendship.isErrorMessage(message)">
+        <div class="error-message" ng-if="friendship.isErrorAction(message)">
           <i class="fa fa-exclamation-triangle"></i> Error fetching message.
         </div>
       </ion-item>

@@ -148,14 +148,14 @@ class ChatsCtrl
     if message?.chat is undefined then return true
 
     members = message.chat?.members or []
-    lastRead = (member.lastRead for member in members when "#{@Auth.user.id}" is member.userId)[0]
+    lastRead = (member.lastRead for member in members \
+        when "#{@Auth.user.id}" is member.userId)[0]
     lastRead >= message.createdAt
 
   #   # Move the event's updated item.
   #   for item in @items
   #     if item.invitation?.event.id is event.id
   #       @items = @buildItems @invitations
-
 
   acceptInvitation: (item, $event) ->
     @respondToInvitation item, $event, @Invitation.accepted

@@ -1,8 +1,8 @@
 class FriendshipCtrl
-  @$inject: ['$meteor', '$mixpanel', '$scope', '$stateParams', 'Auth',
-             'Invitation', 'Friendship', 'User']
-  constructor: (@$meteor, @$mixpanel, @$scope, @$stateParams, @Auth, @Invitation,
-                @Friendship, @User) ->
+  @$inject: ['$ionicLoading', '$meteor', '$mixpanel', '$scope', '$state',
+             '$stateParams', 'Auth', 'Invitation', 'Friendship', 'ngToast', 'User']
+  constructor: (@$ionicLoading, @$meteor, @$mixpanel, @$scope, @$state,
+                @$stateParams, @Auth, @Invitation, @Friendship, @ngToast, @User) ->
     @friend = @$stateParams.friend
 
     # Set Meteor collections on controller
@@ -87,8 +87,52 @@ class FriendshipCtrl
     ]
     message.type in actions
 
+  isInviteAction: (message) ->
+    message.type is @Invitation.inviteAction
+
+  isTextMessage: (message) ->
+    message.type is @Invitation.textMessage
+
+  isLoadingInvitation: (message) ->
+    message.type is @Invitation.inviteAction and message.invitation is undefined
+
+  isErrorAction: (message) ->
+    message.type is @Invitation.errorAction
+
   isMyMessage: (message) ->
     message.creator.id is "#{@Auth.user.id}"
+
+  isAccepted: (invitation) ->
+    invitation.response is @Invitation.accepted
+
+  isMaybe: (invitation) ->
+    invitation.response is @Invitation.maybe
+
+  isDeclined: (invitation) ->
+    invitation.response is @Invitation.declined
+
+  respondToInvitation: (invitation, response) ->
+    @$ionicLoading.show()
+
+    @Invitation.updateResponse invitation, response
+      .$promise.then (invitation) =>
+        if invitation.response in [@Invitation.accepted, @Invitation.maybe]
+          @$state.go 'event',
+            invitation: invitation
+            id: invitation.event.id
+      , =>
+        @ngToast.create 'For some reason, that didn\'t work.'
+      .finally =>
+        @$ionicLoading.hide()
+
+  acceptInvitation: (invitation) ->
+    @respondToInvitation invitation, @Invitation.accepted
+
+  maybeInvitation: (invitation) ->
+    @respondToInvitation invitation, @Invitation.maybe
+
+  declineInvitation: (invitation) ->
+    @respondToInvitation invitation, @Invitation.declined
 
   sendMessage: ->
     @Friendship.sendMessage @friend, @message
