@@ -26,11 +26,12 @@ describe 'events controller', ->
   $window = null
   Auth = null
   ctrl = null
+  chatsCollection = null
   deferredGetInvitations = null
   deferredTemplate = null
   earlier = null
   Event = null
-  chatsCollection = null
+  Friendship = null
   item = null
   invitation = null
   later = null
@@ -70,6 +71,7 @@ describe 'events controller', ->
     $window = $injector.get '$window'
     Auth = angular.copy $injector.get 'Auth'
     Event = $injector.get 'Event'
+    Friendship = $injector.get 'Friendship'
     Invitation = $injector.get 'Invitation'
     ngToast = $injector.get 'ngToast'
     scope = $rootScope.$new()
@@ -315,6 +317,8 @@ describe 'events controller', ->
       newestMessage = 'newestMessage'
       spyOn(ctrl, 'getNewestMessage').and.returnValue newestMessage
 
+      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
+
       builtItems = ctrl.buildItems invitations
 
     it 'should return the items', ->
@@ -339,7 +343,11 @@ describe 'events controller', ->
         isDivider: false
         friend: new User friendWithUsername
         id: friendWithUsername.id
+        newestMessage: newestMessage
       expect(builtItems).toEqual items
+
+    it 'should subscribe to the friend messages', ->
+      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', Friendship.getChatId friendWithUsername.id
 
 
   describe 'subscribing to events\' messages', ->

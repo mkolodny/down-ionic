@@ -1,10 +1,10 @@
 class ChatsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading', '$ionicModal',
              '$ionicPlatform', '$meteor', '$scope', '$state', '$timeout', 'Auth',
-             'Invitation', 'ngToast', 'User']
+             'Friendship', 'Invitation', 'ngToast', 'User']
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading, @$ionicModal,
                 @$ionicPlatform, @$meteor, @$scope, @$state, @$timeout, @Auth,
-                @Invitation, @ngToast, @User) ->
+                @Friendship, @Invitation, @ngToast, @User) ->
     # Set Meteor collections on controller
     @Messages = @$meteor.getCollectionByName 'messages'
     @Chats = @$meteor.getCollectionByName 'chats'
@@ -104,6 +104,7 @@ class ChatsCtrl
 
     friends = (friend for id, friend of @Auth.user.friends \
         when friend.username isnt null)
+
     if friends.length > 0
       title = 'Friends'
       items.push
@@ -111,10 +112,14 @@ class ChatsCtrl
         title: title
         id: title
       for friend in friends
+        chatId = @Friendship.getChatId friend.id
+        @$scope.$meteorSubscribe 'chat', chatId
         items.push angular.extend
           isDivider: false
           friend: new @User friend
           id: friend.id
+          newestMessage: @getNewestMessage chatId
+
 
     items
 
