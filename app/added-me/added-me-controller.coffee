@@ -18,8 +18,5 @@ class AddedMeCtrl
         @$scope.$broadcast 'scroll.refreshComplete'
         @isLoading = false
 
-  delete: (user) ->
-    @users = (_user for _user in @users when _user.id isnt user.id)
-    @Friendship.ack {friend: user.id}
 
 module.exports = AddedMeCtrl

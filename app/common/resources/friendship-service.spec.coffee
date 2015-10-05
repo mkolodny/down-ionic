@@ -115,50 +115,6 @@ describe 'friendship service', ->
         expect(rejected).toBe true
 
 
-  describe 'acknowledging', ->
-    friendId = null
-    url = null
-    requestData = null
-
-    beforeEach ->
-      friendId = 1
-      url = "#{listUrl}/ack"
-      requestData = {friend: friendId}
-
-    describe 'successfully', ->
-      updated = null
-
-      beforeEach ->
-        $httpBackend.expectPUT url, requestData
-          .respond 200, null
-
-        updated = false
-        Friendship.ack {friend: friendId}
-          .$promise.then ->
-            updated = true
-        $httpBackend.flush 1
-
-      it 'should update the friendship', ->
-        expect(updated).toBe true
-
-
-    describe 'with an error', ->
-      rejected = null
-
-      beforeEach ->
-        $httpBackend.expectPUT url, requestData
-          .respond 500, null
-
-        rejected = false
-        Friendship.ack {friend: friendId}
-          .$promise.then null, ->
-            rejected = true
-        $httpBackend.flush 1
-
-      it 'should reject the promise', ->
-        expect(rejected).toBe true
-
-
   describe 'sending a message', ->
     friend = null
     text = null
