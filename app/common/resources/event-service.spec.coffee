@@ -185,7 +185,7 @@ describe 'event service', ->
 
     beforeEach ->
       invitation =
-        to_user_id: 2
+        to_user: 2
       event =
         title: 'bars?!?!!?'
         creatorId: 1
@@ -265,9 +265,11 @@ describe 'event service', ->
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: 'Down?'
-          chatId: Friendship.getChatId invitation.to_user_id # meteor likes strings
+          chatId: Friendship.getChatId invitation.to_user # meteor likes strings
           type: Invitation.inviteAction
           createdAt: new Date()
+          meta:
+            eventId: "#{responseData.id}"
 
         expect(Messages.insert).toHaveBeenCalledWith inviteMessage
 
