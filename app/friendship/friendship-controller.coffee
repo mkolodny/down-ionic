@@ -28,20 +28,8 @@ class FriendshipCtrl
         newestMessage = @messages[@messages.length-1]
         if angular.isDefined newestMessage
           newestMessage._id
-      , (newValue, oldValue) =>
-        if newValue is undefined
-          return
-
-        @$meteor.call 'readMessage', newValue
-        if @shouldScrollBottom
-          @$ionicScrollDelegate.scrollBottom true
-
-        # If the newest message is an invite action, attach the invitation to the
-        #   message.
-        newestMessage = @messages[@messages.length-1]
-        if newestMessage.type is @Invitation.inviteAction
-          @getFriendInvitations()
-
+      , @handleNewMessage
+        
     @$scope.$on '$ionicView.enter', =>
       @shouldScrollBottom = true
       @$ionicScrollDelegate.scrollBottom true
@@ -49,6 +37,20 @@ class FriendshipCtrl
     @$scope.$on '$ionicView.leave', =>
       # Remove angular-meteor bindings.
       @messages.stop()
+
+  handleNewMessage: (newMessageId) =>
+    if newMessageId is undefined
+      return
+
+    @$meteor.call 'readMessage', newMessageId
+    if @shouldScrollBottom
+      @$ionicScrollDelegate.scrollBottom true
+
+    # If the newest message is an invite action, attach the invitation to the
+    #   message.
+    newestMessage = @messages[@messages.length-1]
+    if newestMessage.type is @Invitation.inviteAction
+      @getFriendInvitations()
 
   ###
   # Get the active invitations to/from the friend.
@@ -73,7 +75,8 @@ class FriendshipCtrl
               # Delete expired invite_action message
               @messages.remove message._id
         
-        @$ionicScrollDelegate.scrollBottom true
+        if @shouldScrollBottom
+          @$ionicScrollDelegate.scrollBottom true
       , =>
         # Change all invitation action messages to error action messages.
         for message in @messages

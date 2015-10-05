@@ -168,12 +168,11 @@ describe 'event controller', ->
     chat = null
 
     beforeEach ->
-      spyOn $ionicScrollDelegate, 'scrollBottom'
-
       scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
 
       spyOn ctrl, 'updateMembers'
       spyOn ctrl, 'getMessages'
+      spyOn ctrl, 'handleNewMessage'
 
       message =
         _id: 1
@@ -216,33 +215,17 @@ describe 'event controller', ->
       message2 = null
 
       beforeEach ->
+        ctrl.handleNewMessage.calls.reset()
+
         # Trigger @$scope.watch
-        ctrl.messages = []
         message2 = angular.extend {}, message,
           _id: message._id+1
           type: Invitation.acceptAction
         ctrl.messages.push message2
         scope.$apply()
 
-      it 'should mark the message as read', ->
-        expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
-
-      describe 'when scrolling to the bottom is enabled', ->
-        
-        beforeEach ->
-          ctrl.shouldScrollBottom = true        
-
-          # Trigger @$scope.watch
-          ctrl.messages = []
-          message2 = angular.extend {}, message,
-            _id: message._id+4
-            type: Invitation.acceptAction
-          ctrl.messages.push message2
-          scope.$apply()
-
-        it 'should scroll to the bottom', ->
-          expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
-
+      it 'should handle the message', ->
+        expect(ctrl.handleNewMessage).toHaveBeenCalled()
 
     describe 'when the chat changes', ->
 
@@ -288,6 +271,29 @@ describe 'event controller', ->
 
     it 'should show the bottom border', ->
       expect($rootScope.hideNavBottomBorder).toBe false
+
+
+  describe 'handling a new message', ->
+    newMessageId = null
+
+    beforeEach ->
+      spyOn $ionicScrollDelegate, 'scrollBottom'
+      newMessageId = '1jkhkgfjgfhftxhgdxf'
+
+      ctrl.handleNewMessage newMessageId
+
+    it 'should mark the message as read', ->
+      expect($meteor.call).toHaveBeenCalledWith 'readMessage', newMessageId
+
+    describe 'when scrolling to the bottom is enabled', ->
+      
+      beforeEach ->
+        ctrl.shouldScrollBottom = true        
+
+        ctrl.handleNewMessage newMessageId, 'oldValue'
+
+      it 'should scroll to the bottom', ->
+        expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
 
   describe 'getting messages', ->

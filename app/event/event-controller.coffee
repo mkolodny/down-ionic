@@ -57,13 +57,7 @@ class EventCtrl
         newestMessage = @messages[@messages.length-1]
         if angular.isDefined newestMessage
           newestMessage._id
-      , (newValue, oldValue) =>
-        if newValue is undefined
-          return
-
-        @$meteor.call 'readMessage', newValue
-        if @shouldScrollBottom
-          @$ionicScrollDelegate.scrollBottom true
+      , @handleNewMessage
 
       # Watch for changes in chat members
       @$scope.$watch =>
@@ -79,6 +73,14 @@ class EventCtrl
       @messages.stop()
       @chat.stop()
       @$rootScope.hideNavBottomBorder = false
+
+  handleNewMessage: (newMessageId) =>
+    if newMessageId is undefined
+      return
+
+    @$meteor.call 'readMessage', newMessageId
+    if @shouldScrollBottom
+      @$ionicScrollDelegate.scrollBottom true
 
   getMessages: =>
     @Messages.find
