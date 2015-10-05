@@ -9,6 +9,9 @@ class ChatsCtrl
     @Messages = @$meteor.getCollectionByName 'messages'
     @Chats = @$meteor.getCollectionByName 'chats'
 
+    # Init Added me
+    @addedMe = []
+
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
         scope: @$scope
@@ -34,8 +37,9 @@ class ChatsCtrl
     @$scope.$on '$destroy', =>
       @setPlaceModal.remove()
 
-    # Fetch the invitations to show on the view.
-    @manualRefresh()
+    @$scope.$on '$ionicView.loaded', =>
+      # Fetch the invitations to show on the view.
+      @manualRefresh()
 
     @newEvent = {}
 
@@ -77,6 +81,7 @@ class ChatsCtrl
     # Build the list of items to show on the view.
     items = []
 
+    # Invitations Section
     invitations = (invitation for id, invitation of invitationsDict)
     invitations.sort (a, b) ->
       aCreatedAt = a.event.latestMessage?.createdAt or a.event.createdAt
@@ -102,6 +107,7 @@ class ChatsCtrl
           #   is automatically called. Therefore, do not pass AngularMeteorObjects into $state.go.
           newestMessage: @getNewestMessage "#{invitation.event.id}"
 
+    # Friends section
     friends = (friend for id, friend of @Auth.user.friends \
         when friend.username isnt null)
 
@@ -120,6 +126,20 @@ class ChatsCtrl
           id: friend.id
           newestMessage: @getNewestMessage chatId
 
+    # Added me section
+    if @addedMe.length > 0
+      title = 'Added Me'
+      items.push
+        isDivider: true
+        title: title
+        id: title
+      for user in @addedMe
+        chatId = @Friendship.getChatId user.id
+        items.push angular.extend
+          isDivider: false
+          friend: user
+          id: user.id
+          newestMessage: @getNewestMessage chatId
 
     items
 
@@ -244,12 +264,24 @@ class ChatsCtrl
         @$scope.$broadcast 'scroll.refreshComplete'
         @isLoading = false
 
+  getAddedMe: ->
+    @Auth.getAddedMe()
+      .$promise.then (addedMe) =>
+        for user in addedMe
+          chatId = @Friendship.getChatId user.id
+          @$scope.$meteorSubscribe 'chat', chatId
+
+        @addedMe = addedMe
+        @buildItems()
+
   refresh: ->
     @getInvitations()
+    @getAddedMe()
 
   manualRefresh: =>
     @isLoading = true
     @getInvitations()
+    @getAddedMe()
 
   addByUsername: ->
     @$state.go 'addByUsername'

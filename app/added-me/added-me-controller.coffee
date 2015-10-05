@@ -1,7 +1,7 @@
 class AddedMeCtrl
   @$inject: ['$scope', 'Auth', 'Friendship']
   constructor: (@$scope, @Auth, @Friendship) ->
-    @$scope.$on '$ionicView.enter', =>
+    @$scope.$on '$ionicView.beforeEnter', =>
       @isLoading = true
       @refresh()
 

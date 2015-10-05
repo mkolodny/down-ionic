@@ -16,7 +16,7 @@ meteorHost = 'https://down-meteor-staging.herokuapp.com'
 angular.module 'down.env', []
   ## Staging vars
   .constant 'skipIonicDeploy', true
-  .constant 'apiRoot', 'http://down-staging.herokuapp.com/api'
+  .constant 'apiRoot', 'https://down-staging.herokuapp.com/api'
   .constant 'branchKey', 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv'
   .constant 'mixpanelToken', 'd4d37f58ce26f5e423cbc6fa937c621b'
   .constant 'ionicDeployChannel', 'dev'

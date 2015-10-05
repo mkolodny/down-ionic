@@ -24,12 +24,12 @@ describe 'AddedMe controller', ->
       Auth: Auth
   )
 
-  describe 'on enter', ->
+  describe 'before enter', ->
 
     beforeEach ->
       spyOn ctrl, 'refresh'
 
-      scope.$emit '$ionicView.enter'
+      scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
 
     it 'should refresh the view', ->
