@@ -12,14 +12,16 @@
         </div>
         <div class="text-message"
              ng-if="friendship.isTextMessage(message) || friendship.isInviteAction(message)"
-             ng-class="{'mine': friendship.isMyMessage(message)}">
+             ng-class="{mine: friendship.isMyMessage(message)}">
           <div class="text" ng-if="friendship.isTextMessage(message)">{{message.text}}</div>
-          <div class="text" ng-if="message.invitation"
-               ><span>{{message.invitation.event.title}}</span><span ng-if="message.invitation.event.place"
+          <div class="text invite-action"
+               ng-if="message.invitation"
+               ><span>{{message.invitation.event.title}}</span><span
+               ng-if="message.invitation.event.place"
                > <a href view-place place="message.invitation.event.place"
-               >{{message.invitation.event.place.name}}</a></span><span ng-if="message.invitation.event.datetime"
-               > &mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
-            <div class="respond-buttons" ng-if="!friendship.isMyMessage(message)">
+               >{{message.invitation.event.place.name}}</a></span><span ng-if="message.invitation.event.datetime"> &mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span><div
+                class="respond-section"
+                ng-if="!friendship.isMyMessage(message)">
               <button class="respond"
                       ng-click="friendship.acceptInvitation(message.invitation)"
                       ontouchstart
@@ -35,8 +37,11 @@
                       ontouchstart
                       ng-disabled="friendship.isDeclined(message.invitation)"
                       >Pass</button>
-            </div>
-          </div>
+          </div><div
+              class="respond-section"
+              ng-if="friendship.isMyMessage(message)">
+            <button class="respond" disabled>You Joined</button>
+          </div></div>
           <div class="text" ng-if="friendship.isLoadingInvitation(message)"
                ><ion-spinner icon="bubbles"></ion-spinner></div>
         </div>
