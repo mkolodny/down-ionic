@@ -139,6 +139,9 @@ describe 'events controller', ->
       Auth: Auth
   )
 
+  it 'should init added me', ->
+    expect(ctrl.addedMe).toEqual []
+
   it 'should init a new event', ->
     expect(ctrl.newEvent).toEqual {}
 
@@ -147,9 +150,6 @@ describe 'events controller', ->
     expect($ionicModal.fromTemplateUrl).toHaveBeenCalledWith templateUrl,
       scope: scope
       animation: 'slide-in-up'
-
-  it 'should set a loading flag', ->
-    expect(ctrl.isLoading).toBe true
 
   it 'should listen for when the user comes back to the app', ->
     expect($ionicPlatform.on).toHaveBeenCalledWith 'resume', ctrl.manualRefresh
@@ -162,7 +162,20 @@ describe 'events controller', ->
     expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
     expect(ctrl.Chats).toBe chatsCollection
 
-  describe 'when the events request returns', ->
+  # Only called once http://ionicframework.com/docs/api/directive/ionView/
+  describe 'when the view is loaded', ->
+
+    beforeEach ->
+      spyOn ctrl, 'manualRefresh'
+
+      scope.$broadcast '$ionicView.loaded'
+      scope.$apply()
+
+    it 'should refresh the items', ->
+      expect(ctrl.manualRefresh).toHaveBeenCalled()
+
+
+  describe 'when requesting events', ->
     refreshComplete = null
 
     beforeEach ->
@@ -171,6 +184,8 @@ describe 'events controller', ->
       refreshComplete = false
       scope.$on 'scroll.refreshComplete', ->
         refreshComplete = true
+
+      ctrl.getInvitations()
 
     describe 'successfully', ->
       items = null
@@ -266,6 +281,7 @@ describe 'events controller', ->
     maybeInvitation = null
     invitations = null
     friendWithUsername = null
+    personWhoAddedMe = null
     builtItems = null
     newestMessage = null
 
@@ -314,6 +330,16 @@ describe 'events controller', ->
         Auth.user.friends[friend.id] = friend
       # TODO: Sort the friends by latest message, then distance.
 
+      # Mock Person who added me
+      personWhoAddedMe = new User 
+        id: 9
+        username: 'pl$b'
+        name: 'Mike Pleb'
+        firstName: 'Mike'
+        lastName: 'Pleb'
+        imageUrl: 'https://numberonepleb.com/mike/pic'
+      ctrl.addedMe = [personWhoAddedMe]
+
       newestMessage = 'newestMessage'
       spyOn(ctrl, 'getNewestMessage').and.returnValue newestMessage
 
@@ -323,6 +349,7 @@ describe 'events controller', ->
 
     it 'should return the items', ->
       items = []
+      # Plans section
       title = 'Plans'
       items.push
         isDivider: true
@@ -334,6 +361,7 @@ describe 'events controller', ->
           invitation: invitation
           id: invitation.id
           newestMessage: newestMessage
+      # Friends section
       title = 'Friends'
       items.push
         isDivider: true
@@ -344,6 +372,18 @@ describe 'events controller', ->
         friend: new User friendWithUsername
         id: friendWithUsername.id
         newestMessage: newestMessage
+      # Added Me section
+      title = 'Added Me'
+      items.push
+        isDivider: true
+        title: title
+        id: title
+      items.push angular.extend
+        isDivider: false
+        friend: personWhoAddedMe
+        id: personWhoAddedMe.id
+        newestMessage: newestMessage
+
       expect(builtItems).toEqual items
 
     it 'should subscribe to the friend messages', ->
@@ -573,11 +613,49 @@ describe 'events controller', ->
           Invitation.declined)
 
 
+  describe 'getting people who added me', ->
+    deferred = null
+
+    beforeEach ->
+      deferred = $q.defer()
+      spyOn(Auth, 'getAddedMe').and.returnValue {$promise: deferred.promise}
+
+      ctrl.getAddedMe()
+
+    it 'should get the people who added me', ->
+      expect(Auth.getAddedMe).toHaveBeenCalled()
+
+    describe 'when the request returns successfully', ->
+      user = null
+      users = null
+
+      beforeEach ->
+        scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
+        spyOn ctrl, 'buildItems'
+
+        user =
+          id: 3
+        users = [user]
+        deferred.resolve users
+        scope.$apply()
+
+      it 'should subscribe to the chat messages', ->
+        chatId = Friendship.getChatId user.id
+        expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', chatId
+
+      it 'should set the people who added me on the controller', ->
+        expect(ctrl.addedMe).toBe users
+
+      it 'should rebuild the items', ->
+        expect(ctrl.buildItems).toHaveBeenCalled()
+
+
   describe 'manually refreshing', ->
 
     beforeEach ->
       ctrl.isLoading = false
       spyOn ctrl, 'getInvitations'
+      spyOn ctrl, 'getAddedMe'
 
       ctrl.manualRefresh()
 
@@ -586,6 +664,24 @@ describe 'events controller', ->
 
     it 'should get the invitations', ->
       expect(ctrl.getInvitations).toHaveBeenCalled()
+
+    it 'should get people who added me', ->
+      expect(ctrl.getAddedMe).toHaveBeenCalled()
+
+
+  describe 'ionic\'s pull to refresh', ->
+
+    beforeEach ->
+      spyOn ctrl, 'getInvitations'
+      spyOn ctrl, 'getAddedMe'
+
+      ctrl.refresh()
+
+    it 'should get the invitations', ->
+      expect(ctrl.getInvitations).toHaveBeenCalled()
+
+    it 'should get people who added me', ->
+      expect(ctrl.getAddedMe).toHaveBeenCalled()
 
 
   describe 'viewing an event chat', ->

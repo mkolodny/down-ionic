@@ -24,12 +24,12 @@ describe 'AddedMe controller', ->
       Auth: Auth
   )
 
-  describe 'on enter', ->
+  describe 'before enter', ->
 
     beforeEach ->
       spyOn ctrl, 'refresh'
 
-      scope.$emit '$ionicView.enter'
+      scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
 
     it 'should refresh the view', ->
@@ -107,28 +107,3 @@ describe 'AddedMe controller', ->
 
         it 'should clear the error', ->
           expect(ctrl.error).toBeNull()
-
-
-  describe 'deleting someone who added you', ->
-    user = null
-
-    beforeEach ->
-      user =
-        id: 2
-        email: 'alovelace@gmail.com'
-        name: 'Ada Lovelace'
-        username: 'lovelace'
-        imageUrl: 'https://facebook.com/profile-pics/lovalace'
-        location:
-          lat: 40.7265834
-          long: -73.9821535
-      ctrl.users = [user]
-      spyOn Friendship, 'ack'
-
-      ctrl.delete user
-
-    it 'should remove the user from the array of users', ->
-      expect(ctrl.users).toEqual []
-
-    it 'should update the friendship', ->
-      expect(Friendship.ack).toHaveBeenCalledWith {friend: user.id}

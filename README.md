@@ -74,3 +74,11 @@ Staging:
 Prod:
         "APP_ID": "1466791860252976",
         "APP_NAME": "Down"
+
+## iOS Allow HTTP
+
+<key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsArbitraryLoads</key>
+      <true/>
+    </dict>
