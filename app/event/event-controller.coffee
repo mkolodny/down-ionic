@@ -1,11 +1,11 @@
 class EventCtrl
   @$inject: ['$ionicActionSheet', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel',
+             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel', '$rootScope',
              '$scope', '$state', '$stateParams', 'Auth', 'Event',  'Invitation',
              'LinkInvitation', 'ngToast', 'User']
   constructor: (@$ionicActionSheet, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel, @$scope,
-                @$state, @$stateParams, @Auth, @Event, @Invitation,
+                @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel, @$rootScope,
+                @$scope, @$state, @$stateParams, @Auth, @Event, @Invitation,
                 @LinkInvitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
@@ -70,6 +70,7 @@ class EventCtrl
     @$scope.$on '$ionicView.leave', =>
       @messages.stop()
       @chat.stop()
+      @$rootScope.hideNavBottomBorder = false
 
   getMessages: =>
     @Messages.find
@@ -159,7 +160,9 @@ class EventCtrl
   toggleIsHeaderExpanded: ->
     if @isHeaderExpanded
       @isHeaderExpanded = false
+      @$rootScope.hideNavBottomBorder = false
     else
+      @$rootScope.hideNavBottomBorder = true
       @isHeaderExpanded = true
 
   isAccepted: ->

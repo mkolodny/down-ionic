@@ -263,6 +263,12 @@ body {
   background-image: none;
   border-bottom: 1px solid darken($brand-color, 12%) !important;
 }
+.hide-nav-bottom-border {
+  .bar-header {
+    border-bottom: 0 !important;
+  }
+}
+
 .bar {
   background-color: $brand-color;
 

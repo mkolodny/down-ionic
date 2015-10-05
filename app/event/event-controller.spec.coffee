@@ -20,6 +20,7 @@ describe 'event controller', ->
   $ionicPopup = null
   $ionicScrollDelegate = null
   $q = null
+  $rootScope = null
   $state = null
   $meteor = null
   $mixpanel = null
@@ -61,6 +62,7 @@ describe 'event controller', ->
     $ionicPopup = $injector.get '$ionicPopup'
     $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
     $q = $injector.get '$q'
+    $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     $stateParams = angular.copy $injector.get('$stateParams')
     $mixpanel = $injector.get '$mixpanel'
@@ -252,6 +254,9 @@ describe 'event controller', ->
     it 'should stop remove angular-meteor bindings', ->
       expect(ctrl.messages.stop).toHaveBeenCalled()
       expect(ctrl.chat.stop).toHaveBeenCalled()
+
+    it 'should show the bottom border', ->
+      expect($rootScope.hideNavBottomBorder).toBe false
 
 
   describe 'getting messages', ->
@@ -495,6 +500,9 @@ describe 'event controller', ->
       it 'should collapse the header', ->
         expect(ctrl.isHeaderExpanded).toBe false
 
+      it 'should show the nav bottom border', ->
+        expect($rootScope.hideNavBottomBorder).toBe false
+
 
     describe 'when the header is collapsed', ->
 
@@ -505,6 +513,9 @@ describe 'event controller', ->
 
       it 'should unexpand the header', ->
         expect(ctrl.isHeaderExpanded).toBe true
+
+      it 'should hide the nav bottom border', ->
+        expect($rootScope.hideNavBottomBorder).toBe true
 
 
   describe 'checking whether the user accepted their invitation', ->
