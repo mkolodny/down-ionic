@@ -98,6 +98,7 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
   resource.maybeAction = 'maybe_action'
   resource.inviteAction = 'invite_action'
   resource.errorAction = 'error_action'
+  resource.textMessage = 'text'
 
   resource.bulkCreate = (eventId, invitations) ->
     deferred = $q.defer()

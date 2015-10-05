@@ -1,14 +1,17 @@
 require 'angular'
 require 'angular-mocks'
+require 'ng-toast'
 require '../common/auth/auth-module'
 require '../common/mixpanel/mixpanel-module'
 require '../common/meteor/meteor-mocks'
 FriendshipCtrl = require './friendship-controller'
 
 describe 'friendship controller', ->
+  $ionicLoading = null
   $meteor = null
   $mixpanel = null
   $q = null
+  $state = null
   Auth = null
   chatsCollection = null
   ctrl = null
@@ -16,6 +19,7 @@ describe 'friendship controller', ->
   Friendship = null
   Invitation = null
   messagesCollection = null
+  ngToast = null
   scope = null
   User = null
 
@@ -27,15 +31,22 @@ describe 'friendship controller', ->
 
   beforeEach angular.mock.module('down.auth')
 
+  beforeEach angular.mock.module('ionic')
+
+  beforeEach angular.mock.module('ngToast')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $ionicLoading = $injector.get '$ionicLoading'
     $meteor = $injector.get '$meteor'
     $mixpanel = $injector.get '$mixpanel'
     $q = $injector.get '$q'
+    $state = $injector.get '$state'
     $stateParams = angular.copy $injector.get('$stateParams')
     Auth = angular.copy $injector.get('Auth')
     Invitation = $injector.get 'Invitation'
     Friendship = $injector.get 'Friendship'
+    ngToast = $injector.get 'ngToast'
     scope = $injector.get '$rootScope'
     User = $injector.get 'User'
 
@@ -134,6 +145,128 @@ describe 'friendship controller', ->
         expect(ctrl.isActionMessage message).toBe false
 
 
+  describe 'checking whether a message is an invite action message', ->
+    message = null
+
+    beforeEach ->
+      message =
+        _id: 1
+        creator: new User {id: 2}
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        groupId: '1,2'
+        type: 'text'
+
+    describe 'when it is an invite action', ->
+
+      beforeEach ->
+        message.type = Invitation.inviteAction
+
+      it 'should return true', ->
+        expect(ctrl.isInviteAction message).toBe true
+
+
+    describe 'when it isn\'t an invite action', ->
+
+      beforeEach ->
+        message.type = Invitation.acceptAction
+
+      it 'should return false', ->
+        expect(ctrl.isInviteAction message).toBe false
+
+
+  describe 'checking whether a message is a text message', ->
+    message = null
+
+    beforeEach ->
+      message =
+        _id: 1
+        creator: new User {id: 2}
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        groupId: '1,2'
+
+    describe 'when it is a text message', ->
+
+      beforeEach ->
+        message.type = Invitation.textMessage
+
+      it 'should return true', ->
+        expect(ctrl.isTextMessage message).toBe true
+
+
+    describe 'when it isn\'t a text message', ->
+
+      beforeEach ->
+        message.type = Invitation.inviteAction
+
+      it 'should return false', ->
+        expect(ctrl.isTextMessage message).toBe false
+
+
+  describe 'checking whether an invitation is loading', ->
+    message = null
+
+    beforeEach ->
+      message =
+        _id: 1
+        creator: new User {id: 2}
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        groupId: '1,2'
+
+    describe 'when it is has no invitation', ->
+
+      beforeEach ->
+        message.type = Invitation.inviteAction
+
+      it 'should return true', ->
+        expect(ctrl.isLoadingInvitation message).toBe true
+
+
+    describe 'when it isn\'t a text message', ->
+
+      beforeEach ->
+        message.type = Invitation.inviteAction
+        message.invitation = {id: 1}
+
+      it 'should return false', ->
+        expect(ctrl.isLoadingInvitation message).toBe false
+
+
+  describe 'checking whether a message is an error message', ->
+    message = null
+
+    beforeEach ->
+      message =
+        _id: 1
+        creator: new User {id: 2}
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        groupId: '1,2'
+
+    describe 'when it is an error message', ->
+
+      beforeEach ->
+        message.type = Invitation.errorAction
+
+      it 'should return true', ->
+        expect(ctrl.isErrorAction message).toBe true
+
+
+    describe 'when it isn\'t an error message', ->
+
+      beforeEach ->
+        message.type = Invitation.inviteAction
+
+      it 'should return false', ->
+        expect(ctrl.isErrorAction message).toBe false
+
+
   describe 'checking whether a message is the current user\'s message', ->
     message = null
 
@@ -167,6 +300,216 @@ describe 'friendship controller', ->
 
       it 'should return false', ->
         expect(ctrl.isMyMessage message).toBe false
+
+
+  describe 'checking whether the user accepted their invitation', ->
+    invitation = null
+
+    beforeEach ->
+      invitation = {id: 1}
+
+    describe 'when they did', ->
+
+      beforeEach ->
+        invitation.response = Invitation.accepted
+
+      it 'should return true', ->
+        expect(ctrl.isAccepted invitation).toBe true
+
+
+    describe 'when they didn\'t', ->
+
+      beforeEach ->
+        invitation.response = Invitation.maybe
+
+      it 'should return false', ->
+        expect(ctrl.isAccepted invitation).toBe false
+
+
+  describe 'checking whether the user responded maybe to their invitation', ->
+    invitation = null
+
+    beforeEach ->
+      invitation = {id: 1}
+
+    describe 'when they did', ->
+
+      beforeEach ->
+        invitation.response = Invitation.maybe
+
+      it 'should return true', ->
+        expect(ctrl.isMaybe invitation).toBe true
+
+
+    describe 'when they didn\'t', ->
+
+      beforeEach ->
+        invitation.response = Invitation.accepted
+
+      it 'should return false', ->
+        expect(ctrl.isMaybe invitation).toBe false
+
+
+  describe 'checking whether the user declined their invitation', ->
+    invitation = null
+
+    beforeEach ->
+      invitation = {id: 1}
+
+    describe 'when they did', ->
+
+      beforeEach ->
+        invitation.response = Invitation.declined
+
+      it 'should return true', ->
+        expect(ctrl.isDeclined invitation).toBe true
+
+
+    describe 'when they didn\'t', ->
+
+      beforeEach ->
+        invitation.response = Invitation.accepted
+
+      it 'should return false', ->
+        expect(ctrl.isDeclined invitation).toBe false
+
+
+  describe 'responding to an invitation', ->
+    response = null
+    invitation = null
+    deferred = null
+    newResponse = null
+
+    beforeEach ->
+      spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
+
+      # Mock the current invitation response.
+      response = Invitation.noResponse
+      invitation = new Invitation
+        id: 1
+        response: response
+        event:
+          id: 2
+
+      deferred = $q.defer()
+      spyOn(Invitation, 'updateResponse').and.returnValue
+        $promise: deferred.promise
+
+      newResponse = Invitation.accepted
+      ctrl.respondToInvitation invitation, newResponse
+
+    it 'should show a loading modal', ->
+      expect($ionicLoading.show).toHaveBeenCalled()
+
+    it 'should update the invitation', ->
+      expect(Invitation.updateResponse).toHaveBeenCalledWith(invitation,
+          newResponse)
+
+    describe 'when the update succeeds', ->
+
+      beforeEach ->
+        spyOn $state, 'go'
+
+      describe 'and the response is accepted', ->
+
+        beforeEach ->
+          invitation.response = Invitation.accepted
+          deferred.resolve invitation
+          scope.$apply()
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
+        it 'should go to the event chat', ->
+          expect($state.go).toHaveBeenCalledWith 'event',
+            invitation: invitation
+            id: invitation.event.id
+
+
+      describe 'and the response is maybe', ->
+
+        beforeEach ->
+          invitation.response = Invitation.maybe
+          deferred.resolve invitation
+          scope.$apply()
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
+        it 'should go to the event chat', ->
+          expect($state.go).toHaveBeenCalledWith 'event',
+            invitation: invitation
+            id: invitation.event.id
+
+
+      describe 'and the response is declined', ->
+
+        beforeEach ->
+          invitation.response = Invitation.declined
+          deferred.resolve invitation
+          scope.$apply()
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
+
+    describe 'when the update fails', ->
+
+      beforeEach ->
+        spyOn ngToast, 'create'
+
+        deferred.reject()
+        scope.$apply()
+
+      it 'should hide the loading overlay', ->
+        expect($ionicLoading.hide).toHaveBeenCalled()
+
+      it 'show an error', ->
+        error = 'For some reason, that didn\'t work.'
+        expect(ngToast.create).toHaveBeenCalledWith error
+
+
+  describe 'accepting an invitation', ->
+    invitation = null
+
+    beforeEach ->
+      spyOn ctrl, 'respondToInvitation'
+
+      invitation = {id: 1}
+      ctrl.acceptInvitation invitation
+
+    it 'should respond to the invitation', ->
+      expect(ctrl.respondToInvitation).toHaveBeenCalledWith(invitation,
+          Invitation.accepted)
+
+
+  describe 'responding maybe an invitation', ->
+    invitation = null
+
+    beforeEach ->
+      spyOn ctrl, 'respondToInvitation'
+
+      invitation = {id: 1}
+      ctrl.maybeInvitation invitation
+
+    it 'should respond to the invitation', ->
+      expect(ctrl.respondToInvitation).toHaveBeenCalledWith(invitation,
+          Invitation.maybe)
+
+
+  describe 'declining an invitation', ->
+    invitation = null
+
+    beforeEach ->
+      spyOn ctrl, 'respondToInvitation'
+
+      invitation = {id: 1}
+      ctrl.declineInvitation invitation
+
+    it 'should respond to the invitation', ->
+      expect(ctrl.respondToInvitation).toHaveBeenCalledWith(invitation,
+          Invitation.declined)
 
 
   describe 'sending a message', ->

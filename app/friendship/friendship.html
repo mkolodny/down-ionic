@@ -1,24 +1,54 @@
 <ion-view id="friendship" view-title="{{friendship.friend.name}}">
   <ion-content>
     <ion-list scroll-glue>
-      <ion-item ng-repeat="message in friendship.messages">
+      <ion-item class="message-item" ng-repeat="message in friendship.messages">
         <div class="action-message" ng-if="friendship.isActionMessage(message)">
           {{message.text}}
         </div>
-        <div class="text-message" ng-if="!friendship.isActionMessage(message)"
+        <div class="text-message"
+             ng-if="friendship.isTextMessage(message) || friendship.isInviteAction(message)"
              ng-class="{'mine': friendship.isMyMessage(message)}">
-          <div class="text">{{message.text}}</div>
+          <div class="text" ng-if="friendship.isTextMessage(message)">{{message.text}}</div>
+          <div class="text" ng-if="message.invitation"
+               ><span>{{message.invitation.event.title}}</span> <span ng-if="message.invitation.event.place"
+               ><a href view-place place="message.invitation.event.place"
+               >{{message.invitation.event.place.name}}</a></span> <span ng-if="message.invitation.event.datetime"
+               >&mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
+            <div class="respond-buttons" ng-if="!friendship.isMyMessage(message)">
+              <button class="respond"
+                      ng-click="friendship.acceptInvitation(message.invitation)"
+                      ontouchstart
+                      ng-disabled="friendship.isAccepted(message.invitation)"
+                      >Down</button>
+              <button class="respond"
+                      ng-click="friendship.maybeInvitation(message.invitation)"
+                      ontouchstart
+                      ng-disabled="friendship.isMaybe(message.invitation)"
+                      >Chat</button>
+              <button class="respond"
+                      ng-click="friendship.declineInvitation(message.invitation)"
+                      ontouchstart
+                      ng-disabled="friendship.isDeclined(message.invitation)"
+                      >Pass</button>
+            </div>
+          </div>
+          <div class="text" ng-if="friendship.isLoadingInvitation(message)"
+               ><ion-spinner icon="bubbles"></ion-spinner></div>
+        </div>
+        <div class="error-message" ng-if="friendship.isErrorAction(message)">
+          <i class="fa fa-exclamation-triangle"></i> Error fetching message.
         </div>
       </ion-item>
     </ion-list>
   </ion-content>
-  <ion-footer-bar class="bar-light new-message" keyboard-attach>
-    <textarea ng-model="friendship.message"
+  <ion-footer-bar class="bar-light new-message-bar" keyboard-attach>
+    <textarea class="new-message"
+              ng-model="friendship.message"
               placeholder="Type a message..."
               msd-elastic
               rows="1"
               ></textarea>
-    <button class="button button-clear"
+    <button class="button button-clear send-message"
             ng-disabled="!friendship.message"
             ng-click="friendship.sendMessage()"
             ontouchstart
