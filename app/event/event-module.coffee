@@ -2,7 +2,6 @@ require 'angular'
 require 'angular-elastic'
 require 'angular-ui-router'
 require 'ng-toast'
-require 'angularjs-scroll-glue'
 require '../common/auth/auth-module'
 require '../common/mixpanel/mixpanel-module'
 require '../common/resources/resources-module'
@@ -18,7 +17,6 @@ angular.module 'down.event', [
     'down.resources'
     'down.auth'
     'down.viewPlace'
-    'luegg.directives'
     'ngToast'
   ]
   .config ($stateProvider) ->

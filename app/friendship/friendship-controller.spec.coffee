@@ -8,6 +8,7 @@ FriendshipCtrl = require './friendship-controller'
 
 describe 'friendship controller', ->
   $ionicLoading = null
+  $ionicScrollDelegate = null
   $meteor = null
   $mixpanel = null
   $q = null
@@ -38,6 +39,7 @@ describe 'friendship controller', ->
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $ionicLoading = $injector.get '$ionicLoading'
+    $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
     $meteor = $injector.get '$meteor'
     $mixpanel = $injector.get '$mixpanel'
     $q = $injector.get '$q'
@@ -555,7 +557,7 @@ describe 'friendship controller', ->
       $meteor.collection.and.returnValue messages
       spyOn ctrl, 'getFriendInvitations'
 
-      scope.$emit '$ionicView.enter'
+      scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
 
     it 'should get the chat id', ->
@@ -610,12 +612,18 @@ describe 'friendship controller', ->
             _id: message._id+1
             type: Invitation.inviteAction
           ctrl.messages.push message2
+
+          spyOn $ionicScrollDelegate, 'scrollBottom'
+
           scope.$apply()
 
         it 'should mark the message as read', ->
           # TODO: Don't mark invite action messages as read until we fetch the
           #   invitation
           expect($meteor.call).toHaveBeenCalledWith 'readMessage', message2._id
+
+        it 'should scroll to the bottom', ->
+          expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
         it 'should refresh the invitations', ->
           expect(ctrl.getFriendInvitations).toHaveBeenCalled()
@@ -645,6 +653,8 @@ describe 'friendship controller', ->
       deferred = $q.defer()
       spyOn(Invitation, 'getUserInvitations').and.returnValue
         $promise: deferred.promise
+
+      spyOn $ionicScrollDelegate, 'scrollBottom'
 
       # Mock invite action messages.
       message =
@@ -690,6 +700,9 @@ describe 'friendship controller', ->
 
       it 'should delete expired invite_action messages', ->
         expect(ctrl.messages.remove).toHaveBeenCalledWith message2._id
+
+      it 'should scroll to the bottom of the view', ->
+        expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
 
     describe 'unsuccessfully', ->
 

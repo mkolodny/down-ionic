@@ -37,7 +37,7 @@ class EventCtrl
       currentUser: @Auth.user
 
     # Start out at the most recent message.
-    @$scope.$on '$ionicView.enter', =>
+    @$scope.$on '$ionicView.beforeEnter', =>
       # Get the members invitations.
       @updateMembers()
 
@@ -49,10 +49,19 @@ class EventCtrl
       @newestMessage = @getNewestMessage()
       @chat = @getChat()
 
-      # Watch for changes
+      # Mark messages as read as they come in.
       @$scope.$watch =>
-        @newestMessage._id
-      , @handleNewMessage
+        newestMessage = @messages[@messages.length-1]
+        if angular.isDefined newestMessage
+          newestMessage._id
+      , (newValue, oldValue) =>
+        if newValue is undefined
+          return
+
+        @$meteor.call 'readMessage', newValue
+        @$ionicScrollDelegate.scrollBottom true
+
+      # Watch for changes in chat members
       @$scope.$watch =>
         @chat._id
       , @handleMembersChange
@@ -60,7 +69,6 @@ class EventCtrl
     # Remove angular-meteor bindings
     @$scope.$on '$ionicView.leave', =>
       @messages.stop()
-      @newestMessage.stop()
       @chat.stop()
 
   getMessages: =>
@@ -87,9 +95,6 @@ class EventCtrl
     selector =
       chatId: "#{@event.id}"
     @$meteor.object @Chats, selector, false
-
-  handleNewMessage: =>
-    @$meteor.call 'readMessage', @newestMessage._id
 
   handleMembersChange: =>
     meteorMembers = @chat.members or []
