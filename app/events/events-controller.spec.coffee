@@ -689,4 +689,4 @@ describe 'events controller', ->
         returnedDistanceAway = ctrl.getDistanceAway friend
 
       it 'should show the default message', ->
-        expect(returnedDistanceAway).toBe 'Start a chat'
+        expect(returnedDistanceAway).toBe 'Start a chat...'

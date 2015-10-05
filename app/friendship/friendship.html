@@ -1,6 +1,11 @@
 <ion-view id="friendship" view-title="{{friendship.friend.name}}">
   <ion-content>
     <ion-list scroll-glue>
+      <ion-item class="message-item" ng-if="friendship.messages.length === 0">
+        <div class="action-message">
+          Start a chat...
+        </div>
+      </ion-item>
       <ion-item class="message-item" ng-repeat="message in friendship.messages">
         <div class="action-message" ng-if="friendship.isActionMessage(message)">
           {{message.text}}
@@ -10,10 +15,10 @@
              ng-class="{'mine': friendship.isMyMessage(message)}">
           <div class="text" ng-if="friendship.isTextMessage(message)">{{message.text}}</div>
           <div class="text" ng-if="message.invitation"
-               ><span>{{message.invitation.event.title}}</span> <span ng-if="message.invitation.event.place"
-               ><a href view-place place="message.invitation.event.place"
-               >{{message.invitation.event.place.name}}</a></span> <span ng-if="message.invitation.event.datetime"
-               >&mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
+               ><span>{{message.invitation.event.title}}</span><span ng-if="message.invitation.event.place"
+               > <a href view-place place="message.invitation.event.place"
+               >{{message.invitation.event.place.name}}</a></span><span ng-if="message.invitation.event.datetime"
+               > &mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
             <div class="respond-buttons" ng-if="!friendship.isMyMessage(message)">
               <button class="respond"
                       ng-click="friendship.acceptInvitation(message.invitation)"

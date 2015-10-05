@@ -263,8 +263,8 @@ class ChatsCtrl
   getDistanceAway: (friend) ->
     distanceAway = @Auth.getDistanceAway friend.location
     if distanceAway is null
-      return 'Start a chat'
+      'Start a chat...'
     else
-      return distanceAway
+      distanceAway
 
 module.exports = ChatsCtrl
