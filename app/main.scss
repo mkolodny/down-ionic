@@ -526,10 +526,10 @@ body {
   text-decoration: none;
   font-weight: 700 !important;
   font-size: 16px;
-  color: $link-color;
+  color: $link-color !important;
 
   &:disabled {
-    color: #999;
+    color: #999 !important;
   }
 }
 .platform-ios {
