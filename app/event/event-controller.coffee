@@ -38,9 +38,6 @@ class EventCtrl
 
     # Start out at the most recent message.
     @$scope.$on '$ionicView.beforeEnter', =>
-      # Don't scroll to the bottom until view fully enters
-      @shouldScrollBottom = false
-
       # Get the members invitations.
       @updateMembers()
 
@@ -64,10 +61,6 @@ class EventCtrl
         @chat._id
       , @handleChatChange
 
-    @$scope.$on '$ionicView.enter', =>
-      @shouldScrollBottom = true
-      @$ionicScrollDelegate.scrollBottom true
-
     # Remove angular-meteor bindings
     @$scope.$on '$ionicView.leave', =>
       @messages.stop()
@@ -79,8 +72,7 @@ class EventCtrl
       return
 
     @$meteor.call 'readMessage', newMessageId
-    if @shouldScrollBottom
-      @$ionicScrollDelegate.scrollBottom true
+    @scrollBottom()
 
   getMessages: =>
     @Messages.find
@@ -286,5 +278,9 @@ class EventCtrl
         @ngToast.create 'For some reason, that didn\'t work.'
       .finally =>
         @$ionicLoading.hide()
+
+  scrollBottom: ->
+    @$ionicScrollDelegate.$getByHandle('event')
+      .scrollBottom true
 
 module.exports = EventCtrl
