@@ -331,7 +331,7 @@ describe 'events controller', ->
       # TODO: Sort the friends by latest message, then distance.
 
       # Mock Person who added me
-      personWhoAddedMe = new User 
+      personWhoAddedMe = new User
         id: 9
         username: 'pl$b'
         name: 'Mike Pleb'
@@ -387,7 +387,8 @@ describe 'events controller', ->
       expect(builtItems).toEqual items
 
     it 'should subscribe to the friend messages', ->
-      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', Friendship.getChatId friendWithUsername.id
+      expect(scope.$meteorSubscribe).toHaveBeenCalledWith('chat',
+          Friendship.getChatId friendWithUsername.id)
 
 
   describe 'subscribing to events\' messages', ->
@@ -786,3 +787,45 @@ describe 'events controller', ->
 
       it 'should show the default message', ->
         expect(returnedDistanceAway).toBe 'Start a chat...'
+
+
+  describe 'before the view enters', ->
+    friend = null
+
+    beforeEach ->
+      friend =
+        id: 1
+
+    describe 'when the friends list hasn\'t been saved', ->
+
+      beforeEach ->
+        delete ctrl.friendsList
+        Auth.user.friends = {}
+        Auth.user.friends[friend.id] = friend
+
+        scope.$emit '$ionicView.beforeEnter'
+        scope.$apply()
+
+      it 'should save the friends list', ->
+        friendsList = {}
+        friendsList[friend.id] = true
+        expect(ctrl.friendsList).toEqual friendsList
+
+
+    describe 'when the friends list has changed', ->
+
+      beforeEach ->
+        ctrl.friendsList = {}
+        ctrl.friendsList[friend.id+1] = true
+        spyOn ctrl, 'manualRefresh'
+
+        scope.$emit '$ionicView.beforeEnter'
+        scope.$apply()
+
+      it 'should refresh the feed', ->
+        expect(ctrl.manualRefresh).toHaveBeenCalled()
+
+      it 'should save the new friends list', ->
+        friendsList = {}
+        friendsList[friend.id] = true
+        expect(ctrl.friendsList).toEqual friendsList
