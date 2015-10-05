@@ -374,6 +374,55 @@ describe 'friendship controller', ->
         expect(ctrl.isDeclined invitation).toBe false
 
 
+  describe 'checking whether a user joined an event', ->
+    message = null
+
+    beforeEach ->
+      message =
+        _id: 1
+        creator: new User
+          id: "#{Auth.user.id+1}"
+        createdAt:
+          $date: new Date().getTime()
+        text: 'Down?'
+        chatId: '1,2'
+        type: 'invite_action'
+        invitation:
+          id: 1
+
+    describe 'when they sent the invitation', ->
+
+      beforeEach ->
+        message.creator.id = "#{Auth.user.id}"
+
+      it 'should return true', ->
+        expect(ctrl.wasJoined message).toBe true
+
+
+    describe 'when they accepted the invitation', ->
+
+      beforeEach ->
+        message.invitation.response = Invitation.accepted
+
+      it 'should return true', ->
+        expect(ctrl.wasJoined message).toBe true
+
+
+    describe 'when they responded maybe to the invitation', ->
+
+      beforeEach ->
+        message.invitation.response = Invitation.maybe
+
+      it 'should return true', ->
+        expect(ctrl.wasJoined message).toBe true
+
+
+    describe 'when they haven\'t joined', ->
+
+      it 'should return false', ->
+        expect(ctrl.wasJoined message).toBe false
+
+
   describe 'responding to an invitation', ->
     response = null
     invitation = null
@@ -742,3 +791,21 @@ describe 'friendship controller', ->
       messageCopy = angular.copy message
       messageCopy.creator = new User messageCopy.creator
       expect(transformedMessage).toEqual messageCopy
+
+
+  describe 'viewing an event', ->
+    invitation = null
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      invitation =
+        id: 1
+        event:
+          id: 2
+      ctrl.viewEvent invitation
+
+    it 'should go to the event', ->
+      expect($state.go).toHaveBeenCalledWith 'event',
+        invitation: invitation
+        id: invitation.event.id

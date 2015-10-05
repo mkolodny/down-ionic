@@ -11,7 +11,7 @@ class FriendshipCtrl
 
     @$scope.$on '$ionicView.enter', =>
       @getFriendInvitations()
-      
+
       @chatId = @Friendship.getChatId @friend.id
 
       # Subscribe to the event's chat.
@@ -113,6 +113,11 @@ class FriendshipCtrl
   isDeclined: (invitation) ->
     invitation.response is @Invitation.declined
 
+  wasJoined: (message) ->
+    message.creator.id is "#{@Auth.user.id}" \
+        or message.invitation.response is @Invitation.accepted \
+        or message.invitation.response is @Invitation.maybe
+
   respondToInvitation: (invitation, response) ->
     @$ionicLoading.show()
 
@@ -135,6 +140,11 @@ class FriendshipCtrl
 
   declineInvitation: (invitation) ->
     @respondToInvitation invitation, @Invitation.declined
+
+  viewEvent: (invitation) ->
+    @$state.go 'event',
+      invitation: invitation
+      id: invitation.event.id
 
   sendMessage: ->
     @Friendship.sendMessage @friend, @message

@@ -4,12 +4,10 @@ require 'angular-ui-router'
 require 'angularjs-scroll-glue'
 require 'ng-toast'
 require '../common/auth/auth-module'
-require '../common/view-place/view-place-module'
 FriendshipCtrl = require './friendship-controller'
 
 angular.module 'down.friendship', [
     'down.auth'
-    'down.viewPlace'
     'luegg.directives'
     'monospaced.elastic'
     'ngToast'

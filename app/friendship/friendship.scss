@@ -24,8 +24,8 @@
   .invite-action {
     background-color: $brand-color;
     border-color: $brand-color;
-    color: #fff;
     font-weight: 600;
+    color: #fff;
 
     &::before {
       border-right-color: $brand-color;
@@ -39,8 +39,18 @@
       }
     }
   }
+  .was-joined {
+    text-decoration: underline;
+  }
   ion-spinner {
     stroke: #fff;
     fill: #fff;
+  }
+}
+.platform-ios {
+  #friendship {
+    .respond {
+      padding-top: 3px;
+    }
   }
 }

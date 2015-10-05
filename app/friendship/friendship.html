@@ -16,31 +16,26 @@
           <div class="text" ng-if="friendship.isTextMessage(message)">{{message.text}}</div>
           <div class="text invite-action"
                ng-if="message.invitation"
+               ng-class="{'was-joined': friendship.wasJoined(message)}"
+               ng-click="friendship.wasJoined(message) ? friendship.viewEvent(message.invitation) : null"
                ><span>{{message.invitation.event.title}}</span><span
                ng-if="message.invitation.event.place"
-               > <a href view-place place="message.invitation.event.place"
-               >{{message.invitation.event.place.name}}</a></span><span ng-if="message.invitation.event.datetime"> &mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span><div
+               > at {{message.invitation.event.place.name}}</span><span ng-if="message.invitation.event.datetime"> &mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span><div
                 class="respond-section"
-                ng-if="!friendship.isMyMessage(message)">
+                ng-if="!friendship.wasJoined(message)">
               <button class="respond"
                       ng-click="friendship.acceptInvitation(message.invitation)"
                       ontouchstart
-                      ng-disabled="friendship.isAccepted(message.invitation)"
                       >Down</button>
               <button class="respond"
                       ng-click="friendship.maybeInvitation(message.invitation)"
                       ontouchstart
-                      ng-disabled="friendship.isMaybe(message.invitation)"
                       >Chat</button>
               <button class="respond"
                       ng-click="friendship.declineInvitation(message.invitation)"
                       ontouchstart
                       ng-disabled="friendship.isDeclined(message.invitation)"
                       >Pass</button>
-          </div><div
-              class="respond-section"
-              ng-if="friendship.isMyMessage(message)">
-            <button class="respond" disabled>Joined</button>
           </div></div>
           <div class="text invite-action"
                ng-if="friendship.isLoadingInvitation(message)"
