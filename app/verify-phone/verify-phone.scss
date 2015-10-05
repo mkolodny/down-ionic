@@ -1,9 +1,14 @@
 #verify-phone {
   background-color: $brand-color;
 
+  .button-clear {
+    padding-left: 10px;
+    font-size: 17px;
+    font-weight: 300;
+  }
   .explanation {
     height: 40px;
-    margin: 96px auto 15px;
+    margin: 49px auto 15px;
   }
   .item {
     padding-left: 0;

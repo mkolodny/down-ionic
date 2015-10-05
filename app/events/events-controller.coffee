@@ -41,6 +41,19 @@ class ChatsCtrl
       # Fetch the invitations to show on the view.
       @manualRefresh()
 
+    @$scope.$on '$ionicView.beforeEnter', =>
+      # If the user's friends list has changed since they last entered this
+      #   view, refresh the feed.
+      friendsList = {}
+      for id, friend of @Auth.user.friends
+        friendsList[id] = true
+
+      if angular.isDefined @friendsList \
+          and not angular.equals friendsList, @friendsList
+        @manualRefresh()
+
+      @friendsList = friendsList
+
     @newEvent = {}
 
     # Refresh the feed when the user comes back to the app.
