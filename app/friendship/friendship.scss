@@ -18,6 +18,9 @@
       stroke: #fff;
       fill: #fff;
     }
+    .invite-action {
+      font-weight: 700;
+    }
   }
   .respond {
     background-color: transparent;
@@ -30,9 +33,6 @@
       background-color: #08f;
       border-radius: 4px;
     }
-  }
-  .was-joined {
-    font-weight: 700;
   }
 //  .invite-action {
 //    background-color: $brand-color;
