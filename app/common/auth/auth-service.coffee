@@ -2,9 +2,9 @@ haversine = require 'haversine'
 require '../../ionic/ionic.js'
 
 class Auth
-  @$inject: ['$http', '$q', '$mixpanel', 'Asteroid', 'apiRoot', 'User',
+  @$inject: ['$http', '$q', '$meteor', '$mixpanel', 'apiRoot', 'User',
              '$cordovaGeolocation', '$state', 'localStorageService']
-  constructor: (@$http, @$q, @$mixpanel, @Asteroid, @apiRoot, @User,
+  constructor: (@$http, @$q, @$meteor, @$mixpanel, @apiRoot, @User,
                 @$cordovaGeolocation, @$state, localStorageService) ->
     @localStorage = localStorageService
 
@@ -24,8 +24,8 @@ class Auth
         for id, friend of @user.facebookFriends
           @user.facebookFriends[id] = new @User friend
 
-      # re-establish asteroid auth
-      @Asteroid.login @user.id, @user.authtoken
+      # re-establish Meteor auth
+      @$meteor.loginWithPassword "#{@user.id}", @user.authtoken
 
       @mixpanelIdentify()
 
@@ -126,7 +126,8 @@ class Auth
       return false
 
   isNearby: (user) ->
-    if user.location is undefined or @user.location is undefined
+    if user.location is undefined or \
+       @user.location is undefined
       return false
 
     start =
@@ -216,5 +217,38 @@ class Auth
         deferred.reject()
 
     {$promise: deferred.promise}
+
+  getDistanceAway: (location) ->
+    # Return null if either a user's location
+    #   isn't set or the friend's location isn't set
+    if location is undefined or \
+       @user.location is undefined
+      return null
+
+    start =
+      latitude: @user.location.lat
+      longitude: @user.location.long
+    end =
+      latitude: location.lat
+      longitude: location.long
+    distanceAway = haversine start, end, {unit: 'mile'}
+    if distanceAway < .094697 # 500 feet
+      '< 500 feet'
+    else if distanceAway < 1
+      '< 1 mile'
+    else if distanceAway < 2
+      '< 2 miles'
+    else if distanceAway < 5
+      '< 5 miles'
+    else if distanceAway < 10
+      '< 10 miles'
+    else if distanceAway < 25
+      '< 25 miles'
+    else if distanceAway < 50
+      '< 50 miles'
+    else if distanceAway < 100
+      '< 100 miles'
+    else
+      'really far'
 
 module.exports = Auth

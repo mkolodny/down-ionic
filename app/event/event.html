@@ -35,17 +35,14 @@
       <button class="respond" ng-click="event.acceptInvitation()" ontouchstart
               ng-disabled="event.isAccepted()"
               >Down</button>
-      <button class="respond" ng-click="event.maybeInvitation()" ontouchstart
-              ng-disabled="event.isMaybe()"
-              >Maybe</button>
       <button class="respond" ng-click="event.declineInvitation()" ontouchstart
               >Can't</button>
     </div>
   </div>
-  <ion-content ng-click="event.toggleIsHeaderExpanded()" ontouchstart>
+  <ion-content ng-click="event.toggleIsHeaderExpanded()" ontouchstart delegate-handle="event">
     <ion-list>
       <!-- We might need to use `track by item.id` to keep this quick. -->
-      <ion-item ng-repeat="message in event.messages">
+      <ion-item class="message-item" ng-repeat="message in event.messages">
         <div class="action-message" ng-if="event.isActionMessage(message)">
           {{message.text}}
         </div>
@@ -56,14 +53,18 @@
         </div>
       </ion-item>
     </ion-list>
-    <ion-infinite-scroll on-infinite="event.saveMaxTop()"
-                         distance="1%" ng-show="false"></ion-infinite-scroll>
   </ion-content>
-  <ion-footer-bar class="bar-light" keyboard-attach>
-    <textarea ng-model="event.message" placeholder="Type a message..." msd-elastic
-              rows="1"></textarea>
-    <button id="send-message" class="button button-clear"
-            ng-disabled="!event.message" ng-click="event.sendMessage()" ontouchstart
+  <ion-footer-bar class="bar-light new-message-bar" keyboard-attach>
+    <textarea class="new-message"
+              ng-model="event.message"
+              placeholder=" Type a message..."
+              msd-elastic
+              rows="1"
+              ></textarea>
+    <button class="button button-clear send-message"
+            ng-disabled="!event.message"
+            ng-click="event.sendMessage()"
+            ontouchstart
             >Send</button>
   </ion-footer-bar>
 </ion-view>

@@ -1,6 +1,6 @@
 class VerifyPhoneCtrl
-  @$inject: ['$ionicLoading', '$scope', '$state', 'Asteroid', 'Auth']
-  constructor: (@$ionicLoading, @$scope, @$state, @Asteroid, @Auth) ->
+  @$inject: ['$ionicLoading', '$meteor', '$scope', '$state', 'Auth']
+  constructor: (@$ionicLoading, @$meteor, @$scope, @$state, @Auth) ->
 
   authenticate: ->
     if not @validate()
@@ -31,7 +31,7 @@ class VerifyPhoneCtrl
     @$scope.verifyPhoneForm.$valid
 
   meteorLogin: (user) ->
-    @Asteroid.login user.id, user.authtoken
+    @$meteor.loginWithPassword "#{user.id}", user.authtoken
       .then =>
         # Persist the user to local storage.
         @Auth.setUser user

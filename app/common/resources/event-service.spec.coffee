@@ -2,18 +2,22 @@ require 'angular'
 require 'angular-mocks'
 require '../auth/auth-module'
 require './resources-module'
+require '../meteor/meteor-mocks'
 
 describe 'event service', ->
   $httpBackend = null
   $rootScope = null
+  $meteor = null
   $q = null
-  Asteroid = null
   Auth = null
   Event = null
+  Friendship = null
   Invitation = null
   Messages = null
   User = null
   listUrl = null
+
+  beforeEach angular.mock.module('angular-meteor')
 
   beforeEach angular.mock.module('down.resources')
 
@@ -29,26 +33,24 @@ describe 'event service', ->
         lastName: 'Turing'
         imageUrl: 'http://facebook.com/profile-pic/tdog'
     $provide.value 'Auth', Auth
-
-    # Mock Asteroid.
-    Messages =
-      insert: jasmine.createSpy 'Messages.insert'
-    Asteroid =
-      getCollection: jasmine.createSpy('Asteroid.getCollection').and.returnValue \
-          Messages
-      call: jasmine.createSpy 'Asteroid.call'
-    $provide.value 'Asteroid', Asteroid
     return
   )
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
     $rootScope = $injector.get '$rootScope'
+    $meteor = $injector.get '$meteor'
     $q = $injector.get '$q'
     apiRoot = $injector.get 'apiRoot'
     User = $injector.get 'User'
     Event = $injector.get 'Event'
+    Friendship = $injector.get 'Friendship'
     Invitation = $injector.get 'Invitation'
+
+    # Mock Messages collection
+    Messages =
+      insert: jasmine.createSpy 'Messages.insert'
+    $meteor.getCollectionByName.and.returnValue Messages
 
     listUrl = "#{apiRoot}/events"
   )
@@ -176,11 +178,14 @@ describe 'event service', ->
 
   describe 'creating', ->
     event = null
+    invitation = null
     response = null
     responseData = null
     requestData = null
 
     beforeEach ->
+      invitation =
+        to_user: 2
       event =
         title: 'bars?!?!!?'
         creatorId: 1
@@ -190,6 +195,8 @@ describe 'event service', ->
           lat: 40.7270718
           long: -73.9919324
         comment: 'awwww yisssss'
+        invitations: [invitation]
+
       requestData = Event.serialize event
 
     describe 'successfully', ->
@@ -216,6 +223,8 @@ describe 'event service', ->
         $httpBackend.expectPOST listUrl, requestData
           .respond 201, angular.toJson(responseData)
 
+        spyOn Event, 'readMessage'
+
         response = null
         Event.save event
           .$promise.then (_response_) ->
@@ -230,7 +239,7 @@ describe 'event service', ->
         expect(response).toAngularEqual expectedEvent
 
       it 'should get the messages collection', ->
-        expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+        expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
       it 'should create an accept action message', ->
         message =
@@ -241,23 +250,28 @@ describe 'event service', ->
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: "#{Auth.user.name} is down."
-          eventId: "#{responseData.id}" # meteor likes strings
+          chatId: "#{responseData.id}" # meteor likes strings
           type: Invitation.acceptAction
-          createdAt:
-            $date: new Date().getTime()
-        expect(Messages.insert).toHaveBeenCalledWith message
+          createdAt: new Date()
 
-      describe 'when the message saves', ->
-        messageId = null
+        expect(Messages.insert).toHaveBeenCalledWith message, Event.readMessage
 
-        beforeEach ->
-          messageId = 'asdf'
-          messagesDeferred.resolve messageId
-          $rootScope.$apply()
+      it 'should create invite_action messages', ->
+        inviteMessage =
+          creator:
+            id: "#{Auth.user.id}" # meteor likes strings
+            name: Auth.user.name
+            firstName: Auth.user.firstName
+            lastName: Auth.user.lastName
+            imageUrl: Auth.user.imageUrl
+          text: 'Down?'
+          chatId: Friendship.getChatId invitation.to_user # meteor likes strings
+          type: Invitation.inviteAction
+          createdAt: new Date()
+          meta:
+            eventId: "#{responseData.id}"
 
-        it 'should mark the message as read', ->
-          expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', messageId
-
+        expect(Messages.insert).toHaveBeenCalledWith inviteMessage
 
     describe 'unsuccessfully', ->
       rejected = null
@@ -274,6 +288,17 @@ describe 'event service', ->
 
       it 'should reject the promise', ->
         expect(rejected).toBe true
+
+
+  describe 'marking a message as read', ->
+    messageId = null
+
+    beforeEach ->
+      messageId = 'asdf'
+      Event.readMessage messageId
+
+    it 'should call readMessage with the message id', ->
+      expect($meteor.call).toHaveBeenCalledWith 'readMessage', messageId
 
 
   describe 'sending a message', ->
@@ -309,8 +334,9 @@ describe 'event service', ->
         $httpBackend.expectPOST url, requestData
           .respond 201, null
 
-        Event.sendMessage(event, text).then ->
-          resolved = true
+        Event.sendMessage event, text
+          .then ->
+            resolved = true
         $httpBackend.flush 1
 
       afterEach ->
@@ -320,7 +346,7 @@ describe 'event service', ->
         expect(resolved).toBe true
 
       it 'should get the messages collection', ->
-        expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+        expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
       it 'should save the message in the meteor server', ->
         message =
@@ -331,10 +357,9 @@ describe 'event service', ->
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: text
-          eventId: "#{event.id}"
+          chatId: "#{event.id}"
           type: 'text'
-          createdAt:
-            $date: new Date().getTime()
+          createdAt: new Date()
         expect(Messages.insert).toHaveBeenCalledWith message
 
 
@@ -345,8 +370,9 @@ describe 'event service', ->
         $httpBackend.expectPOST url, requestData
           .respond 500, null
 
-        Event.sendMessage(event, text).then null, ->
-          rejected = true
+        Event.sendMessage event, text
+          .then null, ->
+            rejected = true
         $httpBackend.flush 1
 
       it 'should reject the promise', ->
@@ -455,8 +481,9 @@ describe 'event service', ->
           .respond 400
 
         rejected = null
-        Event.getInvitedIds(event).then null, ->
-          rejected = true
+        Event.getInvitedIds event
+          .then null, ->
+            rejected = true
         $httpBackend.flush 1
 
         expect(rejected).toBe true

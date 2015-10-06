@@ -6,29 +6,29 @@ require 'angular-local-storage'
 require 'ng-cordova'
 require './auth-module'
 require '../mixpanel/mixpanel-module'
-require '../asteroid/asteroid-module'
+require '../meteor/meteor-mocks'
 
 describe 'Auth service', ->
   $cordovaGeolocation = null
   $cordovaDevice = null
   $httpBackend = null
   $mixpanel = null
+  $meteor = null
   scope = null
   $state = null
   $q = null
   apiRoot = null
   Auth = null
-  Asteroid = null
   Invitation = null
   User = null
   deserializedUser = null
   localStorage = null
 
+  beforeEach angular.mock.module('angular-meteor')
+
   beforeEach angular.mock.module('analytics.mixpanel')
 
   beforeEach angular.mock.module('down.auth')
-
-  beforeEach angular.mock.module('down.asteroid')
 
   beforeEach angular.mock.module('ngCordova.plugins.geolocation')
 
@@ -68,10 +68,6 @@ describe 'Auth service', ->
         set: jasmine.createSpy '$mixpanel.people.set'
     $provide.value '$mixpanel', $mixpanel
 
-    Asteroid =
-      login: jasmine.createSpy 'Asteroid.login'
-    $provide.value 'Asteroid', Asteroid
-
     return
   )
 
@@ -80,6 +76,7 @@ describe 'Auth service', ->
     $httpBackend = $injector.get '$httpBackend'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
+    $meteor = $injector.get '$meteor'
     apiRoot = $injector.get 'apiRoot'
     Auth = angular.copy $injector.get('Auth')
     Invitation = $injector.get 'Invitation'
@@ -124,8 +121,8 @@ describe 'Auth service', ->
       it 'should set the user on Auth', ->
         expect(Auth.user).toAngularEqual user
 
-      it 'should log in to Asteroid', ->
-        expect(Asteroid.login).toHaveBeenCalledWith user.id, user.authtoken
+      it 'should log in to meteor', ->
+        expect($meteor.loginWithPassword).toHaveBeenCalledWith "#{user.id}", user.authtoken
 
       it 'should identify the user with mixpanel', ->
         expect(Auth.mixpanelIdentify).toHaveBeenCalled()
@@ -1041,3 +1038,154 @@ describe 'Auth service', ->
 
       it 'should reject the promise', ->
         expect(rejected).toBe true
+
+
+  describe 'getting how far away a location is', ->
+    user = null
+    distanceAway = null
+
+    beforeEach ->
+      Auth.user.location =
+        lat: 40.7138251
+        long: -73.9897481
+
+
+    describe 'when it\'s < 500 ft away', ->
+
+      beforeEach ->
+        location =
+          lat: 40.7151
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 500 feet'
+
+
+    describe 'when it\'s < 1 mile away', ->
+
+      beforeEach ->
+        location =
+          lat: 40.7281
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 1 mile'
+
+
+    describe 'when it\'s < 2 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 40.7421
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 2 miles'
+
+
+    describe 'when it\'s < 5 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 40.78
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 5 miles'
+
+
+    describe 'when it\'s < 10 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 40.85
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 10 miles'
+
+
+    describe 'when it\'s < 25 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 41.05
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 25 miles'
+
+
+    describe 'when it\'s < 50 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 41.4
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 50 miles'
+
+
+    describe 'when it\'s < 100 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 42.1
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe '< 100 miles'
+
+
+    describe 'when it\'s > 100 miles away', ->
+
+      beforeEach ->
+        location =
+          lat: 42.2
+          long: -73.9897481
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should show the distance away', ->
+        expect(distanceAway).toBe 'really far'
+
+
+    describe 'when user\'s location isn\'t set', ->
+
+      beforeEach ->
+        location =
+          lat: 40.7151
+          long: -73.9897481
+        delete Auth.user.location
+
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should default to really far', ->
+        expect(distanceAway).toBeNull()
+
+
+    describe 'when no location is passed in', ->
+
+      beforeEach ->
+        location = undefined
+        distanceAway = Auth.getDistanceAway location
+
+      it 'should default to really far', ->
+        expect(distanceAway).toBeNull()

@@ -2,7 +2,6 @@ require 'angular'
 require 'angular-elastic'
 require 'angular-ui-router'
 require 'ng-toast'
-require '../common/asteroid/asteroid-module'
 require '../common/auth/auth-module'
 require '../common/mixpanel/mixpanel-module'
 require '../common/resources/resources-module'
@@ -10,11 +9,11 @@ require '../common/view-place/view-place-module'
 EventCtrl = require './event-controller'
 
 angular.module 'down.event', [
+    'angular-meteor'
     'analytics.mixpanel'
     'ionic'
     'ui.router'
     'monospaced.elastic'
-    'down.asteroid'
     'down.resources'
     'down.auth'
     'down.viewPlace'
@@ -41,8 +40,6 @@ angular.module 'down.event', [
               long: -73.9919324
             comment: 'It\'s too nice outside.'
           response: 1
-          previouslyAccepted: false
-          toUserMessaged: false
           muted: false
           lastViewed: new Date()
           createdAt: new Date()

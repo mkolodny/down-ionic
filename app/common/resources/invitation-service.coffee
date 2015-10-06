@@ -1,6 +1,7 @@
-Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'Event', \
-              'User', \
-              ($http, $mixpanel, $q, $resource, apiRoot, Asteroid, Auth, Event, User) ->
+Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
+              'apiRoot', 'Auth', 'Event', 'Friendship', 'User', \
+              ($http, $meteor, $mixpanel, $q, $resource,
+               apiRoot, Auth, Event, Friendship, User) ->
   listUrl = "#{apiRoot}/invitations"
   detailUrl =
   serializeInvitation = (invitation) ->
@@ -11,7 +12,6 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
       event: 'eventId'
       from_user: 'fromUserId'
       response: 'response'
-      previously_accepted: 'previouslyAccepted'
       muted: 'muted'
     for serializedField, deserializedField of optionalFields
       if invitation[deserializedField]?
@@ -21,7 +21,6 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
     invitation =
       id: response.id
       response: response.response
-      previouslyAccepted: response.previously_accepted
       muted: response.muted
       createdAt: new Date response.created_at
       updatedAt: new Date response.updated_at
@@ -60,6 +59,13 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
         data = angular.fromJson data
         deserializeInvitation data
 
+    query:
+      method: 'get'
+      isArray: true
+      transformResponse: (data, headersGetter) ->
+        data = angular.fromJson data
+        (deserializeInvitation(invitation) for invitation in data)
+
     ###
     Get an array of invitations with responses.
     ###
@@ -73,6 +79,10 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
         data = angular.fromJson data
         (deserializeInvitation(invitation) for invitation in data)
 
+  # URLs
+  resource.listUrl = listUrl
+
+  # Tranform data to/from the server.
   resource.serialize = serializeInvitation
   resource.deserialize = deserializeInvitation
 
@@ -86,6 +96,9 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
   resource.acceptAction = 'accept_action'
   resource.declineAction = 'decline_action'
   resource.maybeAction = 'maybe_action'
+  resource.inviteAction = 'invite_action'
+  resource.errorAction = 'error_action'
+  resource.textMessage = 'text'
 
   resource.bulkCreate = (eventId, invitations) ->
     deferred = $q.defer()
@@ -100,6 +113,24 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
     $http.post listUrl, postData
       .success (data, status) =>
         invitations = (@deserialize invitation for invitation in data)
+        
+        # Create invite_action messages
+        Messages = $meteor.getCollectionByName 'messages'
+        for invitation in invitations
+          Messages.insert
+            creator:
+              id: "#{Auth.user.id}" # Meteor likes strings
+              name: Auth.user.name
+              firstName: Auth.user.firstName
+              lastName: Auth.user.lastName
+              imageUrl: Auth.user.imageUrl
+            text: 'Down?'
+            chatId: Friendship.getChatId invitation.toUserId
+            type: @inviteAction
+            createdAt: new Date()
+            meta:
+              eventId: "#{invitation.eventId}"
+
         deferred.resolve invitations
       .error (data, status) =>
         deferred.reject()
@@ -125,7 +156,7 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
     invitation.response = newResponse
     @update(invitation).$promise.then (_invitation) =>
       # Re-subscribe to event messages
-      Asteroid.subscribe 'event', "#{_invitation.eventId}" # Meteor likes strings
+      $meteor.subscribe 'chat', "#{_invitation.eventId}" # Meteor likes strings
 
       # Post an action message.
       if _invitation.response is @accepted
@@ -133,7 +164,7 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
         type = @acceptAction
         status = 'accepted'
       else if _invitation.response is @maybe
-        text = "#{Auth.user.name} might be down."
+        text = "#{Auth.user.name} joined the chat."
         type = @maybeAction
         status = 'maybe'
       else if _invitation.response is @declined
@@ -141,7 +172,7 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
         type = @declineAction
         status = 'declined'
       $mixpanel.track 'Update Response', {status: status}
-      Messages = Asteroid.getCollection 'messages'
+      Messages = $meteor.getCollectionByName 'messages'
       Messages.insert
         creator:
           id: "#{Auth.user.id}" # Meteor likes strings
@@ -150,13 +181,10 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
           lastName: Auth.user.lastName
           imageUrl: Auth.user.imageUrl
         text: text
-        eventId: "#{_invitation.eventId}" # Meteor likes strings
+        chatId: "#{_invitation.eventId}" # Meteor likes strings
         type: type
-        createdAt:
-          $date: new Date().getTime()
-      .remote.then (messageId) ->
-        # Mark message as read
-        Asteroid.call 'readMessage', messageId
+        createdAt: new Date()
+      , @readMessage
 
       deferred.resolve invitation
     , ->
@@ -164,6 +192,12 @@ Invitation = ['$http', '$mixpanel', '$q', '$resource', 'apiRoot', 'Asteroid', 'A
       deferred.reject()
 
     {$promise: deferred.promise}
+
+  resource.getUserInvitations = (userId) ->
+    @query {user: userId}
+
+  resource.readMessage = (messageId) ->
+    $meteor.call 'readMessage', messageId
 
   resource
 ]

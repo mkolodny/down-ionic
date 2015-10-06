@@ -1,5 +1,5 @@
-Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
-         ($http, $q, $resource, apiRoot, Asteroid, Auth, User) ->
+Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship', 'User', \
+         ($http, $meteor, $q, $resource, apiRoot, Auth, Friendship, User) ->
   listUrl = "#{apiRoot}/events"
   detailUrl = "#{listUrl}/:id"
   serializeEvent = (event) ->
@@ -53,15 +53,19 @@ Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
   resource.deserialize = deserializeEvent
 
   resource.save = (event) ->
-    deferred = $q.defer()
+    deferred = $q.defer()    
+    eventCopy = angular.copy event
 
     data = serializeEvent event
+
+    # needed to create invite action messages because 
+    #   DJANGO! server doesn't return the invitations
     $http.post listUrl, data
       .success (data, status) =>
         event = deserializeEvent data
 
         # Create the first action message.
-        Messages = Asteroid.getCollection 'messages'
+        Messages = $meteor.getCollectionByName 'messages'
         Messages.insert
           creator:
             id: "#{Auth.user.id}" # Meteor likes strings
@@ -70,13 +74,31 @@ Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
           text: "#{Auth.user.name} is down."
-          eventId: "#{event.id}" # Meteor likes strings
+          chatId: "#{event.id}" # Meteor likes strings
           type: 'accept_action' # We can't use Invitation.acceptAction because it
                                 #   would create a circular dependecy.
-          createdAt:
-            $date: new Date().getTime()
-        .remote.then (messageId) ->
-          Asteroid.call 'readMessage', messageId
+          createdAt: new Date()
+        , @readMessage
+
+        # Create invite_action messages
+        for invitation in eventCopy.invitations
+          toUser = invitation.to_user # they are serialized for the server
+          if toUser is Auth.user.id then continue 
+          
+          Messages.insert
+            creator:
+              id: "#{Auth.user.id}" # Meteor likes strings
+              name: Auth.user.name
+              firstName: Auth.user.firstName
+              lastName: Auth.user.lastName
+              imageUrl: Auth.user.imageUrl
+            text: 'Down?'
+            chatId: Friendship.getChatId toUser # Meteor likes strings
+            type: 'invite_action' # We can't use Invitation.invite_action because it
+                                  #   would create a circular dependecy.
+            createdAt: new Date()
+            meta:
+              eventId: "#{event.id}"
 
         deferred.resolve event
       .error (data, status) =>
@@ -84,9 +106,12 @@ Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
 
     {$promise: deferred.promise}
 
+  resource.readMessage = (messageId) ->
+    $meteor.call 'readMessage', messageId
+
   resource.sendMessage = (event, text) ->
     # Save the message on the meteor server.
-    Messages = Asteroid.getCollection 'messages'
+    Messages = $meteor.getCollectionByName 'messages'
     Messages.insert
       creator:
         id: "#{Auth.user.id}" # Meteor likes strings
@@ -95,10 +120,9 @@ Event = ['$http', '$q', '$resource', 'apiRoot', 'Asteroid', 'Auth', 'User', \
         lastName: Auth.user.lastName
         imageUrl: Auth.user.imageUrl
       text: text
-      eventId: "#{event.id}" # Meteor likes strings
+      chatId: "#{event.id}" # Meteor likes strings
       type: 'text'
-      createdAt:
-        $date: new Date().getTime()
+      createdAt: new Date()
 
     # Save the message on the django server.
     url = "#{listUrl}/#{event.id}/messages"

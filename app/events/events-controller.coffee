@@ -1,195 +1,142 @@
-class EventsCtrl
-  @$inject: ['$ionicHistory', '$ionicLoading', '$ionicPlatform', '$scope',
-             '$state', '$timeout', 'Asteroid','Invitation', 'ngToast', 'Auth']
-  constructor: (@$ionicHistory, @$ionicLoading, @$ionicPlatform, @$scope, @$state,
-                @$timeout, @Asteroid, @Invitation, @ngToast, @Auth) ->
-    # Fetch the invitations to show on the view.
-    @manualRefresh()
+class ChatsCtrl
+  @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading',
+             '$ionicPlatform', '$meteor', '$scope', '$state', '$timeout', 'Auth',
+             'Friendship', 'Invitation', 'ngToast', 'User']
+  constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading,
+                @$ionicPlatform, @$meteor, @$scope, @$state, @$timeout, @Auth,
+                @Friendship, @Invitation, @ngToast, @User) ->
+    # Set Meteor collections on controller
+    @Messages = @$meteor.getCollectionByName 'messages'
+    @Chats = @$meteor.getCollectionByName 'chats'
+
+    # Init Added me
+    @addedMe = []
+
+    @$scope.$on '$ionicView.loaded', =>
+      # Fetch the invitations to show on the view.
+      @manualRefresh()
+
+    @$scope.$on '$ionicView.beforeEnter', =>
+      # If the user's friends list has changed since they last entered this
+      #   view, refresh the feed.
+      friendsList = {}
+      for id, friend of @Auth.user.friends
+        friendsList[id] = true
+
+
+      if angular.isDefined(@friendsList) \
+          and not angular.equals(friendsList, @friendsList)
+        @manualRefresh()
+
+      @friendsList = friendsList
 
     # Refresh the feed when the user comes back to the app.
     @$ionicPlatform.on 'resume', @manualRefresh
 
-  buildItems: (invitations) ->
+  buildItems: (invitationsDict) ->
     # Build the list of items to show on the view.
     items = []
 
-    # Save the section titles.
-    sections = {}
-    sections[@Invitation.noResponse] = {title: 'New'}
-    sections[@Invitation.accepted] = {title: 'Down'}
-    sections[@Invitation.maybe] = {title: 'Maybe'}
-    sections[@Invitation.declined] = {title: 'Can\'t'}
-
-    noResponseInvitations = (invitation for id, invitation of invitations \
-        when invitation.response is @Invitation.noResponse)
-    noResponseInvitations.sort (a, b) ->
+    # Invitations Section
+    invitations = (invitation for id, invitation of invitationsDict)
+    invitations.sort (a, b) ->
       aCreatedAt = a.event.latestMessage?.createdAt or a.event.createdAt
       bCreatedAt = b.event.latestMessage?.createdAt or b.event.createdAt
       if aCreatedAt > bCreatedAt
         return -1
       else
         return 1
-    if noResponseInvitations.length > 0
+    if invitations.length > 0
+      title = 'Plans'
       items.push
         isDivider: true
-        title: sections[@Invitation.noResponse].title
-        id: sections[@Invitation.noResponse].title
-      for invitation in noResponseInvitations
+        title: title
+        id: title
+      for invitation in invitations
         items.push angular.extend
           isDivider: false
-          wasJoined: false
           invitation: invitation
           id: invitation.id
+          # DON'T SET THE METEOR ANGULAR VARIABLES ON THE EVENT ITSELF!!
+          #   AngularMeteorObject.getRawObject() breaks... not sure why...
+          #   When passing an AngularMeteorObject into $state.go, AngularMeteor.getRawObject()
+          #   is automatically called. Therefore, do not pass AngularMeteorObjects into $state.go.
+          newestMessage: @getNewestMessage "#{invitation.event.id}"
 
-    for response in [@Invitation.accepted, @Invitation.maybe]
-      title = sections[response].title
-      sectionInvitations = (invitation for id, invitation of invitations \
-          when invitation.response is response)
+    # Friends section
+    friends = (friend for id, friend of @Auth.user.friends \
+        when friend.username isnt null)
 
-      # Sort by latestMessage time.
-      sectionInvitations.sort (a, b) ->
-        aCreatedAt = a.event.latestMessage?.createdAt or a.event.createdAt
-        bCreatedAt = b.event.latestMessage?.createdAt or b.event.createdAt
-        if aCreatedAt > bCreatedAt
-          return -1
-        else
-          return 1
-
-      if sectionInvitations.length > 0
-        items.push
-          isDivider: true
-          title: title
-          id: title
-        for invitation in sectionInvitations
-          items.push angular.extend
-            isDivider: false
-            wasJoined: true
-            invitation: invitation
-            id: invitation.id
-
-    declinedInvitations = (invitation for id, invitation of invitations \
-        when invitation.response is @Invitation.declined)
-    declinedInvitations.sort (a, b) ->
-      aCreatedAt = a.event.latestMessage?.createdAt or a.event.createdAt
-      bCreatedAt = b.event.latestMessage?.createdAt or b.event.createdAt
-      if aCreatedAt > bCreatedAt
-        return -1
-      else
-        return 1
-    if declinedInvitations.length > 0
+    if friends.length > 0
+      title = 'Friends'
       items.push
         isDivider: true
-        title: sections[@Invitation.declined].title
-        id: sections[@Invitation.declined].title
-      for invitation in declinedInvitations
+        title: title
+        id: title
+      for friend in friends
+        chatId = @Friendship.getChatId friend.id
+        @$scope.$meteorSubscribe 'chat', chatId
         items.push angular.extend
           isDivider: false
-          wasJoined: false
-          invitation: invitation
-          id: invitation.id
+          friend: new @User friend
+          id: friend.id
+          newestMessage: @getNewestMessage chatId
+
+    # Added me section
+    if @addedMe.length > 0
+      title = 'Added Me'
+      items.push
+        isDivider: true
+        title: title
+        id: title
+      for user in @addedMe
+        chatId = @Friendship.getChatId user.id
+        items.push angular.extend
+          isDivider: false
+          friend: user
+          id: user.id
+          newestMessage: @getNewestMessage chatId
+
     items
 
   eventsMessagesSubscribe: (events) ->
     # Subscribe to the messages posted in each event.
     for event in events
-      @Asteroid.subscribe 'event', event.id
+      @$scope.$meteorSubscribe 'chat', "#{event.id}"
 
-    Messages = @Asteroid.getCollection 'messages'
-    Events = @Asteroid.getCollection 'events'
-    for event in events
-      messagesRQ = Messages.reactiveQuery {eventId: "#{event.id}" }
-      eventsRQ = Events.reactiveQuery {_id: "#{event.id}" }
+  getNewestMessage: (chatId) =>
+    selector =
+      chatId: chatId
+    options =
+      sort:
+        createdAt: -1
+      transform: @transformMessage
+    @$scope.$meteorObject @Messages, selector, false, options
 
-      # Keep the same value of `messagesRQ` even after the variable changes
-      #   next time through the loop.
-      do (event, messagesRQ, eventsRQ) =>
-        # Set the latest message on the event.
-        messages = angular.copy messagesRQ.result
-        @setLatestMessage event, messages
+  transformMessage: (message) =>
+    # Show senders first name
+    if message.type is 'text'
+      firstName = message.creator.firstName
+      message.text = "#{firstName}: #{message.text}"
 
-        # Whenever a new message gets posted on the event, set the
-        # latest message on the event.
-        messagesRQ.on 'change', (_id) =>
-          messages = angular.copy messagesRQ.result
-          if @isNewMessage event, _id
-            @setLatestMessage event, messages
+    # Bind chat for checking wasRead
+    message.chat = @$scope.$meteorObject @Chats, {chatId: message.chatId}, false
 
-        # Whenever an event changes, check is the lastest message has been read
-        eventsRQ.on 'change', =>
-          latestMessage = messages[0]
-          if event.latestMessage isnt undefined and latestMessage isnt undefined
-            event.latestMessage.wasRead = @getWasRead latestMessage
+    message
 
-  # mongo _id's are randomly generated client side via
-  # Asteroid and therefore are not chronological
-  # use the message.createdAt for determining new messages
-  isNewMessage: (event, messageId) ->
-    # latest message hasn't been set yet
-    if not event.latestMessage? then return true
+  wasRead: (message) =>
+    # Default to read to stop flicker
+    if message?.chat is undefined then return true
 
-    # get message object by _id
-    Messages = @Asteroid.getCollection 'messages'
-    messagesRQ = Messages.reactiveQuery {_id: messageId}
-    message = messagesRQ.result[0]
-    if message isnt undefined
-      message.createdAt.$date > event.latestMessage?.createdAt?.getTime()
+    members = message.chat?.members or []
+    lastRead = (member.lastRead for member in members \
+        when "#{@Auth.user.id}" is member.userId)[0]
+    lastRead >= message.createdAt
 
-  setLatestMessage: (event, messages) ->
-    if messages.length is 0 then return
-
-    # Sort the messages from newest to oldest.
-    messages.sort (a, b) ->
-      if a.createdAt.$date > b.createdAt.$date
-        return -1
-      else
-        return 1
-
-    latestMessage = messages[0]
-
-    # Only update the event if the latest message is newer than the updatedAt.
-    if latestMessage.createdAt.$date <= event.latestMessage?.createdAt?.getTime()
-      return
-
-    # Update the latest message text
-    event.latestMessage = {}
-    if latestMessage.type is 'text'
-      firstName = latestMessage.creator.firstName
-      event.latestMessage.text = "#{firstName}: #{latestMessage.text}"
-    else
-      event.latestMessage.text = latestMessage.text
-
-    # Set unread or not for message
-    event.latestMessage.wasRead = @getWasRead latestMessage
-
-    # Update the latest message createdAt date.
-    event.latestMessage.createdAt = new Date latestMessage.createdAt.$date
-
-    # Move the event's updated item.
-    for item in @items
-      if item.invitation?.event.id is event.id
-        @items = @buildItems @invitations
-
-  getWasRead: (message) ->
-    Events = @Asteroid.getCollection 'events'
-    eventsRQ = Events.reactiveQuery {_id: message.eventId}
-    event = eventsRQ.result[0]
-
-    # Have to check if event exists in case the
-    # subscribe hasn't returned the event yet
-    if event is undefined
-      return true
-
-    currentUser = (member for member in event.members \
-        when member.userId is "#{@Auth.user.id}")[0]
-
-    # Make sure the current user is still a member.
-    if currentUser is undefined
-      return true
-
-    currentUser.lastRead.$date >= message.createdAt.$date
-
-  toggleIsExpanded: (item) ->
-    item.isExpanded = not item.isExpanded
+  #   # Move the event's updated item.
+  #   for item in @items
+  #     if item.invitation?.event.id is event.id
+  #       @items = @buildItems @invitations
 
   acceptInvitation: (item, $event) ->
     @respondToInvitation item, $event, @Invitation.accepted
@@ -212,10 +159,7 @@ class EventsCtrl
 
     @items = @buildItems @invitations
 
-  itemWasDeclined: (item) ->
-    item.invitation.response is @Invitation.declined
-
-  myFriends: ->
+  inviteFriends: ->
     # Don't animate the transition to the invite friends view.
     @$ionicHistory.nextViewOptions
       disableAnimate: true
@@ -229,10 +173,22 @@ class EventsCtrl
 
     @$state.go 'createEvent'
 
-  viewEvent: (item) ->
+  myFriends: ->
+    # Don't animate the transition to the create event view.
+    @$ionicHistory.nextViewOptions
+      disableAnimate: true
+
+    @$state.go 'friends'
+
+  viewEventChat: (item) ->
     @$state.go 'event',
       invitation: item.invitation
       id: item.invitation.event.id
+
+  viewFriendChat: (item) ->
+    @$state.go 'friendship',
+      friend: item.friend
+      id: item.friend.id
 
   getInvitations: ->
     @Invitation.getMyInvitations()
@@ -260,11 +216,39 @@ class EventsCtrl
         @$scope.$broadcast 'scroll.refreshComplete'
         @isLoading = false
 
+  getAddedMe: ->
+    @Auth.getAddedMe()
+      .$promise.then (addedMe) =>
+        for user in addedMe
+          chatId = @Friendship.getChatId user.id
+          @$scope.$meteorSubscribe 'chat', chatId
+
+        @addedMe = addedMe
+        @buildItems()
+
   refresh: ->
     @getInvitations()
+    @getAddedMe()
 
   manualRefresh: =>
     @isLoading = true
     @getInvitations()
+    @getAddedMe()
 
-module.exports = EventsCtrl
+  addByUsername: ->
+    @$state.go 'addByUsername'
+
+  addFromAddressBook: ->
+    @$state.go 'addFromAddressBook'
+
+  addFromFacebook: ->
+    @$state.go 'addFromFacebook'
+
+  getDistanceAway: (friend) ->
+    distanceAway = @Auth.getDistanceAway friend.location
+    if distanceAway is null
+      'Start a chat...'
+    else
+      "#{distanceAway} away"
+
+module.exports = ChatsCtrl

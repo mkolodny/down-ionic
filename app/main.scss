@@ -47,6 +47,7 @@ $new-event-margin-left: 5px;
 @import "./friends/friends";
 @import "./guest-list/guest-list";
 @import "./added-me/added-me";
+@import "./friendship/friendship";
 @import "./create-event/create-event";
 
 /*
@@ -118,7 +119,7 @@ body {
     background-color: #ccc;
     max-width: 50px;
     max-height: 50px;
-    top: 13px;
+    top: 11px;
     left: 11px;
   }
 }
@@ -263,8 +264,14 @@ body {
   border-bottom-width: 0 !important;
   border-bottom-color: transparent !important;
   background-image: none;
-  border-bottom: none;
+  border-bottom: 1px solid darken($brand-color, 12%) !important;
 }
+.hide-nav-bottom-border {
+  .bar-header {
+    border-bottom: 0 !important;
+  }
+}
+
 .bar {
   background-color: $brand-color;
 
@@ -303,25 +310,6 @@ body {
 }
 
 // Event
-.respond {
-  color: $brand-color;
-  border: 1px solid $brand-color;
-  background-color: #fff;
-  border-radius: 16px;
-  height: 26px;
-  width: 76px;
-  line-height: 20px;
-
-  &.activated {
-    color: #fff;
-    background-color: $brand-color;
-  }
-}
-#events-content {
-  bottom: 81px; // the height of the footer w/o event details
-  // TODO: Figure out how to set the bottom dynamically based on the footer's
-  //   contents.
-}
 .platform-ios {
   #expanded-header {
     // Offset for ios-status-bar
@@ -423,4 +411,142 @@ body {
   padding: 7px;
   color: #767676;
   border: 1px solid #ccc;
+}
+
+// Messages
+.message-item {
+  border: none;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 0;
+  padding-bottom: 0;
+
+  &:first-child {
+    padding-top: 15px;
+  }
+  &:last-child {
+    padding-bottom: 10px;
+  }
+}
+.action-message {
+  color: #888;
+  font-size: 13px;
+  text-align: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.text-message {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  max-width: 100%;
+  margin-top: 3px;
+  margin-bottom: 3px;
+
+  .avatar {
+    flex-shrink: 0;
+    flex-grow: 0;
+    z-index: 1;
+    height: 36px;
+    width: 36px;
+    border-radius: 50%;
+  }
+  .text {
+    position: relative;
+    margin-left: 10px;
+    background-color: #eee;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-radius: 13px;
+    font-weight: lighter;
+    max-width: 70%;
+    color: #222;
+    font-size: 16px;
+    font-weight: 400;
+    white-space: pre-wrap;
+
+    &::before {
+      position: absolute;
+      right: auto;
+      bottom: .6em;
+      left: -12px;
+      height: 0;
+      content: '';
+      border: 6px solid transparent;
+      border-right-color: #eee;
+      z-index: 2;
+    }
+  }
+  &.mine {
+    flex-direction: row-reverse;
+
+    .avatar {
+      display: none;
+    }
+    .text {
+      border-top: 1px solid #07f;
+      border-bottom: 1px solid #07f;
+      background-color: #08f;
+      color: #fff;
+      margin-left: 0;
+      margin-right: 10px;
+
+      &::before {
+        right: -12px;
+        bottom: .6em;
+        left: auto;
+        border: 6px solid transparent;
+        border-left-color: #08f;
+      }
+    }
+  }
+}
+.action-message,
+.text-message {
+  border: none;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.new-message-bar {
+  padding: 0;
+  height: auto;
+  display: block;
+  background-image: none;
+}
+.new-message {
+  border: none;
+  border-radius: 0;
+  width: 100%;
+  padding-right: 50px;
+  resize: none;
+  line-height: 20px;
+  max-height: 104px;
+  font-size: 15px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-left: 12px;
+  -webkit-appearance: none; // remove the inset on ios
+  border-top: 1px solid #b2b2b2;
+}
+.send-message {
+  position: absolute;
+  right: 10px;
+  bottom: 5px;
+  text-decoration: none;
+  font-weight: 700 !important;
+  font-size: 16px;
+  color: $link-color !important;
+
+  &:disabled {
+    color: #999 !important;
+  }
+}
+.platform-ios {
+  .new-message {
+    border-top: .5px solid #b2b2b2;
+  }
 }

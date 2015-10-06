@@ -113,7 +113,7 @@ describe 'friendship button directive', ->
           expect(Auth.setUser).toHaveBeenCalledWith Auth.user
 
         it 'should track the event in mixpanel', ->
-          expect($mixpanel.track).toHaveBeenCalledWith "Remove Friend",
+          expect($mixpanel.track).toHaveBeenCalledWith 'Remove Friend',
             'from screen': $state.current.name
 
 

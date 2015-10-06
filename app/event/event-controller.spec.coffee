@@ -6,9 +6,10 @@ require 'angular-sanitize'
 require 'angular-ui-router'
 require 'ng-toast'
 require '../ionic/ionic-angular.js'
-require '../common/asteroid/asteroid-module'
+require '../common/auth/auth-module'
 require '../common/mixpanel/mixpanel-module'
 require '../common/resources/resources-module'
+require '../common/meteor/meteor-mocks'
 EventCtrl = require './event-controller'
 
 describe 'event controller', ->
@@ -18,32 +19,34 @@ describe 'event controller', ->
   $ionicModal = null
   $ionicPopup = null
   $ionicScrollDelegate = null
-  $q = null
-  $state = null
+  $meteor = null
   $mixpanel = null
-  Asteroid = null
+  $q = null
+  $rootScope = null
+  $state = null
+  $timeout = null
   Auth = null
   ctrl = null
   currentDate = null
   deferredTemplate = null
-  earlierMessage = null
   Event = null
   event = null
+  chatsCollection = null
   invitation = null
   Invitation = null
   LinkInvitation = null
-  laterMessage = null
+  messagesCollection = null
   ngToast = null
   scope = null
   User = null
+
+  beforeEach angular.mock.module('angular-meteor')
 
   beforeEach angular.mock.module('analytics.mixpanel')
 
   beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('down.resources')
-
-  beforeEach angular.mock.module('down.asteroid')
 
   beforeEach angular.mock.module('ui.router')
 
@@ -59,11 +62,13 @@ describe 'event controller', ->
     $ionicModal = $injector.get '$ionicModal'
     $ionicPopup = $injector.get '$ionicPopup'
     $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
-    $q = $injector.get '$q'
-    $state = $injector.get '$state'
-    $stateParams = $injector.get '$stateParams'
     $mixpanel = $injector.get '$mixpanel'
-    Asteroid = $injector.get 'Asteroid'
+    $meteor = $injector.get '$meteor'
+    $q = $injector.get '$q'
+    $rootScope = $injector.get '$rootScope'
+    $state = $injector.get '$state'
+    $stateParams = angular.copy $injector.get('$stateParams')
+    $timeout = $injector.get '$timeout'
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
@@ -99,7 +104,6 @@ describe 'event controller', ->
           lat: 40.7265834
           long: -73.9821535
       response: Invitation.Accepted
-      previouslyAccepted: false
       muted: false
       createdAt: new Date()
       updatedAt: new Date()
@@ -119,8 +123,15 @@ describe 'event controller', ->
     deferredTemplate = $q.defer()
     spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
 
+    messagesCollection = 'messagesCollection'
+    chatsCollection = 'chatsCollection'
+    $meteor.getCollectionByName.and.callFake (collectionName) ->
+      if collectionName is 'messages' then return messagesCollection
+      if collectionName is 'chats' then return chatsCollection
+
     ctrl = $controller EventCtrl,
       $scope: scope
+      $stateParams: $stateParams
       Auth: Auth
   )
 
@@ -145,181 +156,228 @@ describe 'event controller', ->
   it 'should set the current user on the guest list', ->
     expect(scope.guestList.currentUser).toBe Auth.user
 
+  it 'should set the messages collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
+    expect(ctrl.Messages).toBe messagesCollection
+
+  it 'should set the events collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
+    expect(ctrl.Chats).toBe chatsCollection
+
   describe 'once the view loads', ->
-    Messages = null
-    messagesRQ = null
-    Events = null
-    eventsRQ = null
+    message = null
+    messages = null
+    chat = null
 
     beforeEach ->
-      spyOn $ionicScrollDelegate, 'scrollBottom'
-      spyOn ctrl, 'prepareMessages'
-
-      spyOn Asteroid, 'subscribe'
-      # Create mocks/spies for getting the messages for this event, and the event
-      #   itself.
-      messagesRQ =
-        on: jasmine.createSpy 'messagesRQ.on'
-      Messages =
-        reactiveQuery: jasmine.createSpy('Messages.reactiveQuery') \
-            .and.returnValue messagesRQ
-      eventsRQ =
-        on: jasmine.createSpy 'eventsRQ.on'
-      Events =
-        reactiveQuery: jasmine.createSpy('Messages.reactiveQuery') \
-            .and.returnValue eventsRQ
-      spyOn(Asteroid, 'getCollection').and.callFake (collection) ->
-        if collection is 'messages'
-          Messages
-        else if collection is 'events'
-          Events
+      scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
 
       spyOn ctrl, 'updateMembers'
+      spyOn ctrl, 'getMessages'
+      spyOn ctrl, 'handleNewMessage'
 
-      scope.$emit '$ionicView.enter'
+      message =
+        _id: 1
+        creator: new User Auth.user
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        chatId: "#{event.id}"
+        type: 'text'
+      messages = [message]
+      $meteor.collection.and.returnValue messages
+
+      chat =
+        members: []
+      spyOn(ctrl, 'getChat').and.returnValue chat
+
+      spyOn ctrl, 'handleChatMembersChange'
+
+      scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
 
-    it 'should scroll to the bottom of the view', ->
-      expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
-
-    it 'should call prepare messages', ->
-      expect(ctrl.prepareMessages).toHaveBeenCalled()
-
     it 'should subscribe to the events messages', ->
-      expect(Asteroid.subscribe).toHaveBeenCalledWith 'event', event.id
+      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', "#{event.id}"
 
-    it 'should get the messages collection', ->
-      expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+    it 'should bind the messages to the controller', ->
+      # TODO: Check that controller property is set
+      expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
 
-    it 'should set the messages collection on the controller', ->
-      expect(ctrl.Messages).toBe Messages
-
-    it 'should ask for the messages for the event', ->
-      expect(Messages.reactiveQuery).toHaveBeenCalledWith {eventId: "#{event.id}"}
-
-    it 'should set the messages reactive query on the controller', ->
-      expect(ctrl.messagesRQ).toBe messagesRQ
-
-    it 'should listen for new messages', ->
-      expect(messagesRQ.on).toHaveBeenCalledWith 'change', \
-          ctrl.updateMessages
-
-    it 'should get the events collection', ->
-      expect(Asteroid.getCollection).toHaveBeenCalledWith 'events'
-
-    it 'should set the events collection on the controller', ->
-      expect(ctrl.Events).toBe Events
-
-    it 'should ask for the event', ->
-      expect(Events.reactiveQuery).toHaveBeenCalledWith {_id: "#{event.id}"}
-
-    it 'should set the events reactive query on the controller', ->
-      expect(ctrl.eventsRQ).toBe eventsRQ
-
-    it 'should listen for changes to the event', ->
-      expect(eventsRQ.on).toHaveBeenCalledWith 'change', \
-          ctrl.updateMembers
+    it 'should bind the meteor event members to the controller', ->
+      expect(ctrl.chat).toEqual chat
+      expect(ctrl.getChat).toHaveBeenCalled()
 
     it 'should update the members array', ->
       expect(ctrl.updateMembers).toHaveBeenCalled()
 
-    describe 'when new messages get posted', ->
-      top = null
+    describe 'when a new message is posted', ->
+      message2 = null
 
       beforeEach ->
-        top = 20
-        ctrl.maxTop = top + 40
-        spyOn($ionicScrollDelegate, 'getScrollPosition').and.returnValue
-          top: top
+        ctrl.handleNewMessage.calls.reset()
 
-        ctrl.updateMessages()
+        # Trigger @$scope.watch
+        message2 = angular.extend {}, message,
+          _id: message._id+1
+          type: Invitation.acceptAction
+        ctrl.messages.push message2
+        scope.$apply()
 
-      it 'should prepare messages', ->
-        expect(ctrl.prepareMessages).toHaveBeenCalled()
+      it 'should handle the message', ->
+        expect(ctrl.handleNewMessage).toHaveBeenCalled()
 
-      describe 'and the user was at the bottom of the view', ->
+    describe 'when the chat changes', ->
+      chatMembers = null
 
-        beforeEach ->
-          ctrl.maxTop = top
+      beforeEach ->
+        chatMembers = [
+          userId: '1'
+        ,
+          userId: '2'
+        ]
+        ctrl.chat.members = chatMembers
 
-        it 'should scroll to the new bottom of the view', ->
-          expect($ionicScrollDelegate.scrollBottom).toHaveBeenCalledWith true
+        ctrl.handleChatMembersChange.calls.reset()
+        scope.$apply()
+
+      it 'should handle the change', ->
+        expect(ctrl.handleChatMembersChange).toHaveBeenCalled()
 
 
   describe 'when leaving the view', ->
 
     beforeEach ->
-      messagesRQ =
-        off: jasmine.createSpy 'messagesRQ.off'
-      ctrl.messagesRQ = messagesRQ
-      eventsRQ =
-        off: jasmine.createSpy 'eventsRQ.off'
-      ctrl.eventsRQ = eventsRQ
+      ctrl.messages =
+        stop: jasmine.createSpy 'messages.stop'
+      ctrl.chat =
+        stop: jasmine.createSpy 'chat.stop'
 
       scope.$broadcast '$ionicView.leave'
       scope.$apply()
 
-    it 'should stop listening for new messages', ->
-      expect(ctrl.messagesRQ.off).toHaveBeenCalledWith(
-        'change', ctrl.updateMessages)
+    it 'should stop remove angular-meteor bindings', ->
+      expect(ctrl.messages.stop).toHaveBeenCalled()
+      expect(ctrl.chat.stop).toHaveBeenCalled()
 
-    it 'should stop listening for new members', ->
-      expect(ctrl.eventsRQ.off).toHaveBeenCalledWith(
-        'change', ctrl.updateMembers)
+    it 'should show the bottom border', ->
+      expect($rootScope.hideNavBottomBorder).toBe false
 
 
-  describe 'prepare messages', ->
-    messages = null
+  describe 'handling a new message', ->
+    newMessageId = null
 
     beforeEach ->
-      # Mock the current date.
-      jasmine.clock().install()
-      currentDate = new Date 1438195002656
-      jasmine.clock().mockDate currentDate
+      spyOn ctrl, 'scrollBottom'
+      newMessageId = '1jkhkgfjgfhftxhgdxf'
 
-      earlier = new Date()
-      later = new Date earlier.getTime()+1
-      creator =
-        id: 2
-        name: 'Guido van Rossum'
-        imageUrl: 'http://facebook.com/profile-pics/vrawesome'
-      earlierMessage =
-        _id: 1
-        creator: creator
-        createdAt:
-          $date: new Date().getTime()
-        text: 'I\'m in love with a robot.'
-        eventId: event.id
-        type: 'text'
-      laterMessage =
-        _id: 1
-        creator: creator
-        createdAt:
-          $date: new Date().getTime()
-        text: 'Michael Jordan is down'
-        eventId: event.id
-        type: 'action'
-      messages = [earlierMessage, laterMessage]
+      ctrl.handleNewMessage newMessageId
 
-      spyOn Asteroid, 'call'
+    it 'should mark the message as read', ->
+      expect($meteor.call).toHaveBeenCalledWith 'readMessage', newMessageId
 
-      messagesRQ =
-        result: messages
-      ctrl.messagesRQ = messagesRQ
+    it 'should scroll to the bottom', ->
+      expect(ctrl.scrollBottom).toHaveBeenCalled()
 
-      ctrl.messagesRQ
-      ctrl.prepareMessages()
 
-    afterEach ->
-      jasmine.clock().uninstall()
+  describe 'getting messages', ->
+    cursor = null
+    result = null
 
-    it 'should set the messages on the event from oldest to newest', ->
-      laterMessage.creator = new User laterMessage.creator
-      earlierMessage.creator = new User earlierMessage.creator
-      expect(ctrl.messages).toEqual [laterMessage, earlierMessage]
+    beforeEach ->
+      cursor = 'messagesCursor'
+      ctrl.Messages =
+        find: jasmine.createSpy('Messages.find').and.returnValue cursor
+      result = ctrl.getMessages()
 
-    it 'should mark the newest message as read', ->
-      expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', laterMessage._id
+    it 'should return a messages reactive cursor', ->
+      expect(result).toBe cursor
+
+    it 'should query, sort and transform messages', ->
+      selector =
+        chatId: "#{ctrl.event.id}"
+      options =
+        sort:
+          createdAt: 1
+        transform: ctrl.transformMessage
+      expect(ctrl.Messages.find).toHaveBeenCalledWith selector, options
+
+
+  describe 'getting the newest message', ->
+    result = null
+    newestMessage = null
+
+    beforeEach ->
+      newestMessage = 'newestMessage'
+      $meteor.object.and.returnValue newestMessage
+      result = ctrl.getNewestMessage()
+
+    it 'should return a AngularMeteorObject', ->
+      expect(result).toEqual newestMessage
+
+    it 'should filter object by event id and sort by created at', ->
+      selector =
+        chatId: "#{ctrl.event.id}"
+      options =
+        sort:
+          createdAt: -1
+      expect($meteor.object).toHaveBeenCalledWith(ctrl.Messages, selector, false,
+          options)
+
+
+  describe 'getting meteor chat', ->
+    result = null
+    chat = null
+
+    beforeEach ->
+      chat = 'chat'
+      $meteor.object.and.returnValue chat
+      result = ctrl.getChat()
+
+    it 'should return an AngularMeteorObject', ->
+      expect(result).toEqual chat
+
+    it 'should filter for the current event', ->
+      selector =
+        chatId: "#{ctrl.event.id}"
+      expect($meteor.object).toHaveBeenCalledWith ctrl.Chats, selector, false
+
+
+  describe 'transforming messages', ->
+    message = null
+    result = null
+
+    beforeEach ->
+      message =
+        creator: {}
+      result = ctrl.transformMessage message
+
+    it 'should create a new User object with the message.creator', ->
+      expectedResult = angular.copy message
+      expectedResult.creator = new User expectedResult.creator
+
+      expect(result).toEqual expectedResult
+
+
+  describe 'handling chat members changes', ->
+
+    describe 'when users are added or removed', ->
+      member1 = null
+      member2 = null
+
+      beforeEach ->
+        member1 =
+          id: 1
+          name: 'Jim Bob'
+        member2 =
+          id: 2
+          name: 'The Other Guy'
+        ctrl.members = [member1, member2]
+
+        spyOn ctrl, 'updateMembers'
+        ctrl.handleChatMembersChange [{userId: 1}]
+
+      it 'should update members', ->
+        expect(ctrl.updateMembers).toHaveBeenCalled()
 
 
   describe 'when the modal loads', ->
@@ -376,7 +434,7 @@ describe 'event controller', ->
         user: acceptedInvitation.toUser
       ,
         isDivider: true
-        title: 'Maybe'
+        title: 'Chatting'
       ,
         isDivider: false
         user: maybeInvitation.toUser
@@ -399,20 +457,6 @@ describe 'event controller', ->
 
     it 'should show the guest list modal', ->
       expect(ctrl.guestListModal.show).toHaveBeenCalled()
-
-
-  describe 'when the user hits the bottom of the view', ->
-    top = null
-
-    beforeEach ->
-      top = 20
-      spyOn($ionicScrollDelegate, 'getScrollPosition').and.returnValue
-        top: top
-
-      ctrl.saveMaxTop()
-
-    it 'should save the current top', ->
-      expect(ctrl.maxTop).toBe top
 
 
   describe 'updating the members array', ->
@@ -473,6 +517,30 @@ describe 'event controller', ->
 
       it 'should collapse the header', ->
         expect(ctrl.isHeaderExpanded).toBe false
+
+      describe 'after a bit', ->
+
+        beforeEach ->
+          $timeout.flush 160
+          scope.$apply()
+
+        it 'should show the nav bottom border', ->
+          expect($rootScope.hideNavBottomBorder).toBe false
+
+
+      describe 'then it\'s collapsed', ->
+
+        beforeEach ->
+          ctrl.toggleIsHeaderExpanded()
+
+        describe 'after a bit', ->
+
+          beforeEach ->
+            $timeout.flush 160
+            scope.$apply()
+
+          it 'should hide the nav bottom border', ->
+            expect($rootScope.hideNavBottomBorder).toBe true
 
 
     describe 'when the header is collapsed', ->
@@ -661,7 +729,18 @@ describe 'event controller', ->
     message = null
 
     beforeEach ->
-      message = earlierMessage
+      creator =
+        id: 2
+        name: 'Guido van Rossum'
+        imageUrl: 'http://facebook.com/profile-pics/vrawesome'
+      message =
+        _id: 1
+        creator: new User creator
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        chatId: event.id
+        type: 'text'
 
     describe 'when it is an accept action', ->
 
@@ -703,7 +782,20 @@ describe 'event controller', ->
     message = null
 
     beforeEach ->
-      message = earlierMessage
+      creator =
+        id: 2
+        name: 'Guido van Rossum'
+        imageUrl: 'http://facebook.com/profile-pics/vrawesome'
+
+      message =
+        _id: 1
+        creator: new User creator
+        createdAt:
+          $date: new Date().getTime()
+        text: 'I\'m in love with a robot.'
+        chatId: event.id
+        type: 'text'
+
       Auth.user =
         id: 1
         name: 'Alan Turing'
@@ -747,7 +839,8 @@ describe 'event controller', ->
       expect(Event.sendMessage).toHaveBeenCalledWith event, message
 
     it 'should track Sent message in Mixpanel', ->
-      expect($mixpanel.track).toHaveBeenCalledWith 'Send Message'
+      expect($mixpanel.track).toHaveBeenCalledWith 'Send Message',
+        'chat type': 'event'
 
     it 'should clear the message', ->
       expect(ctrl.message).toBeNull()
@@ -779,7 +872,7 @@ describe 'event controller', ->
         expect(hideSheet).toHaveBeenCalled()
 
 
-    describe 'tapping the get group link button', ->
+    describe 'tapping the get chat link button', ->
 
       beforeEach ->
         spyOn ctrl, 'getLinkInvitation'
@@ -1005,3 +1098,19 @@ describe 'event controller', ->
 
         it 'should hide the loading overlay', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
+
+
+  describe 'scrolling to the bottom', ->
+    scrollHandle = null
+
+    describe 'when scrolling bottom is enabled', ->
+
+      beforeEach ->
+        scrollHandle =
+          scrollBottom: jasmine.createSpy 'scrollHandle.scrollBottom'
+        spyOn($ionicScrollDelegate, '$getByHandle').and.returnValue scrollHandle
+
+        ctrl.scrollBottom()
+
+      it 'should scroll to the bottom', ->
+        expect(scrollHandle.scrollBottom).toHaveBeenCalledWith true

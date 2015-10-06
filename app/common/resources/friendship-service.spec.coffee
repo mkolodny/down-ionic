@@ -1,5 +1,6 @@
 require 'angular'
 require 'angular-mocks'
+require '../meteor/meteor-mocks'
 require './resources-module'
 
 describe 'friendship service', ->
@@ -7,8 +8,11 @@ describe 'friendship service', ->
   Auth = null
   Friendship = null
   listUrl = null
+  $meteor = null
 
   beforeEach angular.mock.module('down.resources')
+
+  beforeEach angular.mock.module('angular-meteor')
 
   beforeEach angular.mock.module(($provide) ->
     Auth =
@@ -24,6 +28,7 @@ describe 'friendship service', ->
     $httpBackend = $injector.get '$httpBackend'
     apiRoot = $injector.get 'apiRoot'
     Friendship = $injector.get 'Friendship'
+    $meteor = $injector.get '$meteor'
 
     listUrl = "#{apiRoot}/friendships"
   )
@@ -110,45 +115,115 @@ describe 'friendship service', ->
         expect(rejected).toBe true
 
 
-  describe 'acknowledging', ->
-    friendId = null
+  describe 'sending a message', ->
+    friend = null
+    text = null
     url = null
     requestData = null
+    Messages = null
 
     beforeEach ->
-      friendId = 1
-      url = "#{listUrl}/ack"
-      requestData = {friend: friendId}
+      # Mock the mongo messages collection.
+      Messages =
+        insert: jasmine.createSpy 'Messages.insert'
+      $meteor.getCollectionByName.and.returnValue Messages
+
+      Auth.user =
+        id: 1
+        name: 'Ice Cube'
+        firstName: 'Ice'
+        lastName: 'Cube'
+        username: 'cube'
+        imageUrl: 'https://facebook.com/profile-pics/easye'
+      friend =
+        id: 2
+        name: 'Easy E'
+        firstName: 'Easy'
+        lastName: 'E'
+        username: 'easye'
+        imageUrl: 'https://facebook.com/profile-pics/easye'
+      text = 'I\'m in love with a robot.'
+      url = "#{listUrl}/#{friend.id}/messages"
+      requestData = {text: text}
 
     describe 'successfully', ->
-      updated = null
+      resolved = false
 
       beforeEach ->
-        $httpBackend.expectPUT url, requestData
-          .respond 200, null
+        # Mock the current time.
+        jasmine.clock().install()
+        currentDate = new Date 1438195002656
+        jasmine.clock().mockDate currentDate
 
-        updated = false
-        Friendship.ack {friend: friendId}
-          .$promise.then ->
-            updated = true
+        $httpBackend.expectPOST url, requestData
+          .respond 201, null
+
+        Friendship.sendMessage friend, text
+          .then ->
+            resolved = true
         $httpBackend.flush 1
 
-      it 'should update the friendship', ->
-        expect(updated).toBe true
+      afterEach ->
+        jasmine.clock().uninstall()
+
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
+
+      it 'should get the eventMessages collection', ->
+        expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
+
+      it 'should save the message in the meteor server', ->
+        message =
+          creator:
+            id: "#{Auth.user.id}"
+            name: Auth.user.name
+            firstName: Auth.user.firstName
+            lastName: Auth.user.lastName
+            imageUrl: Auth.user.imageUrl
+          text: text
+          chatId: "#{Auth.user.id},#{friend.id}"
+          type: 'text'
+          createdAt: new Date()
+        expect(Messages.insert).toHaveBeenCalledWith message
 
 
-    describe 'with an error', ->
-      rejected = null
+    describe 'unsuccessfully', ->
+      rejected = false
 
       beforeEach ->
-        $httpBackend.expectPUT url, requestData
+        $httpBackend.expectPOST url, requestData
           .respond 500, null
 
-        rejected = false
-        Friendship.ack {friend: friendId}
-          .$promise.then null, ->
+        Friendship.sendMessage friend, text
+          .then null, ->
             rejected = true
         $httpBackend.flush 1
 
       it 'should reject the promise', ->
         expect(rejected).toBe true
+
+
+  describe 'getting a friend chat id', ->
+    friendId = null
+    chatId = null
+
+    describe 'when the user\'s id is less than the friend\'s id', ->
+
+      beforeEach ->
+        Auth.user = {id: 1}
+        friendId = 2
+        chatId = Friendship.getChatId friendId
+
+      it 'should return the user\'s id first', ->
+        expect(chatId).toBe "#{Auth.user.id},#{friendId}"
+
+
+    describe 'when the user\'s id is less than the friend\'s id', ->
+
+      beforeEach ->
+        Auth.user = {id: 2}
+        friendId = 1
+        chatId = Friendship.getChatId friendId
+
+      it 'should return the friend\'s id first', ->
+        expect(chatId).toBe "#{friendId},#{Auth.user.id}"

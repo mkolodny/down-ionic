@@ -1,7 +1,7 @@
 class AddedMeCtrl
   @$inject: ['$scope', 'Auth', 'Friendship']
   constructor: (@$scope, @Auth, @Friendship) ->
-    @$scope.$on '$ionicView.enter', =>
+    @$scope.$on '$ionicView.beforeEnter', =>
       @isLoading = true
       @refresh()
 
@@ -18,8 +18,5 @@ class AddedMeCtrl
         @$scope.$broadcast 'scroll.refreshComplete'
         @isLoading = false
 
-  delete: (user) ->
-    @users = (_user for _user in @users when _user.id isnt user.id)
-    @Friendship.ack {friend: user.id}
 
 module.exports = AddedMeCtrl

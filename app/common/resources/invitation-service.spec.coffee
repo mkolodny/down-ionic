@@ -2,19 +2,24 @@ require 'angular'
 require 'angular-mocks'
 require './resources-module'
 require '../mixpanel/mixpanel-module'
+require '../meteor/meteor-mocks'
 
 describe 'invitation service', ->
   $httpBackend = null
+  $meteor = null
   $mixpanel = null
   $q = null
   $rootScope = null
-  Asteroid = null
+  apiRoot = null
   Auth = null
   Event = null
+  Friendship = null
   listUrl = null
   Invitation = null
   Messages = null
   User = null
+
+  beforeEach angular.mock.module('angular-meteor')
 
   beforeEach angular.mock.module('analytics.mixpanel')
 
@@ -29,28 +34,25 @@ describe 'invitation service', ->
         lastName: 'Turing'
         imageUrl: 'http://facebook.com/profile-pic/tdog'
     $provide.value 'Auth', Auth
-
-    # Mock Asteroid.
-    Messages =
-      insert: jasmine.createSpy 'Messages.insert'
-    Asteroid =
-      getCollection: jasmine.createSpy('Asteroid.getCollection').and.returnValue \
-          Messages
-      call: jasmine.createSpy 'Asteroid.call'
-      subscribe: jasmine.createSpy 'Asteroid.subscribe'
-    $provide.value 'Asteroid', Asteroid
     return
   )
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'
+    $meteor = $injector.get '$meteor'
     $mixpanel = $injector.get '$mixpanel'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     apiRoot = $injector.get 'apiRoot'
     Event = $injector.get 'Event'
+    Friendship = $injector.get 'Friendship'
     Invitation = $injector.get 'Invitation'
     User = $injector.get 'User'
+
+    # Mock Messages collection
+    Messages =
+      insert: jasmine.createSpy 'Messages.insert'
+    $meteor.getCollectionByName.and.returnValue Messages
 
     listUrl = "#{apiRoot}/invitations"
   )
@@ -80,6 +82,18 @@ describe 'invitation service', ->
   it 'should have a maybe action property', ->
     expect(Invitation.maybeAction).toBe 'maybe_action'
 
+  it 'should have a invite action property', ->
+    expect(Invitation.inviteAction).toBe 'invite_action'
+
+  it 'should have a error action property', ->
+    expect(Invitation.errorAction).toBe 'error_action'
+
+  it 'should have a text message property', ->
+    expect(Invitation.textMessage).toBe 'text'
+
+  it 'should have a list url property', ->
+    expect(Invitation.listUrl).toBe "#{apiRoot}/invitations"
+
   describe 'serializing an invitation', ->
     invitation = null
 
@@ -103,7 +117,6 @@ describe 'invitation service', ->
           eventId: 2
           fromUserId: 4
           response: Invitation.accepted
-          previouslyAccepted: false
           muted: false
 
       it 'should return the serialized invitation', ->
@@ -113,7 +126,6 @@ describe 'invitation service', ->
           to_user: invitation.toUserId
           from_user: invitation.fromUserId
           response: invitation.response
-          previously_accepted: invitation.previouslyAccepted
           muted: invitation.muted
         expect(Invitation.serialize invitation).toEqual expectedInvitation
 
@@ -129,8 +141,6 @@ describe 'invitation service', ->
       response =
         id: 1
         response: Invitation.accepted
-        previously_accepted: false
-        to_user_messaged: false
         muted: false
         created_at: new Date().toISOString()
         updated_at: new Date().toISOString()
@@ -176,7 +186,6 @@ describe 'invitation service', ->
         toUserId: toUser.id
         fromUserId: fromUser.id
         response: response.response
-        previouslyAccepted: response.previously_accepted
         muted: response.muted
         createdAt: new Date response.created_at
         updatedAt: new Date response.updated_at
@@ -211,8 +220,14 @@ describe 'invitation service', ->
     invitations = null
     response = null
     responseData = null
+    Messages = null
 
     beforeEach ->
+      # Mock the current date.
+      jasmine.clock().install()
+      date = new Date 1438195002656
+      jasmine.clock().mockDate date
+
       eventId = 1
       invitation1 =
         toUserId: 2
@@ -235,8 +250,6 @@ describe 'invitation service', ->
           event: eventId
           from_user: 3
           response: Invitation.noResponse
-          previously_accepted: false
-          to_user_messaged: false
           muted: false
           created_at: new Date()
           updated_at: new Date()
@@ -246,15 +259,41 @@ describe 'invitation service', ->
       $httpBackend.expectPOST listUrl, postData
         .respond 201, angular.toJson(responseData)
 
+      Messages = 
+        insert: jasmine.createSpy 'Messages.insert'
+      $meteor.getCollectionByName.and.returnValue Messages
+
       Invitation.bulkCreate eventId, invitations
         .then (_response_) ->
           response = _response_
       $httpBackend.flush 1
 
+    afterEach ->
+      jasmine.clock().uninstall()
+
     it 'should POST the invitations', ->
       expectedInvitations = (Invitation.deserialize invitation \
           for invitation in responseData)
       expect(response).toAngularEqual expectedInvitations
+
+    it 'should create invite action messages', ->
+      expectedInvitations = (Invitation.deserialize invitation \
+          for invitation in responseData)
+      for invitation in expectedInvitations
+        message =
+          creator:
+            id: "#{Auth.user.id}"
+            name: Auth.user.name
+            firstName: Auth.user.firstName
+            lastName: Auth.user.lastName
+            imageUrl: Auth.user.imageUrl
+          text: 'Down?'
+          chatId: Friendship.getChatId invitation.toUserId
+          type: Invitation.inviteAction
+          createdAt: new Date()
+          meta:
+            eventId: "#{invitation.eventId}"
+        expect(Messages.insert).toHaveBeenCalledWith message
 
 
   describe 'updating an invitation', ->
@@ -269,7 +308,6 @@ describe 'invitation service', ->
         toUserId: 2
         fromUserId: 3
         response: Invitation.noResponse
-        previouslyAccepted: false
         muted: false
       putData = Invitation.serialize invitation
       responseData = angular.extend {}, putData,
@@ -307,7 +345,6 @@ describe 'invitation service', ->
         toUserId: 2
         fromUserId: 3
         response: Invitation.noResponse
-        previouslyAccepted: false
         muted: false
 
       deferred = $q.defer()
@@ -353,11 +390,11 @@ describe 'invitation service', ->
           expect(invitationCopy.response).toBe Invitation.accepted
 
         it 'should get the messages collection', ->
-          expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
         it 'should re-subscribe to the event messages', ->
-          expect(Asteroid.subscribe).toHaveBeenCalledWith(
-              'event', "#{invitation.eventId}")
+          expect($meteor.subscribe).toHaveBeenCalledWith(
+              'chat', "#{invitation.eventId}")
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true
@@ -375,22 +412,11 @@ describe 'invitation service', ->
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} is down."
-            eventId: "#{invitation.eventId}"
+            chatId: "#{invitation.eventId}"
             type: Invitation.acceptAction
-            createdAt:
-              $date: date.getTime()
-          expect(Messages.insert).toHaveBeenCalledWith message
-
-        describe 'meteor message saved successfully', ->
-          messageId = null
-
-          beforeEach ->
-            messageId = 'asdf'
-            messagesDeferred.resolve messageId
-            $rootScope.$apply()
-
-          it 'should mark action message as read', ->
-            expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', messageId
+            createdAt: date
+          expect(Messages.insert).toHaveBeenCalledWith(message,
+              Invitation.readMessage)
 
 
       describe 'to maybe', ->
@@ -406,7 +432,7 @@ describe 'invitation service', ->
           $rootScope.$apply()
 
         it 'should get the messages collection', ->
-          expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
         it 'should track the response in mixpanel', ->
           expect($mixpanel.track).toHaveBeenCalledWith 'Update Response',
@@ -420,29 +446,18 @@ describe 'invitation service', ->
               firstName: Auth.user.firstName
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
-            text: "#{Auth.user.name} might be down."
-            eventId: "#{invitation.eventId}"
+            text: "#{Auth.user.name} joined the chat."
+            chatId: "#{invitation.eventId}"
             type: Invitation.maybeAction
-            createdAt:
-              $date: date.getTime()
-          expect(Messages.insert).toHaveBeenCalledWith message
+            createdAt: date
+          expect(Messages.insert).toHaveBeenCalledWith(message,
+              Invitation.readMessage)
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.maybe
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true
-
-        describe 'meteor message saved successfully', ->
-          messageId = null
-
-          beforeEach ->
-            messageId = 'asdf'
-            messagesDeferred.resolve messageId
-            $rootScope.$apply()
-
-          it 'should mark action message as read', ->
-            expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', messageId
 
 
       describe 'from accepted to declined', ->
@@ -458,7 +473,7 @@ describe 'invitation service', ->
           $rootScope.$apply()
 
         it 'should get the messages collection', ->
-          expect(Asteroid.getCollection).toHaveBeenCalledWith 'messages'
+          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
         it 'should track the response in mixpanel', ->
           expect($mixpanel.track).toHaveBeenCalledWith 'Update Response',
@@ -473,28 +488,16 @@ describe 'invitation service', ->
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
             text: "#{Auth.user.name} can\'t make it."
-            eventId: "#{invitation.eventId}"
+            chatId: "#{invitation.eventId}"
             type: Invitation.declineAction
-            createdAt:
-              $date: date.getTime()
-          expect(Messages.insert).toHaveBeenCalledWith message
+            createdAt: date
+          expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.declined
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true
-
-        describe 'meteor message saved successfully', ->
-          messageId = null
-
-          beforeEach ->
-            messageId = 'asdf'
-            messagesDeferred.resolve messageId
-            $rootScope.$apply()
-
-          it 'should mark action message as read', ->
-            expect(Asteroid.call).toHaveBeenCalledWith 'readMessage', messageId
 
 
     describe 'unsuccessfully', ->
@@ -546,8 +549,6 @@ describe 'invitation service', ->
             coordinates: [40.7265834, -73.9821535]
         from_user: 4
         response: Invitation.accepted
-        previously_accepted: false
-        to_user_messaged: false
         muted: false
         created_at: new Date()
         updated_at: new Date()
@@ -603,8 +604,6 @@ describe 'invitation service', ->
               type: 'Point'
               coordinates: [40.7265836, -73.9821539]
           response: Invitation.accepted
-          previously_accepted: false
-          to_user_messaged: false
           muted: false
           created_at: new Date().toISOString()
           updated_at: new Date().toISOString()
@@ -637,3 +636,53 @@ describe 'invitation service', ->
 
       it 'should reject the promise', ->
         expect(rejected).toBe true
+
+
+  describe 'getting invitations to/from a user', ->
+    user = null
+    url = null
+
+    beforeEach ->
+      user =
+        id: 1
+      url = "#{Invitation.listUrl}?user=#{user.id}"
+
+    describe 'successfully', ->
+      responseData = null
+      response = null
+
+      beforeEach ->
+        responseData = [
+          id: 1
+          event:
+            id: 2
+            title: 'bars?!??!'
+            creator: 3
+            canceled: false
+            datetime: new Date().toISOString()
+            created_at: new Date().toISOString()
+            updated_at: new Date().toISOString()
+            place:
+              name: 'Fuku'
+              geo:
+                type: 'Point'
+                coordinates: [40.7285098, -73.9871264]
+          to_user: Auth.user.id
+          from_user: user.id
+          response: Invitation.accepted
+          muted: false
+          created_at: new Date().toISOString()
+          updated_at: new Date().toISOString()
+        ]
+
+        $httpBackend.expectGET url
+          .respond 200, angular.toJson(responseData)
+
+        Invitation.getUserInvitations user.id
+          .$promise.then (_response_) ->
+            response = _response_
+        $httpBackend.flush 1
+
+      it 'should GET the invitations', ->
+        expectedInvitations = [Invitation.deserialize responseData[0]]
+        expect(response).toAngularEqual expectedInvitations

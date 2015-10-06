@@ -22,20 +22,17 @@
     <div id="spinner-container" ng-if="events.isLoading">
       <ion-spinner icon="bubbles"></ion-spinner>
     </div>
-    <div class="placeholder" ng-if="!events.items.length && !events.isLoading">
-      No suggestions right now.
-    </div>
-    <ion-list class="list-avatar" ng-class="{moving: events.moving}">
-      <ion-item ng-repeat="item in events.items track by item.id"
+    <ion-list class="list-avatar">
+      <ion-item collection-repeat="item in events.items track by item.id"
+                item-width="100%"
+                item-height="item.isDivider ? '23px' : '72px'"
                 ng-class="{
                   'item-divider': item.isDivider,
                   'item-avatar': !item.isDivider,
                   'item-icon-right': !item.isDivider,
-                  updated: !item.isDivider && !events.itemWasDeclined(item) && !item.invitation.event.latestMessage.wasRead,
-                  'item-reordering': item.isReordering,
-                  expanded: item.isExpanded
-                }"
-                ng-click="item.isDivider ? null : (item.wasJoined ? events.viewEvent(item) : events.toggleIsExpanded(item))">
+                  updated: !item.isDivider && !events.wasRead(item.newestMessage),
+                  last: $last
+                }">
         <!-- Divider -->
         <div ng-if="item.isDivider">
           <span class="divider-title">{{item.title}}</span>
@@ -43,7 +40,8 @@
         </div>
 
         <!-- Event -->
-        <div ng-if="item.invitation.fromUser">
+        <div ng-if="item.invitation"
+             ng-click="events.viewEventChat(item)">
           <img class="item-image"
                ng-src="{{item.invitation.fromUser.getImageUrl()}}">
           <canvas class="chart chart-pie"
@@ -60,54 +58,53 @@
                   colours="[color, 'rgba(0,0,0,0)']" width="53" height="53"
                   options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
                   ></canvas>
-          <span class="updated-at" ng-if="item.invitation.event.latestMessage">{{item.invitation.event.latestMessage.createdAt | date:'shortTime' | lowercase}}</span>
-          <span class="updated-at" ng-if="!item.invitation.event.latestMessage">{{item.invitation.createdAt | date:'shortTime' | lowercase}}</span>
           <h2>{{item.invitation.event.title}}</h2>
-          <p class="latest-message" ng-if="item.wasJoined">
-            <span ng-if="item.invitation.event.latestMessage.text"
-                  >{{item.invitation.event.latestMessage.text}}</span>
-            <span ng-if="!item.invitation.event.latestMessage.text"
-                  >Suggested by {{item.invitation.fromUser.name}}</span>
+          <p class="latest-message">
+            <span ng-if="item.newestMessage.text"
+                  >{{item.newestMessage.text}}</span>
+            <span ng-if="!item.newestMessage.text"
+                  >with {{item.invitation.fromUser.name}}</span>
           </p>
-          <p ng-if="!item.wasJoined">Suggested by {{item.invitation.fromUser.name}}</p>
-          <i class="fa item-icon" ng-if="!item.wasJoined"
-             ng-class="{'fa-chevron-down': !item.isExpanded, 'fa-chevron-up': item.isExpanded}"
-             ></i>
-          <i class="fa fa-chevron-right item-icon" ng-if="item.wasJoined"></i>
-          <div ng-if="item.isExpanded" class="event-details">
-            <div class="event-detail" ng-if="item.invitation.event.datetime">
-              <i class="fa fa-calendar-o"></i>
-              <div>
-                <div>{{item.invitation.event.datetime | date:'EEEE, MMM d'}}</div>
-                <div>{{item.invitation.event.datetime | date:'shortTime' | lowercase}}</div>
-              </div>
-            </div>
-            <div class="event-detail" ng-if="item.invitation.event.place">
-              <a href view-place place="item.invitation.event.place"
-                 ><i class="fa fa-map-marker"></i>{{item.invitation.event.place.name}}</a>
-            </div>
-            <div class="event-detail"
-                 id="event-comment"
-                 ng-if="item.invitation.event.comment">
-              <i class="fa fa-comment-o"></i>{{item.invitation.event.comment}}
-            </div>
-            <div class="respond-buttons">
-              <button class="respond"
-                      ng-click="events.acceptInvitation(item, $event)"
-                      ontouchstart
-                      >Down</button>
-              <button class="respond"
-                      ng-click="events.maybeInvitation(item, $event)"
-                      ontouchstart
-                      >Maybe</button>
-              <button class="respond"
-                      ng-class="{'activated': events.itemWasDeclined(item)}"
-                      ng-click="events.declineInvitation(item, $event)"
-                      ontouchstart
-                      >Can't</button>
-            </div>
-          </div>
         </div>
+
+        <!-- Friend -->
+        <div ng-if="item.friend"
+             ng-click="events.viewFriendChat(item)">
+          <img class="item-image"
+               ng-src="{{item.friend.getImageUrl()}}">
+          <h2>{{item.friend.name}}</h2>
+          <p class="latest-message">
+            <span ng-if="item.newestMessage.text">
+              {{item.newestMessage.text}}
+            </span>
+            <span ng-if="!item.newestMessage.text">
+              {{events.getDistanceAway(item.friend)}}
+            </span>
+          </p>
+        </div>
+      </ion-item>
+    </ion-list>
+    <ion-list id="add-friends"
+              ng-if="!events.isLoading"
+              ng-class="{'empty-feed': events.items.length === 0}">
+      <ion-item class="item-divider">
+        <span class="divider-title">Add Friends</span>
+        <div class="divider-line"></div>
+      </ion-item>
+      <ion-item class="item-avatar"
+                ng-click="events.addByUsername()">
+        <img ng-src="images/Add_By_Username.png" alt="Username">
+        <h2>Add by username</h2>
+      </ion-item>
+      <ion-item class="item-avatar"
+                ng-click="events.addFromAddressBook()">
+        <img ng-src="images/Add_From_Address_Book.png" alt="Address Book">
+        <h2>Add from address book</h2>
+      </ion-item>
+      <ion-item class="item-avatar"
+                ng-click="events.addFromFacebook()">
+        <img ng-src="images/Add_From_Facebook.png" alt="Facebook">
+        <h2>Add from Facebook</h2>
       </ion-item>
     </ion-list>
   </ion-content>

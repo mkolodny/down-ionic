@@ -1,9 +1,11 @@
-<ion-view id="verify-phone" class="onboard-view" hide-back-button="true">
-  <ion-nav-buttons side="left">
-    <button class="button button-clear icon" ng-click="$ionicGoBack()"
-            ontouchstart
-            >Logout</button>
-  </ion-nav-buttons>
+<ion-view id="verify-phone"
+          class="onboard-view"
+          hide-back-button="true"
+          hide-nav-bar="true"
+          can-swipe-back="false">
+  <button class="button button-clear icon" ng-click="$ionicGoBack()"
+          ontouchstart
+          >Logout</button>
   <div class="explanation">
     Please enter the verification code you get by text message.
   </div>

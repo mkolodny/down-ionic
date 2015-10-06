@@ -1,14 +1,18 @@
 class EventCtrl
   @$inject: ['$ionicActionSheet', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$ionicPopup', '$ionicScrollDelegate', '$mixpanel', '$scope',
-             '$state', '$stateParams', 'Asteroid', 'Auth', 'Event',  'Invitation',
-             'LinkInvitation', 'ngToast', 'User']
+             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel',
+             '$rootScope', '$scope', '$state', '$stateParams', '$timeout', 'Auth',
+             'Event',  'Invitation', 'LinkInvitation', 'ngToast', 'User']
   constructor: (@$ionicActionSheet, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$ionicPopup, @$ionicScrollDelegate, @$mixpanel, @$scope, @$state,
-                @$stateParams, @Asteroid, @Auth, @Event, @Invitation,
-                @LinkInvitation, @ngToast, @User) ->
+                @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel,
+                @$rootScope, @$scope, @$state, @$stateParams, @$timeout, @Auth,
+                @Event, @Invitation, @LinkInvitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
+
+    # Set Meteor collections on controller
+    @Messages = @$meteor.getCollectionByName 'messages'
+    @Chats = @$meteor.getCollectionByName 'chats'
 
     # Give the event a long title variable name as a workaround for:
     #   https://github.com/driftyco/ionic/issues/2881
@@ -33,55 +37,77 @@ class EventCtrl
       currentUser: @Auth.user
 
     # Start out at the most recent message.
-    @$scope.$on '$ionicView.enter', =>
-      # Subscribe to this event.
-      @Asteroid.subscribe 'event', @event.id
-
-      # Show the messages posted so far.
-      @Messages = @Asteroid.getCollection 'messages'
-      @messagesRQ = @Messages.reactiveQuery {eventId: "#{@event.id}"}
-      @prepareMessages()
-      @$ionicScrollDelegate.scrollBottom true
-
-      # Watch for new messages.
-      @messagesRQ.on 'change', @updateMessages
-
-      # Watch for new members
-      @Events = @Asteroid.getCollection 'events'
-      @eventsRQ = @Events.reactiveQuery {_id: "#{@event.id}"}
-      @eventsRQ.on 'change', @updateMembers
-
-      # Show the members on the view.
+    @$scope.$on '$ionicView.beforeEnter', =>
+      # Get the members invitations.
       @updateMembers()
 
-    # Stop listening for new messages and members.
+      # Subscribe to the event's chat.
+      @$scope.$meteorSubscribe 'chat', "#{@event.id}"
+
+      # Bind reactive variables
+      @messages = @$meteor.collection @getMessages, false
+      @newestMessage = @getNewestMessage()
+      @chat = @getChat()
+
+      # Mark messages as read as they come in.
+      @$scope.$watch =>
+        newestMessage = @messages[@messages.length-1]
+        if angular.isDefined newestMessage
+          newestMessage._id
+      , @handleNewMessage
+
+      # Watch for changes in chat members
+      @$scope.$watch =>
+        @chat.members
+      , @handleChatMembersChange
+
+    # Remove angular-meteor bindings
     @$scope.$on '$ionicView.leave', =>
-      @messagesRQ.off 'change', @updateMessages
-      @eventsRQ.off 'change', @updateMembers
+      @messages.stop()
+      @chat.stop()
+      @$rootScope.hideNavBottomBorder = false
 
-  updateMessages: =>
-    @prepareMessages()
-    if not @$scope.$$phase
-      @$scope.$digest()
-    if @maxTop is @$ionicScrollDelegate.getScrollPosition().top
-      @$ionicScrollDelegate.scrollBottom true
+  handleNewMessage: (newMessageId) =>
+    if newMessageId is undefined
+      return
 
-  prepareMessages: ->
-    @messages = angular.copy @messagesRQ.result
-    for message in @messages
-      message.creator = new @User message.creator
+    @$meteor.call 'readMessage', newMessageId
+    @scrollBottom()
 
-    # Sort the messages from oldest to newest.
-    @messages.sort (a, b) ->
-      if a.createdAt.$date < b.createdAt.$date
-        return -1
-      else
-        return 1
+  getMessages: =>
+    @Messages.find
+      chatId: "#{@event.id}"
+    ,
+      sort:
+        createdAt: 1
+      transform: @transformMessage
 
-    # Mark newest message as read
-    if @messages.length > 0
-      newestMessage = @messages[@messages.length - 1]
-      @Asteroid.call 'readMessage', newestMessage._id
+  transformMessage: (message) =>
+    message.creator = new @User message.creator
+    message
+
+  getNewestMessage: =>
+    selector =
+      chatId: "#{@event.id}"
+    options =
+      sort:
+        createdAt: -1
+    @$meteor.object @Messages, selector, false, options
+
+  getChat: =>
+    selector =
+      chatId: "#{@event.id}"
+    @$meteor.object @Chats, selector, false
+
+  handleChatMembersChange: (chatMembers) =>
+    members = @members or []
+    chatMemberIds = (member.userId for member in chatMembers)
+    currentMemberIds = (member.id for member in members)
+    chatMemberIds.sort()
+    currentMemberIds.sort()
+
+    if not angular.equals(chatMemberIds, currentMemberIds)
+      @updateMembers()
 
   updateMembers: =>
     @Invitation.getMemberInvitations {id: @event.id}
@@ -113,7 +139,7 @@ class EventCtrl
     if maybeInvitations.length > 0
       items.push
         isDivider: true
-        title: 'Maybe'
+        title: 'Chatting'
 
       for invitation in maybeInvitations
         items.push
@@ -133,15 +159,17 @@ class EventCtrl
   showGuestList: ->
     @guestListModal.show()
 
-  saveMaxTop: ->
-    # TODO: use angularjs-scroll-glue
-    @maxTop = @$ionicScrollDelegate.getScrollPosition().top
-
   toggleIsHeaderExpanded: ->
     if @isHeaderExpanded
       @isHeaderExpanded = false
+      @headerTimeout = @$timeout =>
+        @$rootScope.hideNavBottomBorder = false
+      , 160
     else
+      if @headerTimeout
+        @$timeout.cancel @headerTimeout
       @isHeaderExpanded = true
+      @$rootScope.hideNavBottomBorder = true
 
   isAccepted: ->
     @invitation.response is @Invitation.accepted
@@ -185,7 +213,8 @@ class EventCtrl
 
   sendMessage: ->
     @Event.sendMessage @event, @message
-    @$mixpanel.track 'Send Message'
+    @$mixpanel.track 'Send Message',
+      'chat type': 'event'
     @message = null
 
   showMoreOptions: ->
@@ -254,5 +283,9 @@ class EventCtrl
         @ngToast.create 'For some reason, that didn\'t work.'
       .finally =>
         @$ionicLoading.hide()
+
+  scrollBottom: ->
+    @$ionicScrollDelegate.$getByHandle('event')
+      .scrollBottom true
 
 module.exports = EventCtrl
