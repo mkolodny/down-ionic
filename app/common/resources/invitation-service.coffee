@@ -1,7 +1,7 @@
 Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
-              'apiRoot', 'Auth', 'Event', 'User', \
+              'apiRoot', 'Auth', 'Event', 'Friendship', 'User', \
               ($http, $meteor, $mixpanel, $q, $resource,
-               apiRoot, Auth, Event, User) ->
+               apiRoot, Auth, Event, Friendship, User) ->
   listUrl = "#{apiRoot}/invitations"
   detailUrl =
   serializeInvitation = (invitation) ->
@@ -113,6 +113,24 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
     $http.post listUrl, postData
       .success (data, status) =>
         invitations = (@deserialize invitation for invitation in data)
+        
+        # Create invite_action messages
+        Messages = $meteor.getCollectionByName 'messages'
+        for invitation in invitations
+          Messages.insert
+            creator:
+              id: "#{Auth.user.id}" # Meteor likes strings
+              name: Auth.user.name
+              firstName: Auth.user.firstName
+              lastName: Auth.user.lastName
+              imageUrl: Auth.user.imageUrl
+            text: 'Down?'
+            chatId: Friendship.getChatId invitation.toUserId
+            type: @inviteAction
+            createdAt: new Date()
+            meta:
+              eventId: "#{invitation.eventId}"
+
         deferred.resolve invitations
       .error (data, status) =>
         deferred.reject()

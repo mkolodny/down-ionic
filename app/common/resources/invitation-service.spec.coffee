@@ -13,6 +13,7 @@ describe 'invitation service', ->
   apiRoot = null
   Auth = null
   Event = null
+  Friendship = null
   listUrl = null
   Invitation = null
   Messages = null
@@ -44,6 +45,7 @@ describe 'invitation service', ->
     $rootScope = $injector.get '$rootScope'
     apiRoot = $injector.get 'apiRoot'
     Event = $injector.get 'Event'
+    Friendship = $injector.get 'Friendship'
     Invitation = $injector.get 'Invitation'
     User = $injector.get 'User'
 
@@ -218,8 +220,14 @@ describe 'invitation service', ->
     invitations = null
     response = null
     responseData = null
+    Messages = null
 
     beforeEach ->
+      # Mock the current date.
+      jasmine.clock().install()
+      date = new Date 1438195002656
+      jasmine.clock().mockDate date
+
       eventId = 1
       invitation1 =
         toUserId: 2
@@ -251,6 +259,10 @@ describe 'invitation service', ->
       $httpBackend.expectPOST listUrl, postData
         .respond 201, angular.toJson(responseData)
 
+      Messages = 
+        insert: jasmine.createSpy 'Messages.insert'
+      $meteor.getCollectionByName.and.returnValue Messages
+
       Invitation.bulkCreate eventId, invitations
         .then (_response_) ->
           response = _response_
@@ -260,6 +272,25 @@ describe 'invitation service', ->
       expectedInvitations = (Invitation.deserialize invitation \
           for invitation in responseData)
       expect(response).toAngularEqual expectedInvitations
+
+    it 'should create invite action messages', ->
+      expectedInvitations = (Invitation.deserialize invitation \
+          for invitation in responseData)
+      for invitation in expectedInvitations
+        message =
+          creator:
+            id: "#{Auth.user.id}"
+            name: Auth.user.name
+            firstName: Auth.user.firstName
+            lastName: Auth.user.lastName
+            imageUrl: Auth.user.imageUrl
+          text: 'Down?'
+          chatId: Friendship.getChatId invitation.toUserId
+          type: Invitation.inviteAction
+          createdAt: new Date()
+          meta:
+            eventId: "#{invitation.eventId}"
+        expect(Messages.insert).toHaveBeenCalledWith message
 
 
   describe 'updating an invitation', ->
