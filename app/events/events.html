@@ -22,7 +22,7 @@
     <div id="spinner-container" ng-if="events.isLoading">
       <ion-spinner icon="bubbles"></ion-spinner>
     </div>
-    <ion-list class="list-avatar">
+    <ion-list class="list-avatar" ng-if="events.items.length > 0">
       <ion-item collection-repeat="item in events.items track by item.id"
                 item-width="100%"
                 item-height="item.isDivider ? '23px' : '72px'"
@@ -85,8 +85,7 @@
       </ion-item>
     </ion-list>
     <ion-list id="add-friends"
-              ng-if="!events.isLoading"
-              ng-class="{'empty-feed': events.items.length === 0}">
+              ng-if="!events.isLoading && events.items.length === 0">
       <ion-item class="item-divider">
         <span class="divider-title">Add Friends</span>
         <div class="divider-line"></div>
