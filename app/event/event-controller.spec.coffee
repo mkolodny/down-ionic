@@ -356,7 +356,7 @@ describe 'event controller', ->
       expect(result).toEqual expectedResult
 
 
-  describe 'handling chat changes', ->
+  describe 'handling chat members changes', ->
 
     describe 'when users are added or removed', ->
       member1 = null
@@ -370,11 +370,9 @@ describe 'event controller', ->
           id: 2
           name: 'The Other Guy'
         ctrl.members = [member1, member2]
-        ctrl.chat =
-          members: [{userId: 1}]
 
         spyOn ctrl, 'updateMembers'
-        ctrl.handleChatMembersChange()
+        ctrl.handleChatMembersChange [{userId: 1}]
 
       it 'should update members', ->
         expect(ctrl.updateMembers).toHaveBeenCalled()
