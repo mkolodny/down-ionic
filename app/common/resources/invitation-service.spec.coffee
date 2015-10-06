@@ -412,11 +412,12 @@ describe 'invitation service', ->
               firstName: Auth.user.firstName
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
-            text: "#{Auth.user.name} might be down."
+            text: "#{Auth.user.name} joined the chat."
             chatId: "#{invitation.eventId}"
             type: Invitation.maybeAction
             createdAt: date
-          expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
+          expect(Messages.insert).toHaveBeenCalledWith(message,
+              Invitation.readMessage)
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.maybe

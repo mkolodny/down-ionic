@@ -434,7 +434,7 @@ describe 'event controller', ->
         user: acceptedInvitation.toUser
       ,
         isDivider: true
-        title: 'Maybe'
+        title: 'Chatting'
       ,
         isDivider: false
         user: maybeInvitation.toUser
