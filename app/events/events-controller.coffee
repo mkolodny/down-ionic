@@ -23,8 +23,9 @@ class ChatsCtrl
       for id, friend of @Auth.user.friends
         friendsList[id] = true
 
-      if angular.isDefined @friendsList \
-          and not angular.equals friendsList, @friendsList
+
+      if angular.isDefined(@friendsList) \
+          and not angular.equals(friendsList, @friendsList)
         @manualRefresh()
 
       @friendsList = friendsList
