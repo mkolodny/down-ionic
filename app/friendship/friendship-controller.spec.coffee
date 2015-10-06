@@ -570,7 +570,7 @@ describe 'friendship controller', ->
 
     it 'should track Sent message in Mixpanel', ->
       expect($mixpanel.track).toHaveBeenCalledWith 'Send Message',
-        to: 'friend'
+        'chat type': 'friend'
 
     it 'should clear the message', ->
       expect(ctrl.message).toBeNull()

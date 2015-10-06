@@ -156,7 +156,7 @@ class FriendshipCtrl
   sendMessage: ->
     @Friendship.sendMessage @friend, @message
     @$mixpanel.track 'Send Message',
-      to: 'friend'
+      'chat type': 'friend'
     @message = null
 
   scrollBottom: ->

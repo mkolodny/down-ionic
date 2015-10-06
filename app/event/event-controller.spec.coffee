@@ -819,7 +819,8 @@ describe 'event controller', ->
       expect(Event.sendMessage).toHaveBeenCalledWith event, message
 
     it 'should track Sent message in Mixpanel', ->
-      expect($mixpanel.track).toHaveBeenCalledWith 'Send Message'
+      expect($mixpanel.track).toHaveBeenCalledWith 'Send Message',
+        'chat type': 'event'
 
     it 'should clear the message', ->
       expect(ctrl.message).toBeNull()
