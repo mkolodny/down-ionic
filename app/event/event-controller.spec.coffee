@@ -186,10 +186,10 @@ describe 'event controller', ->
       $meteor.collection.and.returnValue messages
 
       chat =
-        _id: 'chat'
+        members: []
       spyOn(ctrl, 'getChat').and.returnValue chat
 
-      spyOn ctrl, 'handleChatChange'
+      spyOn ctrl, 'handleChatMembersChange'
 
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
@@ -225,15 +225,21 @@ describe 'event controller', ->
         expect(ctrl.handleNewMessage).toHaveBeenCalled()
 
     describe 'when the chat changes', ->
+      chatMembers = null
 
       beforeEach ->
-        ctrl.chat =
-          _id: 'someotherid'
-        ctrl.handleChatChange.calls.reset()
+        chatMembers = [
+          userId: '1'
+        ,
+          userId: '2'
+        ]
+        ctrl.chat.members = chatMembers
+
+        ctrl.handleChatMembersChange.calls.reset()
         scope.$apply()
 
       it 'should handle the change', ->
-        expect(ctrl.handleChatChange).toHaveBeenCalled()
+        expect(ctrl.handleChatMembersChange).toHaveBeenCalled()
 
 
   describe 'when leaving the view', ->
@@ -368,7 +374,7 @@ describe 'event controller', ->
           members: [{userId: 1}]
 
         spyOn ctrl, 'updateMembers'
-        ctrl.handleChatChange()
+        ctrl.handleChatMembersChange()
 
       it 'should update members', ->
         expect(ctrl.updateMembers).toHaveBeenCalled()

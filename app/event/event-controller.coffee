@@ -58,8 +58,8 @@ class EventCtrl
 
       # Watch for changes in chat members
       @$scope.$watch =>
-        @chat._id
-      , @handleChatChange
+        @chat.members
+      , @handleChatMembersChange
 
     # Remove angular-meteor bindings
     @$scope.$on '$ionicView.leave', =>
@@ -99,14 +99,14 @@ class EventCtrl
       chatId: "#{@event.id}"
     @$meteor.object @Chats, selector, false
 
-  handleChatChange: =>
-    meteorMembers = @chat.members or []
+  handleChatMembersChange: (chatMembers) =>
     members = @members or []
-    meteorMemberIds = (member.userId for member in meteorMembers)
+    chatMemberIds = (member.userId for member in chatMembers)
     currentMemberIds = (member.id for member in members)
-    meteorMemberIds.sort()
+    chatMemberIds.sort()
     currentMemberIds.sort()
-    if not angular.equals meteorMemberIds, currentMemberIds
+   
+    if not angular.equals(chatMemberIds, currentMemberIds)
       @updateMembers()
 
   updateMembers: =>
