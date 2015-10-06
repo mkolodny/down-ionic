@@ -139,7 +139,7 @@ class EventCtrl
     if maybeInvitations.length > 0
       items.push
         isDivider: true
-        title: 'Maybe'
+        title: 'Chatting'
 
       for invitation in maybeInvitations
         items.push

@@ -434,7 +434,7 @@ describe 'event controller', ->
         user: acceptedInvitation.toUser
       ,
         isDivider: true
-        title: 'Maybe'
+        title: 'Chatting'
       ,
         isDivider: false
         user: maybeInvitation.toUser
@@ -539,7 +539,7 @@ describe 'event controller', ->
             $timeout.flush 160
             scope.$apply()
 
-          fit 'should hide the nav bottom border', ->
+          it 'should hide the nav bottom border', ->
             expect($rootScope.hideNavBottomBorder).toBe true
 
 

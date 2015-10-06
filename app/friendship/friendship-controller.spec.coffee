@@ -64,6 +64,8 @@ describe 'friendship controller', ->
       id: 1
       email: 'benihana@gmail.com'
       name: 'Benny Hana'
+      firstName: 'Benny'
+      lastName: 'Hana'
       username: 'benihana'
       imageUrl: 'https://facebook.com/profile-pics/benihana'
       location:
@@ -833,6 +835,7 @@ describe 'friendship controller', ->
         invitation: invitation
         id: invitation.event.id
 
+
   describe 'scrolling to the bottom', ->
     scrollHandle = null
 
@@ -847,3 +850,33 @@ describe 'friendship controller', ->
 
       it 'should scroll to the bottom', ->
         expect(scrollHandle.scrollBottom).toHaveBeenCalledWith true
+
+
+  describe 'getting the placeholder message', ->
+    distanceAway = null
+    placeholder = null
+
+    beforeEach ->
+      ctrl.friend = friend
+
+    describe 'when the friend has a location', ->
+
+      beforeEach ->
+        distanceAway = '< 500 feet'
+        spyOn(Auth, 'getDistanceAway').and.returnValue distanceAway
+
+        placeholder = ctrl.getPlaceholder()
+
+      it 'should show their distance away', ->
+        expect(placeholder).toBe "#{friend.firstName} is #{distanceAway} away"
+
+
+    describe 'when the friend doesn\'t have a location', ->
+
+      beforeEach ->
+        spyOn(Auth, 'getDistanceAway').and.returnValue null
+
+        placeholder = ctrl.getPlaceholder()
+
+      it 'should show a generic placeholder', ->
+        expect(placeholder).toBe 'Start a chat...'

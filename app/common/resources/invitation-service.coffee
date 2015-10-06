@@ -164,7 +164,7 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
         type = @acceptAction
         status = 'accepted'
       else if _invitation.response is @maybe
-        text = "#{Auth.user.name} might be down."
+        text = "#{Auth.user.name} joined the chat."
         type = @maybeAction
         status = 'maybe'
       else if _invitation.response is @declined

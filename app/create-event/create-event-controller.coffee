@@ -57,7 +57,7 @@ class CreateEventCtrl
     if @title
       newEvent.title = @title
     else
-      newEvent.title = 'Let\'s do something'
+      newEvent.title = 'Let\'s do something!'
     if @datetime
       newEvent.datetime = @datetime
     if @place
