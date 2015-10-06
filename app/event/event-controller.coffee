@@ -1,12 +1,12 @@
 class EventCtrl
   @$inject: ['$ionicActionSheet', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel', '$rootScope',
-             '$scope', '$state', '$stateParams', 'Auth', 'Event',  'Invitation',
-             'LinkInvitation', 'ngToast', 'User']
+             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel',
+             '$rootScope', '$scope', '$state', '$stateParams', '$timeout', 'Auth',
+             'Event',  'Invitation', 'LinkInvitation', 'ngToast', 'User']
   constructor: (@$ionicActionSheet, @$ionicHistory, @$ionicLoading, @$ionicModal,
-                @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel, @$rootScope,
-                @$scope, @$state, @$stateParams, @Auth, @Event, @Invitation,
-                @LinkInvitation, @ngToast, @User) ->
+                @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel,
+                @$rootScope, @$scope, @$state, @$stateParams, @$timeout, @Auth,
+                @Event, @Invitation, @LinkInvitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -105,7 +105,7 @@ class EventCtrl
     currentMemberIds = (member.id for member in members)
     chatMemberIds.sort()
     currentMemberIds.sort()
-   
+
     if not angular.equals(chatMemberIds, currentMemberIds)
       @updateMembers()
 
@@ -162,10 +162,14 @@ class EventCtrl
   toggleIsHeaderExpanded: ->
     if @isHeaderExpanded
       @isHeaderExpanded = false
-      @$rootScope.hideNavBottomBorder = false
+      @headerTimeout = @$timeout =>
+        @$rootScope.hideNavBottomBorder = false
+      , 160
     else
-      @$rootScope.hideNavBottomBorder = true
+      if @headerTimeout
+        @$timeout.cancel @headerTimeout
       @isHeaderExpanded = true
+      @$rootScope.hideNavBottomBorder = true
 
   isAccepted: ->
     @invitation.response is @Invitation.accepted

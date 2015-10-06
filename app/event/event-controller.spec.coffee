@@ -19,11 +19,12 @@ describe 'event controller', ->
   $ionicModal = null
   $ionicPopup = null
   $ionicScrollDelegate = null
+  $meteor = null
+  $mixpanel = null
   $q = null
   $rootScope = null
   $state = null
-  $meteor = null
-  $mixpanel = null
+  $timeout = null
   Auth = null
   ctrl = null
   currentDate = null
@@ -61,12 +62,13 @@ describe 'event controller', ->
     $ionicModal = $injector.get '$ionicModal'
     $ionicPopup = $injector.get '$ionicPopup'
     $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
+    $mixpanel = $injector.get '$mixpanel'
+    $meteor = $injector.get '$meteor'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     $stateParams = angular.copy $injector.get('$stateParams')
-    $mixpanel = $injector.get '$mixpanel'
-    $meteor = $injector.get '$meteor'
+    $timeout = $injector.get '$timeout'
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
@@ -518,8 +520,29 @@ describe 'event controller', ->
       it 'should collapse the header', ->
         expect(ctrl.isHeaderExpanded).toBe false
 
-      it 'should show the nav bottom border', ->
-        expect($rootScope.hideNavBottomBorder).toBe false
+      describe 'after a bit', ->
+
+        beforeEach ->
+          $timeout.flush 160
+          scope.$apply()
+
+        it 'should show the nav bottom border', ->
+          expect($rootScope.hideNavBottomBorder).toBe false
+
+
+      describe 'then it\'s collapsed', ->
+
+        beforeEach ->
+          ctrl.toggleIsHeaderExpanded()
+
+        describe 'after a bit', ->
+
+          beforeEach ->
+            $timeout.flush 160
+            scope.$apply()
+
+          fit 'should hide the nav bottom border', ->
+            expect($rootScope.hideNavBottomBorder).toBe true
 
 
     describe 'when the header is collapsed', ->
@@ -531,9 +554,6 @@ describe 'event controller', ->
 
       it 'should unexpand the header', ->
         expect(ctrl.isHeaderExpanded).toBe true
-
-      it 'should hide the nav bottom border', ->
-        expect($rootScope.hideNavBottomBorder).toBe true
 
 
   describe 'checking whether the user accepted their invitation', ->
@@ -1087,7 +1107,7 @@ describe 'event controller', ->
     describe 'when scrolling bottom is enabled', ->
 
       beforeEach ->
-        scrollHandle = 
+        scrollHandle =
           scrollBottom: jasmine.createSpy 'scrollHandle.scrollBottom'
         spyOn($ionicScrollDelegate, '$getByHandle').and.returnValue scrollHandle
 
