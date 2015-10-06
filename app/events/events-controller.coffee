@@ -249,6 +249,6 @@ class ChatsCtrl
     if distanceAway is null
       'Start a chat...'
     else
-      distanceAway
+      "#{distanceAway} away"
 
 module.exports = ChatsCtrl

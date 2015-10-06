@@ -1,8 +1,10 @@
 class FriendshipCtrl
-  @$inject: ['$ionicLoading', '$ionicScrollDelegate', '$meteor', '$mixpanel', '$scope', '$state',
-             '$stateParams', 'Auth', 'Invitation', 'Friendship', 'ngToast', 'User']
-  constructor: (@$ionicLoading, @$ionicScrollDelegate, @$meteor, @$mixpanel, @$scope, @$state,
-                @$stateParams, @Auth, @Invitation, @Friendship, @ngToast, @User) ->
+  @$inject: ['$ionicLoading', '$ionicScrollDelegate', '$meteor', '$mixpanel',
+             '$scope', '$state', '$stateParams', 'Auth', 'Invitation',
+             'Friendship', 'ngToast', 'User']
+  constructor: (@$ionicLoading, @$ionicScrollDelegate, @$meteor, @$mixpanel,
+                @$scope, @$state, @$stateParams, @Auth, @Invitation,
+                @Friendship, @ngToast, @User) ->
     @friend = @$stateParams.friend
 
     # Set Meteor collections on controller
@@ -163,5 +165,11 @@ class FriendshipCtrl
     @$ionicScrollDelegate.$getByHandle('friendship')
       .scrollBottom true
 
+  getPlaceholder: ->
+    distanceAway = @Auth.getDistanceAway @friend.location
+    if distanceAway is null
+      'Start a chat...'
+    else
+      "#{@friend.firstName} is #{distanceAway} away"
 
 module.exports = FriendshipCtrl

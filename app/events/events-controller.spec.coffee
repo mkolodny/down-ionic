@@ -724,7 +724,7 @@ describe 'events controller', ->
         expect(Auth.getDistanceAway).toHaveBeenCalledWith friend.location
 
       it 'should return the distance away', ->
-        expect(returnedDistanceAway).toBe distanceAway
+        expect(returnedDistanceAway).toBe "#{distanceAway} away"
 
     describe 'when distance is unknown', ->
 
