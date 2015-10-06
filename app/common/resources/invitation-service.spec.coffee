@@ -268,6 +268,9 @@ describe 'invitation service', ->
           response = _response_
       $httpBackend.flush 1
 
+    afterEach ->
+      jasmine.clock().uninstall()
+
     it 'should POST the invitations', ->
       expectedInvitations = (Invitation.deserialize invitation \
           for invitation in responseData)
