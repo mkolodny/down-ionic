@@ -213,7 +213,8 @@ class EventCtrl
 
   sendMessage: ->
     @Event.sendMessage @event, @message
-    @$mixpanel.track 'Send Message'
+    @$mixpanel.track 'Send Message',
+      'chat type': 'event'
     @message = null
 
   showMoreOptions: ->
