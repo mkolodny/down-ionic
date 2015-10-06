@@ -69,7 +69,7 @@ class FriendshipCtrl
             else
               # Delete expired invite_action message
               @messages.remove message._id
-        
+
         @scrollBottom()
       , =>
         # Change all invitation action messages to error action messages.
@@ -122,8 +122,7 @@ class FriendshipCtrl
     invitation.response is @Invitation.declined
 
   wasJoined: (message) ->
-    message.creator.id is "#{@Auth.user.id}" \
-        or message.invitation.response is @Invitation.accepted \
+    message.invitation.response is @Invitation.accepted \
         or message.invitation.response is @Invitation.maybe
 
   respondToInvitation: (invitation, response) ->

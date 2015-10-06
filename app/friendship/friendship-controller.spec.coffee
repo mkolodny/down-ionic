@@ -383,7 +383,7 @@ describe 'friendship controller', ->
       message =
         _id: 1
         creator: new User
-          id: "#{Auth.user.id+1}"
+          id: "#{Auth.user.id}"
         createdAt:
           $date: new Date().getTime()
         text: 'Down?'
@@ -391,15 +391,6 @@ describe 'friendship controller', ->
         type: 'invite_action'
         invitation:
           id: 1
-
-    describe 'when they sent the invitation', ->
-
-      beforeEach ->
-        message.creator.id = "#{Auth.user.id}"
-
-      it 'should return true', ->
-        expect(ctrl.wasJoined message).toBe true
-
 
     describe 'when they accepted the invitation', ->
 
@@ -590,7 +581,7 @@ describe 'friendship controller', ->
     message = null
     messages = null
 
-    beforeEach ->      
+    beforeEach ->
       chatId = '1,2'
       spyOn(Friendship, 'getChatId').and.returnValue chatId
       scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
@@ -692,7 +683,7 @@ describe 'friendship controller', ->
 
       it 'should refresh the invitations', ->
         expect(ctrl.getFriendInvitations).toHaveBeenCalled()
-      
+
       it 'should scroll to the bottom', ->
         expect(ctrl.scrollBottom).toHaveBeenCalled()
 
@@ -848,7 +839,7 @@ describe 'friendship controller', ->
     describe 'when scrolling bottom is enabled', ->
 
       beforeEach ->
-        scrollHandle = 
+        scrollHandle =
           scrollBottom: jasmine.createSpy 'scrollHandle.scrollBottom'
         spyOn($ionicScrollDelegate, '$getByHandle').and.returnValue scrollHandle
 
