@@ -101,6 +101,14 @@
     {
       "locator": "https://github.com/ajlin500/phonegap-plugin-push",
       "id": "phonegap-plugin-push"
+    },
+    {
+      "locator": "https://github.com/deefactorial/Cordova-open-native-settings.git",
+      "id": "com.phonegap.plugins.nativesettingsopener"
+    },
+    {
+      "locator": "https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin.git",
+      "id": "cordova-plugin-x-socialsharing"
     }
   ],
   "cordovaPlatforms": [
