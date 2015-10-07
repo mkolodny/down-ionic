@@ -107,11 +107,20 @@ gulp.task 'vendor', ->
     .pipe gulp.dest("#{buildDir}/app")
 
 
-gulp.task 'meteor', ->
-  gulp.src "#{resourcesScriptsDir}/meteor.js"
-    .pipe uglify()
-    .pipe rename(extname: '.min.js')
-    .pipe gulp.dest(resourcesScriptsDir)
+###
+# Minify the scripts to be included in the app bundle.
+####
+gulp.task 'resources-scripts', ->
+  files = [
+    'meteor.js'
+    'ionic.js'
+    'ionic-angular.js'
+  ]
+  for fileName in files
+    gulp.src "#{resourcesScriptsDir}/#{fileName}"
+      .pipe uglify()
+      .pipe rename(extname: '.min.js')
+      .pipe gulp.dest(resourcesScriptsDir)
 
 
 gulp.task 'minify-js', ->
