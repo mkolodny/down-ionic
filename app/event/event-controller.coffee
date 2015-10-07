@@ -1,12 +1,15 @@
 class EventCtrl
-  @$inject: ['$ionicActionSheet', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel',
-             '$rootScope', '$scope', '$state', '$stateParams', '$timeout', 'Auth',
-             'Event',  'Invitation', 'LinkInvitation', 'ngToast', 'User']
-  constructor: (@$ionicActionSheet, @$ionicHistory, @$ionicLoading, @$ionicModal,
+  @$inject: ['$cordovaSocialSharing', '$ionicActionSheet', '$ionicHistory',
+             '$ionicLoading', '$ionicModal', '$ionicPopup',
+             '$ionicScrollDelegate', '$meteor', '$mixpanel',
+             '$rootScope', '$scope', '$state', '$stateParams', '$timeout',
+             '$window', 'Auth', 'Event',  'Invitation', 'LinkInvitation',
+             'ngToast', 'User']
+  constructor: (@$cordovaSocialSharing, @$ionicActionSheet, @$ionicHistory,
+                @$ionicLoading, @$ionicModal,
                 @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel,
-                @$rootScope, @$scope, @$state, @$stateParams, @$timeout, @Auth,
-                @Event, @Invitation, @LinkInvitation, @ngToast, @User) ->
+                @$rootScope, @$scope, @$state, @$stateParams, @$timeout, @$window,
+                @Auth, @Event, @Invitation, @LinkInvitation, @ngToast, @User) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -225,7 +228,7 @@ class EventCtrl
       buttons: [
         text: 'Send To...'
       ,
-        text: 'Copy Group Link'
+        text: 'Share On...'
       ,
         text: notificationText
       ]
@@ -236,7 +239,7 @@ class EventCtrl
             event: @event
           hideSheet()
         if index is 1
-          @getLinkInvitation()
+          @shareLinkInvitation()
           hideSheet()
         if index is 2
           @toggleNotifications()
@@ -244,7 +247,7 @@ class EventCtrl
 
     hideSheet = @$ionicActionSheet.show options
 
-  getLinkInvitation: ->
+  shareLinkInvitation: ->
     @$ionicLoading.show()
 
     linkInvitation =
@@ -253,20 +256,27 @@ class EventCtrl
     @LinkInvitation.save linkInvitation
       .$promise.then (linkInvitation) =>
         @$mixpanel.track 'Get Link Invitation'
-        @$ionicPopup.alert
-          title: 'Copy Group Link'
-          template: """
-            <input id="share-link"
-                   value="https://www.down.life/e/#{linkInvitation.linkId}">
-            """
-          buttons: [
-            text: 'Done'
-            type: 'button-positive'
-          ]
+        groupLink = "https://down.life/e/#{linkInvitation.linkId}"
+        if angular.isDefined @$window.plugins.socialsharing
+          eventMessage = @getEventMessage()
+          @$cordovaSocialSharing.share eventMessage, eventMessage, null, groupLink
+        else
+          @$ionicPopup.alert
+            title: 'Copy Group Link'
+            template: """
+              <input id="share-link"
+                     value="#{groupLink}">
+              """
+            buttons: [
+              text: 'Done'
+              type: 'button-positive'
+            ]
         @$ionicLoading.hide()
       , =>
         @ngToast.create 'For some reason, that didn\'t work.'
         @$ionicLoading.hide()
+
+  getEventMessage: ->
 
   toggleNotifications: ->
     @$ionicLoading.show()

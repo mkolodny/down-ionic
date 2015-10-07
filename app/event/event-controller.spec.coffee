@@ -4,6 +4,7 @@ require 'angular-animate'
 require 'angular-mocks'
 require 'angular-sanitize'
 require 'angular-ui-router'
+require 'ng-cordova'
 require 'ng-toast'
 require '../ionic/ionic-angular.js'
 require '../common/auth/auth-module'
@@ -13,6 +14,7 @@ require '../common/meteor/meteor-mocks'
 EventCtrl = require './event-controller'
 
 describe 'event controller', ->
+  $cordovaSocialSharing = null
   $ionicActionSheet = null
   $ionicHistory = null
   $ionicLoading = null
@@ -25,6 +27,7 @@ describe 'event controller', ->
   $rootScope = null
   $state = null
   $timeout = null
+  $window = null
   Auth = null
   ctrl = null
   currentDate = null
@@ -54,8 +57,11 @@ describe 'event controller', ->
 
   beforeEach angular.mock.module('ngToast')
 
+  beforeEach angular.mock.module('ngCordova')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $cordovaSocialSharing = $injector.get '$cordovaSocialSharing'
     $ionicActionSheet = $injector.get '$ionicActionSheet'
     $ionicHistory = $injector.get '$ionicHistory'
     $ionicLoading = $injector.get '$ionicLoading'
@@ -69,6 +75,7 @@ describe 'event controller', ->
     $state = $injector.get '$state'
     $stateParams = angular.copy $injector.get('$stateParams')
     $timeout = $injector.get '$timeout'
+    $window = $injector.get '$window'
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
@@ -132,6 +139,7 @@ describe 'event controller', ->
     ctrl = $controller EventCtrl,
       $scope: scope
       $stateParams: $stateParams
+      $window: $window
       Auth: Auth
   )
 
@@ -872,18 +880,18 @@ describe 'event controller', ->
         expect(hideSheet).toHaveBeenCalled()
 
 
-    describe 'tapping the get chat link button', ->
+    describe 'tapping the share on button', ->
 
       beforeEach ->
-        spyOn ctrl, 'getLinkInvitation'
+        spyOn ctrl, 'shareLinkInvitation'
         ctrl.showMoreOptions()
         buttonClickedCallback 1
 
-      it 'should get a link invitation', ->
-        expect(ctrl.getLinkInvitation).toHaveBeenCalled()
+      it 'should let the user share a link invitation', ->
+        expect(ctrl.shareLinkInvitation).toHaveBeenCalled()
 
 
-    describe 'getting a link invitation', ->
+    describe 'sharing a link invitation', ->
       deferred = null
 
       beforeEach ->
@@ -892,7 +900,7 @@ describe 'event controller', ->
         spyOn $ionicLoading, 'show'
         spyOn $ionicLoading, 'hide'
 
-        ctrl.getLinkInvitation()
+        ctrl.shareLinkInvitation()
 
       it 'should show a loading overlay', ->
         expect($ionicLoading.show).toHaveBeenCalled()
@@ -908,19 +916,54 @@ describe 'event controller', ->
 
         beforeEach ->
           spyOn $mixpanel, 'track'
-          spyOn $ionicPopup, 'alert'
-          linkId = 'mikepleb'
-          deferred.resolve {linkId: linkId}
-          scope.$apply()
 
-        it 'should show a modal with the share link', ->
-          expect($ionicPopup.alert).toHaveBeenCalled()
+        describe 'when the social sharing plugin isn\'t installed', ->
 
-        it 'should hide the loading overlay', ->
-          expect($ionicLoading.hide).toHaveBeenCalled()
+          beforeEach ->
+            $window.plugins = {}
+            spyOn $ionicPopup, 'alert'
 
-        it 'should track the event in mixpanel', ->
-          expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation'
+            linkId = 'mikepleb'
+            deferred.resolve {linkId: linkId}
+            scope.$apply()
+
+          it 'should show a modal with the share link', ->
+            expect($ionicPopup.alert).toHaveBeenCalled()
+
+          it 'should hide the loading overlay', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
+
+          it 'should track the event in mixpanel', ->
+            expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation'
+
+
+        describe 'when the social sharing plugin is installed', ->
+          eventMessage = null
+
+          beforeEach ->
+            $window.plugins =
+              socialsharing: 'socialsharing'
+            eventMessage = 'eventMessage'
+            spyOn(ctrl, 'getEventMessage').and.returnValue eventMessage
+            spyOn $cordovaSocialSharing, 'share'
+
+            linkId = 'mikepleb'
+            deferred.resolve {linkId: linkId}
+            scope.$apply()
+
+          it 'should show a native share sheet', ->
+            message = eventMessage
+            subject = eventMessage
+            file = null
+            link = "https://down.life/e/#{linkId}"
+            expect($cordovaSocialSharing.share).toHaveBeenCalledWith(message,
+                subject, file, link)
+
+          it 'should hide the loading overlay', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
+
+          it 'should track the event in mixpanel', ->
+            expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation'
 
 
       describe 'on error', ->
@@ -951,7 +994,7 @@ describe 'event controller', ->
           buttons: [
             text: 'Send To...'
           ,
-            text: 'Copy Group Link'
+            text: 'Share On...'
           ,
             text: 'Mute Notifications'
           ]
