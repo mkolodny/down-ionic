@@ -51,9 +51,9 @@ scripts = (watch) ->
       # use vinyl-source-stream to make the stream gulp compatible
       # specifiy the desired output filename here
       .pipe source('bundle.js')
-      .pipe streamify(preprocess({context: {BUILD_ENV: env}}))
       # wrap plugins to support streams
       # i.e. .pipe streamify(plugin())
+      .pipe streamify(preprocess({context: {BUILD_ENV: env}}))
       .pipe gulp.dest("#{buildDir}/app")
     bundleStream
 
@@ -84,10 +84,13 @@ gulp.task 'data', ->
 
 
 gulp.task 'templates', ->
+  # Get the enviroment.
+  env = argv.e or 'staging'
+
   # NOTE: When we build the webview, we can give the ionic templates/partials an
-  # .app.html extension, and the web partials a .web.html extension, then rename them
-  # to .html. If we decide to use gulp-template-cache, we can us the transformUrl
-  # option.
+  #   .app.html extension, and the web partials a .web.html extension, then rename
+  #   them to .html. If we decide to use gulp-template-cache, we can us the
+  #   transformUrl option.
   gulp.src [
     "#{appDir}/**/*.html"
     "!#{appDir}/index.html"
@@ -95,6 +98,7 @@ gulp.task 'templates', ->
     .pipe gulp.dest("#{buildDir}/app")
 
   gulp.src "#{appDir}/index.html"
+    .pipe preprocess({context: {BUILD_ENV: env}})
     .pipe gulp.dest(buildDir)
 
 
