@@ -32,6 +32,7 @@ appDir = './app'
 dataDir = './data'
 testDir = './tests'
 vendorDir = './app/vendor'
+resourcesScriptsDir = './resources/scripts'
 
 scripts = (watch) ->
   bundler = browserify
@@ -100,6 +101,13 @@ gulp.task 'templates', ->
 gulp.task 'vendor', ->
   gulp.src "#{vendorDir}/**/*", {base: "#{appDir}"}
     .pipe gulp.dest("#{buildDir}/app")
+
+
+gulp.task 'meteor', ->
+  gulp.src "#{resourcesScriptsDir}/meteor.js"
+    .pipe uglify()
+    .pipe rename(extname: '.min.js')
+    .pipe gulp.dest(resourcesScriptsDir)
 
 
 gulp.task 'minify-js', ->
