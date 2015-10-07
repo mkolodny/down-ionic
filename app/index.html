@@ -12,11 +12,70 @@
   <!-- cordova script (this will be a 404 during development) -->
   <script src="cordova.js"></script>
 
-  <link href="app/main.css" rel="stylesheet">
-  <script src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
+  <!-- Set Meteor Config Variable -->
+
+  <!-- Load scripts from local resources plugin -->
+  <script src="resources/ionic.js"></script>
+  <script src="resources/jquery.js"></script>
+  <script src="resources/angular.js"></script>
+  <script src="resources/angular-animate.js"></script>
+  <script src="resources/angular-sanitize.js"></script>
+  <script src="resources/angular-ui-router.js"></script>
+  <script src="resources/ionic-angular.js"></script>
+  <script src="resources/meteor.js"></script>
+
+  <!-- Get any remaining scripts from CDN for backwards compatibility -->
+  <script type="text/javascript">
+    (function(d){
+      function injectScripts (scriptsArray) {
+        for (var i = 0; i < scriptsArray.length; i++) {
+          var scriptUrl = scriptsArray[i];
+          var js = d.createElement('script'); 
+          js.src = scriptUrl;
+          var ref = d.getElementsByTagName('script')[0];
+          ref.parentNode.insertBefore(js, ref);
+        }
+      }
+
+      // Ionic
+      if (window.ionic === undefined) {
+        var scripts = ['https://d3r38ef3fjjz7g.cloudfront.net/vendor/ionic.min.js'];
+        injectScripts(scripts);
+      }
+
+      // jquery
+      if (window.jQuery === undefined) {
+        var scripts = ['https://code.jquery.com/jquery-1.11.3.min.js'];
+        injectScripts(scripts);
+      }
+    
+      // angular
+      if (window.angular === undefined) {
+        var scripts = [
+          'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular.min.js',
+          'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular-animate.min.js',
+          'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular-sanitize.min.js',
+          'https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.13/angular-ui-router.min.js',
+          'https://d3r38ef3fjjz7g.cloudfront.net/vendor/ionic-angular.min.js'
+        ];
+        injectScripts(scripts);
+      }
+
+      // Meteor
+      if (window.Meteor === undefined) {
+        var scripts = ['https://d3r38ef3fjjz7g.cloudfront.net/vendor/meteor.min.js'];
+        injectScripts(scripts);
+      }
+    }(document));
+  </script>
+
+  <!-- Load app bundle -->
   <script src="app/bundle.js"></script>
+  <link href="app/main.css" rel="stylesheet">
+  
+  <script src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
 </head>
-<body>
+<body class="platform-ios platform-cordova platform-webview">
   <toast></toast>
   <ion-nav-bar 
     no-tap-scroll="true" 

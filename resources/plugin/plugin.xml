@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+        id="down.resources"
+        version="0.7.0">
+
+  <name>Resources</name>
+
+  <engines>
+    <engine name="cordova" version=">=3.4.0"/>
+  </engines>
+
+  <asset src="www/ionic.min.js" target="resources/ionic.js" />
+  <asset src="www/jquery-1.11.3.min.js" target="resources/jquery.js" />
+  <asset src="www/angular.min.js" target="resources/angular.js"/>
+  <asset src="www/angular-animate.min.js" target="resources/angular-animate.js"/>
+  <asset src="www/angular-sanitize.min.js" target="resources/angular-sanitize.js"/>
+  <asset src="www/angular-ui-router.min.js" target="resources/angular-ui-router.js"/>
+  <asset src="www/ionic-angular.min.js" target="resources/ionic-angular.js" />
+  <asset src="www/meteor.min.js" target="resources/meteor.js"/>
+
+</plugin>
