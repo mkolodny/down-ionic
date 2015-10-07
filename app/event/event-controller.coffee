@@ -4,12 +4,13 @@ class EventCtrl
              '$ionicScrollDelegate', '$meteor', '$mixpanel',
              '$rootScope', '$scope', '$state', '$stateParams', '$timeout',
              '$window', 'Auth', 'Event',  'Invitation', 'LinkInvitation',
-             'ngToast', 'User']
+             'ngToast', 'User', '$filter']
   constructor: (@$cordovaSocialSharing, @$ionicActionSheet, @$ionicHistory,
                 @$ionicLoading, @$ionicModal,
                 @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel,
                 @$rootScope, @$scope, @$state, @$stateParams, @$timeout, @$window,
-                @Auth, @Event, @Invitation, @LinkInvitation, @ngToast, @User) ->
+                @Auth, @Event, @Invitation, @LinkInvitation, @ngToast, @User,
+                @$filter) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -224,11 +225,13 @@ class EventCtrl
     notificationText = if @invitation.muted then 'Turn On Notifications' \
         else 'Mute Notifications'
     hideSheet = null
+    hasSharingPlugin = angular.isDefined @$window.plugins.socialsharing
+    shareText = if hasSharingPlugin then 'Share On...' else 'Copy Group Link'
     options =
       buttons: [
         text: 'Send To...'
       ,
-        text: 'Share On...'
+        text: shareText
       ,
         text: notificationText
       ]
@@ -257,6 +260,8 @@ class EventCtrl
       .$promise.then (linkInvitation) =>
         @$mixpanel.track 'Get Link Invitation'
         groupLink = "https://down.life/e/#{linkInvitation.linkId}"
+        # Show a "Copy Group Link" popup when the social sharing plugin isn\'t
+        #   installed for backwards compatibility.
         if angular.isDefined @$window.plugins.socialsharing
           eventMessage = @getEventMessage()
           @$cordovaSocialSharing.share eventMessage, eventMessage, null, groupLink
@@ -264,8 +269,7 @@ class EventCtrl
           @$ionicPopup.alert
             title: 'Copy Group Link'
             template: """
-              <input id="share-link"
-                     value="#{groupLink}">
+              <input id="share-link" value="#{groupLink}">
               """
             buttons: [
               text: 'Done'
@@ -277,6 +281,18 @@ class EventCtrl
         @$ionicLoading.hide()
 
   getEventMessage: ->
+    if angular.isDefined @event.datetime
+      date = @$filter('date') @event.datetime, "EEE, MMM d 'at' h:mm a"
+      dateString = " — #{date}"
+    else
+      dateString = ''
+
+    if angular.isDefined @event.place
+      placeString = " at #{@event.place.name}"
+    else
+      placeString = ''
+
+    "#{@event.title}#{placeString}#{dateString}"
 
   toggleNotifications: ->
     @$ionicLoading.show()
@@ -295,7 +311,7 @@ class EventCtrl
         @$ionicLoading.hide()
 
   scrollBottom: ->
-    @$ionicScrollDelegate.$getByHandle('event')
+    @$ionicScrollDelegate.$getByHandle 'event'
       .scrollBottom true
 
 module.exports = EventCtrl

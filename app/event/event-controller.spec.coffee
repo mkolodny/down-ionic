@@ -15,6 +15,7 @@ EventCtrl = require './event-controller'
 
 describe 'event controller', ->
   $cordovaSocialSharing = null
+  $filter = null
   $ionicActionSheet = null
   $ionicHistory = null
   $ionicLoading = null
@@ -62,6 +63,7 @@ describe 'event controller', ->
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $cordovaSocialSharing = $injector.get '$cordovaSocialSharing'
+    $filter = $injector.get '$filter'
     $ionicActionSheet = $injector.get '$ionicActionSheet'
     $ionicHistory = $injector.get '$ionicHistory'
     $ionicLoading = $injector.get '$ionicLoading'
@@ -859,15 +861,17 @@ describe 'event controller', ->
     hideSheet = null
 
     beforeEach ->
+      $window.plugins = {}
       spyOn($ionicActionSheet, 'show').and.callFake (options) ->
         buttonClickedCallback = options.buttonClicked
         hideSheet = jasmine.createSpy 'hideSheet'
         hideSheet
 
-    describe 'tapping Send To.. button', ->
+    describe 'tapping the Send To.. button', ->
 
       beforeEach ->
         spyOn $state, 'go'
+
         ctrl.showMoreOptions()
         buttonClickedCallback 0
 
@@ -987,33 +991,73 @@ describe 'event controller', ->
       beforeEach ->
         ctrl.invitation.muted = false
 
-        ctrl.showMoreOptions()
-
-      it 'should show an action sheet', ->
-        options =
-          buttons: [
-            text: 'Send To...'
-          ,
-            text: 'Share On...'
-          ,
-            text: 'Mute Notifications'
-          ]
-          cancelText: 'Cancel'
-          buttonClicked: jasmine.any Function
-        expect($ionicActionSheet.show).toHaveBeenCalledWith options
-
-      describe 'tapping the mute notifications button', ->
+      describe 'and the social sharing plugin is installed', ->
 
         beforeEach ->
-          spyOn ctrl, 'toggleNotifications'
+          $window.plugins =
+            socialsharing: 'socialsharing'
 
-          buttonClickedCallback 2
+          ctrl.showMoreOptions()
 
-        it 'should update the event', ->
-          expect(ctrl.toggleNotifications).toHaveBeenCalled()
+        it 'should show an action sheet', ->
+          options =
+            buttons: [
+              text: 'Send To...'
+            ,
+              text: 'Share On...'
+            ,
+              text: 'Mute Notifications'
+            ]
+            cancelText: 'Cancel'
+            buttonClicked: jasmine.any Function
+          expect($ionicActionSheet.show).toHaveBeenCalledWith options
 
-        it 'should hide the action sheet', ->
-          expect(hideSheet).toHaveBeenCalled()
+        describe 'tapping the mute notifications button', ->
+
+          beforeEach ->
+            spyOn ctrl, 'toggleNotifications'
+
+            buttonClickedCallback 2
+
+          it 'should update the event', ->
+            expect(ctrl.toggleNotifications).toHaveBeenCalled()
+
+          it 'should hide the action sheet', ->
+            expect(hideSheet).toHaveBeenCalled()
+
+
+      describe 'and the social sharing plugin isn\'t installed', ->
+
+        beforeEach ->
+          $window.plugins = {}
+
+          ctrl.showMoreOptions()
+
+        it 'should show an action sheet', ->
+          options =
+            buttons: [
+              text: 'Send To...'
+            ,
+              text: 'Copy Group Link'
+            ,
+              text: 'Mute Notifications'
+            ]
+            cancelText: 'Cancel'
+            buttonClicked: jasmine.any Function
+          expect($ionicActionSheet.show).toHaveBeenCalledWith options
+
+        describe 'tapping the mute notifications button', ->
+
+          beforeEach ->
+            spyOn ctrl, 'toggleNotifications'
+
+            buttonClickedCallback 2
+
+          it 'should update the event', ->
+            expect(ctrl.toggleNotifications).toHaveBeenCalled()
+
+          it 'should hide the action sheet', ->
+            expect(hideSheet).toHaveBeenCalled()
 
 
     describe 'when notifications are turned off', ->
@@ -1021,20 +1065,47 @@ describe 'event controller', ->
       beforeEach ->
         ctrl.invitation.muted = true
 
-        ctrl.showMoreOptions()
+      describe 'and the social sharing plugin is installed', ->
 
-      it 'should show an action sheet', ->
-        options =
-          buttons: [
-            text: 'Send To...'
-          ,
-            text: 'Copy Group Link'
-          ,
-            text: 'Turn On Notifications'
-          ]
-          cancelText: 'Cancel'
-          buttonClicked: jasmine.any Function
-        expect($ionicActionSheet.show).toHaveBeenCalledWith options
+        beforeEach ->
+          $window.plugins =
+            socialsharing: 'socialsharing'
+
+          ctrl.showMoreOptions()
+
+        it 'should show an action sheet', ->
+          options =
+            buttons: [
+              text: 'Send To...'
+            ,
+              text: 'Share On...'
+            ,
+              text: 'Turn On Notifications'
+            ]
+            cancelText: 'Cancel'
+            buttonClicked: jasmine.any Function
+          expect($ionicActionSheet.show).toHaveBeenCalledWith options
+
+
+      describe 'and the social sharing plugin isn\'t installed', ->
+
+        beforeEach ->
+          $window.plugins = {}
+
+          ctrl.showMoreOptions()
+
+        it 'should show an action sheet', ->
+          options =
+            buttons: [
+              text: 'Send To...'
+            ,
+              text: 'Copy Group Link'
+            ,
+              text: 'Turn On Notifications'
+            ]
+            cancelText: 'Cancel'
+            buttonClicked: jasmine.any Function
+          expect($ionicActionSheet.show).toHaveBeenCalledWith options
 
 
   describe 'toggling notifications', ->
@@ -1157,3 +1228,57 @@ describe 'event controller', ->
 
       it 'should scroll to the bottom', ->
         expect(scrollHandle.scrollBottom).toHaveBeenCalledWith true
+
+
+  describe 'getting the event\'s share message', ->
+    eventMessage = null
+
+    beforeEach ->
+      ctrl.event = angular.copy event
+
+    describe 'when the event has all possible properties', ->
+
+      beforeEach ->
+        eventMessage = ctrl.getEventMessage()
+
+      it 'should return the message', ->
+        date = $filter('date') event.datetime, "EEE, MMM d 'at' h:mm a"
+        message = "#{event.title} at #{event.place.name} — #{date}"
+        expect(eventMessage).toBe message
+
+
+    describe 'when the event has a title and place', ->
+
+      beforeEach ->
+        delete ctrl.event.datetime
+
+        eventMessage = ctrl.getEventMessage()
+
+      it 'should return the message', ->
+        message = "#{event.title} at #{event.place.name}"
+        expect(eventMessage).toBe message
+
+
+    describe 'when the event has a title and datetime', ->
+
+      beforeEach ->
+        delete ctrl.event.place
+
+        eventMessage = ctrl.getEventMessage()
+
+      it 'should return the message', ->
+        date = $filter('date') event.datetime, "EEE, MMM d 'at' h:mm a"
+        message = "#{event.title} — #{date}"
+        expect(eventMessage).toBe message
+
+
+    describe 'when the event only has a title', ->
+
+      beforeEach ->
+        delete ctrl.event.place
+        delete ctrl.event.datetime
+
+        eventMessage = ctrl.getEventMessage()
+
+      it 'should return the message', ->
+        expect(eventMessage).toBe ctrl.event.title
