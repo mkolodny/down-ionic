@@ -7,6 +7,7 @@ require './ionic/ionic-core.js'
 require './ionic/ionic-deploy.js'
 require './vendor/mixpanel/mixpanel-jslib-snippet'
 # Common
+require './common/meteor/meteor'
 require './common/mixpanel/mixpanel-module'
 require './common/auth/auth-module'
 require './common/env/env-module'
