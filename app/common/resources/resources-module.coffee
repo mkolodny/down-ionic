@@ -1,4 +1,3 @@
-require 'angular'
 require 'angular-local-storage'
 require 'angular-resource'
 require '../auth/auth-module'

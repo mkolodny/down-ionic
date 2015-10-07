@@ -1,5 +1,3 @@
-require 'angular'
-require 'angular-ui-router'
 require 'ng-cordova'
 RequestContactsCtrl = require './request-contacts-controller'
 

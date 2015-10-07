@@ -1,5 +1,3 @@
-require 'angular'
-require 'angular-ui-router'
 require '../mixpanel/mixpanel-module'
 friendshipButton = require './friendship-button-directive'
 

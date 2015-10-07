@@ -1,5 +1,4 @@
 haversine = require 'haversine'
-require '../../ionic/ionic.js'
 
 class Auth
   @$inject: ['$http', '$q', '$meteor', '$mixpanel', 'apiRoot', 'User',

@@ -1,5 +1,3 @@
-require 'angular'
-require 'angular-ui-router'
 require 'angular-local-storage'
 require '../common/push-notifications/push-notifications-module'
 RequestPushCtrl = require './request-push-controller'

@@ -1,5 +1,3 @@
-require 'angular'
-require 'angular-ui-router'
 require '../common/resources/resources-module'
 SetUsernameCtrl = require './set-username-controller'
 

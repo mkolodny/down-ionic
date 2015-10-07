@@ -1,7 +1,4 @@
-require 'angular'
 require 'ng-cordova'
-require 'angular-animate' # for ngToast
-require 'angular-sanitize' # for ngToast
 require 'ng-toast'
 require 'angular-local-storage'
 require '../auth/auth-module'

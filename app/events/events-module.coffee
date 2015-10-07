@@ -1,7 +1,5 @@
-require 'angular'
 require 'angular-chart.js'
 require 'angular-elastic'
-require 'angular-ui-router'
 require 'ng-toast'
 require '../common/auth/auth-module'
 require '../common/place-autocomplete/place-autocomplete-module'

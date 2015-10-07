@@ -1,6 +1,4 @@
-require 'angular'
 require 'angular-local-storage'
-require 'angular-ui-router'
 require '../common/auth/auth-module'
 VerifyPhoneCtrl = require './verify-phone-controller'
 

@@ -1,7 +1,4 @@
-require 'angular'
-
 ### @if BUILD_ENV='prod' ###
-meteorHost = 'https://down-meteor.herokuapp.com'
 angular.module 'down.env', []
   ## Prod vars
   .constant 'skipIonicDeploy', false
@@ -12,7 +9,6 @@ angular.module 'down.env', []
 ### @endif ###
 
 ### @if BUILD_ENV='staging' ###
-meteorHost = 'https://down-meteor-staging.herokuapp.com'
 angular.module 'down.env', []
   ## Staging vars
   .constant 'skipIonicDeploy', true
@@ -23,7 +19,6 @@ angular.module 'down.env', []
 ### @endif ###
 
 ### @if BUILD_ENV='local' ###
-meteorHost = 'http://localhost:3500'
 angular.module 'down.env', []
   ## Dev vars
   .constant 'skipIonicDeploy', true
@@ -32,7 +27,3 @@ angular.module 'down.env', []
   .constant 'mixpanelToken', 'd4d37f58ce26f5e423cbc6fa937c621b'
   .constant 'ionicDeployChannel', 'dev'
 ### @endif ###
-
-# Set global meteor host variable
-window.__meteor_runtime_config__ =
-  DDP_DEFAULT_CONNECTION_URL: meteorHost

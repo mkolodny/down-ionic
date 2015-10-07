@@ -1,5 +1,3 @@
-require 'angular'
-require 'angular-ui-router'
 require '../common/auth/auth-module'
 MyFriendsCtrl = require './my-friends-controller'
 

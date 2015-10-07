@@ -1,4 +1,3 @@
-require 'angular'
 require 'ng-cordova'
 require 'angular-local-storage'
 require '../auth/auth-module'

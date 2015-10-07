@@ -1,5 +1,3 @@
-require 'angular'
-require 'angular-ui-router'
 FriendsCtrl = require './friends-controller'
 
 angular.module 'down.friends', [

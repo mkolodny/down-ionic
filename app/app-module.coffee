@@ -1,13 +1,8 @@
-require 'angular'
-require 'angular-animate' # for ngToast
 require 'angular-local-storage'
-require 'angular-sanitize' # for ngToast
-require 'angular-ui-router'
 require 'ng-toast'
 require 'ng-cordova'
 # Lib
 require './ionic/angular-ios9-uiwebview.patch.js'
-require './ionic/ionic.js' # for ionic global object
 require './ionic/ionic-core.js'
 require './ionic/ionic-deploy.js'
 require './vendor/mixpanel/mixpanel-jslib-snippet'
@@ -15,7 +10,6 @@ require './vendor/mixpanel/mixpanel-jslib-snippet'
 require './common/mixpanel/mixpanel-module'
 require './common/auth/auth-module'
 require './common/env/env-module'
-require './common/meteor/meteor' # Must be required after env-module
 require './common/resources/resources-module'
 require './common/push-notifications/push-notifications-module'
 # Views

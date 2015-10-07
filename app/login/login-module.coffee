@@ -1,5 +1,3 @@
-require 'angular'
-require 'angular-ui-router'
 require '../common/auth/auth-module'
 require '../common/intl-phone/intl-phone-module'
 LoginCtrl = require './login-controller'

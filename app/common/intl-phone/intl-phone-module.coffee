@@ -1,4 +1,3 @@
-require 'angular'
 require './intlTelInput.js'
 intlPhone = require './intl-phone-directive'
 

@@ -13,6 +13,29 @@
   <script src="cordova.js"></script>
 
   <!-- Set Meteor Config Variable -->
+  <!-- @if BUILD_ENV='prod' -->
+  <script type="text/javascript">
+    window.__meteor_runtime_config__ = {
+      DDP_DEFAULT_CONNECTION_URL:'https://down-meteor.herokuapp.com'
+    };
+  </script>
+  <!-- @endif -->
+
+  <!-- @if BUILD_ENV='staging' -->
+  <script type="text/javascript">
+    window.__meteor_runtime_config__ = {
+      DDP_DEFAULT_CONNECTION_URL:'https://down-meteor-staging.herokuapp.com'
+    };
+  </script>
+  <!-- @endif -->
+
+  <!-- @if BUILD_ENV='local' -->
+  <script type="text/javascript">
+    window.__meteor_runtime_config__ = {
+      DDP_DEFAULT_CONNECTION_URL:'http://localhost:3500'
+    };
+  </script>
+  <!-- @endif -->
 
   <!-- Load scripts from local resources plugin -->
   <script src="resources/ionic.js"></script>
@@ -72,7 +95,7 @@
   <!-- Load app bundle -->
   <script src="app/bundle.js"></script>
   <link href="app/main.css" rel="stylesheet">
-  
+
   <script src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
 </head>
 <body class="platform-ios platform-cordova platform-webview">

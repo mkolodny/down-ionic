@@ -1,6 +1,4 @@
-require 'angular'
 require 'angular-elastic'
-require 'angular-ui-router'
 require 'ng-toast'
 require '../common/auth/auth-module'
 FriendshipCtrl = require './friendship-controller'

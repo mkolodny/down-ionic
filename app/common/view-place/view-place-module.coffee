@@ -1,4 +1,3 @@
-require 'angular'
 viewPlace = require './view-place-directive'
 
 angular.module 'down.viewPlace', [

@@ -1,5 +1,3 @@
-require 'angular'
-require 'angular-ui-router'
 require 'ng-cordova'
 CreateEventCtrl = require './create-event-controller'
 

@@ -1,6 +1,4 @@
-require 'angular'
 require 'angular-local-storage'
-require 'angular-ui-router'
 require '../common/contacts/contacts-module'
 require '../common/friendship-button/friendship-button-module'
 AddFromAddressBookCtrl = require './add-from-address-book-controller'

@@ -1,6 +1,4 @@
-require 'angular'
 require 'angular-local-storage'
-require 'angular-ui-router'
 require '../common/auth/auth-module'
 require '../common/friendship-button/friendship-button-module'
 AddFromFacebookCtrl = require './add-from-facebook-controller'

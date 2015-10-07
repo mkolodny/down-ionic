@@ -1,6 +1,4 @@
-require 'angular'
 require 'ng-cordova'
-require 'angular-ui-router'
 require 'angular-local-storage'
 require '../mixpanel/mixpanel-module'
 require '../resources/resources-module'

@@ -1,5 +1,3 @@
-require 'angular'
-require 'angular-ui-router'
 require 'angular-local-storage'
 require '../common/auth/auth-module'
 require '../common/contacts/contacts-module'
