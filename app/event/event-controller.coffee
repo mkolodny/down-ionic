@@ -1,12 +1,16 @@
 class EventCtrl
-  @$inject: ['$ionicActionSheet', '$ionicHistory', '$ionicLoading', '$ionicModal',
-             '$ionicPopup', '$ionicScrollDelegate', '$meteor', '$mixpanel',
-             '$rootScope', '$scope', '$state', '$stateParams', '$timeout', 'Auth',
-             'Event',  'Invitation', 'LinkInvitation', 'ngToast', 'User']
-  constructor: (@$ionicActionSheet, @$ionicHistory, @$ionicLoading, @$ionicModal,
+  @$inject: ['$cordovaSocialSharing', '$ionicActionSheet', '$ionicHistory',
+             '$ionicLoading', '$ionicModal', '$ionicPopup',
+             '$ionicScrollDelegate', '$meteor', '$mixpanel',
+             '$rootScope', '$scope', '$state', '$stateParams', '$timeout',
+             '$window', 'Auth', 'Event',  'Invitation', 'LinkInvitation',
+             'ngToast', 'User', '$filter']
+  constructor: (@$cordovaSocialSharing, @$ionicActionSheet, @$ionicHistory,
+                @$ionicLoading, @$ionicModal,
                 @$ionicPopup, @$ionicScrollDelegate, @$meteor, @$mixpanel,
-                @$rootScope, @$scope, @$state, @$stateParams, @$timeout, @Auth,
-                @Event, @Invitation, @LinkInvitation, @ngToast, @User) ->
+                @$rootScope, @$scope, @$state, @$stateParams, @$timeout, @$window,
+                @Auth, @Event, @Invitation, @LinkInvitation, @ngToast, @User,
+                @$filter) ->
     @invitation = @$stateParams.invitation
     @event = @invitation.event
 
@@ -221,11 +225,13 @@ class EventCtrl
     notificationText = if @invitation.muted then 'Turn On Notifications' \
         else 'Mute Notifications'
     hideSheet = null
+    hasSharingPlugin = angular.isDefined @$window.plugins.socialsharing
+    shareText = if hasSharingPlugin then 'Share On...' else 'Copy Group Link'
     options =
       buttons: [
         text: 'Send To...'
       ,
-        text: 'Copy Group Link'
+        text: shareText
       ,
         text: notificationText
       ]
@@ -236,7 +242,7 @@ class EventCtrl
             event: @event
           hideSheet()
         if index is 1
-          @getLinkInvitation()
+          @shareLinkInvitation()
           hideSheet()
         if index is 2
           @toggleNotifications()
@@ -244,7 +250,7 @@ class EventCtrl
 
     hideSheet = @$ionicActionSheet.show options
 
-  getLinkInvitation: ->
+  shareLinkInvitation: ->
     @$ionicLoading.show()
 
     linkInvitation =
@@ -253,20 +259,40 @@ class EventCtrl
     @LinkInvitation.save linkInvitation
       .$promise.then (linkInvitation) =>
         @$mixpanel.track 'Get Link Invitation'
-        @$ionicPopup.alert
-          title: 'Copy Group Link'
-          template: """
-            <input id="share-link"
-                   value="https://www.down.life/e/#{linkInvitation.linkId}">
-            """
-          buttons: [
-            text: 'Done'
-            type: 'button-positive'
-          ]
+        groupLink = "https://down.life/e/#{linkInvitation.linkId}"
+        # Show a "Copy Group Link" popup when the social sharing plugin isn\'t
+        #   installed for backwards compatibility.
+        if angular.isDefined @$window.plugins.socialsharing
+          eventMessage = @getEventMessage()
+          @$cordovaSocialSharing.share eventMessage, eventMessage, null, groupLink
+        else
+          @$ionicPopup.alert
+            title: 'Copy Group Link'
+            template: """
+              <input id="share-link" value="#{groupLink}">
+              """
+            buttons: [
+              text: 'Done'
+              type: 'button-positive'
+            ]
         @$ionicLoading.hide()
       , =>
         @ngToast.create 'For some reason, that didn\'t work.'
         @$ionicLoading.hide()
+
+  getEventMessage: ->
+    if angular.isDefined @event.datetime
+      date = @$filter('date') @event.datetime, "EEE, MMM d 'at' h:mm a"
+      dateString = " — #{date}"
+    else
+      dateString = ''
+
+    if angular.isDefined @event.place
+      placeString = " at #{@event.place.name}"
+    else
+      placeString = ''
+
+    "#{@event.title}#{placeString}#{dateString}"
 
   toggleNotifications: ->
     @$ionicLoading.show()
@@ -285,7 +311,7 @@ class EventCtrl
         @$ionicLoading.hide()
 
   scrollBottom: ->
-    @$ionicScrollDelegate.$getByHandle('event')
+    @$ionicScrollDelegate.$getByHandle 'event'
       .scrollBottom true
 
 module.exports = EventCtrl

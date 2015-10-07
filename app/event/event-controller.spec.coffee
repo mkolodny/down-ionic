@@ -4,6 +4,7 @@ require 'angular-animate'
 require 'angular-mocks'
 require 'angular-sanitize'
 require 'angular-ui-router'
+require 'ng-cordova'
 require 'ng-toast'
 require '../ionic/ionic-angular.js'
 require '../common/auth/auth-module'
@@ -13,6 +14,8 @@ require '../common/meteor/meteor-mocks'
 EventCtrl = require './event-controller'
 
 describe 'event controller', ->
+  $cordovaSocialSharing = null
+  $filter = null
   $ionicActionSheet = null
   $ionicHistory = null
   $ionicLoading = null
@@ -25,6 +28,7 @@ describe 'event controller', ->
   $rootScope = null
   $state = null
   $timeout = null
+  $window = null
   Auth = null
   ctrl = null
   currentDate = null
@@ -54,8 +58,12 @@ describe 'event controller', ->
 
   beforeEach angular.mock.module('ngToast')
 
+  beforeEach angular.mock.module('ngCordova')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $cordovaSocialSharing = $injector.get '$cordovaSocialSharing'
+    $filter = $injector.get '$filter'
     $ionicActionSheet = $injector.get '$ionicActionSheet'
     $ionicHistory = $injector.get '$ionicHistory'
     $ionicLoading = $injector.get '$ionicLoading'
@@ -69,6 +77,7 @@ describe 'event controller', ->
     $state = $injector.get '$state'
     $stateParams = angular.copy $injector.get('$stateParams')
     $timeout = $injector.get '$timeout'
+    $window = $injector.get '$window'
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
@@ -132,6 +141,7 @@ describe 'event controller', ->
     ctrl = $controller EventCtrl,
       $scope: scope
       $stateParams: $stateParams
+      $window: $window
       Auth: Auth
   )
 
@@ -851,15 +861,17 @@ describe 'event controller', ->
     hideSheet = null
 
     beforeEach ->
+      $window.plugins = {}
       spyOn($ionicActionSheet, 'show').and.callFake (options) ->
         buttonClickedCallback = options.buttonClicked
         hideSheet = jasmine.createSpy 'hideSheet'
         hideSheet
 
-    describe 'tapping Send To.. button', ->
+    describe 'tapping the Send To.. button', ->
 
       beforeEach ->
         spyOn $state, 'go'
+
         ctrl.showMoreOptions()
         buttonClickedCallback 0
 
@@ -872,18 +884,18 @@ describe 'event controller', ->
         expect(hideSheet).toHaveBeenCalled()
 
 
-    describe 'tapping the get chat link button', ->
+    describe 'tapping the share on button', ->
 
       beforeEach ->
-        spyOn ctrl, 'getLinkInvitation'
+        spyOn ctrl, 'shareLinkInvitation'
         ctrl.showMoreOptions()
         buttonClickedCallback 1
 
-      it 'should get a link invitation', ->
-        expect(ctrl.getLinkInvitation).toHaveBeenCalled()
+      it 'should let the user share a link invitation', ->
+        expect(ctrl.shareLinkInvitation).toHaveBeenCalled()
 
 
-    describe 'getting a link invitation', ->
+    describe 'sharing a link invitation', ->
       deferred = null
 
       beforeEach ->
@@ -892,7 +904,7 @@ describe 'event controller', ->
         spyOn $ionicLoading, 'show'
         spyOn $ionicLoading, 'hide'
 
-        ctrl.getLinkInvitation()
+        ctrl.shareLinkInvitation()
 
       it 'should show a loading overlay', ->
         expect($ionicLoading.show).toHaveBeenCalled()
@@ -908,19 +920,54 @@ describe 'event controller', ->
 
         beforeEach ->
           spyOn $mixpanel, 'track'
-          spyOn $ionicPopup, 'alert'
-          linkId = 'mikepleb'
-          deferred.resolve {linkId: linkId}
-          scope.$apply()
 
-        it 'should show a modal with the share link', ->
-          expect($ionicPopup.alert).toHaveBeenCalled()
+        describe 'when the social sharing plugin isn\'t installed', ->
 
-        it 'should hide the loading overlay', ->
-          expect($ionicLoading.hide).toHaveBeenCalled()
+          beforeEach ->
+            $window.plugins = {}
+            spyOn $ionicPopup, 'alert'
 
-        it 'should track the event in mixpanel', ->
-          expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation'
+            linkId = 'mikepleb'
+            deferred.resolve {linkId: linkId}
+            scope.$apply()
+
+          it 'should show a modal with the share link', ->
+            expect($ionicPopup.alert).toHaveBeenCalled()
+
+          it 'should hide the loading overlay', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
+
+          it 'should track the event in mixpanel', ->
+            expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation'
+
+
+        describe 'when the social sharing plugin is installed', ->
+          eventMessage = null
+
+          beforeEach ->
+            $window.plugins =
+              socialsharing: 'socialsharing'
+            eventMessage = 'eventMessage'
+            spyOn(ctrl, 'getEventMessage').and.returnValue eventMessage
+            spyOn $cordovaSocialSharing, 'share'
+
+            linkId = 'mikepleb'
+            deferred.resolve {linkId: linkId}
+            scope.$apply()
+
+          it 'should show a native share sheet', ->
+            message = eventMessage
+            subject = eventMessage
+            file = null
+            link = "https://down.life/e/#{linkId}"
+            expect($cordovaSocialSharing.share).toHaveBeenCalledWith(message,
+                subject, file, link)
+
+          it 'should hide the loading overlay', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
+
+          it 'should track the event in mixpanel', ->
+            expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation'
 
 
       describe 'on error', ->
@@ -944,33 +991,73 @@ describe 'event controller', ->
       beforeEach ->
         ctrl.invitation.muted = false
 
-        ctrl.showMoreOptions()
-
-      it 'should show an action sheet', ->
-        options =
-          buttons: [
-            text: 'Send To...'
-          ,
-            text: 'Copy Group Link'
-          ,
-            text: 'Mute Notifications'
-          ]
-          cancelText: 'Cancel'
-          buttonClicked: jasmine.any Function
-        expect($ionicActionSheet.show).toHaveBeenCalledWith options
-
-      describe 'tapping the mute notifications button', ->
+      describe 'and the social sharing plugin is installed', ->
 
         beforeEach ->
-          spyOn ctrl, 'toggleNotifications'
+          $window.plugins =
+            socialsharing: 'socialsharing'
 
-          buttonClickedCallback 2
+          ctrl.showMoreOptions()
 
-        it 'should update the event', ->
-          expect(ctrl.toggleNotifications).toHaveBeenCalled()
+        it 'should show an action sheet', ->
+          options =
+            buttons: [
+              text: 'Send To...'
+            ,
+              text: 'Share On...'
+            ,
+              text: 'Mute Notifications'
+            ]
+            cancelText: 'Cancel'
+            buttonClicked: jasmine.any Function
+          expect($ionicActionSheet.show).toHaveBeenCalledWith options
 
-        it 'should hide the action sheet', ->
-          expect(hideSheet).toHaveBeenCalled()
+        describe 'tapping the mute notifications button', ->
+
+          beforeEach ->
+            spyOn ctrl, 'toggleNotifications'
+
+            buttonClickedCallback 2
+
+          it 'should update the event', ->
+            expect(ctrl.toggleNotifications).toHaveBeenCalled()
+
+          it 'should hide the action sheet', ->
+            expect(hideSheet).toHaveBeenCalled()
+
+
+      describe 'and the social sharing plugin isn\'t installed', ->
+
+        beforeEach ->
+          $window.plugins = {}
+
+          ctrl.showMoreOptions()
+
+        it 'should show an action sheet', ->
+          options =
+            buttons: [
+              text: 'Send To...'
+            ,
+              text: 'Copy Group Link'
+            ,
+              text: 'Mute Notifications'
+            ]
+            cancelText: 'Cancel'
+            buttonClicked: jasmine.any Function
+          expect($ionicActionSheet.show).toHaveBeenCalledWith options
+
+        describe 'tapping the mute notifications button', ->
+
+          beforeEach ->
+            spyOn ctrl, 'toggleNotifications'
+
+            buttonClickedCallback 2
+
+          it 'should update the event', ->
+            expect(ctrl.toggleNotifications).toHaveBeenCalled()
+
+          it 'should hide the action sheet', ->
+            expect(hideSheet).toHaveBeenCalled()
 
 
     describe 'when notifications are turned off', ->
@@ -978,20 +1065,47 @@ describe 'event controller', ->
       beforeEach ->
         ctrl.invitation.muted = true
 
-        ctrl.showMoreOptions()
+      describe 'and the social sharing plugin is installed', ->
 
-      it 'should show an action sheet', ->
-        options =
-          buttons: [
-            text: 'Send To...'
-          ,
-            text: 'Copy Group Link'
-          ,
-            text: 'Turn On Notifications'
-          ]
-          cancelText: 'Cancel'
-          buttonClicked: jasmine.any Function
-        expect($ionicActionSheet.show).toHaveBeenCalledWith options
+        beforeEach ->
+          $window.plugins =
+            socialsharing: 'socialsharing'
+
+          ctrl.showMoreOptions()
+
+        it 'should show an action sheet', ->
+          options =
+            buttons: [
+              text: 'Send To...'
+            ,
+              text: 'Share On...'
+            ,
+              text: 'Turn On Notifications'
+            ]
+            cancelText: 'Cancel'
+            buttonClicked: jasmine.any Function
+          expect($ionicActionSheet.show).toHaveBeenCalledWith options
+
+
+      describe 'and the social sharing plugin isn\'t installed', ->
+
+        beforeEach ->
+          $window.plugins = {}
+
+          ctrl.showMoreOptions()
+
+        it 'should show an action sheet', ->
+          options =
+            buttons: [
+              text: 'Send To...'
+            ,
+              text: 'Copy Group Link'
+            ,
+              text: 'Turn On Notifications'
+            ]
+            cancelText: 'Cancel'
+            buttonClicked: jasmine.any Function
+          expect($ionicActionSheet.show).toHaveBeenCalledWith options
 
 
   describe 'toggling notifications', ->
@@ -1114,3 +1228,57 @@ describe 'event controller', ->
 
       it 'should scroll to the bottom', ->
         expect(scrollHandle.scrollBottom).toHaveBeenCalledWith true
+
+
+  describe 'getting the event\'s share message', ->
+    eventMessage = null
+
+    beforeEach ->
+      ctrl.event = angular.copy event
+
+    describe 'when the event has all possible properties', ->
+
+      beforeEach ->
+        eventMessage = ctrl.getEventMessage()
+
+      it 'should return the message', ->
+        date = $filter('date') event.datetime, "EEE, MMM d 'at' h:mm a"
+        message = "#{event.title} at #{event.place.name} — #{date}"
+        expect(eventMessage).toBe message
+
+
+    describe 'when the event has a title and place', ->
+
+      beforeEach ->
+        delete ctrl.event.datetime
+
+        eventMessage = ctrl.getEventMessage()
+
+      it 'should return the message', ->
+        message = "#{event.title} at #{event.place.name}"
+        expect(eventMessage).toBe message
+
+
+    describe 'when the event has a title and datetime', ->
+
+      beforeEach ->
+        delete ctrl.event.place
+
+        eventMessage = ctrl.getEventMessage()
+
+      it 'should return the message', ->
+        date = $filter('date') event.datetime, "EEE, MMM d 'at' h:mm a"
+        message = "#{event.title} — #{date}"
+        expect(eventMessage).toBe message
+
+
+    describe 'when the event only has a title', ->
+
+      beforeEach ->
+        delete ctrl.event.place
+        delete ctrl.event.datetime
+
+        eventMessage = ctrl.getEventMessage()
+
+      it 'should return the message', ->
+        expect(eventMessage).toBe ctrl.event.title
