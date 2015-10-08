@@ -64,7 +64,7 @@ class FriendshipCtrl
 
 
         for message in @messages
-          if message.type is @Invitation.inviteAction
+          if message?.type is @Invitation.inviteAction
             invitation = events[message.meta.eventId]
             if angular.isDefined invitation
               message.invitation = invitation

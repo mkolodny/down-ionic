@@ -104,7 +104,9 @@ class EventCtrl
     @$meteor.object @Chats, selector, false
 
   handleChatMembersChange: (chatMembers) =>
+    chatMembers = chatMembers or []
     members = @members or []
+    
     chatMemberIds = (member.userId for member in chatMembers)
     currentMemberIds = (member.id for member in members)
     chatMemberIds.sort()
