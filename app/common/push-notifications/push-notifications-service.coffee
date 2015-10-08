@@ -7,21 +7,6 @@ class PushNotifications
                 localStorageService, @ngToast) ->
     @localStorage = localStorageService
 
-  listen: ->
-    platform = @$cordovaDevice.getPlatform()
-
-    if platform is 'iOS'
-      # If we've already asked the user for push notifications permissions,
-      #   register the `$cordovaPush` module so that we can send them in-app
-      #   notifications. This is required to start listening for notifications.
-      if @localStorage.get 'hasRequestedPushNotifications'
-        @register()
-
-      # Listen for notifications.
-      @$rootScope.$on '$cordovaPush:notificationReceived', @handleNotification
-    else if platform is 'Android'
-      @registerAndroid()
-
   saveToken: (deviceToken)->
     deferred = @$q.defer()
 
@@ -47,21 +32,44 @@ class PushNotifications
 
     deferred.promise
 
-  registerAndroid: ->
+  listen: ->
+    platform = @$cordovaDevice.getPlatform()
+
+    if platform is 'iOS'
+      # If we've already asked the user for push notifications permissions,
+      #   register the `$cordovaPush` module so that we can send them in-app
+      #   notifications. This is required to start listening for notifications.
+      if @localStorage.get 'hasRequestedPushNotifications'
+        @register()
+
+    else if platform is 'Android'
+      @register()
+
+  register: ->
+    # Check if using the old plugin
+    if @$window.PushNotification is undefined
+      @registerWithOldPlugin()
+      return
+
     options =
       android:
         senderID: @androidSenderID
         icon: 'push_icon'
         iconColor: '#6A38AB'
-    push = @$window.PushNotification.init options
-    push.on 'registration', @handleRegistrationAndroid
-    push.on 'notification', @handleNotificationAndroid
+      ios:
+        alert: true
+        badge: true
+        sound: true
 
-  handleRegistrationAndroid: (data) =>
+    push = @$window.PushNotification.init options
+    push.on 'registration', @handleRegistration
+    push.on 'notification', @handleNotification
+
+  handleRegistration: (data) =>
     deviceToken = data.registrationId
     @saveToken deviceToken
 
-  handleNotificationAndroid: (data) =>
+  handleNotification: (data) =>
     if data.message
       message = data.message
       # format message for in app display
@@ -74,7 +82,12 @@ class PushNotifications
       if not @$rootScope.$$phase
         @$rootScope.$digest()
 
-  register: ->
+
+
+  ###
+  #  Old Plugin Methods - iOS only
+  ###
+  registerWithOldPlugin: ->
     deferred = @$q.defer()
 
     # iOS Notification Permissions Options
@@ -85,24 +98,21 @@ class PushNotifications
 
     @$cordovaPush.register config
       .then (deviceToken) =>
-        # Listen for notifications.
-        @$rootScope.$on '$cordovaPush:notificationReceived', @handleNotification
         @saveToken deviceToken
       .then ->
         deferred.resolve()
       , (error) =>
         deferred.reject()
 
+    # Listen for notifications.
+    @$rootScope.$on '$cordovaPush:notificationReceived', @handleNotificationWithOldPlugin
+
     deferred.promise
 
-  handleNotification: (event, notification) =>
-    platform = @$cordovaDevice.getPlatform()
+  handleNotificationWithOldPlugin: (event, notification) =>
+    message = notification.alert
 
-    message = null
-    if platform is 'iOS' and notification.alert
-      message = notification.alert
-
-    if message isnt null
+    if angular.isDefined message
       # format message for in app display
       if message.indexOf('from ') is 0
         message = "Down. #{message}"

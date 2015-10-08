@@ -687,6 +687,9 @@ describe 'Auth service', ->
 
     describe 'we haven\'t shown the find friends view', ->
       beforeEach ->
+        spyOn(ionic.Platform, 'isIOS').and.returnValue true
+        spyOn(ionic.Platform, 'isAndroid').and.returnValue true
+
         Auth.phone = '+19252852230'
         Auth.user =
           id: 1

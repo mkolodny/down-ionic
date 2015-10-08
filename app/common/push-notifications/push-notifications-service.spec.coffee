@@ -7,6 +7,7 @@ require 'ng-toast'
 require './push-notifications-module'
 require '../resources/resources-module'
 require '../auth/auth-module'
+require '../env/env-module'
 
 describe 'PushNotifications service', ->
   $cordovaPush = null
@@ -17,6 +18,7 @@ describe 'PushNotifications service', ->
   ngToast = null
   $rootScope = null
   APNSDevice = null
+  androidSenderID = null
   Auth = null
   GCMDevice = null
   PushNotifications = null
@@ -32,6 +34,8 @@ describe 'PushNotifications service', ->
   beforeEach angular.mock.module('ngToast')
 
   beforeEach angular.mock.module('down.auth')
+
+  beforeEach angular.mock.module('down.env')
 
   beforeEach angular.mock.module('down.resources')
 
@@ -59,6 +63,7 @@ describe 'PushNotifications service', ->
     $rootScope = $injector.get '$rootScope'
     $window = $injector.get '$window'
     APNSDevice = $injector.get 'APNSDevice'
+    androidSenderID = $injector.get 'androidSenderID'
     GCMDevice = $injector.get 'GCMDevice'
     localStorage = $injector.get 'localStorageService'
     ngToast = $injector.get 'ngToast'
@@ -68,91 +73,6 @@ describe 'PushNotifications service', ->
   afterEach ->
     localStorage.clearAll()
 
-  describe 'registering a device', ->
-    deferred = null
-    apnsDeferred = null
-    device = null
-
-    beforeEach ->
-      deferred = $q.defer()
-      $cordovaPush.register.and.returnValue deferred.promise
-      spyOn PushNotifications, 'handleNotification'
-
-    describe 'when is is an iOS device', ->
-      iosConfig = null
-      resolved = null
-      rejected = null
-
-      beforeEach ->
-        iosConfig =
-          badge: true
-          sound: true
-          alert: true
-        $cordovaDevice.getPlatform.and.returnValue 'iOS'
-
-        PushNotifications.register().then ->
-          resolved = true
-        , ->
-          rejected = true
-
-      it 'should trigger the request notifications prompt', ->
-        expect($cordovaPush.register).toHaveBeenCalledWith iosConfig
-
-      describe 'permission granted', ->
-        deviceToken = null
-        saveDeferred = null
-
-        beforeEach ->
-          deviceToken = '1234'
-
-          saveDeferred = $q.defer()
-          spyOn(PushNotifications, 'saveToken').and.returnValue saveDeferred.promise
-
-          deferred.resolve deviceToken
-          $rootScope.$apply()
-
-        it 'should call save token', ->
-          expect(PushNotifications.saveToken).toHaveBeenCalledWith deviceToken
-
-        describe 'a notification is sent', ->
-
-          beforeEach ->
-            $rootScope.$broadcast '$cordovaPush:notificationReceived'
-            $rootScope.$apply()
-
-          it 'should call handle notificaiton', ->
-            expect(PushNotifications.handleNotification).toHaveBeenCalled()
-
-
-        describe 'save succeeds', ->
-
-          beforeEach ->
-            saveDeferred.resolve()
-            $rootScope.$apply()
-
-          it 'should resolve the promise', ->
-            expect(resolved).toBe true
-
-
-        describe 'save fails', ->
-
-          beforeEach ->
-            saveDeferred.reject()
-            $rootScope.$apply()
-
-          it 'should reject the promise', ->
-            expect(rejected).toBe true
-
-
-      describe 'permission denied', ->
-        rejected = null
-
-        beforeEach ->
-          deferred.reject()
-          $rootScope.$apply()
-
-        it 'should reject the promise', ->
-          expect(rejected).toBe true
 
 
   describe 'saving the device token', ->
@@ -212,7 +132,7 @@ describe 'PushNotifications service', ->
           expect(rejected).toBe true
 
 
-    describe 'when using an iOS device', ->
+    describe 'when using an android device', ->
       device = null
       deviceToken = null
       deferred = null
@@ -238,7 +158,7 @@ describe 'PushNotifications service', ->
         , ->
           rejected = true
 
-      it 'should create a new APNSDevice and call save', ->
+      it 'should create a new GCMDevice and call save', ->
         name = device.model + ', ' + device.version
         gcmDevice =
           userId: Auth.user.id
@@ -288,105 +208,69 @@ describe 'PushNotifications service', ->
 
       beforeEach ->
         $cordovaDevice.getPlatform.and.returnValue 'Android'
-        spyOn PushNotifications, 'registerAndroid'
+        spyOn PushNotifications, 'register'
 
         PushNotifications.listen()
 
       it 'should call register', ->
-        expect(PushNotifications.registerAndroid).toHaveBeenCalled()
+        expect(PushNotifications.register).toHaveBeenCalled()
 
 
-  describe 'handling notifications', ->
-
-    describe 'when using an iOS device', ->
-      beforeEach ->
-        $cordovaDevice.getPlatform.and.returnValue 'iOS'
-
-      describe 'when notification has an alert', ->
-        alert = null
-
-        beforeEach ->
-          alert = 'Chris MacPherson add you back!'
-          notification =
-            alert: alert
-
-          spyOn ngToast, 'create'
-
-          PushNotifications.handleNotification null, notification
-
-        it 'should show a notification', ->
-          expect(ngToast.create).toHaveBeenCalledWith alert
-
-
-      describe 'when notification is for a new invitation', ->
-        alert = null
-
-        beforeEach ->
-          alert = 'from Chris MacPherson'
-          notification =
-            alert: alert
-
-          spyOn ngToast, 'create'
-
-          PushNotifications.handleNotification null, notification
-
-        it 'should show add "Down. " to the alert and show a notification', ->
-          expect(ngToast.create).toHaveBeenCalledWith "Down. #{alert}"
-
-
-      xdescribe 'when notification has a sound', ->
-        event = null
-
-        beforeEach ->
-          event =
-            sound: 'some sound'
-
-
-  describe 'register android', ->
-    pushOptions = null
+  describe 'register a device', ->
     push = null
 
     beforeEach ->
-      androidSenderID = '1234'
-      PushNotifications.androidSenderID = androidSenderID
-      pushOptions =
-        android:
-          senderID: androidSenderID
-          icon: 'push_icon'
-          iconColor: '#6A38AB'
       push =
         on: jasmine.createSpy 'push.on'
       $window.PushNotification =
         init: jasmine.createSpy('PushNotification.init').and.returnValue push
 
-      PushNotifications.registerAndroid()
+      PushNotifications.register()
 
     it 'should init the push plugin', ->
-      expect($window.PushNotification.init).toHaveBeenCalledWith pushOptions
+      expect($window.PushNotification.init).toHaveBeenCalledWith
+        android:
+          senderID: androidSenderID
+          icon: 'push_icon'
+          iconColor: '#6A38AB'
+        ios:
+          alert: true
+          badge: true
+          sound: true
 
     it 'should listen for notification registration', ->
       expect(push.on).toHaveBeenCalledWith('registration',
-          PushNotifications.handleRegistrationAndroid)
+          PushNotifications.handleRegistration)
 
     it 'should listen for notifications', ->
       expect(push.on).toHaveBeenCalledWith('notification',
-          PushNotifications.handleNotificationAndroid)
+          PushNotifications.handleNotification)
+
+    describe 'when using the old plugin', ->
+
+      beforeEach ->
+        $window.PushNotification = undefined
+        spyOn PushNotifications, 'registerWithOldPlugin'
+        PushNotifications.register()
+
+      it 'should call register with the old plugin', ->
+        expect(PushNotifications.registerWithOldPlugin).toHaveBeenCalled()
 
 
-  describe 'handle registration android', ->
+  describe 'handling registration', ->
     deviceToken = null
 
     beforeEach ->
       spyOn PushNotifications, 'saveToken'
       deviceToken = '1324'
 
-      PushNotifications.handleRegistrationAndroid {registrationId: deviceToken}
+      PushNotifications.handleRegistration {registrationId: deviceToken}
 
     it 'should save the token', ->
       expect(PushNotifications.saveToken).toHaveBeenCalledWith deviceToken
 
 
-  describe 'handle notification android', ->
+  describe 'handle notifications', ->
 
     describe 'when notification is for a message', ->
         message = null
@@ -398,7 +282,7 @@ describe 'PushNotifications service', ->
 
           spyOn ngToast, 'create'
 
-          PushNotifications.handleNotificationAndroid data
+          PushNotifications.handleNotification data
 
         it 'should show a notification', ->
           expect(ngToast.create).toHaveBeenCalledWith message
@@ -414,7 +298,118 @@ describe 'PushNotifications service', ->
 
           spyOn ngToast, 'create'
 
-          PushNotifications.handleNotificationAndroid data
+          PushNotifications.handleNotification data
 
         it 'should show add "Down. " to the message and show a notification', ->
           expect(ngToast.create).toHaveBeenCalledWith "Down. #{message}"
+
+
+  describe 'registering a device with the old plugin', ->
+      resolved = null
+      rejected = null
+      deferred = null
+
+      beforeEach ->
+        deferred = $q.defer()
+        $cordovaPush.register.and.returnValue deferred.promise
+        spyOn PushNotifications, 'handleNotificationWithOldPlugin'
+
+        PushNotifications.registerWithOldPlugin().then ->
+          resolved = true
+        , ->
+          rejected = true
+
+        # Simulate new push notification
+        $rootScope.$broadcast '$cordovaPush:notificationReceived'
+        $rootScope.$apply()
+
+
+      it 'should trigger the request notifications prompt', ->
+        expect($cordovaPush.register).toHaveBeenCalledWith
+          badge: true
+          sound: true
+          alert: true
+
+      it 'should listen for notifications', ->
+        expect(PushNotifications.handleNotificationWithOldPlugin).toHaveBeenCalled()
+
+      describe 'permission granted', ->
+        deviceToken = null
+        saveDeferred = null
+
+        beforeEach ->
+          deviceToken = '1234'
+
+          saveDeferred = $q.defer()
+          spyOn(PushNotifications, 'saveToken').and.returnValue saveDeferred.promise
+
+          deferred.resolve deviceToken
+          $rootScope.$apply()
+
+        it 'should save the token', ->
+          expect(PushNotifications.saveToken).toHaveBeenCalledWith deviceToken
+
+        describe 'save succeeds', ->
+
+          beforeEach ->
+            saveDeferred.resolve()
+            $rootScope.$apply()
+
+          it 'should resolve the promise', ->
+            expect(resolved).toBe true
+
+
+        describe 'save fails', ->
+
+          beforeEach ->
+            saveDeferred.reject()
+            $rootScope.$apply()
+
+          it 'should reject the promise', ->
+            expect(rejected).toBe true
+
+
+      describe 'permission denied', ->
+        rejected = null
+
+        beforeEach ->
+          deferred.reject()
+          $rootScope.$apply()
+
+        it 'should reject the promise', ->
+          expect(rejected).toBe true
+
+
+  describe 'handling notifications with the old plugin', ->
+
+    describe 'when notification has an alert', ->
+      alert = null
+
+      beforeEach ->
+        spyOn ngToast, 'create'
+
+        alert = 'Chris MacPherson add you back!'
+        notification =
+          alert: alert
+
+        PushNotifications.handleNotificationWithOldPlugin null, notification
+
+      it 'should show a notification', ->
+        expect(ngToast.create).toHaveBeenCalledWith alert
+
+
+    describe 'when notification is for a new invitation', ->
+      alert = null
+
+      beforeEach ->
+        spyOn ngToast, 'create'
+
+        alert = 'from Chris MacPherson'
+        notification =
+          alert: alert
+
+        PushNotifications.handleNotificationWithOldPlugin null, notification
+
+      it 'should show add "Down. " to the alert and show a notification', ->
+        expect(ngToast.create).toHaveBeenCalledWith "Down. #{alert}"
+

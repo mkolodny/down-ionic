@@ -159,7 +159,7 @@ class Auth
          and isIOS
       @$state.go 'requestContacts'
     else if @localStorage.get('hasCompletedFindFriends') is null \
-         and isIOS or isAndroid
+         and (isIOS or isAndroid)
       @$state.go 'findFriends'
     else
       @$state.go 'events'
