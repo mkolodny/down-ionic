@@ -139,6 +139,7 @@ class Auth
 
   redirectForAuthState: ->
     isIOS = ionic.Platform.isIOS()
+    isAndroid = ionic.Platform.isAndroid()
 
     if not @phone?
       @$state.go 'login'
@@ -157,7 +158,8 @@ class Auth
     else if @localStorage.get('hasRequestedContacts') is null \
          and isIOS
       @$state.go 'requestContacts'
-    else if @localStorage.get('hasCompletedFindFriends') is null
+    else if @localStorage.get('hasCompletedFindFriends') is null \
+         and isIOS or isAndroid
       @$state.go 'findFriends'
     else
       @$state.go 'events'

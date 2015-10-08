@@ -48,15 +48,15 @@
   <script src="resources/meteor.js"></script>
 
   <!-- Get any remaining scripts from CDN for backwards compatibility -->
-  <script id="script-injector" type="text/javascript">
+  <script>
     (function(d){
       function injectScripts (scriptsArray) {
         for (var i = 0; i < scriptsArray.length; i++) {
           var scriptUrl = scriptsArray[i];
           var js = d.createElement('script'); 
           js.src = scriptUrl;
-          var ref = d.getElementById('script-injector');
-          ref.insertAdjacentElement('afterEnd', js);
+          js.async = false;
+          document.head.appendChild(js);
         }
       }
 
@@ -89,6 +89,8 @@
         var scripts = ['https://d3r38ef3fjjz7g.cloudfront.net/vendor/meteor.min.js'];
         injectScripts(scripts);
       }
+
+      injectScripts(['app/bundle.js']);
     }(document));
   </script>
 
@@ -96,11 +98,7 @@
 
   <script src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
 </head>
-<body class="platform-ios platform-cordova platform-webview">
-
-  <!-- Load app bundle -->
-  <script src="app/bundle.js"></script>
-  
+<body class="platform-ios platform-cordova platform-webview">  
   <toast></toast>
   <ion-nav-bar 
     no-tap-scroll="true" 

@@ -119,14 +119,17 @@ angular.module 'down', [
       $window.cordova?.plugins.Keyboard?.disableScroll true
 
       # Make the status bar white.
-      $cordovaStatusbar.overlaysWebView true
-      $cordovaStatusbar.style 1
+      if angular.isDefined $window.StatusBar
+        $cordovaStatusbar.overlaysWebView true
+        $cordovaStatusbar.style 1
 
       # Start a Branch session.
-      branch.init branchKey, (err, data) ->
+      if angular.isDefined $window.branch
+        $window.branch.init branchKey, (err, data) ->
 
       # Start listening for notifications.
-      PushNotifications.listen()
+      if angular.isDefined $window.device
+        PushNotifications.listen()
 
       # Prevent hardware back button from returning
       #   to login views on Android
