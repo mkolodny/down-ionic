@@ -18,4 +18,54 @@
   <asset src="www/ionic-angular.min.js" target="resources/ionic-angular.js" />
   <asset src="www/meteor.min.js" target="resources/meteor.js"/>
 
+  <platform name="ios">
+
+    <!-- Deep linking url schemes -->
+    <config-file target="*-Info.plist" parent="CFBundleURLTypes">
+      <array>
+          <dict>
+              <key>CFBundleURLSchemes</key>
+              <array>
+                <!-- Production -->
+                <!-- <string>down</string> -->
+                <!-- <string>rallytap</string> -->
+
+                <!-- Staging -->
+                <string>down.dev</string>
+                <string>rallytap.dev</string>
+              </array>
+          </dict>
+      </array>
+    </config-file>
+
+    <!-- Request location prompt -->
+    <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
+      <string>RallyTap makes it easy to do fun stuff with your nearby friends.</string>
+    </config-file>
+
+    <!-- Allow opening google maps -->
+    <config-file target="*-Info.plist" parent="LSApplicationQueriesSchemes">
+      <array>
+        <string>comgooglemaps</string>
+        <string>fb</string>
+        <string>uber</string>
+        <string>twitter</string>
+        <string>pinterest</string>
+        <string>instagram</string>
+        <string>yelp</string>
+        <string>vnd.youtube</string>
+        <string>foursquare</string>
+      </array>
+    </config-file>
+
+    <!-- Allow HTTP -->
+    <config-file target="*-Info.plist" parent="NSAppTransportSecurity">
+      <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+      </dict>
+    </config-file>
+
+  </platform>
+
 </plugin>

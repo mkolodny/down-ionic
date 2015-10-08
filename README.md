@@ -32,6 +32,14 @@ Add to iOS Info.plist to open map links in Google Maps:
 <key>LSApplicationQueriesSchemes</key>
 <array>
     <string>comgooglemaps</string>
+    <string>fb</string>
+    <string>uber</string>
+    <string>twitter</string>
+    <string>pinterest</string>
+    <string>instagram</string>
+    <string>yelp</string>
+    <string>vnd.youtube</string>
+    <string>foursquare</string>
 </array>
 
 See https://github.com/ohh2ahh/AppAvailability#important-ios-9-url-scheme-whitelist for more info.
