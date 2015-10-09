@@ -7,6 +7,7 @@ require './ionic/ionic-core.js'
 require './ionic/ionic-deploy.js'
 require './vendor/mixpanel/mixpanel-jslib-snippet'
 # Common
+require './common/local-db/local-db-module'
 require './common/meteor/meteor'
 require './common/mixpanel/mixpanel-module'
 require './common/auth/auth-module'
@@ -46,6 +47,7 @@ angular.module 'down', [
     'down.env'
     'down.resources'
     'down.login'
+    'down.localDB'
     'down.verifyPhone'
     'down.facebookSync'
     'down.setUsername'
@@ -102,7 +104,7 @@ angular.module 'down', [
         $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel,
         $rootScope, $state, $window, Auth, branchKey,
         localStorageService, ionicDeployChannel, PushNotifications,
-        skipIonicDeploy, User) ->
+        skipIonicDeploy, User, LocalDB) ->
     # Resume session from localStorage
     Auth.resumeSession()
 
@@ -110,6 +112,9 @@ angular.module 'down', [
     Put anything that touches Cordova in here!
     ###
     bootstrap = ->
+      # Init local db
+      LocalDB.init()
+
       # Hide the accessory bar by default (remove this to show the accessory bar
       # above the keyboard for form inputs)
       $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true

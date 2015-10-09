@@ -4,7 +4,7 @@ class LocalDB
    
   init: ->
     # Options docs: http://pouchdb.com/api.html
-    @db = pouchDB 'localStorage',
+    @db = new @$window.PouchDB 'localStorage',
       location: 2 # Not visible in iTunes, not backed up to iCloud
       androidDatabaseImplementation: 2 # Use native SQLite
       adapter: 'websql' # For SQLite plugin
