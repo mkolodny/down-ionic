@@ -17,6 +17,7 @@
   <asset src="www/angular-ui-router.min.js" target="resources/angular-ui-router.js"/>
   <asset src="www/ionic-angular.min.js" target="resources/ionic-angular.js" />
   <asset src="www/meteor.min.js" target="resources/meteor.js"/>
+  <asset src="www/pouchdb-5.0.0.min.js" target="resources/pouchdb.js" />
 
   <platform name="ios">
 

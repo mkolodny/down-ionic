@@ -46,6 +46,7 @@
   <script src="resources/angular-ui-router.js"></script>
   <script src="resources/ionic-angular.js"></script>
   <script src="resources/meteor.js"></script>
+  <script src="resources/pouchdb.js"></script>
 
   <!-- Get any remaining scripts from CDN for backwards compatibility -->
   <script>
@@ -87,6 +88,12 @@
       // Meteor
       if (window.Meteor === undefined) {
         var scripts = ['https://d3r38ef3fjjz7g.cloudfront.net/vendor/meteor.min.js'];
+        injectScripts(scripts);
+      }
+
+      // PouchDb
+      if (window.PouchDb === undefined) {
+        var scripts = ['https://cdn.jsdelivr.net/pouchdb/5.0.0/pouchdb.min.js'];
         injectScripts(scripts);
       }
 
