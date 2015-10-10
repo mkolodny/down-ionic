@@ -159,6 +159,7 @@ angular.module 'down', [
           or !ionic.Platform.isIOS()
         Auth.watchLocation()
 
+      $rootScope.finishedBootstrap = true
       Auth.redirectForAuthState()
 
     $ionicPlatform.ready ->

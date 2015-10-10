@@ -271,6 +271,9 @@ body {
     border-bottom: 0 !important;
   }
 }
+ion-nav-back-button {
+  display: none;
+}
 
 .bar {
   background-color: $brand-color;
