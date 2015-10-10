@@ -5,7 +5,7 @@ angular.module 'down.env', []
   .constant 'apiRoot', 'https://down-prod.herokuapp.com/api'
   .constant 'branchKey', 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ'
   .constant 'mixpanelToken', '14c9d01044b39cc2c5cfc2dc8efbe532'
-  .constant 'ionicDeployChannel', 'staging'
+  .constant 'ionicDeployChannel', 'production'
   .constant 'androidSenderID', '189543748377'
 ### @endif ###
 

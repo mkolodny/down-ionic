@@ -67,6 +67,11 @@
       </dict>
     </config-file>
 
+    <!-- Disable iPad multi-tasking -->  
+    <config-file target="*-Info.plist" parent="UIRequiresFullScreen">
+        <true/>
+    </config-file>
+
   </platform>
 
 </plugin>

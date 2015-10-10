@@ -224,7 +224,7 @@ gulp.task 'ionic-upload', (done) ->
 
     # Set Ionic deploy tag
     if argv.e is 'prod'
-      deployTag = 'staging'
+      deployTag = 'production'
     else if argv.e is 'staging'
       deployTag = 'dev'
     else
