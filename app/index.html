@@ -1,119 +1,114 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-  <meta name="format-detection" content="telephone=no">
-  <title>Down.</title>
-
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css?family=Viga" rel="stylesheet">
-
-  <!-- cordova script (this will be a 404 during development) -->
-  <script src="cordova.js"></script>
-
-  <!-- Set Meteor Config Variable -->
-  <!-- @if BUILD_ENV='prod' -->
-  <script type="text/javascript">
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta name="format-detection" content="telephone=no">
+    <title>Down.</title>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Viga" rel="stylesheet">
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+    <!-- Set Meteor Config Variable -->
+    <!-- @if BUILD_ENV='prod' -->
+    <script type="text/javascript">
     window.__meteor_runtime_config__ = {
-      DDP_DEFAULT_CONNECTION_URL:'https://down-meteor.herokuapp.com'
+        DDP_DEFAULT_CONNECTION_URL: 'https://down-meteor.herokuapp.com'
     };
-  </script>
-  <!-- @endif -->
-
-  <!-- @if BUILD_ENV='staging' -->
-  <script type="text/javascript">
+    </script>
+    <!-- @endif -->
+    <!-- @if BUILD_ENV='staging' -->
+    <script type="text/javascript">
     window.__meteor_runtime_config__ = {
-      DDP_DEFAULT_CONNECTION_URL:'https://down-meteor-staging.herokuapp.com'
+        DDP_DEFAULT_CONNECTION_URL: 'https://down-meteor-staging.herokuapp.com'
     };
-  </script>
-  <!-- @endif -->
-
-  <!-- @if BUILD_ENV='local' -->
-  <script type="text/javascript">
+    </script>
+    <!-- @endif -->
+    <!-- @if BUILD_ENV='local' -->
+    <script type="text/javascript">
     window.__meteor_runtime_config__ = {
-      DDP_DEFAULT_CONNECTION_URL:'http://localhost:3500'
+        DDP_DEFAULT_CONNECTION_URL: 'http://localhost:3500'
     };
-  </script>
-  <!-- @endif -->
-
-  <!-- Load scripts from local resources plugin -->
-  <script src="resources/ionic.js"></script>
-  <script src="resources/jquery.js"></script>
-  <script src="resources/angular.js"></script>
-  <script src="resources/angular-animate.js"></script>
-  <script src="resources/angular-sanitize.js"></script>
-  <script src="resources/angular-ui-router.js"></script>
-  <script src="resources/ionic-angular.js"></script>
-  <script src="resources/meteor.js"></script>
-  <script src="resources/pouchdb.js"></script>
-
-  <!-- Get any remaining scripts from CDN for backwards compatibility -->
-  <script>
-    (function(d){
-      function injectScripts (scriptsArray) {
-        for (var i = 0; i < scriptsArray.length; i++) {
-          var scriptUrl = scriptsArray[i];
-          var js = d.createElement('script'); 
-          js.src = scriptUrl;
-          js.async = false;
-          document.head.appendChild(js);
+    </script>
+    <!-- @endif -->
+    <!-- Load scripts from local resources plugin -->
+    <script src="resources/ionic.js"></script>
+    <script src="resources/jquery.js"></script>
+    <script src="resources/angular.js"></script>
+    <script src="resources/angular-animate.js"></script>
+    <script src="resources/angular-sanitize.js"></script>
+    <script src="resources/angular-ui-router.js"></script>
+    <script src="resources/ionic-angular.js"></script>
+    <script src="resources/meteor.js"></script>
+    <script src="resources/pouchdb.js"></script>
+    <!-- Get any remaining scripts from CDN for backwards compatibility -->
+    <script>
+    (function(d) {
+        function injectScripts(scriptsArray) {
+            for (var i = 0; i < scriptsArray.length; i++) {
+                var scriptUrl = scriptsArray[i];
+                var js = d.createElement('script');
+                js.src = scriptUrl;
+                js.async = false;
+                document.head.appendChild(js);
+            }
         }
-      }
 
-      // Ionic
-      if (window.ionic === undefined) {
-        var scripts = ['https://d3r38ef3fjjz7g.cloudfront.net/vendor/ionic.min.js'];
-        injectScripts(scripts);
-      }
+        // Ionic
+        if (window.ionic === undefined) {
+            var scripts = ['https://d3r38ef3fjjz7g.cloudfront.net/vendor/ionic.min.js'];
+            injectScripts(scripts);
+        }
 
-      // jquery
-      if (window.jQuery === undefined) {
-        var scripts = ['https://code.jquery.com/jquery-1.11.3.min.js'];
-        injectScripts(scripts);
-      }
-    
-      // angular
-      if (window.angular === undefined) {
-        var scripts = [
-          'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular.min.js',
-          'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular-animate.min.js',
-          'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular-sanitize.min.js',
-          'https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.13/angular-ui-router.min.js',
-          'https://d3r38ef3fjjz7g.cloudfront.net/vendor/ionic-angular.min.js'
-        ];
-        injectScripts(scripts);
-      }
+        // jquery
+        if (window.jQuery === undefined) {
+            var scripts = ['https://code.jquery.com/jquery-1.11.3.min.js'];
+            injectScripts(scripts);
+        }
 
-      // Meteor
-      if (window.Meteor === undefined) {
-        var scripts = ['https://d3r38ef3fjjz7g.cloudfront.net/vendor/meteor.min.js'];
-        injectScripts(scripts);
-      }
+        // angular
+        if (window.angular === undefined) {
+            var scripts = [
+                'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular-animate.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular-sanitize.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.13/angular-ui-router.min.js',
+                'https://d3r38ef3fjjz7g.cloudfront.net/vendor/ionic-angular.min.js'
+            ];
+            injectScripts(scripts);
+        }
 
-      // PouchDb
-      if (window.PouchDb === undefined) {
-        var scripts = ['https://cdn.jsdelivr.net/pouchdb/5.0.0/pouchdb.min.js'];
-        injectScripts(scripts);
-      }
+        // Meteor
+        if (window.Meteor === undefined) {
+            var scripts = ['https://d3r38ef3fjjz7g.cloudfront.net/vendor/meteor.min.js'];
+            injectScripts(scripts);
+        }
 
-      injectScripts(['app/bundle.js']);
+        // PouchDb
+        if (window.PouchDb === undefined) {
+            var scripts = ['https://cdn.jsdelivr.net/pouchdb/5.0.0/pouchdb.min.js'];
+            injectScripts(scripts);
+        }
+
+        injectScripts(['app/bundle.js']);
     }(document));
-  </script>
-
-  <link href="app/main.css" rel="stylesheet">
-
-  <script src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
+    </script>
+    <link href="app/main.css" rel="stylesheet">
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
 </head>
-<body class="platform-ios platform-cordova platform-webview">  
-  <toast></toast>
-  <ion-nav-bar 
-    no-tap-scroll="true" 
-    ng-class="{'hide-nav-bottom-border': hideNavBottomBorder}">
-    <ion-nav-back-button>
-     <i class="fa fa-chevron-left fa-lg"></i>
-    </ion-nav-back-button>
-  </ion-nav-bar>
-  <ion-nav-view></ion-nav-view>
+
+<body class="platform-ios platform-cordova platform-webview">
+    <div class="bar bar-header" ng-if="!finishedBootstrap"></div>
+
+    <toast></toast>
+    <ion-nav-bar no-tap-scroll="true" ng-class="{'hide-nav-bottom-border': hideNavBottomBorder}">
+        <ion-nav-back-button>
+            <i class="fa fa-chevron-left fa-lg"></i>
+        </ion-nav-back-button>
+    </ion-nav-bar>
+    <ion-nav-view>
+    </ion-nav-view>
 </body>
+
 </html>
