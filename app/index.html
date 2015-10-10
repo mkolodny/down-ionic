@@ -91,13 +91,14 @@
             injectScripts(scripts);
         }
 
-        injectScripts(['app/bundle.js']);
+        injectScripts([
+          'app/bundle.js',
+          'https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false'
+        ]);
     }(document));
     </script>
     <link href="app/main.css" rel="stylesheet">
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
 </head>
-
 <body class="platform-ios platform-cordova platform-webview">
     <div class="bar bar-header" ng-if="!finishedBootstrap"></div>
 
