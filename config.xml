@@ -2,7 +2,7 @@
 <widget id="linfootco.Down.dev" version="3.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>Rallytap</name>
   <description>
-    Emphemeral group chats for events.
+    RallyTap helps you get together with friends.
   </description>
   <author email="contact@rallytap.com" href="http://rallytap.com">
     Rallytap Inc.

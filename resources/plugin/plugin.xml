@@ -41,7 +41,7 @@
 
     <!-- Request location prompt -->
     <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
-      <string>RallyTap makes it easy to do fun stuff with your nearby friends.</string>
+      <string>Rallytap helps you get together with friends.</string>
     </config-file>
 
     <!-- Allow opening google maps -->
