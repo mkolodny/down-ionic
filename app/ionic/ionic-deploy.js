@@ -310,16 +310,15 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
   var get_ionic_app_id = function() {
     return 'e918d37e';
     /*
-    
-     NOTE!! MADE THE CHANGES
+      NOTE!! MADE THE CHANGES
 
-    if ($ionicCoreSettings.get('app_id')) {
-      return $ionicCoreSettings.get('app_id')
-    } else if ($ionicApp.getApp().app_id) {
-      return $ionicApp.getApp().app_id
-    } else {
-      return null;
-    }
+      if ($ionicCoreSettings.get('app_id')) {
+        return $ionicCoreSettings.get('app_id')
+      } else if ($ionicApp.getApp().app_id) {
+        return $ionicApp.getApp().app_id
+      } else {
+        return null;
+      }
     */
   };
 
@@ -327,9 +326,11 @@ angular.module('ionic.service.deploy', ['ionic.service.core'])
     console.log("Ionic Deploy: Init");
     if (typeof IonicDeploy != "undefined") {
       if (ionic.Platform.isAndroid()) {
-        IonicDeploy.init(get_ionic_app_id());
+        IonicDeploy.init('e918d37e');
+        // IonicDeploy.init(get_ionic_app_id());
       } else {
-        IonicDeploy.redirect(get_ionic_app_id());
+        IonicDeploy.redirect('e918d37e');
+        // IonicDeploy.redirect(get_ionic_app_id());
       }
     }
   };
