@@ -102,7 +102,7 @@ angular.module 'down', [
         $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel,
         $rootScope, $state, $window, Auth, branchKey,
         localStorageService, ionicDeployChannel, PushNotifications,
-        skipIonicDeploy, User, LocalDB) ->
+        skipIonicDeploy, User) ->
     # Resume session from localStorage
     Auth.resumeSession()
 
