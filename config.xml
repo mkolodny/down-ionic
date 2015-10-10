@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="linfootco.Down.dev" version="2.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>Down.</name>
+<widget id="linfootco.Down.dev" version="3.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+  <name>Rallytap</name>
   <description>
     Emphemeral group chats for events.
   </description>
-  <author email="contact@down.life" href="http://down.life/">
-    Down. Inc.
+  <author email="contact@rallytap.com" href="http://rallytap.com">
+    Rallytap Inc.
   </author>
   <content src="index.html"/>
   <access origin="*"/>
