@@ -1,5 +1,11 @@
 # down-ionic
 
+## AppStore Deploy checklist
+
+bundle id: linfootco.Down.dev -> linfootco.Down
+switch deeplinks in resources plugin.xml
+switch facebook app id/name in package.json
+
 ## App id
 
 In config.xml:
