@@ -103,7 +103,7 @@ describe 'find friends controller', ->
             ]
           items = [
             isDivider: true
-            title: 'Friends Using Down'
+            title: 'Friends Using Rallytap'
           ,
             isDivider: false
             user: facebookFriend
@@ -174,7 +174,7 @@ describe 'find friends controller', ->
     it 'should create and set items for facebook friends', ->
       items = [
         isDivider: true
-        title: 'Friends Using Down'
+        title: 'Friends Using Rallytap'
       ,
         isDivider: false
         user:
@@ -224,7 +224,7 @@ describe 'find friends controller', ->
     it 'should return the built items', ->
       items = [
         isDivider: true
-        title: 'Friends Using Down'
+        title: 'Friends Using Rallytap'
       ,
         isDivider: false
         user: contactUser

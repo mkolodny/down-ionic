@@ -300,8 +300,8 @@ describe 'PushNotifications service', ->
 
           PushNotifications.handleNotification data
 
-        it 'should show add "Down. " to the message and show a notification', ->
-          expect(ngToast.create).toHaveBeenCalledWith "Down. #{message}"
+        it 'should show add "Down? " to the message and show a notification', ->
+          expect(ngToast.create).toHaveBeenCalledWith "Down? #{message}"
 
 
   describe 'registering a device with the old plugin', ->
@@ -410,6 +410,6 @@ describe 'PushNotifications service', ->
 
         PushNotifications.handleNotificationWithOldPlugin null, notification
 
-      it 'should show add "Down. " to the alert and show a notification', ->
-        expect(ngToast.create).toHaveBeenCalledWith "Down. #{alert}"
+      it 'should show add "Down? " to the alert and show a notification', ->
+        expect(ngToast.create).toHaveBeenCalledWith "Down? #{alert}"
 

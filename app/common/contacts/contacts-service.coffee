@@ -43,7 +43,7 @@ class Contacts
     deferred.promise
 
   ###*
-   * Check which of the user's contacts are Down users. If a contact is a Down
+   * Check which of the user's contacts are Rallytap users. If a contact is a Rallytap
    * user, set their user object as a property on the contact object.
    *
    * @param {Object[]} contacts - The user's contacts, provided by Cordova.

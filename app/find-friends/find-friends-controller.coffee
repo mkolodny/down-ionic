@@ -44,12 +44,12 @@ class FindFriendsCtrl
 
     items = []
 
-    # Only show the "Friends Using Down" divider when the user has friends using
-    #   Down.
+    # Only show the "Friends Using Rallytap" divider when the user has friends using
+    #   Rallytap.
     if users.length > 0
       items.push
         isDivider: true
-        title: 'Friends Using Down'
+        title: 'Friends Using Rallytap'
       users.sort (a, b) ->
         if a.name.toLowerCase() < b.name.toLowerCase()
           return -1

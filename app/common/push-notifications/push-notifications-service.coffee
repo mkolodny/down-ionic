@@ -74,7 +74,7 @@ class PushNotifications
       message = data.message
       # format message for in app display
       if message.indexOf('from ') is 0
-        message = "Down. #{message}"
+        message = "Down? #{message}"
       @ngToast.create message
 
       # Refresh UI because scope changed happened
@@ -115,7 +115,7 @@ class PushNotifications
     if angular.isDefined message
       # format message for in app display
       if message.indexOf('from ') is 0
-        message = "Down. #{message}"
+        message = "Down? #{message}"
       @ngToast.create message
 
 module.exports = PushNotifications
