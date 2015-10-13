@@ -32,71 +32,10 @@
     };
     </script>
     <!-- @endif -->
-    <!-- Load scripts from local resources plugin -->
-    <script src="resources/ionic.js"></script>
-    <script src="resources/jquery.js"></script>
-    <script src="resources/angular.js"></script>
-    <script src="resources/angular-animate.js"></script>
-    <script src="resources/angular-sanitize.js"></script>
-    <script src="resources/angular-ui-router.js"></script>
-    <script src="resources/ionic-angular.js"></script>
-    <script src="resources/meteor.js"></script>
-    <script src="resources/pouchdb.js"></script>
-    <!-- Get any remaining scripts from CDN for backwards compatibility -->
-    <script>
-    (function(d) {
-        function injectScripts(scriptsArray) {
-            for (var i = 0; i < scriptsArray.length; i++) {
-                var scriptUrl = scriptsArray[i];
-                var js = d.createElement('script');
-                js.src = scriptUrl;
-                js.async = false;
-                document.head.appendChild(js);
-            }
-        }
+    
+    <script src="app/bundle.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
 
-        // Ionic
-        if (window.ionic === undefined) {
-            var scripts = ['https://d3r38ef3fjjz7g.cloudfront.net/vendor/ionic.min.js'];
-            injectScripts(scripts);
-        }
-
-        // jquery
-        if (window.jQuery === undefined) {
-            var scripts = ['https://code.jquery.com/jquery-1.11.3.min.js'];
-            injectScripts(scripts);
-        }
-
-        // angular
-        if (window.angular === undefined) {
-            var scripts = [
-                'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular.min.js',
-                'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular-animate.min.js',
-                'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.13/angular-sanitize.min.js',
-                'https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.13/angular-ui-router.min.js',
-                'https://d3r38ef3fjjz7g.cloudfront.net/vendor/ionic-angular.min.js'
-            ];
-            injectScripts(scripts);
-        }
-
-        // Meteor
-        if (window.Meteor === undefined) {
-            var scripts = ['https://d3r38ef3fjjz7g.cloudfront.net/vendor/meteor.min.js'];
-            injectScripts(scripts);
-        }
-
-        // PouchDb
-        if (window.PouchDb === undefined) {
-            var scripts = ['https://cdn.jsdelivr.net/pouchdb/5.0.0/pouchdb.min.js'];
-            injectScripts(scripts);
-        }
-
-        injectScripts([
-          'app/bundle.js',
-          'https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false'
-        ]);
-    }(document));
-    </script>
     <link href="app/main.css" rel="stylesheet">
 </head>
 <body class="platform-ios platform-cordova platform-webview">

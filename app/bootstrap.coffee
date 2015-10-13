@@ -1,3 +1,10 @@
+require './ionic/ionic.js'
+window.$ = window.jQuery = require 'jquery' # jquery must be loaded before angular - needed for intl-phone
+require 'angular'
+require 'angular-animate'
+require 'angular-sanitize'
+require 'angular-ui-router'
+require './ionic/ionic-angular.js'
 require './app-module'
 
 # Tell AngularJS to go ahead and bootstrap when the DOM is loaded
