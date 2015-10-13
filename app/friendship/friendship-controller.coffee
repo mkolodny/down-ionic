@@ -1,10 +1,10 @@
 class FriendshipCtrl
   @$inject: ['$ionicLoading', '$ionicScrollDelegate', '$meteor', '$mixpanel',
              '$scope', '$state', '$stateParams', 'Auth', 'Invitation',
-             'Friendship', 'ngToast', 'User']
+             'Friendship', 'ngToast', 'User', '$rootScope']
   constructor: (@$ionicLoading, @$ionicScrollDelegate, @$meteor, @$mixpanel,
                 @$scope, @$state, @$stateParams, @Auth, @Invitation,
-                @Friendship, @ngToast, @User) ->
+                @Friendship, @ngToast, @User, @$rootScope) ->
     @friend = @$stateParams.friend
 
     # Set Meteor collections on controller
@@ -16,7 +16,7 @@ class FriendshipCtrl
       @shouldScrollBottom = false
 
       @getFriendInvitations()
-
+      @$rootScope.hideNavBottomBorder = true
       @chatId = @Friendship.getChatId @friend.id
 
       # Subscribe to the event's chat.
@@ -35,6 +35,8 @@ class FriendshipCtrl
     @$scope.$on '$ionicView.leave', =>
       # Remove angular-meteor bindings.
       @messages.stop()
+
+      @$rootScope.hideNavBottomBorder = false
 
   handleNewMessage: (newMessageId) =>
     if newMessageId is undefined
