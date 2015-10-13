@@ -19,6 +19,7 @@ describe 'friendship controller', ->
   friend = null
   Friendship = null
   Invitation = null
+  matchesCollection = null
   messagesCollection = null
   ngToast = null
   scope = null
@@ -75,9 +76,11 @@ describe 'friendship controller', ->
 
     messagesCollection = 'messagesCollection'
     chatsCollection = 'chatsCollection'
+    matchesCollection = 'matchesCollection'
     $meteor.getCollectionByName.and.callFake (collectionName) ->
       if collectionName is 'messages' then return messagesCollection
       if collectionName is 'chats' then return chatsCollection
+      if collectionName is 'matches' then return matchesCollection
 
     ctrl = $controller FriendshipCtrl,
       $scope: scope
@@ -95,6 +98,9 @@ describe 'friendship controller', ->
   it 'should set the events collection on the controller', ->
     expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
     expect(ctrl.Chats).toBe chatsCollection
+
+  it 'should set the matches collection on the controller', ->
+    expect(ctrl.Matches).toBe matchesCollection
 
   describe 'checking whether a message is an action message', ->
     message = null
@@ -582,6 +588,7 @@ describe 'friendship controller', ->
     chatId = null
     message = null
     messages = null
+    matchObject = null
 
     beforeEach ->
       chatId = '1,2'
@@ -598,8 +605,9 @@ describe 'friendship controller', ->
       messages = [message]
       $meteor.collection.and.returnValue messages
       spyOn ctrl, 'getFriendInvitations'
-
       spyOn ctrl, 'handleNewMessage'
+      matchObject = 'matchObject'
+      spyOn(ctrl, 'getMatch').and.returnValue matchObject
 
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
@@ -625,6 +633,9 @@ describe 'friendship controller', ->
     it 'should request the invitations to/from the friend', ->
       expect(ctrl.getFriendInvitations).toHaveBeenCalled()
 
+    it 'should bind the match AngularMeteorObject to the controller', ->
+      expect(ctrl.match).toBe matchObject
+
     describe 'when no messages were posted yet', ->
 
       beforeEach ->
@@ -648,6 +659,32 @@ describe 'friendship controller', ->
 
       it 'should handle the new message', ->
         expect(ctrl.handleNewMessage).toHaveBeenCalled()
+
+
+  describe 'getting the match', ->
+    meteorObject = null
+    result = null
+
+    beforeEach ->
+      ctrl.friend =
+        id: 1
+      meteorObject = 'meteorObject'
+      scope.$meteorObject = jasmine.createSpy('scope.$meteorObject') \
+      .and.returnValue meteorObject
+      result = ctrl.getMatch()
+
+    it 'should return an AngularMeteorObject', ->
+      expect(result).toBe meteorObject
+
+    it 'should filter matches by friend id', ->
+      selector =
+        $or: [
+          firstUserId: "#{ctrl.friend.id}"
+        ,
+          secondUserId: "#{ctrl.friend.id}"
+        ]
+      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.Matches, selector, false
+
 
 
   describe 'handling a new message', ->
