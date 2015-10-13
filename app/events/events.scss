@@ -106,7 +106,7 @@
   }
   .fa-circle-thin,
   .fa-circle {
-    font-size: 36px;
+    font-size: 40px;
   }
   .fa-circle-thin,
   .fa-hand-o-up {
@@ -117,8 +117,8 @@
     display: none;
   }
   .fa-hand-o-up {
-    top: -1px;
-    font-size: 17px;
+    font-size: 19px;
+    right: 10px;
   }
   .match-button.selected {
     .fa-circle-thin {
@@ -130,8 +130,7 @@
     .fa-hand-o-up {
       color: #fff;
       z-index: 2;
-      top: 0;
-      font-size: 18px;
+      font-size: 20px;
     }
   }
   #add-friends {
