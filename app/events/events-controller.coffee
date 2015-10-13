@@ -8,10 +8,14 @@ class ChatsCtrl
     # Set Meteor collections on controller
     @Messages = @$meteor.getCollectionByName 'messages'
     @Chats = @$meteor.getCollectionByName 'chats'
+    @Matches = @$meteor.getCollectionByName 'matches'
+    @FriendSelects = @$meteor.getCollectionByName 'friendSelects'
+
+    # Subscribe to friendSelects data
+    @$scope.$meteorSubscribe 'friendSelects'
 
     # Init the view.
     @addedMe = []
-    @selectedFriends = {}
 
     @$scope.$on '$ionicView.loaded', =>
       # Fetch the invitations to show on the view.
@@ -81,6 +85,7 @@ class ChatsCtrl
           friend: new @User friend
           id: friend.id
           newestMessage: @getNewestMessage chatId
+          friendSelect: @getFriendSelect friend.id
 
     # Added me section
     if @addedMe.length > 0
@@ -96,6 +101,7 @@ class ChatsCtrl
           friend: user
           id: user.id
           newestMessage: @getNewestMessage chatId
+          friendSelect: @getFriendSelect user.id
 
     items
 
@@ -132,6 +138,11 @@ class ChatsCtrl
     lastRead = (member.lastRead for member in members \
         when "#{@Auth.user.id}" is member.userId)[0]
     lastRead >= message.createdAt
+
+  getFriendSelect: (friendId) =>
+    selector =
+      friendId: "#{friendId}"
+    @$scope.$meteorObject @FriendSelects, selector, false
 
   #   # Move the event's updated item.
   #   for item in @items
@@ -251,15 +262,25 @@ class ChatsCtrl
     else
       "#{distanceAway} away"
 
-  toggleIsSelected: (friend, $event) ->
+  toggleIsSelected: (item, $event) ->
     $event.stopPropagation()
 
-    if @isSelected friend
-      delete @selectedFriends[friend.id]
-    else
-      @selectedFriends[friend.id] = true
+    if @isSelected(item)
+      # Remove friend select
+      @FriendSelects.remove {_id: item.friendSelect._id}
+    else      
+      now = new Date().getTime()
+      sixHours = 1000 * 60 * 60 * 6
+      sixHoursFromNow = new Date(now + sixHours)
+      # Create new friendSelect
+      @FriendSelects.insert
+        userId: "#{@Auth.user.id}"
+        friendId: "#{item.friend.id}"
+        expiresAt: sixHoursFromNow
 
-  isSelected: (friend) ->
-    angular.isDefined @selectedFriends[friend.id]
+    
+
+  isSelected: (item) ->
+    angular.isDefined item.friendSelect._id
 
 module.exports = ChatsCtrl
