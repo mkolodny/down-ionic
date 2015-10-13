@@ -456,7 +456,6 @@ ion-nav-back-button {
   }
   .text {
     position: relative;
-    margin-left: 10px;
     background-color: #eee;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -493,8 +492,6 @@ ion-nav-back-button {
       border-bottom: 1px solid #07f;
       background-color: #08f;
       color: #fff;
-      margin-left: 0;
-      margin-right: 10px;
 
       &::before {
         right: -12px;
