@@ -81,6 +81,14 @@
               {{events.getDistanceAway(item.friend)}}
             </span>
           </p>
+          <a href=""
+             class="match-button"
+             ng-click="events.toggleIsSelected(item.friend, $event)"
+             ng-class="{'selected': events.isSelected(item.friend)}">
+            <i class="icon fa fa-circle-thin"></i>
+            <i class="icon fa fa-circle"></i>
+            <i class="icon fa fa-hand-o-up"></i>
+          </a>
         </div>
       </ion-item>
     </ion-list>

@@ -9,8 +9,9 @@ class ChatsCtrl
     @Messages = @$meteor.getCollectionByName 'messages'
     @Chats = @$meteor.getCollectionByName 'chats'
 
-    # Init Added me
+    # Init the view.
     @addedMe = []
+    @selectedFriends = {}
 
     @$scope.$on '$ionicView.loaded', =>
       # Fetch the invitations to show on the view.
@@ -22,7 +23,6 @@ class ChatsCtrl
       friendsList = {}
       for id, friend of @Auth.user.friends
         friendsList[id] = true
-
 
       if angular.isDefined(@friendsList) \
           and not angular.equals(friendsList, @friendsList)
@@ -250,5 +250,16 @@ class ChatsCtrl
       'Start a chat...'
     else
       "#{distanceAway} away"
+
+  toggleIsSelected: (friend, $event) ->
+    $event.stopPropagation()
+
+    if @isSelected friend
+      delete @selectedFriends[friend.id]
+    else
+      @selectedFriends[friend.id] = true
+
+  isSelected: (friend) ->
+    angular.isDefined @selectedFriends[friend.id]
 
 module.exports = ChatsCtrl

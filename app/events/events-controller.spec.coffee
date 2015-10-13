@@ -143,6 +143,9 @@ describe 'events controller', ->
     expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
     expect(ctrl.Chats).toBe chatsCollection
 
+  fit 'should init the selectedFriends', ->
+    expect(ctrl.selectedFriends).toEqual {}
+
   # Only called once http://ionicframework.com/docs/api/directive/ionView/
   describe 'when the view is loaded', ->
 
@@ -810,3 +813,78 @@ describe 'events controller', ->
 
     it 'should go to the create event view', ->
       expect($state.go).toHaveBeenCalledWith 'createEvent'
+
+
+  describe 'toggling whether a friend is selected', ->
+    friend = null
+    $event = null
+
+    beforeEach ->
+      friend = {id: 1}
+      $event =
+        stopPropagation: jasmine.createSpy '$event.stopPropagation'
+      ctrl.selectedFriends = {}
+
+    describe 'when they are selected', ->
+
+      beforeEach ->
+        ctrl.selectedFriends[friend.id] = true
+        spyOn(ctrl, 'isSelected').and.returnValue true
+
+        ctrl.toggleIsSelected friend, $event
+
+      fit 'should check if the friend is selected', ->
+        expect(ctrl.isSelected).toHaveBeenCalledWith friend
+
+      fit 'should prevent the default event', ->
+        expect($event.stopPropagation).toHaveBeenCalled()
+
+      fit 'should remove the friend from the selected friends', ->
+        expect(ctrl.selectedFriends).toEqual {}
+
+
+    describe 'when they aren\'t selected', ->
+
+      beforeEach ->
+        spyOn(ctrl, 'isSelected').and.returnValue false
+
+        ctrl.toggleIsSelected friend, $event
+
+      fit 'should check if the friend is selected', ->
+        expect(ctrl.isSelected).toHaveBeenCalledWith friend
+
+      fit 'should prevent the default event', ->
+        expect($event.stopPropagation).toHaveBeenCalled()
+
+      fit 'should add the friend to the selected friends', ->
+        selectedFriends = {}
+        selectedFriends[friend.id] = true
+        expect(ctrl.selectedFriends).toEqual selectedFriends
+
+
+  describe 'checking whether a friend is selected', ->
+    friend = null
+    isSelected = null
+
+    beforeEach ->
+      friend = {id: 1}
+      ctrl.selectedFriends = {}
+
+    describe 'when they are selected', ->
+
+      beforeEach ->
+        ctrl.selectedFriends[friend.id] = true
+
+        isSelected = ctrl.isSelected friend
+
+      fit 'should return true', ->
+        expect(isSelected).toBe true
+
+
+    describe 'when they aren\'t selected', ->
+
+      beforeEach ->
+        isSelected = ctrl.isSelected friend
+
+      fit 'should return false', ->
+        expect(isSelected).toBe false

@@ -65,179 +65,80 @@
       }
     }
     &.last {
-      border-bottom: 0;
-    }
-    .chart-pie {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-
-      &.gray {
-        display: none;
-      }
-    }
-    .updated-at,
-    .latest-message {
-      padding-right: 23px;
-    }
-    .updated-at {
-      font-size: 14px;
-      float: right;
-      padding-top: 2px;
-    }
-    h2 {
-      font-weight: 400;
-      margin-bottom: 2px;
-    }
-    p,
-    .updated-at {
-      color: #777;
-    }
-    .item-icon {
-      position: absolute;
-      top: 21px;
-      right: 7px;
-      color: #ccc;
-    }
-    .respond-buttons {
-      margin-top: 10px;
+      border-bottom-width: 1px;
     }
     & + .item-divider {
       margin-top: -7px;
       min-height: 16px;
     }
   }
-  .event-detail {
-    display: flex;
-    margin-top: 5px;
-    color: $brand-color;
-    font-size: 16px;
+  .chart-pie {
+    position: absolute;
+    top: 10px;
+    left: 10px;
 
-    i {
-      width: 15px;
-      margin-right: 15px;
-      font-size: 1.2em;
-      color: $brand-color;
-    }
-    .fa-calendar-o {
-      margin-top: 10px;
-    }
-    .fa-map-marker {
-      width: 12px;
-      margin-left: 3px;
-      margin-top: 2px;
-    }
-    .fa-comment-o {
-      margin-top: 1px;
-    }
-    a {
-      color: $brand-color;
-      text-decoration: none;
-      font-weight: 500;
+    &.gray {
+      display: none;
     }
   }
-  #event-comment {
-    white-space: normal;
+  .updated-at,
+  .latest-message {
+    padding-right: 45px;
+  }
+  .updated-at {
+    font-size: 14px;
+    float: right;
+    padding-top: 2px;
+  }
+  h2 {
+    font-weight: 400;
+    margin-bottom: 2px;
+  }
+  p,
+  .updated-at {
+    color: #777;
+  }
+  .item-icon {
+    position: absolute;
+    top: 21px;
+    right: 7px;
+    color: #ccc;
+  }
+  .fa-circle-thin,
+  .fa-circle {
+    font-size: 36px;
+  }
+  .fa-circle-thin,
+  .fa-hand-o-up {
+    color: #999;
+  }
+  .fa-circle {
+    color: $brand-color;
+    display: none;
+  }
+  .fa-hand-o-up {
+    top: -1px;
+    font-size: 17px;
+  }
+  .match-button.selected {
+    .fa-circle-thin {
+      display: none;
+    }
+    .fa-circle {
+      display: flex;
+    }
+    .fa-hand-o-up {
+      color: #fff;
+      z-index: 2;
+      top: 0;
+      font-size: 18px;
+    }
   }
   #add-friends {
     .item-avatar {
       h2 {
         padding-top: 7px;
       }
-    }
-  }
-  ion-footer-bar {
-    height: auto;
-    display: block;
-    padding: 0;
-    background-image: none;
-    border-top: 1px solid #b2b2b2;
-    //box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.24);
-
-    .event-detail {
-      margin-left: $new-event-margin-left;
-    }
-    a {
-      color: #fff;
-      padding-left: 15px;
-      padding-right: 15px;
-    }
-    a,
-    button {
-      padding-top: 15px;
-      padding-bottom: 12px;
-      padding-left: 13px;
-      padding-right: 13px;
-    }
-    i {
-      font-size: 1.5em;
-      line-height: .8em;
-      vertical-align: -10%;
-    }
-  }
-  #new-event-details {
-    padding-left: 13px;
-    padding-right: 13px;
-    padding-top: 7px;
-
-    .fa-comment-o {
-      margin-top: 4px;
-    }
-  }
-  #actions {
-    margin-top: 15px;
-    margin-bottom: 12px;
-
-    i { 
-      color: #aaa;
-    }
-    .selected {
-      color: $brand-color;
-    }
-    .enabled {
-      color: $link-color !important;
-      /*color: #357ded !important; *?
-      /*color: #232ed1 !important; */
-      /*color: #7678ed !important; */
-      /*color: $brand-color !important;*/
-    }
-  }
-  input,
-  textarea {
-    border: none;    
-    width: 100%;
-    color: $brand-color;
-  }
-  #suggestion {
-    font-size: 18px;
-    padding-left: $new-event-margin-left;
-  }
-  #comment {
-    font-size: 16px;
-    resize: none;
-    line-height: 20px;
-    max-height: 64px;
-  }
-  #suggest {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    border: none;
-    background-color: #fff;
-
-    & > i {
-      color: #ccc !important;
-    }
-  }
-}
-
-.platform-ios {
-  #events {
-    #new-event-details {
-      padding-top: 3px;
-    }
-    ion-footer-bar {
-      border-top: .5px solid #b2b2b2;
     }
   }
 }
