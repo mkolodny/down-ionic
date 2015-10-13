@@ -1,4 +1,7 @@
 <ion-view id="friendship" view-title="{{friendship.friend.name}}">
+  <div id="match-header" ng-if="friendship.match._id">
+    It's a match!
+  </div>
   <ion-content delegate-handle="friendship">
     <ion-list>
       <ion-item class="message-item" ng-if="friendship.messages.length === 0">
