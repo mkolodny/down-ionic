@@ -29,10 +29,12 @@ describe 'events controller', ->
   earlier = null
   Event = null
   Friendship = null
+  friendSelectsCollection = null
   item = null
   invitation = null
   later = null
   Invitation = null
+  matchesCollection = null
   messagesCollection = null
   ngToast = null
   scope = null
@@ -120,9 +122,15 @@ describe 'events controller', ->
 
     messagesCollection = 'messagesCollection'
     chatsCollection = 'chatsCollection'
+    matchesCollection = 'matchesCollection'
+    friendSelectsCollection = 'friendSelectsCollection'
     $meteor.getCollectionByName.and.callFake (collectionName) ->
       if collectionName is 'messages' then return messagesCollection
       if collectionName is 'chats' then return chatsCollection
+      if collectionName is 'matches' then return matchesCollection
+      if collectionName is 'friendSelects' then return friendSelectsCollection
+
+    scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
 
     ctrl = $controller EventsCtrl,
       $scope: scope
@@ -143,8 +151,15 @@ describe 'events controller', ->
     expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
     expect(ctrl.Chats).toBe chatsCollection
 
-  fit 'should init the selectedFriends', ->
-    expect(ctrl.selectedFriends).toEqual {}
+  it 'should set the matches collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'matches'
+    expect(ctrl.Matches).toBe matchesCollection
+
+  it 'should set the friendSelects collection on the controller', ->
+    expect(ctrl.FriendSelects).toBe friendSelectsCollection
+
+  it 'should subscribe to friendSelects', ->
+    expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'friendSelects'
 
   # Only called once http://ionicframework.com/docs/api/directive/ionView/
   describe 'when the view is loaded', ->
@@ -236,6 +251,7 @@ describe 'events controller', ->
     personWhoAddedMe = null
     builtItems = null
     newestMessage = null
+    friendSelect = null
 
     beforeEach ->
       # Mock invitations to events the user has joined.
@@ -295,6 +311,9 @@ describe 'events controller', ->
       newestMessage = 'newestMessage'
       spyOn(ctrl, 'getNewestMessage').and.returnValue newestMessage
 
+      friendSelect = 'friendSelect'
+      spyOn(ctrl, 'getFriendSelect').and.returnValue friendSelect
+
       scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
 
       builtItems = ctrl.buildItems invitations
@@ -324,6 +343,7 @@ describe 'events controller', ->
         friend: new User friendWithUsername
         id: friendWithUsername.id
         newestMessage: newestMessage
+        friendSelect: friendSelect
       # Added Me section
       title = 'Added Me'
       items.push
@@ -335,6 +355,7 @@ describe 'events controller', ->
         friend: personWhoAddedMe
         id: personWhoAddedMe.id
         newestMessage: newestMessage
+        friendSelect: friendSelect
 
       expect(builtItems).toEqual items
 
@@ -463,6 +484,27 @@ describe 'events controller', ->
 
       it 'should return false', ->
         expect(result).toBe false
+
+
+  describe 'getting the friendSelect', ->
+    friendId = null
+    meteorObject = null
+    response = null
+
+    beforeEach ->
+      meteorObject = 'meteorObject'
+      scope.$meteorObject = jasmine.createSpy('scope.$meteorObject') \
+        .and.returnValue meteorObject
+      friendId = 1
+      response = ctrl.getFriendSelect friendId
+
+    it 'should return an AngularMeteorObject', ->
+      expect(response).toBe meteorObject
+
+    it 'should filter by friendId', ->
+      selector =
+        friendId: "#{friendId}"
+      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.FriendSelects, selector, false
 
 
   describe 'responding to an invitation', ->
@@ -816,75 +858,94 @@ describe 'events controller', ->
 
 
   describe 'toggling whether a friend is selected', ->
+    item = null
     friend = null
+    friendSelect = null
     $event = null
 
     beforeEach ->
-      friend = {id: 1}
+      friend = 
+        id: 1
+      friendSelect =
+        _id: 'asdf'
+      item =
+        friend: friend
+        friendSelect: friendSelect
       $event =
         stopPropagation: jasmine.createSpy '$event.stopPropagation'
-      ctrl.selectedFriends = {}
+      ctrl.FriendSelects = 
+        remove: jasmine.createSpy 'FriendSelects.remove'
+        insert: jasmine.createSpy 'FriendSelects.insert'
 
     describe 'when they are selected', ->
 
       beforeEach ->
-        ctrl.selectedFriends[friend.id] = true
         spyOn(ctrl, 'isSelected').and.returnValue true
 
-        ctrl.toggleIsSelected friend, $event
+        ctrl.toggleIsSelected item, $event
 
-      fit 'should check if the friend is selected', ->
-        expect(ctrl.isSelected).toHaveBeenCalledWith friend
+      it 'should check if the friend is selected', ->
+        expect(ctrl.isSelected).toHaveBeenCalledWith item
 
-      fit 'should prevent the default event', ->
+      it 'should prevent the default event', ->
         expect($event.stopPropagation).toHaveBeenCalled()
 
-      fit 'should remove the friend from the selected friends', ->
-        expect(ctrl.selectedFriends).toEqual {}
+      it 'should remove the selectFriend object', ->
+        expect(ctrl.FriendSelects.remove).toHaveBeenCalledWith {_id: friendSelect._id}
 
 
     describe 'when they aren\'t selected', ->
+      userId = null
 
       beforeEach ->
         spyOn(ctrl, 'isSelected').and.returnValue false
+        userId = 1
+        Auth.user.id = userId
 
-        ctrl.toggleIsSelected friend, $event
+        jasmine.clock().install()
+        date = new Date 1438014089235
+        jasmine.clock().mockDate date
 
-      fit 'should check if the friend is selected', ->
-        expect(ctrl.isSelected).toHaveBeenCalledWith friend
+        ctrl.toggleIsSelected item, $event
 
-      fit 'should prevent the default event', ->
+      afterEach ->
+        jasmine.clock().uninstall()
+
+      it 'should check if the friend is selected', ->
+        expect(ctrl.isSelected).toHaveBeenCalledWith item
+
+      it 'should prevent the default event', ->
         expect($event.stopPropagation).toHaveBeenCalled()
 
-      fit 'should add the friend to the selected friends', ->
-        selectedFriends = {}
-        selectedFriends[friend.id] = true
-        expect(ctrl.selectedFriends).toEqual selectedFriends
+      it 'should insert a friend select', ->
+        now = new Date().getTime()
+        sixHours = 1000 * 60 * 60 * 6
+        sixHoursFromNow = new Date(now + sixHours)
+        expect(ctrl.FriendSelects.insert).toHaveBeenCalledWith
+          userId: "#{userId}"
+          friendId: "#{friend.id}"
+          expiresAt: sixHoursFromNow
 
 
   describe 'checking whether a friend is selected', ->
-    friend = null
-    isSelected = null
-
-    beforeEach ->
-      friend = {id: 1}
-      ctrl.selectedFriends = {}
+    item = null
 
     describe 'when they are selected', ->
 
       beforeEach ->
-        ctrl.selectedFriends[friend.id] = true
+       item =
+          friendSelect:
+            _id: 'asdfas'
 
-        isSelected = ctrl.isSelected friend
-
-      fit 'should return true', ->
-        expect(isSelected).toBe true
+      it 'should return true', ->
+        expect(ctrl.isSelected(item)).toBe true
 
 
     describe 'when they aren\'t selected', ->
 
       beforeEach ->
-        isSelected = ctrl.isSelected friend
+        item =
+          friendSelect: {}
 
-      fit 'should return false', ->
-        expect(isSelected).toBe false
+      it 'should return false', ->
+        expect(ctrl.isSelected(item)).toBe false

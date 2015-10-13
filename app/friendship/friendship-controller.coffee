@@ -10,6 +10,7 @@ class FriendshipCtrl
     # Set Meteor collections on controller
     @Messages = @$meteor.getCollectionByName 'messages'
     @Chats = @$meteor.getCollectionByName 'chats'
+    @Matches = @$meteor.getCollectionByName 'matches'
 
     @$scope.$on '$ionicView.beforeEnter', =>
       # Don't scroll to the bottom until view fully enters
@@ -24,6 +25,7 @@ class FriendshipCtrl
 
       # Bind reactive variables
       @messages = @$meteor.collection @getMessages, false
+      @match = @getMatch()
 
       # Mark messages as read as they come in.
       @$scope.$watch =>
@@ -92,6 +94,15 @@ class FriendshipCtrl
   transformMessage: (message) =>
     message.creator = new @User message.creator
     message
+
+  getMatch: =>
+    selector =
+      $or: [
+        firstUserId: "#{@friend.id}"
+      ,
+        secondUserId: "#{@friend.id}"
+      ]
+    @$scope.$meteorObject @Matches, selector, false
 
   isActionMessage: (message) ->
     actions = [

@@ -1,6 +1,6 @@
 <ion-view id="friendship" view-title="{{friendship.friend.name}}">
-  <div id="expanded-header">
-    You and Andrew are down to do something.
+  <div id="match-header" ng-if="friendship.match._id">
+    You and {{friendship.friend.firstName}} are down to do something.
   </div>
   <ion-content delegate-handle="friendship">
     <ion-list>
