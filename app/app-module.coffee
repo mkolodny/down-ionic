@@ -100,7 +100,7 @@ angular.module 'down', [
 
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel,
-        $rootScope, $state, $window, Auth, branchKey,
+        $rootScope, $state, $timeout, $window, Auth, branchKey,
         localStorageService, ionicDeployChannel, PushNotifications,
         skipIonicDeploy, User) ->
     # Resume session from localStorage
@@ -157,7 +157,9 @@ angular.module 'down', [
       # Update the user's location while they use the app.
       if localStorageService.get('hasRequestedLocationServices') \
           or !ionic.Platform.isIOS()
-        Auth.watchLocation()
+        $timeout ->
+          Auth.watchLocation()
+        , 5000
 
       $rootScope.finishedBootstrap = true
       Auth.redirectForAuthState()
