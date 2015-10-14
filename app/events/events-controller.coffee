@@ -1,4 +1,4 @@
-class ChatsCtrl
+class EventsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading',
              '$ionicPlatform', '$meteor', '$scope', '$state', '$timeout', 'Auth',
              'Friendship', 'Invitation', 'ngToast', 'User']
@@ -12,7 +12,16 @@ class ChatsCtrl
     @FriendSelects = @$meteor.getCollectionByName 'friendSelects'
 
     # Subscribe to friendSelects data
-    @$scope.$meteorSubscribe 'friendSelects'
+    @$meteor.subscribe('friendSelects').then =>
+      @newestMatch = @getNewestMatch()
+      # Watch for new matches
+      @$scope.$watch =>
+        @newestMatch._id
+      , (newValue, oldValue) =>
+        # First cycle, old and new 
+        #   value will be equal
+        if newValue isnt oldValue
+          @handleNewMatch()
 
     # Init the view.
     @addedMe = []
@@ -143,6 +152,19 @@ class ChatsCtrl
     selector =
       friendId: "#{friendId}"
     @$scope.$meteorObject @FriendSelects, selector, false
+
+  getNewestMatch: =>
+    @$scope.$meteorObject @Matches, {}, false,
+      sort:
+        expiresAt: -1
+
+  handleNewMatch: =>
+    # If second user in match, go into chat
+    if @newestMatch.secondUserId is "#{@Auth.user.id}"
+      friendId = parseInt @newestMatch.firstUserId
+      @$state.go 'friendship',
+        friend: @Auth.user.friends[friendId]
+        id: friendId
 
   #   # Move the event's updated item.
   #   for item in @items
@@ -283,4 +305,4 @@ class ChatsCtrl
   isSelected: (item) ->
     angular.isDefined item.friendSelect._id
 
-module.exports = ChatsCtrl
+module.exports = EventsCtrl
