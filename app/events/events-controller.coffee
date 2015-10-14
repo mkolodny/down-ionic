@@ -1,4 +1,4 @@
-class ChatsCtrl
+class EventsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading',
              '$ionicPlatform', '$meteor', '$scope', '$state', '$timeout', 'Auth',
              'Friendship', 'Invitation', 'ngToast', 'User']
@@ -283,4 +283,4 @@ class ChatsCtrl
   isSelected: (item) ->
     angular.isDefined item.friendSelect._id
 
-module.exports = ChatsCtrl
+module.exports = EventsCtrl
