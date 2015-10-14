@@ -114,7 +114,7 @@ describe 'LocalDB service', ->
       result = LocalDB.set key, value
 
     it 'should query local_storage by key', ->
-      value = JSON.stringify value
+      value = angular.toJson value
       query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES (#{key}, #{value})"
       expect($cordovaSQLite.execute).toHaveBeenCalledWith LocalDB.db, query
 

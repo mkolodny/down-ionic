@@ -20,11 +20,19 @@ class LocalDB
     deferred.promise
 
   get: (key) ->
+    deferred = @$q.defer()
+
     query = "SELECT * FROM local_storage WHERE key=#{key} LIMIT 1"
     @$cordovaSQLite.execute @db, query
+      .then (value) ->
+        deferred.resolve angular.fromJson(value)
+      , ->
+        deferred.reject()
+
+    deferred.promise
     
   set: (key, value) ->
-    value = JSON.stringify value
+    value = angular.toJson value
     query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES (#{key}, #{value})"
     @$cordovaSQLite.execute @db, query
     

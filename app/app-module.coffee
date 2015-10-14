@@ -105,15 +105,15 @@ angular.module 'down', [
         $rootScope, $state, $timeout, $window, Auth, branchKey,
         localStorageService, LocalDB, ionicDeployChannel, PushNotifications,
         skipIonicDeploy, User) ->
-    # Resume session from localStorage
-    Auth.resumeSession()
-
     ###
     Put anything that touches Cordova in here!
     ###
     bootstrap = ->
       # Init the localDB
       LocalDB.init().then ->
+        # Resume session from localStorage
+        Auth.resumeSession()
+      .then ->
         # Hide the accessory bar by default (remove this to show the accessory bar
         # above the keyboard for form inputs)
         $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
