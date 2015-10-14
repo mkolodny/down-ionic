@@ -16,7 +16,7 @@ class EventsCtrl
       @newestMatch = @getNewestMatch()
       # Watch for new matches
       @$scope.$watch =>
-        @newestMatch._id
+        @newestMatch.expiresAt
       , (newValue, oldValue) =>
         # First cycle, old and new 
         #   value will be equal

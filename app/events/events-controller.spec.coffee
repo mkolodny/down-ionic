@@ -181,7 +181,7 @@ describe 'events controller', ->
 
       beforeEach ->
         spyOn ctrl, 'handleNewMatch'
-        ctrl.newestMatch._id = 'asdkfjnlkcriu4jnkj4'
+        ctrl.newestMatch.expiresAt = new Date()
         scope.$apply()
 
       it 'should handle the new match', ->
