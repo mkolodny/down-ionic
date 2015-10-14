@@ -66,7 +66,6 @@ class FriendshipCtrl
         for invitation in invitations
           events[invitation.eventId] = invitation
 
-
         for message in @messages
           if message?.type is @Invitation.inviteAction
             invitation = events[message.meta.eventId]

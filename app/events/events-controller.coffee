@@ -18,7 +18,7 @@ class EventsCtrl
       @$scope.$watch =>
         @newestMatch._id
       , (newValue, oldValue) =>
-        # First cycle, old and new 
+        # First cycle, old and new
         #   value will be equal
         if newValue isnt oldValue
           @handleNewMatch()
@@ -299,7 +299,7 @@ class EventsCtrl
     if @isSelected(item)
       # Remove friend select
       @FriendSelects.remove {_id: item.friendSelect._id}
-    else      
+    else
       now = new Date().getTime()
       sixHours = 1000 * 60 * 60 * 6
       sixHoursFromNow = new Date(now + sixHours)
@@ -308,8 +308,6 @@ class EventsCtrl
         userId: "#{@Auth.user.id}"
         friendId: "#{item.friend.id}"
         expiresAt: sixHoursFromNow
-
-    
 
   isSelected: (item) ->
     angular.isDefined item.friendSelect._id
