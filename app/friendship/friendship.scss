@@ -5,6 +5,7 @@
     padding-right: 20px;
     padding-bottom: 10px;
     position: absolute;
+    top: $bar-height + $ios-statusbar-height;
     width: 100%;
     z-index: 1;
     text-align: center;
