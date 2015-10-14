@@ -44,7 +44,7 @@
              ng-click="events.viewEventChat(item)">
           <img class="item-image"
                ng-src="{{item.invitation.fromUser.getImageUrl()}}">
-          <canvas class="chart chart-pie"
+          <canvas class="chart chart-pie event-pie"
                   ng-repeat="color in ['#ffffff', 'rgb(217,217,217)']"
                   data="[
                     (100 - item.invitation.event.percentRemaining),
@@ -88,6 +88,15 @@
             <i class="icon fa fa-circle-thin"></i>
             <i class="icon fa fa-circle"></i>
             <i class="icon fa fa-hand-o-up"></i>
+            <canvas class="chart chart-pie friend-select-pie"
+                    data="[
+                      (100 - 20),
+                      20
+                    ]"
+                    labels="['', '']"
+                    colours="['#ffffff', 'rgba(0,0,0,0)']" width="30" height="30"
+                    options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
+                    ></canvas>
           </a>
         </div>
       </ion-item>
