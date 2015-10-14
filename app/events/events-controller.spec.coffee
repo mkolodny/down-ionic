@@ -528,10 +528,40 @@ describe 'events controller', ->
     it 'should return an AngularMeteorObject', ->
       expect(response).toBe meteorObject
 
-    it 'should filter by friendId', ->
+    it 'should filter by friendId and add a tranform for time remaining', ->
       selector =
         friendId: "#{friendId}"
-      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.FriendSelects, selector, false
+      options =
+        transform: ctrl.transformFriendSelect
+      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.FriendSelects, selector, false, options
+
+
+  describe 'transforming the friendSelect', ->
+    sixHours = null
+    threeHours = null
+    result = null
+    friendSelect = null
+
+    beforeEach ->
+      jasmine.clock().install()
+      date = new Date 1438014089235
+      jasmine.clock().mockDate date
+
+      sixHours = 1000 * 60 * 60 * 6
+      threeHours = 1000 * 60 * 60 * 3
+
+      friendSelect =
+        _id: 'asdfasdf'
+        expiresAt: new Date(new Date().getTime() + threeHours)
+
+      result = ctrl.transformFriendSelect angular.copy(friendSelect)
+
+    afterEach ->
+      jasmine.clock().uninstall()
+
+    it 'should set the percent remaining', ->
+      friendSelect.percentRemaining = 50
+      expect(result).toEqual friendSelect
 
 
   describe 'getting the newest match', ->

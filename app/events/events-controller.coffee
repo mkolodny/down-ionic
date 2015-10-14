@@ -151,7 +151,16 @@ class EventsCtrl
   getFriendSelect: (friendId) =>
     selector =
       friendId: "#{friendId}"
-    @$scope.$meteorObject @FriendSelects, selector, false
+    options =
+        transform: @transformFriendSelect
+    @$scope.$meteorObject @FriendSelects, selector, false, options
+
+  transformFriendSelect: (friendSelect) =>
+    now = new Date().getTime()
+    timeRemaining = friendSelect.expiresAt.getTime() - now
+    sixHours = 1000 * 60 * 60 * 6
+    friendSelect.percentRemaining = (timeRemaining / sixHours) * 100
+    friendSelect
 
   getNewestMatch: =>
     @$scope.$meteorObject @Matches, {}, false,
