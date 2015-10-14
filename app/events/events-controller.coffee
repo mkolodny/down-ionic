@@ -159,10 +159,12 @@ class EventsCtrl
         expiresAt: -1
 
   handleNewMatch: =>
-    friendId = parseInt @newestMatch.friendId
-    @$state.go 'friendship',
-      friend: @Auth.user.friends[friendId]
-      id: friendId
+    # If second user in match, go into chat
+    if @newestMatch.secondUserId is "#{@Auth.user.id}"
+      friendId = parseInt @newestMatch.firstUserId
+      @$state.go 'friendship',
+        friend: @Auth.user.friends[friendId]
+        id: friendId
 
   #   # Move the event's updated item.
   #   for item in @items

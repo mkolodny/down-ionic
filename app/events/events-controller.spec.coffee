@@ -569,7 +569,8 @@ describe 'events controller', ->
       Auth.user.friends[friendId] = friend
 
       ctrl.newestMatch =
-        friendId: "#{friendId}"
+        firstUserId: "#{friendId}"
+        secondUserId: "#{Auth.user.id}"
       spyOn $state, 'go'
       ctrl.handleNewMatch()
 
