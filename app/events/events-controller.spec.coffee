@@ -30,6 +30,7 @@ describe 'events controller', ->
   Event = null
   Friendship = null
   friendSelectsCollection = null
+  friendSelectsDeferred = null
   item = null
   invitation = null
   later = null
@@ -130,7 +131,8 @@ describe 'events controller', ->
       if collectionName is 'matches' then return matchesCollection
       if collectionName is 'friendSelects' then return friendSelectsCollection
 
-    scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
+    friendSelectsDeferred = $q.defer()
+    $meteor.subscribe.and.returnValue friendSelectsDeferred.promise
 
     ctrl = $controller EventsCtrl,
       $scope: scope
@@ -159,7 +161,32 @@ describe 'events controller', ->
     expect(ctrl.FriendSelects).toBe friendSelectsCollection
 
   it 'should subscribe to friendSelects', ->
-    expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'friendSelects'
+    expect($meteor.subscribe).toHaveBeenCalledWith 'friendSelects'
+
+  describe 'when the friendSelects subscription is ready', ->
+    newestMatch = null
+
+    beforeEach ->
+      newestMatch =
+        _id: 'asdkfjnasdlkfjn'
+      spyOn(ctrl, 'getNewestMatch').and.returnValue newestMatch
+
+      friendSelectsDeferred.resolve()
+      scope.$apply()
+
+    it 'should bind the newestMatch to the controller', ->
+      expect(ctrl.newestMatch).toBe newestMatch
+
+    describe 'when the newest match changes', ->
+
+      beforeEach ->
+        spyOn ctrl, 'handleNewMatch'
+        ctrl.newestMatch._id = 'asdkfjnlkcriu4jnkj4'
+        scope.$apply()
+
+      it 'should handle the new match', ->
+        expect(ctrl.handleNewMatch).toHaveBeenCalled()
+
 
   # Only called once http://ionicframework.com/docs/api/directive/ionView/
   describe 'when the view is loaded', ->
@@ -505,6 +532,51 @@ describe 'events controller', ->
       selector =
         friendId: "#{friendId}"
       expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.FriendSelects, selector, false
+
+
+  describe 'getting the newest match', ->
+    meteorObject = null
+    response = null
+
+    beforeEach ->
+      meteorObject = 'meteorObject'
+      scope.$meteorObject = jasmine.createSpy('scope.$meteorObject') \
+        .and.returnValue meteorObject
+      response = ctrl.getNewestMatch()
+
+    it 'should return an AngularMeteorObject', ->
+      expect(response).toBe meteorObject
+
+    it 'should filter by friendId', ->
+      options =
+        sort:
+          expiresAt: -1
+      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.Matches, {}, false, options
+
+
+  describe 'handling the new match', ->
+    friendId = null
+    friend = null
+
+    beforeEach ->
+      friendId = 1
+      friend =
+        id: friendId
+        name: 'Jim Bob'
+      Auth.user =
+        id: 2
+        friends: {}
+      Auth.user.friends[friendId] = friend
+
+      ctrl.newestMatch =
+        friendId: "#{friendId}"
+      spyOn $state, 'go'
+      ctrl.handleNewMatch()
+
+    it 'should transition to the chat', ->
+      expect($state.go).toHaveBeenCalledWith 'friendship',
+        friend: friend
+        id: friendId
 
 
   describe 'responding to an invitation', ->

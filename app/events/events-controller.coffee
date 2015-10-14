@@ -12,7 +12,16 @@ class EventsCtrl
     @FriendSelects = @$meteor.getCollectionByName 'friendSelects'
 
     # Subscribe to friendSelects data
-    @$scope.$meteorSubscribe 'friendSelects'
+    @$meteor.subscribe('friendSelects').then =>
+      @newestMatch = @getNewestMatch()
+      # Watch for new matches
+      @$scope.$watch =>
+        @newestMatch._id
+      , (newValue, oldValue) =>
+        # First cycle, old and new 
+        #   value will be equal
+        if newValue isnt oldValue
+          @handleNewMatch()
 
     # Init the view.
     @addedMe = []
@@ -143,6 +152,17 @@ class EventsCtrl
     selector =
       friendId: "#{friendId}"
     @$scope.$meteorObject @FriendSelects, selector, false
+
+  getNewestMatch: =>
+    @$scope.$meteorObject @Matches, {}, false,
+      sort:
+        expiresAt: -1
+
+  handleNewMatch: =>
+    friendId = parseInt @newestMatch.friendId
+    @$state.go 'friendship',
+      friend: @Auth.user.friends[friendId]
+      id: friendId
 
   #   # Move the event's updated item.
   #   for item in @items
