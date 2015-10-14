@@ -1,19 +1,17 @@
 require 'angular'
 require 'angular-mocks'
-window.PouchDB = require 'pouchdb'
-# require './angular-pouchdb'
+require '../ng-cordova/sqlite.js'
 require './local-db-module'
 
-xdescribe 'LocalDB service', ->
+describe 'LocalDB service', ->
+  $cordovaSQLite = null
   $rootScope = null
+  $q = null
   LocalDB = null
-  pouchDB = null
-  $timeout = null
 
   beforeEach angular.mock.module('down.localDB')
 
-  # beforeEach angular.mock.module('pouchdb')
-
+  beforeEach angular.mock.module('ngCordova.plugins.sqlite')
 
   # beforeEach angular.mock.module(($provide) ->
   #   db = {}
@@ -24,70 +22,101 @@ xdescribe 'LocalDB service', ->
   # )
 
   beforeEach inject(($injector) ->
-    # pouchDB = $injector.get 'pouchDB'
+    $cordovaSQLite = $injector.get '$cordovaSQLite'
     $rootScope = $injector.get '$rootScope'
+    $q = $injector.get '$q'
     LocalDB = $injector.get 'LocalDB'
-    $timeout = $injector.get '$timeout'
   )
 
   describe 'initilizing the database', ->
     db = null
+    deferred = null
+    resolved = null
+    rejected = null
 
     beforeEach ->
       db = 'db'
-      spyOn(LocalDB, 'pouchDB').and.returnValue db
-      LocalDB.init()
+      spyOn($cordovaSQLite, 'openDB').and.returnValue db
+
+      deferred = $q.defer()
+      spyOn($cordovaSQLite, 'execute').and.returnValue deferred.promise
+      
+      LocalDB.init().then ->
+        resolved = true
+      , ->
+        rejected = true
 
     it 'should initilize the database', ->
-      expect(LocalDB.pouchDB).toHaveBeenCalledWith 'localStorage',
+      expect($cordovaSQLite.openDB).toHaveBeenCalledWith
+        name: 'rallytap.db'
         location: 2
-        androidDatabaseImplementation: 2
-        adapter: 'websql'
-
+       
     it 'should set the db on the service', ->
       expect(LocalDB.db).toBe db
 
-  describe 'saving to the database', ->
-    someValue = null
-    someKey = null
-    db = null
+    it 'should create the localStorage table if it doesn\'t exist', ->
+      query = 'CREATE TABLE IF NOT EXISTS local_storage (key string primary key, value text)'
+      expect($cordovaSQLite.execute).toHaveBeenCalledWith LocalDB.db, query
+
+    describe 'table created successfully', ->
+
+      beforeEach ->
+        deferred.resolve()
+        $rootScope.$apply()
+
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
+
+
+    describe 'on error', ->
+
+      beforeEach ->
+        deferred.reject()
+        $rootScope.$apply()
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
+
+
+  describe 'getting a value', ->
     promise = null
+    key = null
+    result = null
 
-    beforeEach (done) ->
-      db = new window.PouchDB 'localStorage'
-      LocalDB.db = db
+    beforeEach ->
+      promise = 'promise'
+      spyOn($cordovaSQLite, 'execute').and.returnValue promise
+      key = 'someKey'
+      result = LocalDB.get key
 
-      someKey = 'someKey'
-      someValue =
+    it 'should query local_storage by key', ->
+      query = "SELECT * FROM local_storage WHERE key=#{key} LIMIT 1"
+      expect($cordovaSQLite.execute).toHaveBeenCalledWith LocalDB.db, query
+
+    it 'should return the $cordovaSQLite.execute promise', ->
+      expect(result).toBe promise
+
+
+  describe 'setting a value', ->
+    promise = null
+    key = null
+    value = null
+    result = null
+
+    beforeEach ->
+      promise = 'promise'
+      spyOn($cordovaSQLite, 'execute').and.returnValue promise
+      key = 'someKey'
+      value =
         id: 1
-        name: 'Some name'
+        name: 'Mike Pleb'
+        friends: 'none'
+      result = LocalDB.set key, value
 
-      promise = LocalDB.set(someKey, someValue)
-      console.log promise
-      promise.then ->
-        console.log 'resolved'
-        done()
-      , ->
-        console.log 'rejected'
-        done()
+    it 'should query local_storage by key', ->
+      value = JSON.stringify value
+      query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES (#{key}, #{value})"
+      expect($cordovaSQLite.execute).toHaveBeenCalledWith LocalDB.db, query
 
-      # $rootScope.$apply()
-      $timeout.flush()
-
-
-    afterEach ->
-      db.destroy()
-
-    it 'should save the item in the database', (done) ->
-      console.log promise
-      console.log 'here'
-      key = "_local/#{someKey}"
-      db.get(key).then (doc) ->
-        console.log doc
-        expect(doc).toEqual someValue
-        done()
-      , (err) ->
-        console.log err
-        done()
-
-
+    it 'should return the $cordovaSQLite.execute promise', ->
+      expect(result).toBe promise

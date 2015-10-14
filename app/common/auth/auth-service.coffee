@@ -2,36 +2,39 @@ haversine = require 'haversine'
 
 class Auth
   @$inject: ['$http', '$q', '$meteor', '$mixpanel', 'apiRoot', 'User',
-             '$cordovaGeolocation', '$state', 'localStorageService']
+             '$cordovaGeolocation', '$state', 'LocalDB']
   constructor: (@$http, @$q, @$meteor, @$mixpanel, @apiRoot, @User,
-                @$cordovaGeolocation, @$state, localStorageService) ->
-    @localStorage = localStorageService
+                @$cordovaGeolocation, @$state, @LocalDB) ->
 
   user: {}
 
   resumeSession: ->
-    # Check local storage for currentUser
-    currentUser = @localStorage.get 'currentUser'
-    if currentUser isnt null
-      @user = new @User currentUser
+    deferred = @$q.defer()
 
-      # Set friends as instances of User resource
-      if @user.friends isnt undefined
-        for id, friend of @user.friends
-          @user.friends[id] = new @User friend
-      if @user.facebookFriends isnt undefined
-        for id, friend of @user.facebookFriends
-          @user.facebookFriends[id] = new @User friend
+    @LocalDB.get('session').then (session) =>
+      if session
+        console.log session
+        @phone = session.phone
+        @flags = session.flags
+        @user = new @User session.user
 
-      # re-establish Meteor auth
-      @$meteor.loginWithPassword "#{@user.id}", @user.authtoken
+        # Set friends as instances of User resource
+        if @user.friends isnt undefined
+          for id, friend of @user.friends
+            @user.friends[id] = new @User friend
+        if @user.facebookFriends isnt undefined
+          for id, friend of @user.facebookFriends
+            @user.facebookFriends[id] = new @User friend
 
-      @mixpanelIdentify()
+        # re-establish Meteor auth
+        @$meteor.loginWithPassword "#{@user.id}", @user.authtoken
 
-    # Check local storage for currentPhone
-    currentPhone = @localStorage.get 'currentPhone'
-    if currentPhone isnt null
-      @phone = currentPhone
+        @mixpanelIdentify()
+      deferred.resolve()
+    , ->
+      deferred.reject()
+
+    deferred.promise
 
   mixpanelIdentify: ->
     #identify and set user data with mixpanel

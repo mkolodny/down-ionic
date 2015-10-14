@@ -7,6 +7,7 @@ require './ionic/ionic-core.js'
 require './ionic/ionic-deploy.js'
 require './vendor/mixpanel/mixpanel-jslib-snippet'
 # Common
+require './common/local-db/local-db-module'
 require './common/meteor/meteor'
 require './common/mixpanel/mixpanel-module'
 require './common/auth/auth-module'
@@ -66,6 +67,7 @@ angular.module 'down', [
     'down.pushNotifications'
     'down.friendship'
     'down.createEvent'
+    'down.localDB'
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]
@@ -101,7 +103,7 @@ angular.module 'down', [
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel,
         $rootScope, $state, $timeout, $window, Auth, branchKey,
-        localStorageService, ionicDeployChannel, PushNotifications,
+        localStorageService, LocalDB, ionicDeployChannel, PushNotifications,
         skipIonicDeploy, User) ->
     # Resume session from localStorage
     Auth.resumeSession()
@@ -110,59 +112,61 @@ angular.module 'down', [
     Put anything that touches Cordova in here!
     ###
     bootstrap = ->
-      # Hide the accessory bar by default (remove this to show the accessory bar
-      # above the keyboard for form inputs)
-      $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
+      # Init the localDB
+      LocalDB.init().then ->
+        # Hide the accessory bar by default (remove this to show the accessory bar
+        # above the keyboard for form inputs)
+        $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
 
-      # Fix this problem:
-      #   http://stackoverflow.com/questions/29846816/space-made-for-two-keyboards-in-ionic-on-ios
-      $window.cordova?.plugins.Keyboard?.disableScroll true
+        # Fix this problem:
+        #   http://stackoverflow.com/questions/29846816/space-made-for-two-keyboards-in-ionic-on-ios
+        $window.cordova?.plugins.Keyboard?.disableScroll true
 
-      # Make the status bar white.
-      if angular.isDefined $window.StatusBar
-        $cordovaStatusbar.overlaysWebView true
-        $cordovaStatusbar.style 1
+        # Make the status bar white.
+        if angular.isDefined $window.StatusBar
+          $cordovaStatusbar.overlaysWebView true
+          $cordovaStatusbar.style 1
 
-      # Start a Branch session.
-      if angular.isDefined $window.branch
-        $window.branch.init branchKey, (err, data) ->
+        # Start a Branch session.
+        if angular.isDefined $window.branch
+          $window.branch.init branchKey, (err, data) ->
 
-      # Start listening for notifications.
-      if angular.isDefined $window.device
-        PushNotifications.listen()
+        # Start listening for notifications.
+        if angular.isDefined $window.device
+          PushNotifications.listen()
 
-      # Prevent hardware back button from returning
-      #   to login views on Android
-      $ionicPlatform.registerBackButtonAction (event) ->
-        currentState = $state.current.name
-        # States where going back is disabled, therefore the
-        #   hardware back button should exit the app
-        disabledStates = [
-          'login'
-          'facebookSync'
-          'setUsername'
-          'findFriends'
-          'events'
-        ]
-        if currentState in disabledStates
-          ionic.Platform.exitApp()
-        else
-          $ionicHistory.goBack()
-      , 100 # override action priority 100 (Return to previous view)
+        # Prevent hardware back button from returning
+        #   to login views on Android
+        $ionicPlatform.registerBackButtonAction (event) ->
+          currentState = $state.current.name
+          # States where going back is disabled, therefore the
+          #   hardware back button should exit the app
+          disabledStates = [
+            'login'
+            'facebookSync'
+            'setUsername'
+            'findFriends'
+            'events'
+          ]
+          if currentState in disabledStates
+            ionic.Platform.exitApp()
+          else
+            $ionicHistory.goBack()
+        , 100 # override action priority 100 (Return to previous view)
 
-      # Track App Opens
-      $ionicPlatform.on 'resume', ->
-        $mixpanel.track 'Open App'
+        # Track App Opens
+        $ionicPlatform.on 'resume', ->
+          $mixpanel.track 'Open App'
 
-      # Update the user's location while they use the app.
-      if localStorageService.get('hasRequestedLocationServices') \
-          or !ionic.Platform.isIOS()
-        $timeout ->
-          Auth.watchLocation()
-        , 5000
+        # Update the user's location while they use the app.
+        if localStorageService.get('hasRequestedLocationServices') \
+            or !ionic.Platform.isIOS()
+          $timeout ->
+            Auth.watchLocation()
+          , 5000
 
-      $rootScope.finishedBootstrap = true
-      Auth.redirectForAuthState()
+        $rootScope.finishedBootstrap = true
+        Auth.redirectForAuthState()
 
     $ionicPlatform.ready ->
       # Skip Downloading Updates During Development

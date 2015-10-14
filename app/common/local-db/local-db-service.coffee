@@ -1,41 +1,32 @@
 class LocalDB
-  @$inject: ['$q', '$rootScope', '$window']
-  constructor: (@$q, @$rootScope, @$window) ->
+  @$inject: ['$cordovaSQLite', '$q']
+  constructor: (@$cordovaSQLite, @$q) ->
    
-
-
   init: ->
-    # Options docs: http://pouchdb.com/api.html
-    @db = new @$window.PouchDB 'localStorage',
-      location: 2 # Not visible in iTunes, not backed up to iCloud
-      androidDatabaseImplementation: 2 # Use native SQLite
-      adapter: 'websql' # For SQLite plugin
-    
-    # Get localStorage document
     deferred = @$q.defer()
 
-    @key = '_local/localStorage'
-    @db.get(@key).catch (err) =>
-      if err.status is 404
-        # Default to blank object
-        return {_id: @key}
-      else
-        throw err
-    .then (doc) =>
-      @data = doc
-      deferred.resolve @data
-    , (err) =>
-      deferred.reject()
+    # Open DB connection
+    @db = @$cordovaSQLite.openDB
+      name: 'rallytap.db'
+      location: 2
+    # Create local_storage table if needed
+    query = 'CREATE TABLE IF NOT EXISTS local_storage (key string primary key, value text)'
+    @$cordovaSQLite.execute @db, query
+      .then =>
+        deferred.resolve()
+      , ->
+        deferred.reject()
 
     deferred.promise
 
   get: (key) ->
-    @data[key]
-
+    query = "SELECT * FROM local_storage WHERE key=#{key} LIMIT 1"
+    @$cordovaSQLite.execute @db, query
+    
   set: (key, value) ->
-    @data[key] = value
-    @db.put(@data).then (response) =>
-      # Update LocalDB.data._rev for future updates
-      @data._rev = response.rev
+    value = JSON.stringify value
+    query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES (#{key}, #{value})"
+    @$cordovaSQLite.execute @db, query
+    
 
 module.exports = LocalDB

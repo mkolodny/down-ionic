@@ -2,11 +2,11 @@ require '../../ionic/ionic.js'
 require 'angular'
 require 'angular-mocks'
 require 'angular-ui-router'
-require 'angular-local-storage'
 require 'ng-cordova'
 require './auth-module'
 require '../mixpanel/mixpanel-module'
 require '../meteor/meteor-mocks'
+require '../local-db/local-db-module'
 
 describe 'Auth service', ->
   $cordovaGeolocation = null
@@ -14,6 +14,7 @@ describe 'Auth service', ->
   $httpBackend = null
   $mixpanel = null
   $meteor = null
+  $rootScope = null
   scope = null
   $state = null
   $q = null
@@ -22,7 +23,7 @@ describe 'Auth service', ->
   Invitation = null
   User = null
   deserializedUser = null
-  localStorage = null
+  LocalDB = null
 
   beforeEach angular.mock.module('angular-meteor')
 
@@ -36,7 +37,7 @@ describe 'Auth service', ->
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('LocalStorageModule')
+  beforeEach angular.mock.module('down.localDB')
 
   beforeEach angular.mock.module(($provide) ->
     $cordovaGeolocation =
@@ -68,6 +69,10 @@ describe 'Auth service', ->
         set: jasmine.createSpy '$mixpanel.people.set'
     $provide.value '$mixpanel', $mixpanel
 
+    LocalDB =
+      get: jasmine.createSpy 'LocalDB.get'
+    $provide.value 'LocalDB', LocalDB
+
     return
   )
 
@@ -81,21 +86,33 @@ describe 'Auth service', ->
     Auth = angular.copy $injector.get('Auth')
     Invitation = $injector.get 'Invitation'
     scope = $rootScope.$new()
-    localStorage = $injector.get 'localStorageService'
   )
-
-  afterEach ->
-    localStorage.clearAll()
 
   it 'should init the user', ->
     expect(Auth.user).toEqual {}
 
   describe 'resume session', ->
+    deferred = null
+    resolved = null
+    rejected = null
 
-    describe 'when a user is stored in local storage', ->
+    beforeEach ->
+      deferred = $q.defer()
+      LocalDB.get.and.returnValue deferred.promise
+      Auth.resumeSession().then ->
+        resolved = true
+      , ->
+        rejected = true
+
+    it 'should get the session object from the LocalDB', ->
+      expect(LocalDB.get).toHaveBeenCalledWith 'session'
+
+    describe 'when a session is stored in local storage', ->
       user = null
       friends = null
       facebookFriends = null
+      phone = null
+      flags = null
 
       beforeEach ->
         friends =
@@ -112,11 +129,18 @@ describe 'Auth service', ->
           authtoken: 'asdfkasf'
           friends: friends
           facebookFriends: facebookFriends
-        localStorage.set 'currentUser', user
+        phone = '+19252852230'
+        flags = {}
+
+        session = 
+          user: user
+          phone: phone
+          flags: flags
 
         spyOn Auth, 'mixpanelIdentify'
 
-        Auth.resumeSession()
+        deferred.resolve session
+        $rootScope.$apply()
 
       it 'should set the user on Auth', ->
         expect(Auth.user).toAngularEqual user
@@ -126,6 +150,12 @@ describe 'Auth service', ->
 
       it 'should identify the user with mixpanel', ->
         expect(Auth.mixpanelIdentify).toHaveBeenCalled()
+
+      it 'should set the phone on Auth', ->
+        expect(Auth.phone).toEqual phone
+
+      it 'should set the flags on Auth', ->
+        expect(Auth.flags).toBe flags
 
       describe 'when a user has friends', ->
 
@@ -138,17 +168,19 @@ describe 'Auth service', ->
         it 'should set the facebookFriends on the user', ->
           expect(Auth.user.facebookFriends).toAngularEqual facebookFriends
 
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
 
-    describe 'when a phone is stored in localStorage', ->
-      phone = null
+
+    describe 'when there is a LocalDB error', ->
 
       beforeEach ->
-        phone = '+19252852230'
-        localStorage.set 'currentPhone', phone
-        Auth.resumeSession()
+        deferred.reject()
+        $rootScope.$apply()
 
-      it 'should set the phone on Auth', ->
-        expect(Auth.phone).toEqual phone
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
+
 
 
   describe 'mixpanel identify', ->
