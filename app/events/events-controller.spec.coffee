@@ -163,19 +163,32 @@ describe 'events controller', ->
   it 'should subscribe to friendSelects', ->
     expect($meteor.subscribe).toHaveBeenCalledWith 'friendSelects'
 
+  it 'should init the invitations dict', ->
+    expect(ctrl.invitations).toEqual {}
+
   describe 'when the friendSelects subscription is ready', ->
     newestMatch = null
+    items = null
 
     beforeEach ->
       newestMatch =
         _id: 'asdkfjnasdlkfjn'
       spyOn(ctrl, 'getNewestMatch').and.returnValue newestMatch
+      ctrl.invitations = 'invitations'
+      items = 'items'
+      spyOn(ctrl, 'buildItems').and.returnValue items
 
       friendSelectsDeferred.resolve()
       scope.$apply()
 
     it 'should bind the newestMatch to the controller', ->
       expect(ctrl.newestMatch).toBe newestMatch
+
+    it 'should build the items list', ->
+      expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+    it 'should save the new items', ->
+      expect(ctrl.items).toBe items
 
     describe 'when the newest match changes', ->
 
@@ -274,31 +287,38 @@ describe 'events controller', ->
     acceptedInvitation = null
     maybeInvitation = null
     invitations = null
+    olderMatch = null
+    newerMatch = null
+    matches = null
     friendWithUsername = null
     personWhoAddedMe = null
     builtItems = null
     newestMessage = null
     friendSelect = null
+    friendItems = null
 
     beforeEach ->
+      # Mock the current user's id.
+      Auth.user.id = 1
+
       # Mock invitations to events the user has joined.
       event = invitation.event
-      oldTimestamp = 1
-      newTimestamp = 2
+      olderTimestamp = 1
+      newerTimestamp = 2
       acceptedInvitation = angular.extend {}, invitation,
         id: 2
         response: Invitation.accepted
         event: angular.extend {}, event,
           id: 2
           latestMessage:
-            createdAt: newTimestamp
+            createdAt: newerTimestamp
       maybeInvitation = angular.extend {}, invitation,
         id: 3
         response: Invitation.maybe
         event: angular.extend {}, event,
           id: 3
           latestMessage:
-            createdAt: oldTimestamp
+            createdAt: olderTimestamp
       invitationsArray = [
         acceptedInvitation
         maybeInvitation
@@ -325,6 +345,20 @@ describe 'events controller', ->
         Auth.user.friends[friend.id] = friend
       # TODO: Sort the friends by latest message, then distance.
 
+      # Mock the function to get the user's matches.
+      olderMatch =
+        _id: '1'
+        firstUserId: "#{Auth.user.id}"
+        secondUserId: "#{friendWithUsername.id}"
+        expiresAt: olderTimestamp
+      newerMatch =
+        _id: '2'
+        firstUserId: "#{friendWithoutUsername.id}"
+        secondUserId: "#{Auth.user.id}"
+        expiresAt: newerTimestamp
+      matches = [olderMatch, newerMatch]
+      spyOn(ctrl, 'getMatches').and.returnValue matches
+
       # Mock Person who added me
       personWhoAddedMe = new User
         id: 9
@@ -343,34 +377,55 @@ describe 'events controller', ->
 
       scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
 
+      friendItems = [
+        isDivider: false
+        friend: new User friendWithUsername
+        id: friendWithUsername.id
+        newestMessage: newestMessage
+        friendSelect: friendSelect
+      ]
+      spyOn(ctrl, 'getFriendItems').and.returnValue friendItems
+
       builtItems = ctrl.buildItems invitations
 
     it 'should return the items', ->
       items = []
-      # Plans section
-      title = 'Plans'
+
+      # Events/matches section
+      title = 'Happening'
       items.push
         isDivider: true
         title: title
         id: title
+      # TODO: Handle when the user unfriended someone while they were still
+      #   matched.
+      items.push
+        isDivider: false
+        friend: Auth.user.friends[matches[0].secondUserId]
+        id: matches[0]._id
+        newestMessage: newestMessage
+        friendSelect: friendSelect
+      items.push
+        isDivider: false
+        friend: Auth.user.friends[matches[1].firstUserId]
+        id: matches[1]._id
+        newestMessage: newestMessage
+        friendSelect: friendSelect
       for id, invitation of invitations
-        items.push angular.extend
+        items.push
           isDivider: false
           invitation: invitation
           id: invitation.id
           newestMessage: newestMessage
+
       # Friends section
       title = 'Friends'
       items.push
         isDivider: true
         title: title
         id: title
-      items.push angular.extend
-        isDivider: false
-        friend: new User friendWithUsername
-        id: friendWithUsername.id
-        newestMessage: newestMessage
-        friendSelect: friendSelect
+      items.push friendItems[0]
+
       # Added Me section
       title = 'Added Me'
       items.push
@@ -386,9 +441,170 @@ describe 'events controller', ->
 
       expect(builtItems).toEqual items
 
-    it 'should subscribe to the friend messages', ->
-      expect(scope.$meteorSubscribe).toHaveBeenCalledWith('chat',
-          Friendship.getChatId friendWithUsername.id)
+
+  describe 'getting friend items', ->
+    newerMessage = null
+    newerMessageFriend = null
+    newerMessageFriendItem = null
+    olderMessage = null
+    olderMessageFriend = null
+    olderMessageFriendItem = null
+    nearerFriend = null
+    nearerFriendItem = null
+    fartherFriend = null
+    fartherFriendItem = null
+    stealthyFriend = null
+    stealthyFriendItem = null
+    returnedItems = null
+
+    beforeEach ->
+      # Mock the logged in user.
+      Auth.user =
+        id: 7
+        friends: {}
+
+      # Mock a friend without messages or a location.
+      stealthyFriend =
+        id: 1
+        username: 'smitty'
+      stealthyFriendItem =
+        isDivider: false
+        id: stealthyFriend.id
+        friend: new User stealthyFriend
+        newestMessage: {}
+        friendSelect: stealthyFriend.id
+
+      # Mock friends who have sent/received messages from the user.
+      olderTimestamp = 1
+      olderMessage =
+        _id: '1'
+        createdAt: olderTimestamp
+      olderMessageFriend =
+        id: 2
+        username: 'bignick'
+      olderMessageFriendItem =
+        isDivider: false
+        id: olderMessageFriend.id
+        friend: new User olderMessageFriend
+        newestMessage: olderMessage
+        friendSelect: olderMessageFriend.id
+      newerTimestamp = 2
+      newerMessage =
+        _id: '2'
+        createdAt: newerTimestamp
+      newerMessageFriend =
+        id: 3
+        username: 'drock'
+      newerMessageFriendItem =
+        isDivider: false
+        id: newerMessageFriend.id
+        friend: new User newerMessageFriend
+        newestMessage: newerMessage
+        friendSelect: newerMessageFriend.id
+
+      # Mock friends who haven't sent/received messages, but have a location.
+      fartherFriend =
+        id: 5
+        username: 'kb'
+        location:
+          lat: 40.7286954
+          long: -74.0069337
+      fartherFriendItem =
+        isDivider: false
+        id: fartherFriend.id
+        friend: new User fartherFriend
+        newestMessage: {}
+        friendSelect: fartherFriend.id
+      nearerFriend =
+        id: 6
+        username: 'kost'
+        location:
+          lat: 40.7194731
+          long: -73.9957201
+      nearerFriendItem =
+        isDivider: false
+        id: nearerFriend.id
+        friend: new User nearerFriend
+        newestMessage: {}
+        friendSelect: nearerFriend.id
+
+      # Mock a friend without a username.
+      friendWithoutUsername =
+        id: 8
+        username: null
+
+      spyOn(Friendship, 'getChatId').and.callFake (id) -> id
+      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
+      spyOn(ctrl, 'getFriendSelect').and.callFake (id) -> id
+      spyOn(ctrl, 'getNewestMessage').and.callFake (chatId) ->
+        if chatId is newerMessageFriend.id
+          newerMessage
+        else if chatId is olderMessageFriend.id
+          olderMessage
+        else
+          {}
+
+    describe 'when both friends have messages', ->
+
+      beforeEach ->
+        friends =  [newerMessageFriend, olderMessageFriend]
+        for friend in friends
+          Auth.user.friends[friend.id] = friend
+
+        returnedItems = ctrl.getFriendItems()
+
+      it 'should return the items sorted from newer to older messages', ->
+        items = [newerMessageFriendItem, olderMessageFriendItem]
+        expect(returnedItems).toEqual items
+
+
+    describe 'when only the first friend has a message', ->
+
+      beforeEach ->
+        friends =  [olderMessageFriend, stealthyFriend]
+        for friend in friends
+          Auth.user.friends[friend.id] = friend
+
+        returnedItems = ctrl.getFriendItems()
+
+      it 'should return the item with a message first', ->
+        items = [olderMessageFriendItem, stealthyFriendItem]
+        expect(returnedItems).toEqual items
+
+
+    describe 'when the user has a location', ->
+
+      beforeEach ->
+        Auth.user.location =
+          lat: 40.7138251
+          long: -73.9897481
+
+      describe 'and both friends have a location', ->
+
+        beforeEach ->
+          friends = [fartherFriend, nearerFriend]
+          for friend in friends
+            Auth.user.friends[friend.id] = friend
+
+          returnedItems = ctrl.getFriendItems()
+
+        it 'should return the nearer friend before the farther one', ->
+          items = [nearerFriendItem, fartherFriendItem]
+          expect(returnedItems).toEqual items
+
+
+      describe 'and only one friend has a location', ->
+
+        beforeEach ->
+          friends = [fartherFriend, stealthyFriend]
+          for friend in friends
+            Auth.user.friends[friend.id] = friend
+
+          returnedItems = ctrl.getFriendItems()
+
+        it 'should return the friend with a location before the one without', ->
+          items = [fartherFriendItem, stealthyFriendItem]
+          expect(returnedItems).toEqual items
 
 
   describe 'subscribing to events\' messages', ->
@@ -533,7 +749,8 @@ describe 'events controller', ->
         friendId: "#{friendId}"
       options =
         transform: ctrl.transformFriendSelect
-      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.FriendSelects, selector, false, options
+      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.FriendSelects,
+          selector, false, options)
 
 
   describe 'transforming the friendSelect', ->
@@ -581,12 +798,14 @@ describe 'events controller', ->
       options =
         sort:
           expiresAt: -1
-      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.Matches, {}, false, options
+      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.Matches, {}, false,
+          options)
 
 
   describe 'handling the new match', ->
     friendId = null
     friend = null
+    items = null
 
     beforeEach ->
       friendId = 1
@@ -602,12 +821,41 @@ describe 'events controller', ->
         firstUserId: "#{friendId}"
         secondUserId: "#{Auth.user.id}"
       spyOn $state, 'go'
+      ctrl.invitations = 'invitations'
+      items = 'items'
+      spyOn(ctrl, 'buildItems').and.returnValue items
+
       ctrl.handleNewMatch()
 
     it 'should transition to the chat', ->
       expect($state.go).toHaveBeenCalledWith 'friendship',
         friend: friend
         id: friendId
+
+    it 'should build the items list', ->
+      expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+    it 'should save the new items', ->
+      expect(ctrl.items).toBe items
+
+
+  describe 'getting the user\'s matches', ->
+    meteorCollection = null
+    matches = null
+
+    beforeEach ->
+      ctrl.Matches = 'Matches'
+      meteorCollection = 'meteorCollection'
+      scope.$meteorCollection = jasmine.createSpy('scope.$meteorCollection') \
+        .and.returnValue meteorCollection
+
+      matches = ctrl.getMatches()
+
+    it 'should fetch the matches from mongo', ->
+      expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.Matches, false
+
+    it 'should return the meteorCollection', ->
+      expect(matches).toBe meteorCollection
 
 
   describe 'responding to an invitation', ->
@@ -967,7 +1215,7 @@ describe 'events controller', ->
     $event = null
 
     beforeEach ->
-      friend = 
+      friend =
         id: 1
       friendSelect =
         _id: 'asdf'
@@ -976,7 +1224,7 @@ describe 'events controller', ->
         friendSelect: friendSelect
       $event =
         stopPropagation: jasmine.createSpy '$event.stopPropagation'
-      ctrl.FriendSelects = 
+      ctrl.FriendSelects =
         remove: jasmine.createSpy 'FriendSelects.remove'
         insert: jasmine.createSpy 'FriendSelects.insert'
 
@@ -994,7 +1242,8 @@ describe 'events controller', ->
         expect($event.stopPropagation).toHaveBeenCalled()
 
       it 'should remove the selectFriend object', ->
-        expect(ctrl.FriendSelects.remove).toHaveBeenCalledWith {_id: friendSelect._id}
+        expect(ctrl.FriendSelects.remove).toHaveBeenCalledWith
+          _id: friendSelect._id
 
 
     describe 'when they aren\'t selected', ->

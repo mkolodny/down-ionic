@@ -47,7 +47,7 @@ class PushNotifications
 
   register: ->
     # Check if using the old plugin
-    if @$window.PushNotification is undefined
+    if @$window.PushNotification.init is undefined
       @registerWithOldPlugin()
       return
 
@@ -105,7 +105,8 @@ class PushNotifications
         deferred.reject()
 
     # Listen for notifications.
-    @$rootScope.$on '$cordovaPush:notificationReceived', @handleNotificationWithOldPlugin
+    @$rootScope.$on('$cordovaPush:notificationReceived',
+        @handleNotificationWithOldPlugin)
 
     deferred.promise
 

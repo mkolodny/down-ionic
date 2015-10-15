@@ -264,14 +264,15 @@ describe 'event service', ->
             firstName: Auth.user.firstName
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
-          text: 'Down?'
+          text: "#{Auth.user.firstName}: Down?"
           chatId: Friendship.getChatId invitation.to_user # meteor likes strings
           type: Invitation.inviteAction
           createdAt: new Date()
           meta:
             eventId: "#{responseData.id}"
 
-        expect(Messages.insert).toHaveBeenCalledWith inviteMessage
+        expect(Messages.insert).toHaveBeenCalledWith(inviteMessage,
+            Event.readMessage)
 
     describe 'unsuccessfully', ->
       rejected = null
@@ -294,8 +295,9 @@ describe 'event service', ->
     messageId = null
 
     beforeEach ->
+      error = null
       messageId = 'asdf'
-      Event.readMessage messageId
+      Event.readMessage error, messageId
 
     it 'should call readMessage with the message id', ->
       expect($meteor.call).toHaveBeenCalledWith 'readMessage', messageId

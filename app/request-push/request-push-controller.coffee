@@ -10,5 +10,4 @@ class RequestPushCtrl
     @localStorage.set 'hasRequestedPushNotifications', true
     @Auth.redirectForAuthState()
 
-
 module.exports = RequestPushCtrl

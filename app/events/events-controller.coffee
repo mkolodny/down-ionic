@@ -1,3 +1,5 @@
+haversine = require 'haversine'
+
 class EventsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading',
              '$ionicPlatform', '$meteor', '$scope', '$state', '$timeout', 'Auth',
@@ -5,6 +7,10 @@ class EventsCtrl
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading,
                 @$ionicPlatform, @$meteor, @$scope, @$state, @$timeout, @Auth,
                 @Friendship, @Invitation, @ngToast, @User) ->
+    # Init the view.
+    @addedMe = []
+    @invitations = {}
+
     # Set Meteor collections on controller
     @Messages = @$meteor.getCollectionByName 'messages'
     @Chats = @$meteor.getCollectionByName 'chats'
@@ -14,6 +20,8 @@ class EventsCtrl
     # Subscribe to friendSelects data
     @$meteor.subscribe('friendSelects').then =>
       @newestMatch = @getNewestMatch()
+      @items = @buildItems @invitations
+
       # Watch for new matches
       @$scope.$watch =>
         @newestMatch.expiresAt
@@ -22,9 +30,6 @@ class EventsCtrl
         #   value will be equal
         if newValue isnt oldValue
           @handleNewMatch()
-
-    # Init the view.
-    @addedMe = []
 
     @$scope.$on '$ionicView.loaded', =>
       # Fetch the invitations to show on the view.
@@ -59,42 +64,49 @@ class EventsCtrl
         return -1
       else
         return 1
-    if invitations.length > 0
-      title = 'Plans'
+    matches = @getMatches()
+    if invitations.length > 0 or matches.length > 0
+      title = 'Happening'
       items.push
         isDivider: true
         title: title
         id: title
+      for match in matches
+        firstUserId = parseInt match.firstUserId
+        secondUserId = parseInt match.secondUserId
+        if @Auth.user.id is firstUserId
+          friend = @Auth.user.friends[secondUserId]
+        else
+          friend = @Auth.user.friends[firstUserId]
+        chatId = @Friendship.getChatId friend.id
+        items.push
+          isDivider: false
+          friend: friend
+          id: match._id
+          newestMessage: @getNewestMessage chatId
+          friendSelect: @getFriendSelect friend.id
       for invitation in invitations
-        items.push angular.extend
+        items.push
           isDivider: false
           invitation: invitation
           id: invitation.id
           # DON'T SET THE METEOR ANGULAR VARIABLES ON THE EVENT ITSELF!!
           #   AngularMeteorObject.getRawObject() breaks... not sure why...
-          #   When passing an AngularMeteorObject into $state.go, AngularMeteor.getRawObject()
-          #   is automatically called. Therefore, do not pass AngularMeteorObjects into $state.go.
+          #   When passing an AngularMeteorObject into $state.go,
+          #   AngularMeteor.getRawObject() is automatically called. Therefore, do
+          #   not pass AngularMeteorObjects into $state.go.
           newestMessage: @getNewestMessage "#{invitation.event.id}"
 
     # Friends section
-    friends = (friend for id, friend of @Auth.user.friends \
-        when friend.username isnt null)
-
-    if friends.length > 0
+    friendItems = @getFriendItems()
+    if friendItems.length > 0
       title = 'Friends'
       items.push
         isDivider: true
         title: title
         id: title
-      for friend in friends
-        chatId = @Friendship.getChatId friend.id
-        @$scope.$meteorSubscribe 'chat', chatId
-        items.push angular.extend
-          isDivider: false
-          friend: new @User friend
-          id: friend.id
-          newestMessage: @getNewestMessage chatId
-          friendSelect: @getFriendSelect friend.id
+      for item in friendItems
+        items.push item
 
     # Added me section
     if @addedMe.length > 0
@@ -111,6 +123,73 @@ class EventsCtrl
           id: user.id
           newestMessage: @getNewestMessage chatId
           friendSelect: @getFriendSelect user.id
+
+    items
+
+  getFriendItems: ->
+    friends = (friend for id, friend of @Auth.user.friends \
+        when friend.username isnt null)
+
+    # Build an unsorted list of items.
+    items = []
+    for friend in friends
+      chatId = @Friendship.getChatId friend.id
+      @$scope.$meteorSubscribe 'chat', chatId
+      items.push angular.extend
+        isDivider: false
+        friend: new @User friend
+        id: friend.id
+        newestMessage: @getNewestMessage chatId
+        friendSelect: @getFriendSelect friend.id
+
+    # Get the user's location to check which friend is nearer.
+    userHasLocation = angular.isDefined @Auth.user.location
+    if userHasLocation
+      userLocation =
+        latitude: @Auth.user.location.lat
+        longitude: @Auth.user.location.long
+
+    items.sort (a, b) ->
+      aHasMessage = angular.isDefined a.newestMessage._id
+      bHasMessage = angular.isDefined b.newestMessage._id
+      if aHasMessage and bHasMessage
+        if a.newestMessage.createdAt > b.newestMessage.createdAt
+          return -1
+        else if a.newestMessage.createdAt < b.newestMessage.createdAt
+          return 1
+        else
+          return 0
+      else if aHasMessage # only a has a message
+        return -1
+      else if bHasMessage # only b has a message
+        return 1
+
+      if not userHasLocation
+        return 0
+
+      aHasLocation = angular.isDefined a.friend.location
+      bHasLocation = angular.isDefined b.friend.location
+      if aHasLocation and bHasLocation # and userHasLocation
+        aLocation =
+          latitude: a.friend.location.lat
+          longitude: a.friend.location.long
+        bLocation =
+          latitude: b.friend.location.lat
+          longitude: b.friend.location.long
+        distanceToA = haversine(userLocation, aLocation)
+        distanceToB = haversine(userLocation, bLocation)
+        if distanceToA < distanceToB
+          return -1
+        else if distanceToA > distanceToB
+          return 1
+        else
+          return 0
+      else if aHasLocation # only a has a location
+        return -1
+      else if bHasLocation # only b has a location
+        return 1
+
+      0 # Neither user has a message or location
 
     items
 
@@ -152,7 +231,7 @@ class EventsCtrl
     selector =
       friendId: "#{friendId}"
     options =
-        transform: @transformFriendSelect
+      transform: @transformFriendSelect
     @$scope.$meteorObject @FriendSelects, selector, false, options
 
   transformFriendSelect: (friendSelect) =>
@@ -161,6 +240,9 @@ class EventsCtrl
     sixHours = 1000 * 60 * 60 * 6
     friendSelect.percentRemaining = (timeRemaining / sixHours) * 100
     friendSelect
+
+  getMatches: ->
+    @$scope.$meteorCollection @Matches, false
 
   getNewestMatch: =>
     @$scope.$meteorObject @Matches, {}, false,
@@ -175,10 +257,8 @@ class EventsCtrl
         friend: @Auth.user.friends[friendId]
         id: friendId
 
-  #   # Move the event's updated item.
-  #   for item in @items
-  #     if item.invitation?.event.id is event.id
-  #       @items = @buildItems @invitations
+    # Re-build the items list.
+    @items = @buildItems @invitations
 
   acceptInvitation: (item, $event) ->
     @respondToInvitation item, $event, @Invitation.accepted
@@ -296,13 +376,13 @@ class EventsCtrl
   toggleIsSelected: (item, $event) ->
     $event.stopPropagation()
 
-    if @isSelected(item)
+    if @isSelected item
       # Remove friend select
       @FriendSelects.remove {_id: item.friendSelect._id}
     else
       now = new Date().getTime()
       sixHours = 1000 * 60 * 60 * 6
-      sixHoursFromNow = new Date(now + sixHours)
+      sixHoursFromNow = new Date now + sixHours
       # Create new friendSelect
       @FriendSelects.insert
         userId: "#{@Auth.user.id}"

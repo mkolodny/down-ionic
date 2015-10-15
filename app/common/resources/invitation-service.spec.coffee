@@ -259,7 +259,7 @@ describe 'invitation service', ->
       $httpBackend.expectPOST listUrl, postData
         .respond 201, angular.toJson(responseData)
 
-      Messages = 
+      Messages =
         insert: jasmine.createSpy 'Messages.insert'
       $meteor.getCollectionByName.and.returnValue Messages
 
@@ -287,13 +287,13 @@ describe 'invitation service', ->
             firstName: Auth.user.firstName
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
-          text: 'Down?'
+          text: "#{Auth.user.firstName}: Down?"
           chatId: Friendship.getChatId invitation.toUserId
           type: Invitation.inviteAction
           createdAt: new Date()
           meta:
             eventId: "#{invitation.eventId}"
-        expect(Messages.insert).toHaveBeenCalledWith message
+        expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
 
 
   describe 'updating an invitation', ->
@@ -491,7 +491,8 @@ describe 'invitation service', ->
             chatId: "#{invitation.eventId}"
             type: Invitation.declineAction
             createdAt: date
-          expect(Messages.insert).toHaveBeenCalledWith message, Invitation.readMessage
+          expect(Messages.insert).toHaveBeenCalledWith(message,
+              Invitation.readMessage)
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.declined
@@ -686,3 +687,15 @@ describe 'invitation service', ->
       it 'should GET the invitations', ->
         expectedInvitations = [Invitation.deserialize responseData[0]]
         expect(response).toAngularEqual expectedInvitations
+
+
+  describe 'marking a message as read', ->
+    messageId = null
+
+    beforeEach ->
+      error = null
+      messageId = 'asdf'
+      Invitation.readMessage error, messageId
+
+    it 'should call readMessage with the message id', ->
+      expect($meteor.call).toHaveBeenCalledWith 'readMessage', messageId

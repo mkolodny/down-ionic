@@ -73,8 +73,6 @@ describe 'PushNotifications service', ->
   afterEach ->
     localStorage.clearAll()
 
-
-
   describe 'saving the device token', ->
 
     describe 'when using an iOS device', ->
@@ -224,6 +222,7 @@ describe 'PushNotifications service', ->
         on: jasmine.createSpy 'push.on'
       $window.PushNotification =
         init: jasmine.createSpy('PushNotification.init').and.returnValue push
+        on: jasmine.createSpy 'PushNotification.on'
 
       PushNotifications.register()
 
@@ -249,8 +248,9 @@ describe 'PushNotifications service', ->
     describe 'when using the old plugin', ->
 
       beforeEach ->
-        $window.PushNotification = undefined
+        delete $window.PushNotification.init
         spyOn PushNotifications, 'registerWithOldPlugin'
+
         PushNotifications.register()
 
       it 'should call register with the old plugin', ->
