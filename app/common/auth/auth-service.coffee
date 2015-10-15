@@ -7,6 +7,7 @@ class Auth
                 @$cordovaGeolocation, @$state, @LocalDB) ->
 
   user: {}
+  flags: {}
 
   resumeSession: ->
     deferred = @$q.defer()
@@ -36,6 +37,21 @@ class Auth
 
     deferred.promise
 
+  saveSession: ->
+    deferred = @$q.defer()
+
+    session =
+      flags: @flags
+      user: @user
+      phone: @phone
+
+    @LocalDB.set('session', session).then ->
+      deferred.resolve()
+    , ->
+      deferred.reject()
+
+    deferred.promise
+
   mixpanelIdentify: ->
     #identify and set user data with mixpanel
     @$mixpanel.identify @user.id
@@ -48,12 +64,12 @@ class Auth
 
   setUser: (user) ->
     @user = angular.extend @user, user
-    @localStorage.set 'currentUser', @user
     @mixpanelIdentify()
+    @saveSession()
 
   setPhone: (phone) ->
     @phone = phone
-    @localStorage.set 'currentPhone', @phone
+    @saveSession()
 
   isAuthenticated: ->
     deferred = @$q.defer()
@@ -152,16 +168,16 @@ class Auth
       @$state.go 'facebookSync'
     else if not @user.username?
       @$state.go 'setUsername'
-    else if @localStorage.get('hasRequestedLocationServices') is null \
+    else if @flags.hasRequestedLocationServices is undefined \
          and isIOS
       @$state.go 'requestLocation'
-    else if @localStorage.get('hasRequestedPushNotifications') is null \
+    else if @flags.hasRequestedPushNotifications is undefined \
          and isIOS
       @$state.go 'requestPush'
-    else if @localStorage.get('hasRequestedContacts') is null \
+    else if @flags.hasRequestedContacts is undefined \
          and isIOS
       @$state.go 'requestContacts'
-    else if @localStorage.get('hasCompletedFindFriends') is null \
+    else if @flags.hasCompletedFindFriends is undefined \
          and (isIOS or isAndroid)
       @$state.go 'findFriends'
     else

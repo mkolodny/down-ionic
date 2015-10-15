@@ -79,22 +79,47 @@ describe 'LocalDB service', ->
 
 
   describe 'getting a value', ->
-    promise = null
+    deferred = null
     key = null
     result = null
+    rejected = null
 
     beforeEach ->
-      promise = 'promise'
-      spyOn($cordovaSQLite, 'execute').and.returnValue promise
+      deferred = $q.defer()
+      spyOn($cordovaSQLite, 'execute').and.returnValue deferred.promise
       key = 'someKey'
-      result = LocalDB.get key
+      LocalDB.get(key).then (_result_) ->
+        result = _result_
+      , ->
+        rejected = true
 
     it 'should query local_storage by key', ->
       query = "SELECT * FROM local_storage WHERE key=#{key} LIMIT 1"
       expect($cordovaSQLite.execute).toHaveBeenCalledWith LocalDB.db, query
 
-    it 'should return the $cordovaSQLite.execute promise', ->
-      expect(result).toBe promise
+    describe 'when the query executes successfully', ->
+      value = null
+
+      beforeEach ->
+        value = 
+          id: 2
+          name: 'Jimbo Walker'
+
+        jsonStringValue = angular.toJson angular.copy(value)
+        deferred.resolve jsonStringValue
+        $rootScope.$apply()
+
+      it 'should resolve the promise with the JSON value', ->
+        expect(result).toEqual value
+
+    describe 'when the query fails', ->
+
+      beforeEach ->
+        deferred.reject()
+        $rootScope.$apply()
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
 
 
   describe 'setting a value', ->

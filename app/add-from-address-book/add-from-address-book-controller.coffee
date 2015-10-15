@@ -1,14 +1,15 @@
 class AddFromAddressBookCtrl
-  @$inject: ['$scope', 'Contacts', 'localStorageService', 'User']
-  constructor: (@$scope, @Contacts, localStorageService, @User) ->
-    @localStorage = localStorageService
+  @$inject: ['$scope', 'Contacts', 'LocalDB', 'User']
+  constructor: (@$scope, @Contacts, @LocalDB, @User) ->
 
-    contacts = @localStorage.get 'contacts'
-    if contacts isnt null
-      @showContacts contacts
-    else
-      @isLoading = true
-      @refresh()
+    @LocalDB.get('contacts').then (contactsObject) =>
+      if contactsObject isnt null
+        @showContacts contactsObject
+      else
+        @isLoading = true
+        @refresh()
+    , =>
+      @getContactsError = true
 
   showContacts: (contacts) ->
     contactsArray = (contact for id, contact of contacts)

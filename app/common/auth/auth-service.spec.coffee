@@ -71,6 +71,7 @@ describe 'Auth service', ->
 
     LocalDB =
       get: jasmine.createSpy 'LocalDB.get'
+      set: jasmine.createSpy 'LocalDB.set'
     $provide.value 'LocalDB', LocalDB
 
     return
@@ -90,6 +91,9 @@ describe 'Auth service', ->
 
   it 'should init the user', ->
     expect(Auth.user).toEqual {}
+
+  it 'should init the flags', ->
+    expect(Auth.flags).toEqual {}
 
   describe 'resume session', ->
     deferred = null
@@ -182,6 +186,59 @@ describe 'Auth service', ->
         expect(rejected).toBe true
 
 
+  describe 'saving the session', ->
+    user = null
+    phone = null
+    flags = null
+    deferred = null
+    rejected = null
+    resolved = null
+
+    beforeEach ->
+      user =
+          id: 1
+          name: 'Andrew Linfoot'
+          authtoken: 'asdfkasf'
+      phone = '+19252852230'
+      flags = {}
+
+      Auth.user = user
+      Auth.phone = phone
+      Auth.flags = flags
+
+      deferred = $q.defer()
+      LocalDB.set.and.returnValue deferred.promise
+
+      Auth.saveSession().then ->
+        resolved = true
+      , ->
+        rejected = true
+
+    it 'should save the session to LocalDB', ->
+      expect(LocalDB.set).toHaveBeenCalledWith 'session',
+        user: user
+        phone: phone
+        flags: flags
+
+    describe 'saved successfully', ->
+
+      beforeEach ->
+        deferred.resolve()
+        $rootScope.$apply()
+
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
+
+
+    describe 'save fails', ->
+
+      beforeEach ->
+        deferred.reject()
+        $rootScope.$apply()
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
+
 
   describe 'mixpanel identify', ->
 
@@ -239,6 +296,8 @@ describe 'Auth service', ->
   describe 'set user', ->
     user = null
     expectedUser = null
+    saveSession = null
+    result = null
 
     beforeEach ->
       Auth.user =
@@ -252,32 +311,39 @@ describe 'Auth service', ->
       expectedUser = angular.extend({}, Auth.user, user)
 
       spyOn Auth, 'mixpanelIdentify'
+      saveSession = 'saveSession'
+      spyOn(Auth, 'saveSession').and.returnValue saveSession
 
-      Auth.setUser user
+      result = Auth.setUser user
 
     it 'should extend passed in user with auth.user', ->
       expect(Auth.user).toEqual expectedUser
 
-    it 'should save the user to localstorage', ->
-      expect(localStorage.get 'currentUser').toEqual expectedUser
-
     it 'should identify the user in mixpanel', ->
       expect(Auth.mixpanelIdentify).toHaveBeenCalled()
+
+    it 'should return the save session promise', ->
+      expect(result).toBe saveSession
 
 
   describe 'set phone', ->
     phone = null
+    result = null
+    saveSession = null
 
     beforeEach ->
       Auth.phone = null
       phone = '19252852230'
-      Auth.setPhone phone
+      saveSession = 'saveSession'
+      spyOn(Auth, 'saveSession').and.returnValue saveSession
+
+      result = Auth.setPhone phone
 
     it 'should set Auth.phone', ->
       expect(Auth.phone).toEqual phone
 
-    it 'should save the phone to local storage', ->
-      expect(localStorage.get 'currentPhone').toEqual phone
+    it 'should return the save session promise', ->
+      expect(result).toBe saveSession
 
 
   describe 'checking whether the user is authenticated', ->
@@ -691,7 +757,7 @@ describe 'Auth service', ->
               lat: 40.7265834
               long: -73.9821535
             username: 'tdog'
-          localStorage.set 'hasRequestedLocationServices', true
+          Auth.flags.hasRequestedLocationServices = true
           Auth.redirectForAuthState()
 
         it 'should go to the request push notifications view', ->
@@ -710,8 +776,8 @@ describe 'Auth service', ->
               lat: 40.7265834
               long: -73.9821535
             username: 'tdog'
-          localStorage.set 'hasRequestedLocationServices', true
-          localStorage.set 'hasRequestedPushNotifications', true
+          Auth.flags.hasRequestedLocationServices = true
+          Auth.flags.hasRequestedPushNotifications = true
           Auth.redirectForAuthState()
 
         it 'should go to the request contacts view', ->
@@ -732,9 +798,9 @@ describe 'Auth service', ->
             lat: 40.7265834
             long: -73.9821535
           username: 'tdog'
-        localStorage.set 'hasRequestedLocationServices', true
-        localStorage.set 'hasRequestedPushNotifications', true
-        localStorage.set 'hasRequestedContacts', true
+        Auth.flags.hasRequestedLocationServices = true
+        Auth.flags.hasRequestedPushNotifications = true
+        Auth.flags.hasRequestedContacts = true
         Auth.redirectForAuthState()
 
       it 'should go to the find friends view', ->
@@ -754,10 +820,10 @@ describe 'Auth service', ->
             lat: 40.7265834
             long: -73.9821535
           username: 'tdog'
-        localStorage.set 'hasRequestedLocationServices', true
-        localStorage.set 'hasRequestedPushNotifications', true
-        localStorage.set 'hasRequestedContacts', true
-        localStorage.set 'hasCompletedFindFriends', true
+        Auth.flags.hasRequestedLocationServices = true
+        Auth.flags.hasRequestedPushNotifications = true
+        Auth.flags.hasRequestedContacts = true
+        Auth.flags.hasCompletedFindFriends = true
         Auth.redirectForAuthState()
 
       it 'should go to the events view', ->
