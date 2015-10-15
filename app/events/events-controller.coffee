@@ -71,17 +71,6 @@ class EventsCtrl
         isDivider: true
         title: title
         id: title
-      for invitation in invitations
-        items.push
-          isDivider: false
-          invitation: invitation
-          id: invitation.id
-          # DON'T SET THE METEOR ANGULAR VARIABLES ON THE EVENT ITSELF!!
-          #   AngularMeteorObject.getRawObject() breaks... not sure why...
-          #   When passing an AngularMeteorObject into $state.go,
-          #   AngularMeteor.getRawObject() is automatically called. Therefore, do
-          #   not pass AngularMeteorObjects into $state.go.
-          newestMessage: @getNewestMessage "#{invitation.event.id}"
       for match in matches
         firstUserId = parseInt match.firstUserId
         secondUserId = parseInt match.secondUserId
@@ -96,6 +85,17 @@ class EventsCtrl
           id: match._id
           newestMessage: @getNewestMessage chatId
           friendSelect: @getFriendSelect friend.id
+      for invitation in invitations
+        items.push
+          isDivider: false
+          invitation: invitation
+          id: invitation.id
+          # DON'T SET THE METEOR ANGULAR VARIABLES ON THE EVENT ITSELF!!
+          #   AngularMeteorObject.getRawObject() breaks... not sure why...
+          #   When passing an AngularMeteorObject into $state.go,
+          #   AngularMeteor.getRawObject() is automatically called. Therefore, do
+          #   not pass AngularMeteorObjects into $state.go.
+          newestMessage: @getNewestMessage "#{invitation.event.id}"
 
     # Friends section
     friendItems = @getFriendItems()

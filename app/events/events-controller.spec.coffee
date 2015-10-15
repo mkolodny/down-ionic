@@ -397,12 +397,6 @@ describe 'events controller', ->
         isDivider: true
         title: title
         id: title
-      for id, invitation of invitations
-        items.push
-          isDivider: false
-          invitation: invitation
-          id: invitation.id
-          newestMessage: newestMessage
       # TODO: Handle when the user unfriended someone while they were still
       #   matched.
       items.push
@@ -417,6 +411,12 @@ describe 'events controller', ->
         id: matches[1]._id
         newestMessage: newestMessage
         friendSelect: friendSelect
+      for id, invitation of invitations
+        items.push
+          isDivider: false
+          invitation: invitation
+          id: invitation.id
+          newestMessage: newestMessage
 
       # Friends section
       title = 'Friends'
