@@ -606,7 +606,7 @@ describe 'friendship controller', ->
       $meteor.collection.and.returnValue messages
       spyOn ctrl, 'getFriendInvitations'
       spyOn ctrl, 'handleNewMessage'
-      matchObject = 'matchObject'
+      matchObject = {_id: '1'}
       spyOn(ctrl, 'getMatch').and.returnValue matchObject
 
       scope.$emit '$ionicView.beforeEnter'
@@ -636,6 +636,9 @@ describe 'friendship controller', ->
     it 'should bind the match AngularMeteorObject to the controller', ->
       expect(ctrl.match).toBe matchObject
 
+    it 'should hide the nav border', ->
+      expect(scope.hideNavBottomBorder).toBe true
+
     describe 'when no messages were posted yet', ->
 
       beforeEach ->
@@ -661,6 +664,18 @@ describe 'friendship controller', ->
         expect(ctrl.handleNewMessage).toHaveBeenCalled()
 
 
+    describe 'when there is no match', ->
+
+      beforeEach ->
+        delete matchObject._id
+
+        scope.$emit '$ionicView.beforeEnter'
+        scope.$apply()
+
+      it 'should show the hideNavBottomBorder', ->
+        expect(scope.hideNavBottomBorder).toBe false
+
+
   describe 'getting the match', ->
     meteorObject = null
     result = null
@@ -684,7 +699,6 @@ describe 'friendship controller', ->
           secondUserId: "#{ctrl.friend.id}"
         ]
       expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.Matches, selector, false
-
 
 
   describe 'handling a new message', ->

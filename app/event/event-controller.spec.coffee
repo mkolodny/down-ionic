@@ -254,6 +254,16 @@ describe 'event controller', ->
         expect(ctrl.handleChatMembersChange).toHaveBeenCalled()
 
 
+  describe 'after entering the view', ->
+
+    beforeEach ->
+      scope.$emit '$ionicView.afterEnter'
+      scope.$apply()
+
+    it 'should show the nav border', ->
+      expect(scope.hideNavBottomBorder).toBe false
+
+
   describe 'when leaving the view', ->
 
     beforeEach ->
@@ -268,9 +278,6 @@ describe 'event controller', ->
     it 'should stop remove angular-meteor bindings', ->
       expect(ctrl.messages.stop).toHaveBeenCalled()
       expect(ctrl.chat.stop).toHaveBeenCalled()
-
-    it 'should show the bottom border', ->
-      expect($rootScope.hideNavBottomBorder).toBe false
 
 
   describe 'handling a new message', ->

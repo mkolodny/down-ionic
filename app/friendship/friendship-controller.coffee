@@ -17,7 +17,6 @@ class FriendshipCtrl
       @shouldScrollBottom = false
 
       @getFriendInvitations()
-      @$rootScope.hideNavBottomBorder = true
       @chatId = @Friendship.getChatId @friend.id
 
       # Subscribe to the event's chat.
@@ -26,6 +25,8 @@ class FriendshipCtrl
       # Bind reactive variables
       @messages = @$meteor.collection @getMessages, false
       @match = @getMatch()
+
+      @$rootScope.hideNavBottomBorder = angular.isDefined @match._id
 
       # Mark messages as read as they come in.
       @$scope.$watch =>
@@ -37,8 +38,6 @@ class FriendshipCtrl
     @$scope.$on '$ionicView.leave', =>
       # Remove angular-meteor bindings.
       @messages.stop()
-
-      @$rootScope.hideNavBottomBorder = false
 
   handleNewMessage: (newMessageId) =>
     if newMessageId is undefined

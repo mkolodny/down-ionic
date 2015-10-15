@@ -65,11 +65,14 @@ class EventCtrl
         @chat.members
       , @handleChatMembersChange
 
-    # Remove angular-meteor bindings
+    @$scope.$on '$ionicView.afterEnter', =>
+      # Show the nav border to distinguish the navbar from invite messages.
+      @$rootScope.hideNavBottomBorder = false
+
     @$scope.$on '$ionicView.leave', =>
+      # Remove angular-meteor bindings
       @messages.stop()
       @chat.stop()
-      @$rootScope.hideNavBottomBorder = false
 
   handleNewMessage: (newMessageId) =>
     if newMessageId is undefined
@@ -106,7 +109,7 @@ class EventCtrl
   handleChatMembersChange: (chatMembers) =>
     chatMembers = chatMembers or []
     members = @members or []
-    
+
     chatMemberIds = (member.userId for member in chatMembers)
     currentMemberIds = (member.id for member in members)
     chatMemberIds.sort()
