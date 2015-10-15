@@ -40,7 +40,9 @@
               >Can't</button>
     </div>
   </div>
-  <ion-content ng-click="event.toggleIsHeaderExpanded()" ontouchstart delegate-handle="event">
+  <ion-content ng-click="event.toggleIsHeaderExpanded()"
+               ontouchstart
+               delegate-handle="event">
     <ion-list>
       <!-- We might need to use `track by item.id` to keep this quick. -->
       <ion-item class="message-item" ng-repeat="message in event.messages">
