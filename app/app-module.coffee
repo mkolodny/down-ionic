@@ -159,11 +159,9 @@ angular.module 'down', [
           $mixpanel.track 'Open App'
 
         # Update the user's location while they use the app.
-        if localStorageService.get('hasRequestedLocationServices') \
+        if Auth.flags.hasRequestedLocationServices \
             or !ionic.Platform.isIOS()
-          $timeout ->
-            Auth.watchLocation()
-          , 5000
+          Auth.watchLocation()
 
         $rootScope.finishedBootstrap = true
         Auth.redirectForAuthState()

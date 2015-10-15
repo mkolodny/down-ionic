@@ -14,9 +14,8 @@ class Auth
 
     @LocalDB.get('session').then (session) =>
       if session
-        console.log session
         @phone = session.phone
-        @flags = session.flags
+        @flags = session.flags or {}
         @user = new @User session.user
 
         # Set friends as instances of User resource
@@ -32,7 +31,7 @@ class Auth
 
         @mixpanelIdentify()
       deferred.resolve()
-    , ->
+    , (error) ->
       deferred.reject()
 
     deferred.promise

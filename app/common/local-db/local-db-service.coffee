@@ -22,19 +22,24 @@ class LocalDB
   get: (key) ->
     deferred = @$q.defer()
 
-    query = "SELECT * FROM local_storage WHERE key=#{key} LIMIT 1"
+    query = "SELECT * FROM local_storage WHERE key='#{key}' LIMIT 1"
     @$cordovaSQLite.execute @db, query
-      .then (value) ->
-        deferred.resolve angular.fromJson(value)
-      , ->
+      .then (sqlResultSet) ->
+        if sqlResultSet.rows.length is 0
+          # No data found
+          deferred.resolve null
+        else
+          value = sqlResultSet.rows[0]?.value
+          deferred.resolve angular.fromJson(value)
+      , (error) ->
         deferred.reject()
 
     deferred.promise
     
   set: (key, value) ->
     value = angular.toJson value
-    query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES (#{key}, #{value})"
-    @$cordovaSQLite.execute @db, query
+    query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES ('#{key}', '#{value}')"
+    @$cordovaSQLite.execute(@db, query)
     
 
 module.exports = LocalDB

@@ -94,23 +94,43 @@ describe 'LocalDB service', ->
         rejected = true
 
     it 'should query local_storage by key', ->
-      query = "SELECT * FROM local_storage WHERE key=#{key} LIMIT 1"
+      query = "SELECT * FROM local_storage WHERE key='#{key}' LIMIT 1"
       expect($cordovaSQLite.execute).toHaveBeenCalledWith LocalDB.db, query
 
     describe 'when the query executes successfully', ->
-      value = null
 
-      beforeEach ->
-        value = 
-          id: 2
-          name: 'Jimbo Walker'
+      describe 'when data is found', ->
+        value = null
 
-        jsonStringValue = angular.toJson angular.copy(value)
-        deferred.resolve jsonStringValue
-        $rootScope.$apply()
+        beforeEach ->
+          value = 
+            id: 2
+            name: 'Jimbo Walker'
 
-      it 'should resolve the promise with the JSON value', ->
-        expect(result).toEqual value
+          sqlResultSet =
+            rows: [
+              key: key
+              value: angular.toJson angular.copy(value)
+            ]
+
+          deferred.resolve sqlResultSet
+          $rootScope.$apply()
+
+        it 'should resolve the promise with the JSON value', ->
+          expect(result).toEqual value
+
+      describe 'when no data is found', ->
+
+        beforeEach ->
+          sqlResultSet =
+            rows: []
+
+          deferred.resolve sqlResultSet
+          $rootScope.$apply()
+
+        it 'should return null', ->
+          expect(result).toBeNull()
+
 
     describe 'when the query fails', ->
 
@@ -140,7 +160,7 @@ describe 'LocalDB service', ->
 
     it 'should query local_storage by key', ->
       value = angular.toJson value
-      query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES (#{key}, #{value})"
+      query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES ('#{key}', '#{value}')"
       expect($cordovaSQLite.execute).toHaveBeenCalledWith LocalDB.db, query
 
     it 'should return the $cordovaSQLite.execute promise', ->
