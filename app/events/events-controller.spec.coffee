@@ -294,6 +294,7 @@ describe 'events controller', ->
     personWhoAddedMe = null
     builtItems = null
     newestMessage = null
+    match = null
     friendSelect = null
     friendItems = null
 
@@ -371,7 +372,8 @@ describe 'events controller', ->
 
       newestMessage = 'newestMessage'
       spyOn(ctrl, 'getNewestMessage').and.returnValue newestMessage
-
+      match = 'match'
+      spyOn(ctrl, 'getMatch').and.returnValue match
       friendSelect = 'friendSelect'
       spyOn(ctrl, 'getFriendSelect').and.returnValue friendSelect
 
@@ -404,12 +406,14 @@ describe 'events controller', ->
         friend: Auth.user.friends[matches[0].secondUserId]
         id: matches[0]._id
         newestMessage: newestMessage
+        match: match
         friendSelect: friendSelect
       items.push
         isDivider: false
         friend: Auth.user.friends[matches[1].firstUserId]
         id: matches[1]._id
         newestMessage: newestMessage
+        match: match
         friendSelect: friendSelect
       for id, invitation of invitations
         items.push
@@ -748,7 +752,7 @@ describe 'events controller', ->
       selector =
         friendId: "#{friendId}"
       options =
-        transform: ctrl.transformFriendSelect
+        transform: ctrl.addPercentRemaining
       expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.FriendSelects,
           selector, false, options)
 
@@ -771,7 +775,7 @@ describe 'events controller', ->
         _id: 'asdfasdf'
         expiresAt: new Date(new Date().getTime() + threeHours)
 
-      result = ctrl.transformFriendSelect angular.copy(friendSelect)
+      result = ctrl.addPercentRemaining angular.copy(friendSelect)
 
     afterEach ->
       jasmine.clock().uninstall()
@@ -1301,3 +1305,31 @@ describe 'events controller', ->
 
       it 'should return false', ->
         expect(ctrl.isSelected(item)).toBe false
+
+
+  describe 'getting a match', ->
+    friendId = null
+    meteorObject = null
+    response = null
+
+    beforeEach ->
+      meteorObject = 'meteorObject'
+      scope.$meteorObject = jasmine.createSpy('scope.$meteorObject') \
+        .and.returnValue meteorObject
+      friendId = 1
+      response = ctrl.getMatch friendId
+
+    it 'should return an AngularMeteorObject', ->
+      expect(response).toBe meteorObject
+
+    it 'should filter by friendId and add a tranform for time remaining', ->
+      selector =
+        $or: [
+          firstUserId: "#{friendId}"
+        ,
+          secondUserId: "#{friendId}"
+        ]
+      options =
+        transform: ctrl.addPercentRemaining
+      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.Matches,
+          selector, false, options)

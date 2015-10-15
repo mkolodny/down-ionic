@@ -84,6 +84,7 @@ class EventsCtrl
           friend: friend
           id: match._id
           newestMessage: @getNewestMessage chatId
+          match: @getMatch friend.id
           friendSelect: @getFriendSelect friend.id
       for invitation in invitations
         items.push
@@ -176,8 +177,8 @@ class EventsCtrl
         bLocation =
           latitude: b.friend.location.lat
           longitude: b.friend.location.long
-        distanceToA = haversine(userLocation, aLocation)
-        distanceToB = haversine(userLocation, bLocation)
+        distanceToA = haversine userLocation, aLocation
+        distanceToB = haversine userLocation, bLocation
         if distanceToA < distanceToB
           return -1
         else if distanceToA > distanceToB
@@ -231,15 +232,26 @@ class EventsCtrl
     selector =
       friendId: "#{friendId}"
     options =
-      transform: @transformFriendSelect
+      transform: @addPercentRemaining
     @$scope.$meteorObject @FriendSelects, selector, false, options
 
-  transformFriendSelect: (friendSelect) =>
+  getMatch: (friendId) =>
+    selector =
+      $or: [
+        firstUserId: "#{friendId}"
+      ,
+        secondUserId: "#{friendId}"
+      ]
+    options =
+      transform: @addPercentRemaining
+    @$scope.$meteorObject @Matches, selector, false, options
+
+  addPercentRemaining: (obj) =>
     now = new Date().getTime()
-    timeRemaining = friendSelect.expiresAt.getTime() - now
+    timeRemaining = obj.expiresAt.getTime() - now
     sixHours = 1000 * 60 * 60 * 6
-    friendSelect.percentRemaining = (timeRemaining / sixHours) * 100
-    friendSelect
+    obj.percentRemaining = (timeRemaining / sixHours) * 100
+    obj
 
   getMatches: ->
     @$scope.$meteorCollection @Matches, false
