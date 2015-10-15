@@ -47,7 +47,7 @@ class PushNotifications
 
   register: ->
     # Check if using the old plugin
-    if @$window.PushNotification.on is undefined
+    if @$window.PushNotification.init is undefined
       @registerWithOldPlugin()
       return
 
