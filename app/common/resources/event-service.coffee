@@ -1,4 +1,5 @@
-Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship', 'User', \
+Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship', \
+         'User', \
          ($http, $meteor, $q, $resource, apiRoot, Auth, Friendship, User) ->
   listUrl = "#{apiRoot}/events"
   detailUrl = "#{listUrl}/:id"
@@ -99,6 +100,7 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship',
             createdAt: new Date()
             meta:
               eventId: "#{event.id}"
+          , @readMessage
 
         deferred.resolve event
       .error (data, status) =>
