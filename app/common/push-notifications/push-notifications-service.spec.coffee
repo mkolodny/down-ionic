@@ -248,7 +248,7 @@ describe 'PushNotifications service', ->
     describe 'when using the old plugin', ->
 
       beforeEach ->
-        delete $window.PushNotification.on
+        delete $window.PushNotification.init
         spyOn PushNotifications, 'registerWithOldPlugin'
 
         PushNotifications.register()
