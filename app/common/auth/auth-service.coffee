@@ -71,6 +71,10 @@ class Auth
     @phone = phone
     @saveSession()
 
+  setFlag: (flagKey, flagValue) ->
+    @flags[flagKey] = flagValue
+    @saveSession()
+
   isAuthenticated: ->
     deferred = @$q.defer()
 

@@ -325,7 +325,7 @@ describe 'Auth service', ->
     it 'should return the save session promise', ->
       expect(result).toBe saveSession
 
-
+  ##setPhone
   describe 'set phone', ->
     phone = null
     result = null
@@ -341,6 +341,30 @@ describe 'Auth service', ->
 
     it 'should set Auth.phone', ->
       expect(Auth.phone).toEqual phone
+
+    it 'should return the save session promise', ->
+      expect(result).toBe saveSession
+
+
+  ##setFlag
+  describe 'setting a flag', ->
+    flagKey = null
+    flagValue = null
+    saveSession = null
+    result = null
+
+    beforeEach ->
+      flagKey = 'hasRequestedPushNotifications'
+      flagValue = true
+      Auth.flags = {}
+
+      saveSession = 'saveSession'
+      spyOn(Auth, 'saveSession').and.returnValue saveSession
+
+      result = Auth.setFlag flagKey, flagValue
+
+    it 'should set the flag on Auth', ->
+      expect(Auth.flags[flagKey]).toBe flagValue
 
     it 'should return the save session promise', ->
       expect(result).toBe saveSession
