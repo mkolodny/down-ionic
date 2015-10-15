@@ -264,7 +264,7 @@ describe 'event service', ->
             firstName: Auth.user.firstName
             lastName: Auth.user.lastName
             imageUrl: Auth.user.imageUrl
-          text: 'Down?'
+          text: "#{Auth.user.firstName}: Down?"
           chatId: Friendship.getChatId invitation.to_user # meteor likes strings
           type: Invitation.inviteAction
           createdAt: new Date()

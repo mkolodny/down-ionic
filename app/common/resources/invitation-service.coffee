@@ -113,7 +113,7 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
     $http.post listUrl, postData
       .success (data, status) =>
         invitations = (@deserialize invitation for invitation in data)
-        
+
         # Create invite_action messages
         Messages = $meteor.getCollectionByName 'messages'
         for invitation in invitations
@@ -124,12 +124,13 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
               firstName: Auth.user.firstName
               lastName: Auth.user.lastName
               imageUrl: Auth.user.imageUrl
-            text: 'Down?'
+            text: "#{Auth.user.firstName}: Down?"
             chatId: Friendship.getChatId invitation.toUserId
             type: @inviteAction
             createdAt: new Date()
             meta:
               eventId: "#{invitation.eventId}"
+          , @readMessage
 
         deferred.resolve invitations
       .error (data, status) =>
