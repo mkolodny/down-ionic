@@ -1,3 +1,5 @@
+haversine = require 'haversine'
+
 class EventsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading',
              '$ionicPlatform', '$meteor', '$scope', '$state', '$timeout', 'Auth',
@@ -96,24 +98,15 @@ class EventsCtrl
           friendSelect: @getFriendSelect friend.id
 
     # Friends section
-    friends = (friend for id, friend of @Auth.user.friends \
-        when friend.username isnt null)
-
-    if friends.length > 0
+    friendItems = @getFriendItems()
+    if friendItems.length > 0
       title = 'Friends'
       items.push
         isDivider: true
         title: title
         id: title
-      for friend in friends
-        chatId = @Friendship.getChatId friend.id
-        @$scope.$meteorSubscribe 'chat', chatId
-        items.push angular.extend
-          isDivider: false
-          friend: new @User friend
-          id: friend.id
-          newestMessage: @getNewestMessage chatId
-          friendSelect: @getFriendSelect friend.id
+      for item in friendItems
+        items.push item
 
     # Added me section
     if @addedMe.length > 0
@@ -130,6 +123,73 @@ class EventsCtrl
           id: user.id
           newestMessage: @getNewestMessage chatId
           friendSelect: @getFriendSelect user.id
+
+    items
+
+  getFriendItems: ->
+    friends = (friend for id, friend of @Auth.user.friends \
+        when friend.username isnt null)
+
+    # Build an unsorted list of items.
+    items = []
+    for friend in friends
+      chatId = @Friendship.getChatId friend.id
+      @$scope.$meteorSubscribe 'chat', chatId
+      items.push angular.extend
+        isDivider: false
+        friend: new @User friend
+        id: friend.id
+        newestMessage: @getNewestMessage chatId
+        friendSelect: @getFriendSelect friend.id
+
+    # Get the user's location to check which friend is nearer.
+    userHasLocation = angular.isDefined @Auth.user.location
+    if userHasLocation
+      userLocation =
+        latitude: @Auth.user.location.lat
+        longitude: @Auth.user.location.long
+
+    items.sort (a, b) ->
+      aHasMessage = angular.isDefined a.newestMessage._id
+      bHasMessage = angular.isDefined b.newestMessage._id
+      if aHasMessage and bHasMessage
+        if a.newestMessage.createdAt > b.newestMessage.createdAt
+          return -1
+        else if a.newestMessage.createdAt < b.newestMessage.createdAt
+          return 1
+        else
+          return 0
+      else if aHasMessage # only a has a message
+        return -1
+      else if bHasMessage # only b has a message
+        return 1
+
+      if not userHasLocation
+        return 0
+
+      aHasLocation = angular.isDefined a.friend.location
+      bHasLocation = angular.isDefined b.friend.location
+      if aHasLocation and bHasLocation # and userHasLocation
+        aLocation =
+          latitude: a.friend.location.lat
+          longitude: a.friend.location.long
+        bLocation =
+          latitude: b.friend.location.lat
+          longitude: b.friend.location.long
+        distanceToA = haversine(userLocation, aLocation)
+        distanceToB = haversine(userLocation, bLocation)
+        if distanceToA < distanceToB
+          return -1
+        else if distanceToA > distanceToB
+          return 1
+        else
+          return 0
+      else if aHasLocation # only a has a location
+        return -1
+      else if bHasLocation # only b has a location
+        return 1
+
+      0 # Neither user has a message or location
 
     items
 

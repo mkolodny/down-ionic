@@ -283,7 +283,7 @@ describe 'events controller', ->
         expect(refreshComplete).toBe true
 
 
-  fdescribe 'building the items list', ->
+  describe 'building the items list', ->
     acceptedInvitation = null
     maybeInvitation = null
     invitations = null
@@ -295,6 +295,7 @@ describe 'events controller', ->
     builtItems = null
     newestMessage = null
     friendSelect = null
+    friendItems = null
 
     beforeEach ->
       # Mock the current user's id.
@@ -376,6 +377,15 @@ describe 'events controller', ->
 
       scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
 
+      friendItems = [
+        isDivider: false
+        friend: new User friendWithUsername
+        id: friendWithUsername.id
+        newestMessage: newestMessage
+        friendSelect: friendSelect
+      ]
+      spyOn(ctrl, 'getFriendItems').and.returnValue friendItems
+
       builtItems = ctrl.buildItems invitations
 
     it 'should return the items', ->
@@ -414,12 +424,7 @@ describe 'events controller', ->
         isDivider: true
         title: title
         id: title
-      items.push
-        isDivider: false
-        friend: new User friendWithUsername
-        id: friendWithUsername.id
-        newestMessage: newestMessage
-        friendSelect: friendSelect
+      items.push friendItems[0]
 
       # Added Me section
       title = 'Added Me'
@@ -436,9 +441,170 @@ describe 'events controller', ->
 
       expect(builtItems).toEqual items
 
-    it 'should subscribe to the friend messages', ->
-      expect(scope.$meteorSubscribe).toHaveBeenCalledWith('chat',
-          Friendship.getChatId friendWithUsername.id)
+
+  describe 'getting friend items', ->
+    newerMessage = null
+    newerMessageFriend = null
+    newerMessageFriendItem = null
+    olderMessage = null
+    olderMessageFriend = null
+    olderMessageFriendItem = null
+    nearerFriend = null
+    nearerFriendItem = null
+    fartherFriend = null
+    fartherFriendItem = null
+    stealthyFriend = null
+    stealthyFriendItem = null
+    returnedItems = null
+
+    beforeEach ->
+      # Mock the logged in user.
+      Auth.user =
+        id: 7
+        friends: {}
+
+      # Mock a friend without messages or a location.
+      stealthyFriend =
+        id: 1
+        username: 'smitty'
+      stealthyFriendItem =
+        isDivider: false
+        id: stealthyFriend.id
+        friend: new User stealthyFriend
+        newestMessage: {}
+        friendSelect: stealthyFriend.id
+
+      # Mock friends who have sent/received messages from the user.
+      olderTimestamp = 1
+      olderMessage =
+        _id: '1'
+        createdAt: olderTimestamp
+      olderMessageFriend =
+        id: 2
+        username: 'bignick'
+      olderMessageFriendItem =
+        isDivider: false
+        id: olderMessageFriend.id
+        friend: new User olderMessageFriend
+        newestMessage: olderMessage
+        friendSelect: olderMessageFriend.id
+      newerTimestamp = 2
+      newerMessage =
+        _id: '2'
+        createdAt: newerTimestamp
+      newerMessageFriend =
+        id: 3
+        username: 'drock'
+      newerMessageFriendItem =
+        isDivider: false
+        id: newerMessageFriend.id
+        friend: new User newerMessageFriend
+        newestMessage: newerMessage
+        friendSelect: newerMessageFriend.id
+
+      # Mock friends who haven't sent/received messages, but have a location.
+      fartherFriend =
+        id: 5
+        username: 'kb'
+        location:
+          lat: 40.7286954
+          long: -74.0069337
+      fartherFriendItem =
+        isDivider: false
+        id: fartherFriend.id
+        friend: new User fartherFriend
+        newestMessage: {}
+        friendSelect: fartherFriend.id
+      nearerFriend =
+        id: 6
+        username: 'kost'
+        location:
+          lat: 40.7194731
+          long: -73.9957201
+      nearerFriendItem =
+        isDivider: false
+        id: nearerFriend.id
+        friend: new User nearerFriend
+        newestMessage: {}
+        friendSelect: nearerFriend.id
+
+      # Mock a friend without a username.
+      friendWithoutUsername =
+        id: 8
+        username: null
+
+      spyOn(Friendship, 'getChatId').and.callFake (id) -> id
+      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
+      spyOn(ctrl, 'getFriendSelect').and.callFake (id) -> id
+      spyOn(ctrl, 'getNewestMessage').and.callFake (chatId) ->
+        if chatId is newerMessageFriend.id
+          newerMessage
+        else if chatId is olderMessageFriend.id
+          olderMessage
+        else
+          {}
+
+    describe 'when both friends have messages', ->
+
+      beforeEach ->
+        friends =  [newerMessageFriend, olderMessageFriend]
+        for friend in friends
+          Auth.user.friends[friend.id] = friend
+
+        returnedItems = ctrl.getFriendItems()
+
+      it 'should return the items sorted from newer to older messages', ->
+        items = [newerMessageFriendItem, olderMessageFriendItem]
+        expect(returnedItems).toEqual items
+
+
+    describe 'when only the first friend has a message', ->
+
+      beforeEach ->
+        friends =  [olderMessageFriend, stealthyFriend]
+        for friend in friends
+          Auth.user.friends[friend.id] = friend
+
+        returnedItems = ctrl.getFriendItems()
+
+      it 'should return the item with a message first', ->
+        items = [olderMessageFriendItem, stealthyFriendItem]
+        expect(returnedItems).toEqual items
+
+
+    describe 'when the user has a location', ->
+
+      beforeEach ->
+        Auth.user.location =
+          lat: 40.7138251
+          long: -73.9897481
+
+      describe 'and both friends have a location', ->
+
+        beforeEach ->
+          friends = [fartherFriend, nearerFriend]
+          for friend in friends
+            Auth.user.friends[friend.id] = friend
+
+          returnedItems = ctrl.getFriendItems()
+
+        it 'should return the nearer friend before the farther one', ->
+          items = [nearerFriendItem, fartherFriendItem]
+          expect(returnedItems).toEqual items
+
+
+      describe 'and only one friend has a location', ->
+
+        beforeEach ->
+          friends = [fartherFriend, stealthyFriend]
+          for friend in friends
+            Auth.user.friends[friend.id] = friend
+
+          returnedItems = ctrl.getFriendItems()
+
+        it 'should return the friend with a location before the one without', ->
+          items = [fartherFriendItem, stealthyFriendItem]
+          expect(returnedItems).toEqual items
 
 
   describe 'subscribing to events\' messages', ->
