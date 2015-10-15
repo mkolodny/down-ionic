@@ -687,3 +687,15 @@ describe 'invitation service', ->
       it 'should GET the invitations', ->
         expectedInvitations = [Invitation.deserialize responseData[0]]
         expect(response).toAngularEqual expectedInvitations
+
+
+  describe 'marking a message as read', ->
+    messageId = null
+
+    beforeEach ->
+      error = null
+      messageId = 'asdf'
+      Invitation.readMessage error, messageId
+
+    it 'should call readMessage with the message id', ->
+      expect($meteor.call).toHaveBeenCalledWith 'readMessage', messageId

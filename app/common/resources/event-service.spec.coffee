@@ -256,7 +256,7 @@ describe 'event service', ->
 
         expect(Messages.insert).toHaveBeenCalledWith message, Event.readMessage
 
-      fit 'should create invite_action messages', ->
+      it 'should create invite_action messages', ->
         inviteMessage =
           creator:
             id: "#{Auth.user.id}" # meteor likes strings
@@ -295,8 +295,9 @@ describe 'event service', ->
     messageId = null
 
     beforeEach ->
+      error = null
       messageId = 'asdf'
-      Event.readMessage messageId
+      Event.readMessage error, messageId
 
     it 'should call readMessage with the message id', ->
       expect($meteor.call).toHaveBeenCalledWith 'readMessage', messageId

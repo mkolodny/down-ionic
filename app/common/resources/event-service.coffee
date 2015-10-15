@@ -108,7 +108,7 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship',
 
     {$promise: deferred.promise}
 
-  resource.readMessage = (messageId) ->
+  resource.readMessage = (error, messageId) ->
     $meteor.call 'readMessage', messageId
 
   resource.sendMessage = (event, text) ->

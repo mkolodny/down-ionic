@@ -197,7 +197,7 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
   resource.getUserInvitations = (userId) ->
     @query {user: userId}
 
-  resource.readMessage = (messageId) ->
+  resource.readMessage = (error, messageId) ->
     $meteor.call 'readMessage', messageId
 
   resource
