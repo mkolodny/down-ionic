@@ -10,7 +10,7 @@ require '../common/local-db/local-db-module'
 require '../common/mixpanel/mixpanel-module'
 InviteFriendsCtrl = require './invite-friends-controller'
 
-fdescribe 'invite friends controller', ->
+describe 'invite friends controller', ->
   $controller = null
   $ionicHistory = null
   $ionicLoading = null
