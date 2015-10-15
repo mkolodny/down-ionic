@@ -1,16 +1,16 @@
 require '../ionic/ionic.js'
 require 'angular'
-require 'angular-local-storage'
 require 'angular-mocks'
 require 'angular-sanitize'
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js'
 require '../common/auth/auth-module'
 require '../common/resources/resources-module'
+require '../common/local-db/local-db-module'
 require '../common/mixpanel/mixpanel-module'
 InviteFriendsCtrl = require './invite-friends-controller'
 
-describe 'invite friends controller', ->
+fdescribe 'invite friends controller', ->
   $controller = null
   $ionicHistory = null
   $ionicLoading = null
@@ -23,7 +23,7 @@ describe 'invite friends controller', ->
   event = null
   Event = null
   Invitation = null
-  localStorage = null
+  LocalDB = null
   scope = null
 
   beforeEach angular.mock.module('analytics.mixpanel')
@@ -36,7 +36,7 @@ describe 'invite friends controller', ->
 
   beforeEach angular.mock.module('down.resources')
 
-  beforeEach angular.mock.module('LocalStorageModule')
+  beforeEach angular.mock.module('down.localDB')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
@@ -48,7 +48,7 @@ describe 'invite friends controller', ->
     Auth = angular.copy $injector.get('Auth')
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
-    localStorage = $injector.get 'localStorageService'
+    LocalDB = $injector.get 'LocalDB'
     scope = $injector.get '$rootScope'
 
     # Mock the logged in user.
@@ -96,7 +96,6 @@ describe 'invite friends controller', ->
     contacts =
       2: Auth.user.friends[2]
       3: Auth.user.friends[3]
-    localStorage.set 'contacts', contacts
 
     # Mock the event being created.
     event =
@@ -121,9 +120,6 @@ describe 'invite friends controller', ->
       $state: $state
   )
 
-  afterEach ->
-    localStorage.clearAll()
-
   it 'should init the array of selected friends', ->
     expect(ctrl.selectedFriends).toEqual []
 
@@ -134,73 +130,105 @@ describe 'invite friends controller', ->
     expect(ctrl.invitedUserIds).toEqual {}
 
   describe 'when entering the view', ->
+    deferred = null
 
     beforeEach ->
       ctrl.error = 'inviteError'
 
-    describe 'with items', ->
+      spyOn ctrl, 'setupView'
+      spyOn $ionicHistory, 'nextViewOptions'
+
+      deferred = $q.defer()
+      spyOn(LocalDB, 'get').and.returnValue deferred.promise
+
+      scope.$broadcast '$ionicView.enter'
+      scope.$apply()
+
+    it 'should init cleanupViewAfterLeave', ->
+      expect(ctrl.cleanupViewAfterLeave).toBe true
+
+    it 'should set the event on the controller', ->
+      expect(ctrl.event).toBe event
+
+    it 'should disable animating the transition to the next view', ->
+      options = {disableAnimate: true}
+      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
+
+    it 'should clear errors', ->
+      expect(ctrl.error).toEqual false
+
+    it 'should get contacts from the localdb', ->
+      expect(LocalDB.get).toHaveBeenCalledWith 'contacts'
+
+    describe 'when successful', ->
 
       beforeEach ->
-        spyOn(ctrl, 'buildItems').and.callFake ->
-          # Mock there being items.
-          ctrl.items = [
-            isDivider: false
-            friend: Auth.user.friends[2]
-          ]
-        spyOn $ionicHistory, 'nextViewOptions'
-
-        scope.$broadcast '$ionicView.enter'
+        deferred.resolve contacts
         scope.$apply()
 
-      it 'should init cleanupViewAfterLeave', ->
-        expect(ctrl.cleanupViewAfterLeave).toBe true
+      it 'should set the contacts object on the controller', ->
+        expect(ctrl.contacts).toBe contacts
 
-      it 'should set the event on the controller', ->
-        expect(ctrl.event).toBe event
-
-      it 'should disable animating the transition to the next view', ->
-        options = {disableAnimate: true}
-        expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
-
-      it 'should clear errors', ->
-        expect(ctrl.error).toEqual false
-
-      it 'should build the items array', ->
-        expect(ctrl.buildItems).toHaveBeenCalled()
+      it 'should set up the view', ->
+        expect(ctrl.setupView).toHaveBeenCalled()
 
 
-    describe 'with no items', ->
+    describe 'on localDB error', ->
 
       beforeEach ->
-        spyOn(ctrl, 'buildItems').and.callFake ->
-          # Mock there being items.
-          ctrl.items = []
-        spyOn $ionicHistory, 'nextViewOptions'
-
-        scope.$broadcast '$ionicView.enter'
+        deferred.reject()
         scope.$apply()
 
-      it 'should init cleanupViewAfterLeave', ->
-        expect(ctrl.cleanupViewAfterLeave).toBe true
-
-      it 'should set the event on the controller', ->
-        expect(ctrl.event).toBe event
-
-      it 'should disable animating the transition to the next view', ->
-        options = {disableAnimate: true}
-        expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
-
-      it 'should clear errors', ->
-        expect(ctrl.error).toEqual false
-
-      it 'should build the items array', ->
-        expect(ctrl.buildItems).toHaveBeenCalled()
-
-      it 'should set a no items flag', ->
-        expect(ctrl.noItems).toBe true
+      it 'should show and error', ->
+        expect(ctrl.error).toBe 'localDBError'
 
 
-  describe 'when we\'re inviting users to an existing event', ->
+
+  describe 'after leaving the view', ->
+
+    describe 'when cleanupViewAfterLeave is true', ->
+
+      beforeEach ->
+        ctrl.cleanupViewAfterLeave = true
+        spyOn ctrl, 'cleanupView'
+
+        scope.$broadcast '$ionicView.afterLeave'
+        scope.$apply()
+
+      it 'should clean up the view', ->
+        expect(ctrl.cleanupView).toHaveBeenCalled()
+
+
+  ##setupView
+  describe 'setting up the view', ->
+
+    describe 'when setting up the view for an existing event', ->
+
+      beforeEach ->
+        ctrl.event =
+          id: 1
+        spyOn ctrl, 'setupExistingEvent'
+
+        ctrl.setupView()
+
+      it 'should call setup existing event', ->
+        expect(ctrl.setupExistingEvent).toHaveBeenCalled()
+
+
+    describe 'when setting up the view for creating a new event', ->
+
+      beforeEach ->
+        ctrl.event = {}
+        spyOn ctrl, 'setupNewEvent'
+
+        ctrl.setupView()
+
+      it 'should call setup existing event', ->
+        expect(ctrl.setupNewEvent).toHaveBeenCalled()
+
+
+  ##setupExistingEvent
+  describe 'setting up the view for an existing event', ->
     deferred = null
 
     beforeEach ->
@@ -217,7 +245,7 @@ describe 'invite friends controller', ->
           name: 'B Bar & Grill'
           lat: 40.7270718
           long: -73.9919324
-      $state.params.event = event
+      ctrl.event = event
 
       deferred = $q.defer()
       spyOn(Event, 'getInvitedIds').and.returnValue deferred.promise
@@ -225,18 +253,13 @@ describe 'invite friends controller', ->
       spyOn $ionicLoading, 'show'
       spyOn $ionicLoading, 'hide'
 
-      ctrl = $controller InviteFriendsCtrl,
-        $scope: scope
-        Auth: Auth
-        $state: $state
-      scope.$broadcast '$ionicView.enter'
-      scope.$apply()
-
-    it 'should get invited ids', ->
-      expect(Event.getInvitedIds).toHaveBeenCalledWith event
+      ctrl.setupExistingEvent()
 
     it 'should show a loading indicator', ->
       expect($ionicLoading.show).toHaveBeenCalled()
+
+    it 'should get invited ids', ->
+      expect(Event.getInvitedIds).toHaveBeenCalledWith event
 
     describe 'getting invited ids', ->
 
@@ -257,9 +280,6 @@ describe 'invite friends controller', ->
             deferred.resolve invitedUserIds
             scope.$apply()
 
-          it 'should hide the loading indicator', ->
-            expect($ionicLoading.hide).toHaveBeenCalled()
-
           it 'should save users\' ids who were invited', ->
             expectedIds = {}
             for id in invitedUserIds
@@ -268,6 +288,9 @@ describe 'invite friends controller', ->
 
           it 'should call build items', ->
             expect(ctrl.buildItems).toHaveBeenCalled()
+
+          it 'should hide the loading indicator', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
 
 
         describe 'with no items', ->
@@ -297,7 +320,6 @@ describe 'invite friends controller', ->
             expect(ctrl.noItems).toBe true
 
 
-
       describe 'when there is an error', ->
 
         beforeEach ->
@@ -313,21 +335,37 @@ describe 'invite friends controller', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
 
-  describe 'after leaving the view', ->
+  ##setupNewEvent
+  describe 'setting up the view for a new event', ->
 
-    describe 'when cleanupViewAfterLeave is true', ->
+    describe 'with items', ->
 
       beforeEach ->
-        ctrl.cleanupViewAfterLeave = true
-        spyOn ctrl, 'cleanupView'
+        spyOn(ctrl, 'buildItems').and.callFake ->
+          # Mock there being items.
+          ctrl.items = [
+            isDivider: false
+            friend: Auth.user.friends[2]
+          ]
+        ctrl.setupNewEvent()
 
-        scope.$broadcast '$ionicView.afterLeave'
-        scope.$apply()
-
-      it 'should clean up the view', ->
-        expect(ctrl.cleanupView).toHaveBeenCalled()
+      it 'should build the items array', ->
+        expect(ctrl.buildItems).toHaveBeenCalled()
 
 
+    describe 'with no items', ->
+
+      beforeEach ->
+        spyOn(ctrl, 'buildItems').and.callFake ->
+          # Mock there being items.
+          ctrl.items = []
+        ctrl.setupNewEvent()
+
+      it 'should set a no items flag', ->
+        expect(ctrl.noItems).toBe true
+      
+
+  ##cleanupView
   describe 'cleaning up the view', ->
 
     beforeEach ->
@@ -348,16 +386,18 @@ describe 'invite friends controller', ->
       expect(ctrl.invitedUserIds).toEqual {}
 
 
+  ##buildItems
   describe 'building the items array', ->
 
-    describe 'without a query', ->
+    describe 'without a search query', ->
 
       beforeEach ->
         ctrl.query = ''
 
-      describe 'when we\'ve requested contacts', ->
+      describe 'when the user has contacts', ->
 
         beforeEach ->
+          ctrl.contacts = contacts
           ctrl.buildItems()
 
         it 'should set the items on the controller', ->
@@ -426,11 +466,10 @@ describe 'invite friends controller', ->
           expect(ctrl.nearbyFriendIds).toEqual nearbyFriendIds
 
 
-      describe 'when the user doesn\'t have contacts yet', ->
+      describe 'when the user doesn\'t have contacts', ->
 
         beforeEach ->
-          localStorage.clearAll()
-
+          ctrl.contacts = {}
           ctrl.buildItems()
 
         it 'should set the items on the controller', ->
@@ -475,7 +514,7 @@ describe 'invite friends controller', ->
           expect(ctrl.items).toEqual items
 
 
-    describe 'with a query', ->
+    describe 'with a search query', ->
 
       beforeEach ->
         ctrl.query = 'U'

@@ -1,10 +1,8 @@
 class InviteFriendsCtrl
   @$inject: ['$ionicHistory', '$ionicLoading', '$mixpanel', '$scope',
-             '$state', 'Auth', 'Event', 'Invitation', 'localStorageService']
+             '$state', 'Auth', 'Event', 'Invitation', 'LocalDB']
   constructor: (@$ionicHistory, @$ionicLoading, @$mixpanel, @$scope, @$state,
-                @Auth, @Event, @Invitation, localStorageService) ->
-    @localStorage = localStorageService
-
+                @Auth, @Event, @Invitation, @LocalDB) ->
     @selectedFriends = []
     @selectedFriendIds = {}
     @invitedUserIds = {}
@@ -27,36 +25,49 @@ class InviteFriendsCtrl
       @$ionicHistory.nextViewOptions
         disableAnimate: true
 
-      if 'id' of @event
-        # We're inviting more people to an existing event.
-        @$ionicLoading.show()
-
-        @Event.getInvitedIds @event
-          .then (invitedUserIds) =>
-            for id in invitedUserIds
-              @invitedUserIds[id] = true
-            @buildItems()
-
-            if @items.length is 0
-              # Set a flag marking the fact that there were no items when the view
-              #   loaded.
-              @noItems = true
-          , =>
-            @error = 'getInvitedIdsError'
-          .finally =>
-            @$ionicLoading.hide()
-      else
-        # We're creating a new event.
-        @buildItems()
-
-        if @items.length is 0
-          # Set a flag marking the fact that there were no items when the view
-          #   loaded.
-          @noItems = true
+      @LocalDB.get('contacts').then (contacts) =>
+        @contacts = contacts
+        @setupView()
+      , =>
+        @error = 'localDBError'
 
     @$scope.$on '$ionicView.afterLeave', =>
       if @cleanupViewAfterLeave
         @cleanupView()
+
+  setupView: ->
+    if 'id' of @event
+      # We're inviting more people to an existing event.
+      @setupExistingEvent()
+    else
+      # We're creating a new event.
+      @setupNewEvent()
+
+  setupExistingEvent: ->
+    @$ionicLoading.show()
+
+    @Event.getInvitedIds @event
+      .then (invitedUserIds) =>
+        for id in invitedUserIds
+          @invitedUserIds[id] = true
+        @buildItems()
+
+        if @items.length is 0
+          # Set a flag marking the fact that there were no items when the view
+          #   loaded. Used to show no friends yet prompt
+          @noItems = true
+      , =>
+        @error = 'getInvitedIdsError'
+      .finally =>
+        @$ionicLoading.hide()
+
+  setupNewEvent: ->
+    @buildItems()
+
+    if @items.length is 0
+      # Set a flag marking the fact that there were no items when the view
+      #   loaded. Used to show no friends yet prompt
+      @noItems = true
 
   cleanupView: ->
     delete @event
@@ -72,7 +83,7 @@ class InviteFriendsCtrl
         friendsDict[id] = friend
       for id, friend of @Auth.user.facebookFriends
         friendsDict[id] = friend
-      for id, contact of @localStorage.get 'contacts'
+      for id, contact of @contacts
         friendsDict[id] = contact
       friends = (friend for id, friend of friendsDict \
           when friend.name.toLowerCase().indexOf(@query.toLowerCase()) isnt -1)
@@ -130,7 +141,7 @@ class InviteFriendsCtrl
           for friend in facebookFriends)
 
       # Build the list of contacts.
-      contacts = (contact for id, contact of @localStorage.get 'contacts')
+      contacts = (contact for id, contact of @contacts)
       contacts.sort (a, b) ->
         if a.name.toLowerCase() < b.name.toLowerCase()
           return -1

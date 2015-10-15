@@ -1,7 +1,7 @@
-require 'angular-local-storage'
 require '../common/auth/auth-module'
 require '../common/resources/resources-module'
 require '../common/mixpanel/mixpanel-module'
+require '../common/local-db/local-db-module'
 InviteFriendsCtrl = require './invite-friends-controller'
 
 angular.module 'down.inviteFriends', [
@@ -10,7 +10,7 @@ angular.module 'down.inviteFriends', [
     'ui.router'
     'down.auth'
     'down.resources'
-    'LocalStorageModule'
+    'down.localDB'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'inviteFriends',
