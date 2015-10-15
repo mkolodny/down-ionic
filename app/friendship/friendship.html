@@ -1,5 +1,7 @@
 <ion-view id="friendship" view-title="{{friendship.friend.name}}">
-  <div id="match-header" ng-show="friendship.match._id">
+  <div id="match-header"
+       ng-show="friendship.match._id"
+       ng-class="{'match-notification': friendship.match._id}">
     You and {{friendship.friend.firstName}} are down to do something.
   </div>
   <ion-content delegate-handle="friendship">
