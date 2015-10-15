@@ -163,19 +163,32 @@ describe 'events controller', ->
   it 'should subscribe to friendSelects', ->
     expect($meteor.subscribe).toHaveBeenCalledWith 'friendSelects'
 
+  it 'should init the invitations dict', ->
+    expect(ctrl.invitations).toEqual {}
+
   describe 'when the friendSelects subscription is ready', ->
     newestMatch = null
+    items = null
 
     beforeEach ->
       newestMatch =
         _id: 'asdkfjnasdlkfjn'
       spyOn(ctrl, 'getNewestMatch').and.returnValue newestMatch
+      ctrl.invitations = 'invitations'
+      items = 'items'
+      spyOn(ctrl, 'buildItems').and.returnValue items
 
       friendSelectsDeferred.resolve()
       scope.$apply()
 
     it 'should bind the newestMatch to the controller', ->
       expect(ctrl.newestMatch).toBe newestMatch
+
+    it 'should build the items list', ->
+      expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+    it 'should save the new items', ->
+      expect(ctrl.items).toBe items
 
     describe 'when the newest match changes', ->
 
@@ -270,10 +283,13 @@ describe 'events controller', ->
         expect(refreshComplete).toBe true
 
 
-  describe 'building the items list', ->
+  fdescribe 'building the items list', ->
     acceptedInvitation = null
     maybeInvitation = null
     invitations = null
+    olderMatch = null
+    newerMatch = null
+    matches = null
     friendWithUsername = null
     personWhoAddedMe = null
     builtItems = null
@@ -281,24 +297,27 @@ describe 'events controller', ->
     friendSelect = null
 
     beforeEach ->
+      # Mock the current user's id.
+      Auth.user.id = 1
+
       # Mock invitations to events the user has joined.
       event = invitation.event
-      oldTimestamp = 1
-      newTimestamp = 2
+      olderTimestamp = 1
+      newerTimestamp = 2
       acceptedInvitation = angular.extend {}, invitation,
         id: 2
         response: Invitation.accepted
         event: angular.extend {}, event,
           id: 2
           latestMessage:
-            createdAt: newTimestamp
+            createdAt: newerTimestamp
       maybeInvitation = angular.extend {}, invitation,
         id: 3
         response: Invitation.maybe
         event: angular.extend {}, event,
           id: 3
           latestMessage:
-            createdAt: oldTimestamp
+            createdAt: olderTimestamp
       invitationsArray = [
         acceptedInvitation
         maybeInvitation
@@ -325,6 +344,20 @@ describe 'events controller', ->
         Auth.user.friends[friend.id] = friend
       # TODO: Sort the friends by latest message, then distance.
 
+      # Mock the function to get the user's matches.
+      olderMatch =
+        _id: '1'
+        firstUserId: "#{Auth.user.id}"
+        secondUserId: "#{friendWithUsername.id}"
+        expiresAt: olderTimestamp
+      newerMatch =
+        _id: '2'
+        firstUserId: "#{friendWithoutUsername.id}"
+        secondUserId: "#{Auth.user.id}"
+        expiresAt: newerTimestamp
+      matches = [olderMatch, newerMatch]
+      spyOn(ctrl, 'getMatches').and.returnValue matches
+
       # Mock Person who added me
       personWhoAddedMe = new User
         id: 9
@@ -347,30 +380,47 @@ describe 'events controller', ->
 
     it 'should return the items', ->
       items = []
-      # Plans section
-      title = 'Plans'
+
+      # Events/matches section
+      title = 'Happening'
       items.push
         isDivider: true
         title: title
         id: title
       for id, invitation of invitations
-        items.push angular.extend
+        items.push
           isDivider: false
           invitation: invitation
           id: invitation.id
           newestMessage: newestMessage
+      # TODO: Handle when the user unfriended someone while they were still
+      #   matched.
+      items.push
+        isDivider: false
+        friend: Auth.user.friends[matches[0].secondUserId]
+        id: matches[0]._id
+        newestMessage: newestMessage
+        friendSelect: friendSelect
+      items.push
+        isDivider: false
+        friend: Auth.user.friends[matches[1].firstUserId]
+        id: matches[1]._id
+        newestMessage: newestMessage
+        friendSelect: friendSelect
+
       # Friends section
       title = 'Friends'
       items.push
         isDivider: true
         title: title
         id: title
-      items.push angular.extend
+      items.push
         isDivider: false
         friend: new User friendWithUsername
         id: friendWithUsername.id
         newestMessage: newestMessage
         friendSelect: friendSelect
+
       # Added Me section
       title = 'Added Me'
       items.push
@@ -533,7 +583,8 @@ describe 'events controller', ->
         friendId: "#{friendId}"
       options =
         transform: ctrl.transformFriendSelect
-      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.FriendSelects, selector, false, options
+      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.FriendSelects,
+          selector, false, options)
 
 
   describe 'transforming the friendSelect', ->
@@ -581,12 +632,14 @@ describe 'events controller', ->
       options =
         sort:
           expiresAt: -1
-      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.Matches, {}, false, options
+      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.Matches, {}, false,
+          options)
 
 
   describe 'handling the new match', ->
     friendId = null
     friend = null
+    items = null
 
     beforeEach ->
       friendId = 1
@@ -602,12 +655,41 @@ describe 'events controller', ->
         firstUserId: "#{friendId}"
         secondUserId: "#{Auth.user.id}"
       spyOn $state, 'go'
+      ctrl.invitations = 'invitations'
+      items = 'items'
+      spyOn(ctrl, 'buildItems').and.returnValue items
+
       ctrl.handleNewMatch()
 
     it 'should transition to the chat', ->
       expect($state.go).toHaveBeenCalledWith 'friendship',
         friend: friend
         id: friendId
+
+    it 'should build the items list', ->
+      expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+    it 'should save the new items', ->
+      expect(ctrl.items).toBe items
+
+
+  describe 'getting the user\'s matches', ->
+    meteorCollection = null
+    matches = null
+
+    beforeEach ->
+      ctrl.Matches = 'Matches'
+      meteorCollection = 'meteorCollection'
+      scope.$meteorCollection = jasmine.createSpy('scope.$meteorCollection') \
+        .and.returnValue meteorCollection
+
+      matches = ctrl.getMatches()
+
+    it 'should fetch the matches from mongo', ->
+      expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.Matches, false
+
+    it 'should return the meteorCollection', ->
+      expect(matches).toBe meteorCollection
 
 
   describe 'responding to an invitation', ->
@@ -967,7 +1049,7 @@ describe 'events controller', ->
     $event = null
 
     beforeEach ->
-      friend = 
+      friend =
         id: 1
       friendSelect =
         _id: 'asdf'
@@ -976,7 +1058,7 @@ describe 'events controller', ->
         friendSelect: friendSelect
       $event =
         stopPropagation: jasmine.createSpy '$event.stopPropagation'
-      ctrl.FriendSelects = 
+      ctrl.FriendSelects =
         remove: jasmine.createSpy 'FriendSelects.remove'
         insert: jasmine.createSpy 'FriendSelects.insert'
 
@@ -994,7 +1076,8 @@ describe 'events controller', ->
         expect($event.stopPropagation).toHaveBeenCalled()
 
       it 'should remove the selectFriend object', ->
-        expect(ctrl.FriendSelects.remove).toHaveBeenCalledWith {_id: friendSelect._id}
+        expect(ctrl.FriendSelects.remove).toHaveBeenCalledWith
+          _id: friendSelect._id
 
 
     describe 'when they aren\'t selected', ->
