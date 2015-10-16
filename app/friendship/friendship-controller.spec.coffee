@@ -589,11 +589,14 @@ describe 'friendship controller', ->
     message = null
     messages = null
     matchObject = null
+    deferred = null
 
     beforeEach ->
       chatId = '1,2'
       spyOn(Friendship, 'getChatId').and.returnValue chatId
-      scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
+      deferred = $q.defer()
+      scope.$meteorSubscribe = jasmine.createSpy('$scope.$meteorSubscribe') \
+        .and.returnValue deferred.promise
       message =
         _id: 1
         creator: new User Auth.user
@@ -605,7 +608,6 @@ describe 'friendship controller', ->
       messages = [message]
       $meteor.collection.and.returnValue messages
       spyOn ctrl, 'getFriendInvitations'
-      spyOn ctrl, 'handleNewMessage'
       matchObject = {_id: '1'}
       spyOn(ctrl, 'getMatch').and.returnValue matchObject
 
@@ -624,6 +626,17 @@ describe 'friendship controller', ->
       chatId = "#{friend.id},#{Auth.user.id}"
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', chatId
 
+    describe 'when the subscription is ready', ->
+
+      beforeEach ->
+        spyOn ctrl, 'watchNewestMessage'
+        deferred.resolve()
+        scope.$apply()
+
+      it 'should watch the newestMessage', ->
+        expect(ctrl.watchNewestMessage).toHaveBeenCalled()
+
+
     it 'should get the messages', ->
       expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
 
@@ -639,31 +652,6 @@ describe 'friendship controller', ->
     it 'should hide the nav border', ->
       expect(scope.hideNavBottomBorder).toBe true
 
-    describe 'when no messages were posted yet', ->
-
-      beforeEach ->
-        ctrl.messages = []
-        scope.$apply()
-
-      it 'should handle when there are no messages', ->
-
-
-    describe 'when new messages get posted', ->
-      message2 = null
-
-      beforeEach ->
-        ctrl.handleNewMessage.calls.reset()
-
-        message2 = angular.extend {}, message,
-          _id: message._id+1
-          type: Invitation.acceptAction
-        ctrl.messages.push message2
-        scope.$apply()
-
-      it 'should handle the new message', ->
-        expect(ctrl.handleNewMessage).toHaveBeenCalled()
-
-
     describe 'when there is no match', ->
 
       beforeEach ->
@@ -674,6 +662,31 @@ describe 'friendship controller', ->
 
       it 'should show the hideNavBottomBorder', ->
         expect(scope.hideNavBottomBorder).toBe false
+
+  ##watchNewestMessage
+  describe 'watching new messages coming in', ->
+
+    describe 'when new messages get posted', ->
+
+      beforeEach ->
+        spyOn ctrl, 'handleNewMessage'
+
+        message =
+          _id: 'asdfs'
+          creator: new User Auth.user
+          createdAt: new Date()
+          text: 'I\'m in love with a robot.'
+          type: 'text'
+
+        ctrl.watchNewestMessage()
+
+        # Trigger watch
+        ctrl.messages = [message]
+        scope.$apply()
+
+
+      it 'should handle the new message', ->
+        expect(ctrl.handleNewMessage).toHaveBeenCalled()
 
 
   describe 'getting the match', ->
