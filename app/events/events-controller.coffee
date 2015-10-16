@@ -17,9 +17,6 @@ class EventsCtrl
     @Matches = @$meteor.getCollectionByName 'matches'
     @FriendSelects = @$meteor.getCollectionByName 'friendSelects'
 
-    # Subscribe to chat latest messages
-    @$meteor.subscribe 'newestMessages'
-
     # Subscribe to friendSelects data
     @$meteor.subscribe('friendSelects').then =>
       @newestMatch = @getNewestMatch()
@@ -33,6 +30,9 @@ class EventsCtrl
         #   value will be equal
         if newValue isnt oldValue
           @handleNewMatch()
+
+    # Subscribe to chat latest messages
+    @$meteor.subscribe 'newestMessages'
 
     @$scope.$on '$ionicView.loaded', =>
       # Fetch the invitations to show on the view.
