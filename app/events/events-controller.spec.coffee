@@ -148,7 +148,7 @@ describe 'events controller', ->
   it 'should init added me', ->
     expect(ctrl.addedMe).toEqual []
 
-  it 'should listen for when the user comes back to the app', ->
+  xit 'should listen for when the user comes back to the app', ->
     expect($ionicPlatform.on).toHaveBeenCalledWith 'resume', ctrl.manualRefresh
 
   it 'should set the messages collection on the controller', ->

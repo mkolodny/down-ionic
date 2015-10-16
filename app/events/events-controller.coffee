@@ -53,7 +53,7 @@ class EventsCtrl
       @friendsList = friendsList
 
     # Refresh the feed when the user comes back to the app.
-    @$ionicPlatform.on 'resume', @manualRefresh
+    #@$ionicPlatform.on 'resume', @manualRefresh
 
   buildItems: (invitationsDict) ->
     # Build the list of items to show on the view.
