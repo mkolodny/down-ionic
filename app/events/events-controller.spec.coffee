@@ -37,6 +37,7 @@ describe 'events controller', ->
   Invitation = null
   matchesCollection = null
   messagesCollection = null
+  newestMessagesDeferred = null
   ngToast = null
   scope = null
   User = null
@@ -132,7 +133,12 @@ describe 'events controller', ->
       if collectionName is 'friendSelects' then return friendSelectsCollection
 
     friendSelectsDeferred = $q.defer()
-    $meteor.subscribe.and.returnValue friendSelectsDeferred.promise
+    newestMessagesDeferred = $q.defer()
+    $meteor.subscribe.and.callFake (subscriptionName) =>
+      if subscriptionName is 'friendSelects'
+        return friendSelectsDeferred.promise
+      if subscriptionName is 'newestMessages'
+        return newestMessagesDeferred.promise
 
     ctrl = $controller EventsCtrl,
       $scope: scope
@@ -202,6 +208,16 @@ describe 'events controller', ->
 
       it 'should handle the new match', ->
         expect(ctrl.handleNewMatch).toHaveBeenCalled()
+
+
+  describe 'when the newestMessages subscription is ready', ->
+
+    beforeEach ->
+      newestMessagesDeferred.resolve()
+      scope.$apply()
+
+    it 'should subscribe to all messages', ->
+      expect($meteor.subscribe).toHaveBeenCalledWith 'allMessages'
 
 
   # Only called once http://ionicframework.com/docs/api/directive/ionView/

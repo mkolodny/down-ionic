@@ -32,7 +32,8 @@ class EventsCtrl
           @handleNewMatch()
 
     # Subscribe to chat latest messages
-    @$meteor.subscribe 'newestMessages'
+    @$meteor.subscribe('newestMessages').then =>
+      @$meteor.subscribe 'allMessages'
 
     @$scope.$on '$ionicView.loaded', =>
       # Fetch the invitations to show on the view.
