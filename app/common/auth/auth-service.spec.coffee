@@ -578,9 +578,19 @@ describe 'Auth service', ->
 
   describe 'redirecting for auth state', ->
 
+    describe 'when you haven\'t viewed the tutorial yet', ->
+
+      beforeEach ->
+        Auth.redirectForAuthState()
+
+      it 'should send the user to the tutorial view', ->
+        expect($state.go).toHaveBeenCalledWith 'tutorial'
+
+
     describe 'no phone number entered', ->
 
       beforeEach ->
+        localStorage.set 'hasViewedTutorial', true
         Auth.phone = undefined
         Auth.redirectForAuthState()
 
@@ -591,6 +601,7 @@ describe 'Auth service', ->
     describe 'no authenticated user', ->
 
       beforeEach ->
+        localStorage.set 'hasViewedTutorial', true
         Auth.phone = '+19252852230'
         Auth.user = {}
         Auth.redirectForAuthState()
@@ -602,6 +613,7 @@ describe 'Auth service', ->
     describe 'the user doesn\'t have an image url', ->
 
       beforeEach ->
+        localStorage.set 'hasViewedTutorial', true
         Auth.phone = '+19252852230'
         Auth.user =
           id: 1
@@ -614,6 +626,7 @@ describe 'Auth service', ->
     describe 'the user doesn\'t have a username', ->
 
       beforeEach ->
+        localStorage.set 'hasViewedTutorial', true
         Auth.phone = '+19252852230'
         Auth.user =
           id: 1
@@ -628,6 +641,7 @@ describe 'Auth service', ->
     describe 'when using an iOS device', ->
 
       beforeEach ->
+        localStorage.set 'hasViewedTutorial', true
         spyOn(ionic.Platform, 'isIOS').and.returnValue true
 
       describe 'we haven\'t requested location services', ->
@@ -686,7 +700,9 @@ describe 'Auth service', ->
           expect($state.go).toHaveBeenCalledWith 'requestContacts'
 
     describe 'we haven\'t shown the find friends view', ->
+
       beforeEach ->
+        localStorage.set 'hasViewedTutorial', true
         spyOn(ionic.Platform, 'isIOS').and.returnValue true
         spyOn(ionic.Platform, 'isAndroid').and.returnValue true
 
@@ -712,6 +728,7 @@ describe 'Auth service', ->
     describe 'user has already completed sign up', ->
 
       beforeEach ->
+        localStorage.set 'hasViewedTutorial', true
         Auth.phone = '+19252852230'
         Auth.user =
           id: 1
