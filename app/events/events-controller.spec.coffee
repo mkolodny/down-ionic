@@ -160,6 +160,9 @@ describe 'events controller', ->
   it 'should set the friendSelects collection on the controller', ->
     expect(ctrl.FriendSelects).toBe friendSelectsCollection
 
+  it 'should subscribe to the newestMessages', ->
+    expect($meteor.subscribe).toHaveBeenCalledWith 'newestMessages'
+
   it 'should subscribe to friendSelects', ->
     expect($meteor.subscribe).toHaveBeenCalledWith 'friendSelects'
 
@@ -234,7 +237,6 @@ describe 'events controller', ->
       beforeEach ->
         items = []
         spyOn(ctrl, 'buildItems').and.returnValue items
-        spyOn ctrl, 'eventsMessagesSubscribe'
         percentRemaining = 16
         spyOn(invitation.event, 'getPercentRemaining').and.returnValue \
             percentRemaining
@@ -252,10 +254,6 @@ describe 'events controller', ->
         for invitation in response
           invitations[invitation.id] = invitation
         expect(ctrl.buildItems).toHaveBeenCalledWith invitations
-
-      it 'should subscribe to messages for each event', ->
-        events = [invitation.event]
-        expect(ctrl.eventsMessagesSubscribe).toHaveBeenCalledWith events
 
       it 'should clear a loading flag', ->
         expect(ctrl.isLoading).toBe false
@@ -376,8 +374,6 @@ describe 'events controller', ->
       spyOn(ctrl, 'getMatch').and.returnValue match
       friendSelect = 'friendSelect'
       spyOn(ctrl, 'getFriendSelect').and.returnValue friendSelect
-
-      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
 
       friendItems = [
         isDivider: false
@@ -538,7 +534,6 @@ describe 'events controller', ->
         username: null
 
       spyOn(Friendship, 'getChatId').and.callFake (id) -> id
-      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
       spyOn(ctrl, 'getFriendSelect').and.callFake (id) -> id
       spyOn(ctrl, 'getNewestMessage').and.callFake (chatId) ->
         if chatId is newerMessageFriend.id
@@ -609,20 +604,6 @@ describe 'events controller', ->
         it 'should return the friend with a location before the one without', ->
           items = [fartherFriendItem, stealthyFriendItem]
           expect(returnedItems).toEqual items
-
-
-  describe 'subscribing to events\' messages', ->
-    event = null
-
-    beforeEach ->
-      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
-      event = invitation.event
-      events = [event]
-
-      ctrl.eventsMessagesSubscribe events
-
-    it 'should subscribe to the events messages', ->
-      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', "#{event.id}"
 
 
   describe 'getting the newest message', ->
@@ -980,7 +961,6 @@ describe 'events controller', ->
       users = null
 
       beforeEach ->
-        scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
         spyOn ctrl, 'buildItems'
 
         user =
@@ -988,10 +968,6 @@ describe 'events controller', ->
         users = [user]
         deferred.resolve users
         scope.$apply()
-
-      it 'should subscribe to the chat messages', ->
-        chatId = Friendship.getChatId user.id
-        expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', chatId
 
       it 'should set the people who added me on the controller', ->
         expect(ctrl.addedMe).toBe users
