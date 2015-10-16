@@ -222,34 +222,33 @@ describe 'event controller', ->
       it 'should watch the newestMessage', ->
         expect(ctrl.watchNewestMessage).toHaveBeenCalled()
 
+      it 'should bind the messages to the controller', ->
+        # TODO: Check that controller property is set
+        expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
 
-    it 'should bind the messages to the controller', ->
-      # TODO: Check that controller property is set
-      expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
+      it 'should bind the meteor event members to the controller', ->
+        expect(ctrl.chat).toEqual chat
+        expect(ctrl.getChat).toHaveBeenCalled()
 
-    it 'should bind the meteor event members to the controller', ->
-      expect(ctrl.chat).toEqual chat
-      expect(ctrl.getChat).toHaveBeenCalled()
+      it 'should update the members array', ->
+        expect(ctrl.updateMembers).toHaveBeenCalled()
 
-    it 'should update the members array', ->
-      expect(ctrl.updateMembers).toHaveBeenCalled()
+      describe 'when the chat changes', ->
+        chatMembers = null
 
-    describe 'when the chat changes', ->
-      chatMembers = null
+        beforeEach ->
+          chatMembers = [
+            userId: '1'
+          ,
+            userId: '2'
+          ]
+          ctrl.chat.members = chatMembers
 
-      beforeEach ->
-        chatMembers = [
-          userId: '1'
-        ,
-          userId: '2'
-        ]
-        ctrl.chat.members = chatMembers
+          ctrl.handleChatMembersChange.calls.reset()
+          scope.$apply()
 
-        ctrl.handleChatMembersChange.calls.reset()
-        scope.$apply()
-
-      it 'should handle the change', ->
-        expect(ctrl.handleChatMembersChange).toHaveBeenCalled()
+        it 'should handle the change', ->
+          expect(ctrl.handleChatMembersChange).toHaveBeenCalled()
 
 
   ##watchNewestMessage

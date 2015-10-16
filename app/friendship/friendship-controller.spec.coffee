@@ -636,32 +636,32 @@ describe 'friendship controller', ->
       it 'should watch the newestMessage', ->
         expect(ctrl.watchNewestMessage).toHaveBeenCalled()
 
+      it 'should get the messages', ->
+        expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
 
-    it 'should get the messages', ->
-      expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
+      it 'should bind the messages to the controller', ->
+        expect(ctrl.messages).toBe messages
 
-    it 'should bind the messages to the controller', ->
-      expect(ctrl.messages).toBe messages
+      it 'should request the invitations to/from the friend', ->
+        expect(ctrl.getFriendInvitations).toHaveBeenCalled()
 
-    it 'should request the invitations to/from the friend', ->
-      expect(ctrl.getFriendInvitations).toHaveBeenCalled()
+      it 'should bind the match AngularMeteorObject to the controller', ->
+        expect(ctrl.match).toBe matchObject
 
-    it 'should bind the match AngularMeteorObject to the controller', ->
-      expect(ctrl.match).toBe matchObject
+      it 'should hide the nav border', ->
+        expect(scope.hideNavBottomBorder).toBe true
 
-    it 'should hide the nav border', ->
-      expect(scope.hideNavBottomBorder).toBe true
+      describe 'when there is no match', ->
 
-    describe 'when there is no match', ->
+        beforeEach ->
+          delete matchObject._id
 
-      beforeEach ->
-        delete matchObject._id
+          scope.$emit '$ionicView.beforeEnter'
+          scope.$apply()
 
-        scope.$emit '$ionicView.beforeEnter'
-        scope.$apply()
+        it 'should show the hideNavBottomBorder', ->
+          expect(scope.hideNavBottomBorder).toBe false
 
-      it 'should show the hideNavBottomBorder', ->
-        expect(scope.hideNavBottomBorder).toBe false
 
   ##watchNewestMessage
   describe 'watching new messages coming in', ->

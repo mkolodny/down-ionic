@@ -47,17 +47,19 @@ class EventCtrl
 
       # Subscribe to the event's chat.
       @$scope.$meteorSubscribe('chat', "#{@event.id}").then =>
+
+        # Bind reactive variables
+        @messages = @$meteor.collection @getMessages, false
+        @newestMessage = @getNewestMessage()
+        @chat = @getChat()
+
+        # Watch for changes in newest message
         @watchNewestMessage()
 
-      # Bind reactive variables
-      @messages = @$meteor.collection @getMessages, false
-      @newestMessage = @getNewestMessage()
-      @chat = @getChat()
-
-      # Watch for changes in chat members
-      @$scope.$watch =>
-        @chat.members
-      , @handleChatMembersChange
+        # Watch for changes in chat members
+        @$scope.$watch =>
+          @chat.members
+        , @handleChatMembersChange
 
     @$scope.$on '$ionicView.afterEnter', =>
       # Show the nav border to distinguish the navbar from invite messages.
