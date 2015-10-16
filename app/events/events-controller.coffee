@@ -269,27 +269,6 @@ class EventsCtrl
     # Re-build the items list.
     @items = @buildItems @invitations
 
-  acceptInvitation: (item, $event) ->
-    @respondToInvitation item, $event, @Invitation.accepted
-
-  maybeInvitation: (item, $event) ->
-    @respondToInvitation item, $event, @Invitation.maybe
-
-  declineInvitation: (item, $event) ->
-    @respondToInvitation item, $event, @Invitation.declined
-
-  respondToInvitation: (item, $event, response) ->
-    # Prevent calling the ion-item element's ng-click.
-    $event.stopPropagation()
-
-    invitation = @invitations[item.invitation.id]
-    @Invitation.updateResponse invitation, response
-      .$promise.then null, =>
-        @items = @buildItems @invitations
-        @ngToast.create 'For some reason, that didn\'t work.'
-
-    @items = @buildItems @invitations
-
   inviteFriends: ->
     # Don't animate the transition to the invite friends view.
     @$ionicHistory.nextViewOptions
