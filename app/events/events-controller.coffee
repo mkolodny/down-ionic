@@ -22,8 +22,7 @@ class EventsCtrl
       @newestMatch = @getNewestMatch()
 
       @friendSelectsLoaded = true
-      if @dataFinishedLoading()
-        @items = @buildItems @invitations
+      @handleLoadedData()
 
       # Watch for new matches
       @$scope.$watch =>
@@ -316,11 +315,6 @@ class EventsCtrl
         for invitation in invitations
           @invitations[invitation.id] = invitation
 
-        @invitationsLoaded = true
-        if @dataFinishedLoading()
-          # Build the list of items to show in the view.
-          @items = @buildItems @invitations
-
         # Set `percentRemaining` as a property on each event as a workaround for
         #   stopping angular-chart.js from calling `getPercentRemaining` too many
         #   times.
@@ -330,17 +324,16 @@ class EventsCtrl
       , =>
         @getInvitationsError = true
       .finally =>
-        @$scope.$broadcast 'scroll.refreshComplete'
-        @isLoading = false
+        @invitationsLoaded = true
+        @handleLoadedData()
 
   getAddedMe: ->
     @Auth.getAddedMe()
       .$promise.then (addedMe) =>
         @addedMe = addedMe
+      .finally =>
         @addedMeLoaded = true
-
-        if @dataFinishedLoading()
-          @items = @buildItems @invitations
+        @handleLoadedData()
 
   refresh: ->
     # Reset the data loaded flags.
@@ -391,7 +384,13 @@ class EventsCtrl
   isSelected: (item) ->
     angular.isDefined item.friendSelect._id
 
-  dataFinishedLoading: ->
-    @addedMeLoaded and @invitationsLoaded and @friendSelectsLoaded
+  handleLoadedData: ->
+    if @addedMeLoaded and @invitationsLoaded and @friendSelectsLoaded
+      @items = @buildItems @invitations
+      @isLoading = false
+      @$scope.$broadcast 'scroll.refreshComplete'
+      true
+    else
+      false
 
 module.exports = EventsCtrl

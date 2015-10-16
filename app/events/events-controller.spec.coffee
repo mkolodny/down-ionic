@@ -182,16 +182,12 @@ describe 'events controller', ->
 
   describe 'when the friendSelects subscription is ready', ->
     newestMatch = null
-    items = null
 
     beforeEach ->
       newestMatch =
         _id: 'asdkfjnasdlkfjn'
       spyOn(ctrl, 'getNewestMatch').and.returnValue newestMatch
-      ctrl.invitations = 'invitations'
-      spyOn(ctrl, 'dataFinishedLoading').and.returnValue true
-      items = 'items'
-      spyOn(ctrl, 'buildItems').and.returnValue items
+      spyOn ctrl, 'handleLoadedData'
 
       friendSelectsDeferred.resolve()
       scope.$apply()
@@ -202,11 +198,8 @@ describe 'events controller', ->
     it 'should set a flag', ->
       expect(ctrl.friendSelectsLoaded).toBe true
 
-    it 'should build the items list', ->
-      expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
-
-    it 'should save the new items', ->
-      expect(ctrl.items).toBe items
+    it 'should handle the loaded data', ->
+      expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
     describe 'when the newest match changes', ->
 
@@ -243,26 +236,17 @@ describe 'events controller', ->
 
 
   describe 'when requesting events', ->
-    refreshComplete = null
 
     beforeEach ->
-      # Listen to the refresh complete event to check whether we've broadcasted
-      # the event.
-      refreshComplete = false
-      scope.$on 'scroll.refreshComplete', ->
-        refreshComplete = true
+      spyOn ctrl, 'handleLoadedData'
 
       ctrl.getInvitations()
 
     describe 'successfully', ->
-      items = null
       percentRemaining = null
       response = null
 
       beforeEach ->
-        spyOn(ctrl, 'dataFinishedLoading').and.returnValue true
-        items = []
-        spyOn(ctrl, 'buildItems').and.returnValue items
         percentRemaining = 16
         spyOn(invitation.event, 'getPercentRemaining').and.returnValue \
             percentRemaining
@@ -278,20 +262,11 @@ describe 'events controller', ->
       it 'should set a flag', ->
         expect(ctrl.invitationsLoaded).toBe true
 
-      it 'should save the items list on the controller', ->
-        invitations = {}
-        for invitation in response
-          invitations[invitation.id] = invitation
-        expect(ctrl.buildItems).toHaveBeenCalledWith invitations
-
-      it 'should clear a loading flag', ->
-        expect(ctrl.isLoading).toBe false
+      it 'should handle loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
       it 'should set the percent remaining on the event', ->
         expect(invitation.event.percentRemaining).toBe percentRemaining
-
-      it 'should stop the spinner', ->
-        expect(refreshComplete).toBe true
 
 
     describe 'with an error', ->
@@ -303,11 +278,11 @@ describe 'events controller', ->
       it 'should show an error', ->
         expect(ctrl.getInvitationsError).toBe true
 
-      it 'should clear a loading flag', ->
-        expect(ctrl.isLoading).toBe false
+      it 'should set a flag', ->
+        expect(ctrl.invitationsLoaded).toBe true
 
-      it 'should stop the spinner', ->
-        expect(refreshComplete).toBe true
+      it 'should handle loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
 
   describe 'building the items list', ->
@@ -905,6 +880,7 @@ describe 'events controller', ->
     beforeEach ->
       deferred = $q.defer()
       spyOn(Auth, 'getAddedMe').and.returnValue {$promise: deferred.promise}
+      spyOn ctrl, 'handleLoadedData'
 
       ctrl.getAddedMe()
 
@@ -912,16 +888,10 @@ describe 'events controller', ->
       expect(Auth.getAddedMe).toHaveBeenCalled()
 
     describe 'when the request returns successfully', ->
-      items = null
       user = null
       users = null
 
       beforeEach ->
-        spyOn(ctrl, 'dataFinishedLoading').and.returnValue true
-        items = 'items'
-        spyOn(ctrl, 'buildItems').and.returnValue items
-        ctrl.invitations = 'invitations'
-
         user =
           id: 3
         users = [user]
@@ -934,11 +904,21 @@ describe 'events controller', ->
       it 'should set a flag', ->
         expect(ctrl.addedMeLoaded).toBe true
 
-      it 'should rebuild the items', ->
-        expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+      it 'should handle loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
-      it 'should set the items on the controller', ->
-        expect(ctrl.items).toBe items
+
+    describe 'when the request is unsuccessful', ->
+
+      beforeEach ->
+        deferred.reject()
+        scope.$apply()
+
+      it 'should set a flag', ->
+        expect(ctrl.addedMeLoaded).toBe true
+
+      it 'should handle loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
 
   describe 'manually refreshing', ->
@@ -1287,18 +1267,45 @@ describe 'events controller', ->
           selector, false, options)
 
 
-  ##dataFinishedLoading
+  ##handleLoadedData
   describe 'checking whether the data finished loading', ->
 
     describe 'when it did', ->
+      finished = null
+      refreshComplete = null
+      items = null
 
       beforeEach ->
+        # Listen to the refresh complete event to check whether we've broadcasted
+        # the event.
+        refreshComplete = false
+        scope.$on 'scroll.refreshComplete', ->
+          refreshComplete = true
+
+        ctrl.invitations = 'invitations'
+        items = 'items'
+        spyOn(ctrl, 'buildItems').and.returnValue items
+
         ctrl.addedMeLoaded = true
         ctrl.invitationsLoaded = true
         ctrl.friendSelectsLoaded = true
 
+        finished = ctrl.handleLoadedData()
+
       it 'should return true', ->
-        expect(ctrl.dataFinishedLoading()).toBe true
+        expect(finished).toBe true
+
+      it 'should clear a loading flag', ->
+        expect(ctrl.isLoading).toBe false
+
+      it 'should stop the spinner', ->
+        expect(refreshComplete).toBe true
+
+      it 'should build the items list', ->
+        expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+      it 'should set the items on the controller', ->
+        expect(ctrl.items).toBe items
 
 
     describe 'when it didn\'t', ->
@@ -1307,4 +1314,4 @@ describe 'events controller', ->
         ctrl.addedMeLoaded = false
 
       it 'should return false', ->
-        expect(ctrl.dataFinishedLoading()).toBe false
+        expect(ctrl.handleLoadedData()).toBe false
