@@ -46,19 +46,13 @@ class EventCtrl
       @updateMembers()
 
       # Subscribe to the event's chat.
-      @$scope.$meteorSubscribe 'chat', "#{@event.id}"
+      @$scope.$meteorSubscribe('chat', "#{@event.id}").then =>
+        @watchNewestMessage()
 
       # Bind reactive variables
       @messages = @$meteor.collection @getMessages, false
       @newestMessage = @getNewestMessage()
       @chat = @getChat()
-
-      # Mark messages as read as they come in.
-      @$scope.$watch =>
-        newestMessage = @messages[@messages.length-1]
-        if angular.isDefined newestMessage
-          newestMessage._id
-      , @handleNewMessage
 
       # Watch for changes in chat members
       @$scope.$watch =>
@@ -73,6 +67,15 @@ class EventCtrl
       # Remove angular-meteor bindings
       @messages.stop()
       @chat.stop()
+
+  watchNewestMessage: =>
+    # Mark messages as read as they come in 
+    #   and scroll to bottom
+    @$scope.$watch =>
+      newestMessage = @messages[@messages.length-1]
+      if angular.isDefined newestMessage
+        newestMessage._id
+    , @handleNewMessage
 
   handleNewMessage: (newMessageId) =>
     if newMessageId is undefined
