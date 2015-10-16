@@ -2,10 +2,10 @@ haversine = require 'haversine'
 
 class EventsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading',
-             '$ionicPlatform', '$meteor', '$scope', '$state', '$timeout', 'Auth',
+             '$ionicPlatform', '$meteor', '$mixpanel', '$scope', '$state', '$timeout', 'Auth',
              'Friendship', 'Invitation', 'ngToast', 'User']
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading,
-                @$ionicPlatform, @$meteor, @$scope, @$state, @$timeout, @Auth,
+                @$ionicPlatform, @$meteor, @$mixpanel, @$scope, @$state, @$timeout, @Auth,
                 @Friendship, @Invitation, @ngToast, @User) ->
     # Init the view.
     @addedMe = []
@@ -261,11 +261,15 @@ class EventsCtrl
 
   handleNewMatch: =>
     # If second user in match, go into chat
-    if @newestMatch.secondUserId is "#{@Auth.user.id}"
+    isSecondUser = @newestMatch.secondUserId is "#{@Auth.user.id}"
+    if isSecondUser
       friendId = parseInt @newestMatch.firstUserId
       @$state.go 'friendship',
         friend: @Auth.user.friends[friendId]
         id: friendId
+
+    @$mixpanel.track 'Match Friend',
+      'is second user': isSecondUser
 
     # Re-build the items list.
     @items = @buildItems @invitations
@@ -361,6 +365,7 @@ class EventsCtrl
     if @isSelected item
       # Remove friend select
       @FriendSelects.remove {_id: item.friendSelect._id}
+      @$mixpanel.track 'Deselect Friend'
     else
       now = new Date().getTime()
       sixHours = 1000 * 60 * 60 * 6
@@ -370,6 +375,7 @@ class EventsCtrl
         userId: "#{@Auth.user.id}"
         friendId: "#{item.friend.id}"
         expiresAt: sixHoursFromNow
+      @$mixpanel.track 'Select Friend'
 
   isSelected: (item) ->
     angular.isDefined item.friendSelect._id

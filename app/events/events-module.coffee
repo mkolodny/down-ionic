@@ -4,11 +4,13 @@ require 'ng-toast'
 require '../common/auth/auth-module'
 require '../common/place-autocomplete/place-autocomplete-module'
 require '../common/resources/resources-module'
+require '../common/mixpanel/mixpanel-module'
 require '../common/view-place/view-place-module'
 EventsCtrl = require './events-controller'
 
 angular.module 'down.events', [
     'angular-meteor' # required in app-module for tests
+    'analytics.mixpanel'
     'chart.js'
     'down.auth'
     'down.placeAutocomplete'

@@ -8,6 +8,7 @@ require '../ionic/ionic-angular.js' # for ionic module
 require 'ng-toast'
 require '../common/auth/auth-module'
 require '../common/meteor/meteor-mocks'
+require '../common/mixpanel/mixpanel-module'
 require './events-module'
 EventsCtrl = require './events-controller'
 
@@ -17,6 +18,7 @@ describe 'events controller', ->
   $ionicHistory = null
   $ionicPlatform = null
   $meteor = null
+  $mixpanel = null
   $q = null
   $state = null
   $timeout = null
@@ -54,6 +56,8 @@ describe 'events controller', ->
 
   beforeEach angular.mock.module('ngToast')
 
+  beforeEach angular.mock.module('analytics.mixpanel')
+
   beforeEach inject(($injector) ->
     $compile = $injector.get '$compile'
     $controller = $injector.get '$controller'
@@ -61,6 +65,7 @@ describe 'events controller', ->
     $ionicHistory = $injector.get '$ionicHistory'
     $ionicPlatform = $injector.get '$ionicPlatform'
     $meteor = $injector.get '$meteor'
+    $mixpanel = $injector.get '$mixpanel'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
@@ -803,6 +808,7 @@ describe 'events controller', ->
           options)
 
 
+  ##handleNewMatch
   describe 'handling the new match', ->
     friendId = null
     friend = null
@@ -817,27 +823,53 @@ describe 'events controller', ->
         id: 2
         friends: {}
       Auth.user.friends[friendId] = friend
-
-      ctrl.newestMatch =
-        firstUserId: "#{friendId}"
-        secondUserId: "#{Auth.user.id}"
-      spyOn $state, 'go'
-      ctrl.invitations = 'invitations'
       items = 'items'
       spyOn(ctrl, 'buildItems').and.returnValue items
+      ctrl.invitations = 'invitations'
+      spyOn $mixpanel, 'track'
 
-      ctrl.handleNewMatch()
+    describe 'when the user is the second user', ->
 
-    it 'should transition to the chat', ->
-      expect($state.go).toHaveBeenCalledWith 'friendship',
-        friend: friend
-        id: friendId
+      beforeEach ->
+        ctrl.newestMatch =
+          firstUserId: "#{friendId}"
+          secondUserId: "#{Auth.user.id}"
+        spyOn $state, 'go'
+        ctrl.handleNewMatch()
 
-    it 'should build the items list', ->
-      expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+      it 'should transition to the chat', ->
+        expect($state.go).toHaveBeenCalledWith 'friendship',
+          friend: friend
+          id: friendId
 
-    it 'should save the new items', ->
-      expect(ctrl.items).toBe items
+      it 'should build the items list', ->
+        expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+      it 'should save the new items', ->
+        expect(ctrl.items).toBe items
+
+      it 'should track the match in Mixpanel', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Match Friend',
+          'is second user': true
+
+
+    describe 'when the user is the first user', ->
+
+      beforeEach ->
+        ctrl.newestMatch =
+          firstUserId: "#{Auth.user.id}"
+          secondUserId: "#{friendId}"
+        ctrl.handleNewMatch()
+
+      it 'should build the items list', ->
+        expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+      it 'should save the new items', ->
+        expect(ctrl.items).toBe items
+
+      it 'should track the match in Mixpanel', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Match Friend',
+          'is second user': false
 
 
   describe 'getting the user\'s matches', ->
@@ -1103,6 +1135,7 @@ describe 'events controller', ->
       expect($state.go).toHaveBeenCalledWith 'createEvent'
 
 
+  ##toggleIsSelected
   describe 'toggling whether a friend is selected', ->
     item = null
     friend = null
@@ -1122,6 +1155,7 @@ describe 'events controller', ->
       ctrl.FriendSelects =
         remove: jasmine.createSpy 'FriendSelects.remove'
         insert: jasmine.createSpy 'FriendSelects.insert'
+      spyOn $mixpanel, 'track'
 
     describe 'when they are selected', ->
 
@@ -1139,6 +1173,9 @@ describe 'events controller', ->
       it 'should remove the selectFriend object', ->
         expect(ctrl.FriendSelects.remove).toHaveBeenCalledWith
           _id: friendSelect._id
+
+      it 'should track deselecting the friend', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Deselect Friend'
 
 
     describe 'when they aren\'t selected', ->
@@ -1173,7 +1210,11 @@ describe 'events controller', ->
           friendId: "#{friend.id}"
           expiresAt: sixHoursFromNow
 
+      it 'should track selecting the friend', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Select Friend'
 
+
+  ##isSelected
   describe 'checking whether a friend is selected', ->
     item = null
 
