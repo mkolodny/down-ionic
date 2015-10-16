@@ -1135,8 +1135,8 @@ describe 'events controller', ->
       expect($state.go).toHaveBeenCalledWith 'createEvent'
 
 
-  ##toggleIsSelected
-  describe 'toggling whether a friend is selected', ->
+  ##selectFriend
+  describe 'selecting a friend', ->
     item = null
     friend = null
     friendSelect = null
@@ -1153,30 +1153,8 @@ describe 'events controller', ->
       $event =
         stopPropagation: jasmine.createSpy '$event.stopPropagation'
       ctrl.FriendSelects =
-        remove: jasmine.createSpy 'FriendSelects.remove'
         insert: jasmine.createSpy 'FriendSelects.insert'
       spyOn $mixpanel, 'track'
-
-    describe 'when they are selected', ->
-
-      beforeEach ->
-        spyOn(ctrl, 'isSelected').and.returnValue true
-
-        ctrl.toggleIsSelected item, $event
-
-      it 'should check if the friend is selected', ->
-        expect(ctrl.isSelected).toHaveBeenCalledWith item
-
-      it 'should prevent the default event', ->
-        expect($event.stopPropagation).toHaveBeenCalled()
-
-      it 'should remove the selectFriend object', ->
-        expect(ctrl.FriendSelects.remove).toHaveBeenCalledWith
-          _id: friendSelect._id
-
-      it 'should track deselecting the friend', ->
-        expect($mixpanel.track).toHaveBeenCalledWith 'Deselect Friend'
-
 
     describe 'when they aren\'t selected', ->
       userId = null
@@ -1190,7 +1168,7 @@ describe 'events controller', ->
         date = new Date 1438014089235
         jasmine.clock().mockDate date
 
-        ctrl.toggleIsSelected item, $event
+        ctrl.selectFriend item, $event
 
       afterEach ->
         jasmine.clock().uninstall()

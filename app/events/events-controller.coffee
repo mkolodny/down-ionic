@@ -2,11 +2,11 @@ haversine = require 'haversine'
 
 class EventsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading',
-             '$ionicPlatform', '$meteor', '$mixpanel', '$scope', '$state', '$timeout', 'Auth',
-             'Friendship', 'Invitation', 'ngToast', 'User']
+             '$ionicPlatform', '$meteor', '$mixpanel', '$scope', '$state',
+             '$timeout', 'Auth', 'Friendship', 'Invitation', 'ngToast', 'User']
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading,
-                @$ionicPlatform, @$meteor, @$mixpanel, @$scope, @$state, @$timeout, @Auth,
-                @Friendship, @Invitation, @ngToast, @User) ->
+                @$ionicPlatform, @$meteor, @$mixpanel, @$scope, @$state, @$timeout,
+                @Auth, @Friendship, @Invitation, @ngToast, @User) ->
     # Init the view.
     @addedMe = []
     @invitations = {}
@@ -363,23 +363,21 @@ class EventsCtrl
     else
       "#{distanceAway} away"
 
-  toggleIsSelected: (item, $event) ->
+  selectFriend: (item, $event) ->
     $event.stopPropagation()
 
     if @isSelected item
-      # Remove friend select
-      @FriendSelects.remove {_id: item.friendSelect._id}
-      @$mixpanel.track 'Deselect Friend'
-    else
-      now = new Date().getTime()
-      sixHours = 1000 * 60 * 60 * 6
-      sixHoursFromNow = new Date now + sixHours
-      # Create new friendSelect
-      @FriendSelects.insert
-        userId: "#{@Auth.user.id}"
-        friendId: "#{item.friend.id}"
-        expiresAt: sixHoursFromNow
-      @$mixpanel.track 'Select Friend'
+      return
+
+    now = new Date().getTime()
+    sixHours = 1000 * 60 * 60 * 6
+    sixHoursFromNow = new Date now + sixHours
+    # Create new friendSelect
+    @FriendSelects.insert
+      userId: "#{@Auth.user.id}"
+      friendId: "#{item.friend.id}"
+      expiresAt: sixHoursFromNow
+    @$mixpanel.track 'Select Friend'
 
   isSelected: (item) ->
     angular.isDefined item.friendSelect._id
