@@ -1,5 +1,6 @@
 <ion-view id="friendship" view-title="{{friendship.friend.name}}">
   <div id="match-header"
+       ng-cloak
        ng-show="friendship.match._id"
        ng-class="{'match-notification': friendship.match._id}">
     You and {{friendship.friend.firstName}} want to do something.
