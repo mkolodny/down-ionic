@@ -20,7 +20,10 @@ class EventsCtrl
     # Subscribe to friendSelects data
     @$meteor.subscribe('friendSelects').then =>
       @newestMatch = @getNewestMatch()
-      @items = @buildItems @invitations
+
+      @friendSelectsLoaded = true
+      if @dataFinishedLoading()
+        @items = @buildItems @invitations
 
       # Watch for new matches
       @$scope.$watch =>
@@ -313,8 +316,10 @@ class EventsCtrl
         for invitation in invitations
           @invitations[invitation.id] = invitation
 
-        # Build the list of items to show in the view.
-        @items = @buildItems @invitations
+        @invitationsLoaded = true
+        if @dataFinishedLoading()
+          # Build the list of items to show in the view.
+          @items = @buildItems @invitations
 
         # Set `percentRemaining` as a property on each event as a workaround for
         #   stopping angular-chart.js from calling `getPercentRemaining` too many
@@ -332,16 +337,22 @@ class EventsCtrl
     @Auth.getAddedMe()
       .$promise.then (addedMe) =>
         @addedMe = addedMe
-        @buildItems()
+        @addedMeLoaded = true
+
+        if @dataFinishedLoading()
+          @items = @buildItems @invitations
 
   refresh: ->
+    # Reset the data loaded flags.
+    @addedMeLoaded = false
+    @invitationsLoaded = false
+
     @getInvitations()
     @getAddedMe()
 
   manualRefresh: =>
     @isLoading = true
-    @getInvitations()
-    @getAddedMe()
+    @refresh()
 
   addByUsername: ->
     @$state.go 'addByUsername'
@@ -379,5 +390,8 @@ class EventsCtrl
 
   isSelected: (item) ->
     angular.isDefined item.friendSelect._id
+
+  dataFinishedLoading: ->
+    @addedMeLoaded and @invitationsLoaded and @friendSelectsLoaded
 
 module.exports = EventsCtrl

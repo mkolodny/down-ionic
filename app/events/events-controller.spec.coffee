@@ -189,6 +189,7 @@ describe 'events controller', ->
         _id: 'asdkfjnasdlkfjn'
       spyOn(ctrl, 'getNewestMatch').and.returnValue newestMatch
       ctrl.invitations = 'invitations'
+      spyOn(ctrl, 'dataFinishedLoading').and.returnValue true
       items = 'items'
       spyOn(ctrl, 'buildItems').and.returnValue items
 
@@ -197,6 +198,9 @@ describe 'events controller', ->
 
     it 'should bind the newestMatch to the controller', ->
       expect(ctrl.newestMatch).toBe newestMatch
+
+    it 'should set a flag', ->
+      expect(ctrl.friendSelectsLoaded).toBe true
 
     it 'should build the items list', ->
       expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
@@ -256,6 +260,7 @@ describe 'events controller', ->
       response = null
 
       beforeEach ->
+        spyOn(ctrl, 'dataFinishedLoading').and.returnValue true
         items = []
         spyOn(ctrl, 'buildItems').and.returnValue items
         percentRemaining = 16
@@ -269,6 +274,9 @@ describe 'events controller', ->
       it 'should save the invitations on the controller', ->
         invitations = {"#{invitation.id}": invitation}
         expect(ctrl.invitations).toEqual invitations
+
+      it 'should set a flag', ->
+        expect(ctrl.invitationsLoaded).toBe true
 
       it 'should save the items list on the controller', ->
         invitations = {}
@@ -904,11 +912,15 @@ describe 'events controller', ->
       expect(Auth.getAddedMe).toHaveBeenCalled()
 
     describe 'when the request returns successfully', ->
+      items = null
       user = null
       users = null
 
       beforeEach ->
-        spyOn ctrl, 'buildItems'
+        spyOn(ctrl, 'dataFinishedLoading').and.returnValue true
+        items = 'items'
+        spyOn(ctrl, 'buildItems').and.returnValue items
+        ctrl.invitations = 'invitations'
 
         user =
           id: 3
@@ -919,27 +931,29 @@ describe 'events controller', ->
       it 'should set the people who added me on the controller', ->
         expect(ctrl.addedMe).toBe users
 
+      it 'should set a flag', ->
+        expect(ctrl.addedMeLoaded).toBe true
+
       it 'should rebuild the items', ->
-        expect(ctrl.buildItems).toHaveBeenCalled()
+        expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+      it 'should set the items on the controller', ->
+        expect(ctrl.items).toBe items
 
 
   describe 'manually refreshing', ->
 
     beforeEach ->
       ctrl.isLoading = false
-      spyOn ctrl, 'getInvitations'
-      spyOn ctrl, 'getAddedMe'
+      spyOn ctrl, 'refresh'
 
       ctrl.manualRefresh()
 
     it 'should set a loading flag', ->
       expect(ctrl.isLoading).toBe true
 
-    it 'should get the invitations', ->
-      expect(ctrl.getInvitations).toHaveBeenCalled()
-
-    it 'should get people who added me', ->
-      expect(ctrl.getAddedMe).toHaveBeenCalled()
+    it 'should refresh the view', ->
+      expect(ctrl.refresh).toHaveBeenCalled()
 
 
   describe 'ionic\'s pull to refresh', ->
@@ -949,6 +963,12 @@ describe 'events controller', ->
       spyOn ctrl, 'getAddedMe'
 
       ctrl.refresh()
+
+    it 'should clear the addedMe flag', ->
+      expect(ctrl.addedMeLoaded).toBe false
+
+    it 'should clear the got invitations flag', ->
+      expect(ctrl.invitationsLoaded).toBe false
 
     it 'should get the invitations', ->
       expect(ctrl.getInvitations).toHaveBeenCalled()
@@ -1204,7 +1224,7 @@ describe 'events controller', ->
       it 'should insert a friend select', ->
         now = new Date().getTime()
         sixHours = 1000 * 60 * 60 * 6
-        sixHoursFromNow = new Date(now + sixHours)
+        sixHoursFromNow = new Date now+sixHours
         expect(ctrl.FriendSelects.insert).toHaveBeenCalledWith
           userId: "#{userId}"
           friendId: "#{friend.id}"
@@ -1226,7 +1246,7 @@ describe 'events controller', ->
             _id: 'asdfas'
 
       it 'should return true', ->
-        expect(ctrl.isSelected(item)).toBe true
+        expect(ctrl.isSelected item).toBe true
 
 
     describe 'when they aren\'t selected', ->
@@ -1236,7 +1256,7 @@ describe 'events controller', ->
           friendSelect: {}
 
       it 'should return false', ->
-        expect(ctrl.isSelected(item)).toBe false
+        expect(ctrl.isSelected item).toBe false
 
 
   describe 'getting a match', ->
@@ -1265,3 +1285,26 @@ describe 'events controller', ->
         transform: ctrl.addPercentRemaining
       expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.Matches,
           selector, false, options)
+
+
+  ##dataFinishedLoading
+  describe 'checking whether the data finished loading', ->
+
+    describe 'when it did', ->
+
+      beforeEach ->
+        ctrl.addedMeLoaded = true
+        ctrl.invitationsLoaded = true
+        ctrl.friendSelectsLoaded = true
+
+      it 'should return true', ->
+        expect(ctrl.dataFinishedLoading()).toBe true
+
+
+    describe 'when it didn\'t', ->
+
+      beforeEach ->
+        ctrl.addedMeLoaded = false
+
+      it 'should return false', ->
+        expect(ctrl.dataFinishedLoading()).toBe false
