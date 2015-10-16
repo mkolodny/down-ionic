@@ -308,7 +308,7 @@ ion-nav-back-button {
 .platform-ios {
   #event-title {
     i {
-      top: 0;
+      top: 0 !important;
     }
   }
 }
