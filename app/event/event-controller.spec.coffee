@@ -178,9 +178,12 @@ describe 'event controller', ->
     message = null
     messages = null
     chat = null
+    deferred = null
 
     beforeEach ->
-      scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
+      deferred = $q.defer()
+      scope.$meteorSubscribe = jasmine.createSpy('$scope.$meteorSubscribe') \
+        .and.returnValue deferred.promise
 
       spyOn ctrl, 'updateMembers'
       spyOn ctrl, 'getMessages'
@@ -209,49 +212,69 @@ describe 'event controller', ->
     it 'should subscribe to the events messages', ->
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', "#{event.id}"
 
-    it 'should bind the messages to the controller', ->
-      # TODO: Check that controller property is set
-      expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
-
-    it 'should bind the meteor event members to the controller', ->
-      expect(ctrl.chat).toEqual chat
-      expect(ctrl.getChat).toHaveBeenCalled()
-
-    it 'should update the members array', ->
-      expect(ctrl.updateMembers).toHaveBeenCalled()
-
-    describe 'when a new message is posted', ->
-      message2 = null
+    describe 'when the subscription is ready', ->
 
       beforeEach ->
-        ctrl.handleNewMessage.calls.reset()
-
-        # Trigger @$scope.watch
-        message2 = angular.extend {}, message,
-          _id: message._id+1
-          type: Invitation.acceptAction
-        ctrl.messages.push message2
+        spyOn ctrl, 'watchNewestMessage'
+        deferred.resolve()
         scope.$apply()
 
-      it 'should handle the message', ->
+      it 'should watch the newestMessage', ->
+        expect(ctrl.watchNewestMessage).toHaveBeenCalled()
+
+      it 'should bind the messages to the controller', ->
+        # TODO: Check that controller property is set
+        expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
+
+      it 'should bind the meteor event members to the controller', ->
+        expect(ctrl.chat).toEqual chat
+        expect(ctrl.getChat).toHaveBeenCalled()
+
+      it 'should update the members array', ->
+        expect(ctrl.updateMembers).toHaveBeenCalled()
+
+      describe 'when the chat changes', ->
+        chatMembers = null
+
+        beforeEach ->
+          chatMembers = [
+            userId: '1'
+          ,
+            userId: '2'
+          ]
+          ctrl.chat.members = chatMembers
+
+          ctrl.handleChatMembersChange.calls.reset()
+          scope.$apply()
+
+        it 'should handle the change', ->
+          expect(ctrl.handleChatMembersChange).toHaveBeenCalled()
+
+
+  ##watchNewestMessage
+  describe 'watching new messages coming in', ->
+
+    describe 'when new messages get posted', ->
+
+      beforeEach ->
+        spyOn ctrl, 'handleNewMessage'
+
+        message =
+          _id: 'asdfs'
+          creator: new User Auth.user
+          createdAt: new Date()
+          text: 'I\'m in love with a robot.'
+          type: 'text'
+
+        ctrl.watchNewestMessage()
+
+        # Trigger watch
+        ctrl.messages = [message]
+        scope.$apply()
+
+
+      it 'should handle the new message', ->
         expect(ctrl.handleNewMessage).toHaveBeenCalled()
-
-    describe 'when the chat changes', ->
-      chatMembers = null
-
-      beforeEach ->
-        chatMembers = [
-          userId: '1'
-        ,
-          userId: '2'
-        ]
-        ctrl.chat.members = chatMembers
-
-        ctrl.handleChatMembersChange.calls.reset()
-        scope.$apply()
-
-      it 'should handle the change', ->
-        expect(ctrl.handleChatMembersChange).toHaveBeenCalled()
 
 
   describe 'after entering the view', ->

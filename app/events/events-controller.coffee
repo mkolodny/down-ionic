@@ -17,6 +17,9 @@ class EventsCtrl
     @Matches = @$meteor.getCollectionByName 'matches'
     @FriendSelects = @$meteor.getCollectionByName 'friendSelects'
 
+    # Subscribe to chat latest messages
+    @$meteor.subscribe 'newestMessages'
+
     # Subscribe to friendSelects data
     @$meteor.subscribe('friendSelects').then =>
       @newestMatch = @getNewestMatch()
@@ -135,7 +138,6 @@ class EventsCtrl
     items = []
     for friend in friends
       chatId = @Friendship.getChatId friend.id
-      @$scope.$meteorSubscribe 'chat', chatId
       items.push angular.extend
         isDivider: false
         friend: new @User friend
@@ -193,11 +195,6 @@ class EventsCtrl
       0 # Neither user has a message or location
 
     items
-
-  eventsMessagesSubscribe: (events) ->
-    # Subscribe to the messages posted in each event.
-    for event in events
-      @$scope.$meteorSubscribe 'chat', "#{event.id}"
 
   getNewestMessage: (chatId) =>
     selector =
@@ -335,13 +332,10 @@ class EventsCtrl
         # Build the list of items to show in the view.
         @items = @buildItems @invitations
 
-        # Subscribe to the messages for each event.
-        events = (invitation.event for invitation in invitations)
-        @eventsMessagesSubscribe events
-
         # Set `percentRemaining` as a property on each event as a workaround for
         #   stopping angular-chart.js from calling `getPercentRemaining` too many
         #   times.
+        events = (invitation.event for invitation in invitations)
         for event in events
           event.percentRemaining = event.getPercentRemaining()
       , =>
@@ -353,10 +347,6 @@ class EventsCtrl
   getAddedMe: ->
     @Auth.getAddedMe()
       .$promise.then (addedMe) =>
-        for user in addedMe
-          chatId = @Friendship.getChatId user.id
-          @$scope.$meteorSubscribe 'chat', chatId
-
         @addedMe = addedMe
         @buildItems()
 
