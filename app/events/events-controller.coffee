@@ -17,6 +17,9 @@ class EventsCtrl
     @Matches = @$meteor.getCollectionByName 'matches'
     @FriendSelects = @$meteor.getCollectionByName 'friendSelects'
 
+    # Subscribe to all chats for unread messages
+    @$meteor.subscribe 'allChats'
+
     # Subscribe to friendSelects data
     @$meteor.subscribe('friendSelects').then =>
       @newestMatch = @getNewestMatch()

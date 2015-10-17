@@ -177,6 +177,9 @@ describe 'events controller', ->
   it 'should subscribe to friendSelects', ->
     expect($meteor.subscribe).toHaveBeenCalledWith 'friendSelects'
 
+  it 'should subscribe to all the chats', ->
+    expect($meteor.subscribe).toHaveBeenCalledWith 'allChats'
+
   it 'should init the invitations dict', ->
     expect(ctrl.invitations).toEqual {}
 
