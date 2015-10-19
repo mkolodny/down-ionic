@@ -163,7 +163,7 @@ class Auth
     isIOS = ionic.Platform.isIOS()
     isAndroid = ionic.Platform.isAndroid()
 
-    if @flags.hasViewedTutorial is undefined
+    if @flags.hasViewedTutorial isnt true
       @$state.go 'tutorial'
     else if not @phone?
       @$state.go 'login'
@@ -173,16 +173,16 @@ class Auth
       @$state.go 'facebookSync'
     else if not @user.username?
       @$state.go 'setUsername'
-    else if @flags.hasRequestedLocationServices is undefined \
+    else if @flags.hasRequestedLocationServices isnt true \
          and isIOS
       @$state.go 'requestLocation'
-    else if @flags.hasRequestedPushNotifications is undefined \
+    else if @flags.hasRequestedPushNotifications isnt true \
          and isIOS
       @$state.go 'requestPush'
-    else if @flags.hasRequestedContacts is undefined \
+    else if @flags.hasRequestedContacts isnt true \
          and isIOS
       @$state.go 'requestContacts'
-    else if @flags.hasCompletedFindFriends is undefined \
+    else if @flags.hasCompletedFindFriends isnt true \
          and (isIOS or isAndroid)
       @$state.go 'findFriends'
     else
