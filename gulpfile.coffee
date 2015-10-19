@@ -219,7 +219,8 @@ gulp.task 'ionic-upload', (done) ->
   prompt.message = 'Enter an upload note!'.green
 
   prompt.start()
-  prompt.get [{name: 'note', required: true}], (err, result) ->
+  env = argv.e or 'unknown env'
+  prompt.get [{name: env, required: true}], (err, result) ->
     if err then return console.log 'Error with prompt'
 
     # Set Ionic deploy tag
@@ -230,7 +231,7 @@ gulp.task 'ionic-upload', (done) ->
     else
       deployTag = 'dev'
 
-    cmdArgs = ['upload', '--note', result.note, "--deploy=#{deployTag}"]
+    cmdArgs = ['upload', '--note', "#{env} - #{result[env]}", "--deploy=#{deployTag}"]
     childProcess.spawn 'ionic', cmdArgs, stdio: 'inherit'
       .once 'close', done
 

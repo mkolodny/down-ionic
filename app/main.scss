@@ -49,6 +49,7 @@ $new-event-margin-left: 5px;
 @import "./added-me/added-me";
 @import "./friendship/friendship";
 @import "./create-event/create-event";
+@import "./tutorial/tutorial";
 
 /*
 Global Sass
@@ -298,7 +299,7 @@ ion-nav-back-button {
     position: relative;
     padding-left: 2px;
     font-size: 18px;
-    top: -14px;
+    top: -14px !important;
   }
 }
 #create-event-nav {
@@ -307,7 +308,7 @@ ion-nav-back-button {
 .platform-ios {
   #event-title {
     i {
-      top: 0;
+      top: 0 !important;
     }
   }
 }

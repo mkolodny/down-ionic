@@ -13,32 +13,32 @@ class FriendshipCtrl
     @Matches = @$meteor.getCollectionByName 'matches'
 
     @$scope.$on '$ionicView.beforeEnter', =>
-      # Don't scroll to the bottom until view fully enters
-      @shouldScrollBottom = false
-
       @getFriendInvitations()
-      @$rootScope.hideNavBottomBorder = true
       @chatId = @Friendship.getChatId @friend.id
 
       # Subscribe to the event's chat.
-      @$scope.$meteorSubscribe 'chat', @chatId
+      @$scope.$meteorSubscribe('chat', @chatId).then =>
+        # Bind reactive variables
+        @messages = @$meteor.collection @getMessages, false
+        @match = @getMatch()
 
-      # Bind reactive variables
-      @messages = @$meteor.collection @getMessages, false
-      @match = @getMatch()
+        # Watch for changes in newest message
+        @watchNewestMessage()
 
-      # Mark messages as read as they come in.
-      @$scope.$watch =>
-        newestMessage = @messages[@messages.length-1]
-        if angular.isDefined newestMessage
-          newestMessage._id
-      , @handleNewMessage
+        @$rootScope.hideNavBottomBorder = angular.isDefined @match._id
 
     @$scope.$on '$ionicView.leave', =>
       # Remove angular-meteor bindings.
       @messages.stop()
 
-      @$rootScope.hideNavBottomBorder = false
+  watchNewestMessage: =>
+    # Mark messages as read as they come in 
+    #   and scroll to bottom
+    @$scope.$watch =>
+      newestMessage = @messages[@messages.length-1]
+      if angular.isDefined newestMessage
+        newestMessage._id
+    , @handleNewMessage
 
   handleNewMessage: (newMessageId) =>
     if newMessageId is undefined

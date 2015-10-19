@@ -1,0 +1,60 @@
+<ion-view id="tutorial" hide-nav-bar="true" can-swipe-back="false">
+  <ion-content scroll="false">
+    <ion-slide-box active-slide="tutorial.currentSection" show-pager="false">
+      <ion-slide>
+        <div class="explainer-container">
+          <h1>Anonymously tap on a friend to see if they're free to hang out.</h1>
+        </div>
+        <div class="img-container">
+          <img src="images/tutorial-intro-phone.png">
+        </div>
+      </ion-slide>
+      <ion-slide>
+        <div class="explainer-container">
+          <h1>If you both tapped on each other, chat to figure out a plan.</h1>
+        </div>
+        <div class="img-container">
+          <img src="images/tutorial-anon-phone.png">
+        </div>
+      </ion-slide>
+      <ion-slide>
+        <div class="explainer-container">
+          <h1>Once you figure out a plan, rally more friends to join.</h1>
+        </div>
+        <div class="img-container">
+          <img src="images/tutorial-rally-phone.png">
+        </div>
+      </ion-slide>
+    </ion-slide-box>
+    <div class="static-container">
+      <div class="spacer"></div>
+      <div class="static-wrapper">
+        <div class="section-icons">
+          <i class="section-icon fa fa-circle"
+             ng-class="{
+               'fa-circle-thin': tutorial.isCurrentSection(0),
+               'fa-circle': !tutorial.isCurrentSection(0),
+             }"></i>
+          <i class="section-icon fa fa-circle"
+             ng-class="{
+               'fa-circle-thin': tutorial.isCurrentSection(1),
+               'fa-circle': !tutorial.isCurrentSection(1),
+             }"></i>
+          <i class="section-icon fa fa-circle"
+             ng-class="{
+               'fa-circle-thin': tutorial.isCurrentSection(2),
+               'fa-circle': !tutorial.isCurrentSection(2),
+             }"></i>
+        </div>
+        <div class="button-wrapper">
+          <button class="button button-block"
+                  ng-click="tutorial.continue()"
+                  ontouchstart>
+            <span ng-if="tutorial.isAuthenticated">Continue</span>
+            <span ng-if="!tutorial.isAuthenticated">Log In with Phone #</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

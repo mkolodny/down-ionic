@@ -8,6 +8,7 @@ require '../ionic/ionic-angular.js' # for ionic module
 require 'ng-toast'
 require '../common/auth/auth-module'
 require '../common/meteor/meteor-mocks'
+require '../common/mixpanel/mixpanel-module'
 require './events-module'
 EventsCtrl = require './events-controller'
 
@@ -17,6 +18,7 @@ describe 'events controller', ->
   $ionicHistory = null
   $ionicPlatform = null
   $meteor = null
+  $mixpanel = null
   $q = null
   $state = null
   $timeout = null
@@ -37,6 +39,7 @@ describe 'events controller', ->
   Invitation = null
   matchesCollection = null
   messagesCollection = null
+  newestMessagesDeferred = null
   ngToast = null
   scope = null
   User = null
@@ -53,6 +56,8 @@ describe 'events controller', ->
 
   beforeEach angular.mock.module('ngToast')
 
+  beforeEach angular.mock.module('analytics.mixpanel')
+
   beforeEach inject(($injector) ->
     $compile = $injector.get '$compile'
     $controller = $injector.get '$controller'
@@ -60,6 +65,7 @@ describe 'events controller', ->
     $ionicHistory = $injector.get '$ionicHistory'
     $ionicPlatform = $injector.get '$ionicPlatform'
     $meteor = $injector.get '$meteor'
+    $mixpanel = $injector.get '$mixpanel'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
@@ -132,7 +138,12 @@ describe 'events controller', ->
       if collectionName is 'friendSelects' then return friendSelectsCollection
 
     friendSelectsDeferred = $q.defer()
-    $meteor.subscribe.and.returnValue friendSelectsDeferred.promise
+    newestMessagesDeferred = $q.defer()
+    $meteor.subscribe.and.callFake (subscriptionName) =>
+      if subscriptionName is 'friendSelects'
+        return friendSelectsDeferred.promise
+      if subscriptionName is 'newestMessages'
+        return newestMessagesDeferred.promise
 
     ctrl = $controller EventsCtrl,
       $scope: scope
@@ -142,7 +153,7 @@ describe 'events controller', ->
   it 'should init added me', ->
     expect(ctrl.addedMe).toEqual []
 
-  it 'should listen for when the user comes back to the app', ->
+  xit 'should listen for when the user comes back to the app', ->
     expect($ionicPlatform.on).toHaveBeenCalledWith 'resume', ctrl.manualRefresh
 
   it 'should set the messages collection on the controller', ->
@@ -160,23 +171,26 @@ describe 'events controller', ->
   it 'should set the friendSelects collection on the controller', ->
     expect(ctrl.FriendSelects).toBe friendSelectsCollection
 
+  it 'should subscribe to the newestMessages', ->
+    expect($meteor.subscribe).toHaveBeenCalledWith 'newestMessages'
+
   it 'should subscribe to friendSelects', ->
     expect($meteor.subscribe).toHaveBeenCalledWith 'friendSelects'
+
+  it 'should subscribe to all the chats', ->
+    expect($meteor.subscribe).toHaveBeenCalledWith 'allChats'
 
   it 'should init the invitations dict', ->
     expect(ctrl.invitations).toEqual {}
 
   describe 'when the friendSelects subscription is ready', ->
     newestMatch = null
-    items = null
 
     beforeEach ->
       newestMatch =
         _id: 'asdkfjnasdlkfjn'
       spyOn(ctrl, 'getNewestMatch').and.returnValue newestMatch
-      ctrl.invitations = 'invitations'
-      items = 'items'
-      spyOn(ctrl, 'buildItems').and.returnValue items
+      spyOn ctrl, 'handleLoadedData'
 
       friendSelectsDeferred.resolve()
       scope.$apply()
@@ -184,11 +198,11 @@ describe 'events controller', ->
     it 'should bind the newestMatch to the controller', ->
       expect(ctrl.newestMatch).toBe newestMatch
 
-    it 'should build the items list', ->
-      expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+    it 'should set a flag', ->
+      expect(ctrl.friendSelectsLoaded).toBe true
 
-    it 'should save the new items', ->
-      expect(ctrl.items).toBe items
+    it 'should handle the loaded data', ->
+      expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
     describe 'when the newest match changes', ->
 
@@ -199,6 +213,16 @@ describe 'events controller', ->
 
       it 'should handle the new match', ->
         expect(ctrl.handleNewMatch).toHaveBeenCalled()
+
+
+  describe 'when the newestMessages subscription is ready', ->
+
+    beforeEach ->
+      newestMessagesDeferred.resolve()
+      scope.$apply()
+
+    it 'should subscribe to all messages', ->
+      expect($meteor.subscribe).toHaveBeenCalledWith 'allMessages'
 
 
   # Only called once http://ionicframework.com/docs/api/directive/ionView/
@@ -215,26 +239,17 @@ describe 'events controller', ->
 
 
   describe 'when requesting events', ->
-    refreshComplete = null
 
     beforeEach ->
-      # Listen to the refresh complete event to check whether we've broadcasted
-      # the event.
-      refreshComplete = false
-      scope.$on 'scroll.refreshComplete', ->
-        refreshComplete = true
+      spyOn ctrl, 'handleLoadedData'
 
       ctrl.getInvitations()
 
     describe 'successfully', ->
-      items = null
       percentRemaining = null
       response = null
 
       beforeEach ->
-        items = []
-        spyOn(ctrl, 'buildItems').and.returnValue items
-        spyOn ctrl, 'eventsMessagesSubscribe'
         percentRemaining = 16
         spyOn(invitation.event, 'getPercentRemaining').and.returnValue \
             percentRemaining
@@ -247,24 +262,14 @@ describe 'events controller', ->
         invitations = {"#{invitation.id}": invitation}
         expect(ctrl.invitations).toEqual invitations
 
-      it 'should save the items list on the controller', ->
-        invitations = {}
-        for invitation in response
-          invitations[invitation.id] = invitation
-        expect(ctrl.buildItems).toHaveBeenCalledWith invitations
+      it 'should set a flag', ->
+        expect(ctrl.invitationsLoaded).toBe true
 
-      it 'should subscribe to messages for each event', ->
-        events = [invitation.event]
-        expect(ctrl.eventsMessagesSubscribe).toHaveBeenCalledWith events
-
-      it 'should clear a loading flag', ->
-        expect(ctrl.isLoading).toBe false
+      it 'should handle loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
       it 'should set the percent remaining on the event', ->
         expect(invitation.event.percentRemaining).toBe percentRemaining
-
-      it 'should stop the spinner', ->
-        expect(refreshComplete).toBe true
 
 
     describe 'with an error', ->
@@ -276,11 +281,11 @@ describe 'events controller', ->
       it 'should show an error', ->
         expect(ctrl.getInvitationsError).toBe true
 
-      it 'should clear a loading flag', ->
-        expect(ctrl.isLoading).toBe false
+      it 'should set a flag', ->
+        expect(ctrl.invitationsLoaded).toBe true
 
-      it 'should stop the spinner', ->
-        expect(refreshComplete).toBe true
+      it 'should handle loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
 
   describe 'building the items list', ->
@@ -294,6 +299,7 @@ describe 'events controller', ->
     personWhoAddedMe = null
     builtItems = null
     newestMessage = null
+    match = null
     friendSelect = null
     friendItems = null
 
@@ -371,11 +377,10 @@ describe 'events controller', ->
 
       newestMessage = 'newestMessage'
       spyOn(ctrl, 'getNewestMessage').and.returnValue newestMessage
-
+      match = 'match'
+      spyOn(ctrl, 'getMatch').and.returnValue match
       friendSelect = 'friendSelect'
       spyOn(ctrl, 'getFriendSelect').and.returnValue friendSelect
-
-      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
 
       friendItems = [
         isDivider: false
@@ -404,12 +409,14 @@ describe 'events controller', ->
         friend: Auth.user.friends[matches[0].secondUserId]
         id: matches[0]._id
         newestMessage: newestMessage
+        match: match
         friendSelect: friendSelect
       items.push
         isDivider: false
         friend: Auth.user.friends[matches[1].firstUserId]
         id: matches[1]._id
         newestMessage: newestMessage
+        match: match
         friendSelect: friendSelect
       for id, invitation of invitations
         items.push
@@ -534,7 +541,6 @@ describe 'events controller', ->
         username: null
 
       spyOn(Friendship, 'getChatId').and.callFake (id) -> id
-      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
       spyOn(ctrl, 'getFriendSelect').and.callFake (id) -> id
       spyOn(ctrl, 'getNewestMessage').and.callFake (chatId) ->
         if chatId is newerMessageFriend.id
@@ -605,20 +611,6 @@ describe 'events controller', ->
         it 'should return the friend with a location before the one without', ->
           items = [fartherFriendItem, stealthyFriendItem]
           expect(returnedItems).toEqual items
-
-
-  describe 'subscribing to events\' messages', ->
-    event = null
-
-    beforeEach ->
-      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
-      event = invitation.event
-      events = [event]
-
-      ctrl.eventsMessagesSubscribe events
-
-    it 'should subscribe to the events messages', ->
-      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', "#{event.id}"
 
 
   describe 'getting the newest message', ->
@@ -748,7 +740,7 @@ describe 'events controller', ->
       selector =
         friendId: "#{friendId}"
       options =
-        transform: ctrl.transformFriendSelect
+        transform: ctrl.addPercentRemaining
       expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.FriendSelects,
           selector, false, options)
 
@@ -771,7 +763,7 @@ describe 'events controller', ->
         _id: 'asdfasdf'
         expiresAt: new Date(new Date().getTime() + threeHours)
 
-      result = ctrl.transformFriendSelect angular.copy(friendSelect)
+      result = ctrl.addPercentRemaining angular.copy(friendSelect)
 
     afterEach ->
       jasmine.clock().uninstall()
@@ -802,6 +794,7 @@ describe 'events controller', ->
           options)
 
 
+  ##handleNewMatch
   describe 'handling the new match', ->
     friendId = null
     friend = null
@@ -816,27 +809,53 @@ describe 'events controller', ->
         id: 2
         friends: {}
       Auth.user.friends[friendId] = friend
-
-      ctrl.newestMatch =
-        firstUserId: "#{friendId}"
-        secondUserId: "#{Auth.user.id}"
-      spyOn $state, 'go'
-      ctrl.invitations = 'invitations'
       items = 'items'
       spyOn(ctrl, 'buildItems').and.returnValue items
+      ctrl.invitations = 'invitations'
+      spyOn $mixpanel, 'track'
 
-      ctrl.handleNewMatch()
+    describe 'when the user is the second user', ->
 
-    it 'should transition to the chat', ->
-      expect($state.go).toHaveBeenCalledWith 'friendship',
-        friend: friend
-        id: friendId
+      beforeEach ->
+        ctrl.newestMatch =
+          firstUserId: "#{friendId}"
+          secondUserId: "#{Auth.user.id}"
+        spyOn $state, 'go'
+        ctrl.handleNewMatch()
 
-    it 'should build the items list', ->
-      expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+      it 'should transition to the chat', ->
+        expect($state.go).toHaveBeenCalledWith 'friendship',
+          friend: friend
+          id: friendId
 
-    it 'should save the new items', ->
-      expect(ctrl.items).toBe items
+      it 'should build the items list', ->
+        expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+      it 'should save the new items', ->
+        expect(ctrl.items).toBe items
+
+      it 'should track the match in Mixpanel', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Match Friend',
+          'is second user': true
+
+
+    describe 'when the user is the first user', ->
+
+      beforeEach ->
+        ctrl.newestMatch =
+          firstUserId: "#{Auth.user.id}"
+          secondUserId: "#{friendId}"
+        ctrl.handleNewMatch()
+
+      it 'should build the items list', ->
+        expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+      it 'should save the new items', ->
+        expect(ctrl.items).toBe items
+
+      it 'should track the match in Mixpanel', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Match Friend',
+          'is second user': false
 
 
   describe 'getting the user\'s matches', ->
@@ -858,113 +877,13 @@ describe 'events controller', ->
       expect(matches).toBe meteorCollection
 
 
-  describe 'responding to an invitation', ->
-    date = null
-    $event = null
-    deferred = null
-    originalResponse = null
-    newResponse = null
-    originalInvitations = null
-    originalInvitation = null
-    builtItems = null
-
-    beforeEach ->
-      jasmine.clock().install()
-      date = new Date 1438014089235
-      jasmine.clock().mockDate date
-
-      deferred = $q.defer()
-      spyOn(Invitation, 'updateResponse').and.returnValue
-        $promise: deferred.promise
-      builtItems = []
-      spyOn(ctrl, 'buildItems').and.returnValue builtItems
-
-      # Mock the invitations saved on the controller.
-      ctrl.invitations =
-        "#{item.invitation.id}": item.invitation
-
-      # Save the invitations before the item gets updated so that we can
-      # compare the updated invitations to the original.
-      originalInvitation = angular.copy item.invitation
-      originalInvitations = angular.copy ctrl.invitations
-      originalResponse = item.invitation.response
-
-      $event =
-        stopPropagation: jasmine.createSpy '$event.stopPropagation'
-      newResponse = Invitation.accepted
-      ctrl.respondToInvitation item, $event, newResponse
-
-    afterEach ->
-      jasmine.clock().uninstall()
-
-    it 'should stop the event from propagating', ->
-      expect($event.stopPropagation).toHaveBeenCalled()
-
-    it 'should update the invitation', ->
-      expect(Invitation.updateResponse).toHaveBeenCalledWith originalInvitation, \
-          newResponse
-
-    it 'should rebuild the items array', ->
-      expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
-
-    it 'should save the new items on the controller', ->
-      expect(ctrl.items).toBe builtItems
-
-
-  describe 'accepting an invitation', ->
-    invitation = null
-    event = null
-
-    beforeEach ->
-      spyOn ctrl, 'respondToInvitation'
-
-      invitation = {id: 1}
-      event = 'event'
-      ctrl.acceptInvitation invitation, event
-
-    it 'should respond to the invitation', ->
-      expect(ctrl.respondToInvitation).toHaveBeenCalledWith(invitation, event,
-          Invitation.accepted)
-
-
-  describe 'responding maybe an invitation', ->
-    invitation = null
-    event = null
-
-    beforeEach ->
-      spyOn ctrl, 'respondToInvitation'
-
-      invitation = {id: 1}
-      event = 'event'
-      ctrl.maybeInvitation invitation, event
-
-    it 'should respond to the invitation', ->
-      expect(ctrl.respondToInvitation).toHaveBeenCalledWith(invitation, event,
-          Invitation.maybe)
-
-
-  describe 'declining an invitation', ->
-    invitation = null
-    event = null
-
-    beforeEach ->
-      spyOn ctrl, 'respondToInvitation'
-
-      invitation = {id: 1}
-      event = 'event'
-      ctrl.declineInvitation invitation, event
-
-    it 'should respond to the invitation', ->
-      expect(ctrl.respondToInvitation).toHaveBeenCalledWith(invitation, event,
-          Invitation.declined)
-
-
   describe 'getting people who added me', ->
     deferred = null
 
     beforeEach ->
       deferred = $q.defer()
       spyOn(Auth, 'getAddedMe').and.returnValue {$promise: deferred.promise}
+      spyOn ctrl, 'handleLoadedData'
 
       ctrl.getAddedMe()
 
@@ -976,43 +895,48 @@ describe 'events controller', ->
       users = null
 
       beforeEach ->
-        scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
-        spyOn ctrl, 'buildItems'
-
         user =
           id: 3
         users = [user]
         deferred.resolve users
         scope.$apply()
 
-      it 'should subscribe to the chat messages', ->
-        chatId = Friendship.getChatId user.id
-        expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', chatId
-
       it 'should set the people who added me on the controller', ->
         expect(ctrl.addedMe).toBe users
 
-      it 'should rebuild the items', ->
-        expect(ctrl.buildItems).toHaveBeenCalled()
+      it 'should set a flag', ->
+        expect(ctrl.addedMeLoaded).toBe true
+
+      it 'should handle loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
+
+
+    describe 'when the request is unsuccessful', ->
+
+      beforeEach ->
+        deferred.reject()
+        scope.$apply()
+
+      it 'should set a flag', ->
+        expect(ctrl.addedMeLoaded).toBe true
+
+      it 'should handle loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
 
   describe 'manually refreshing', ->
 
     beforeEach ->
       ctrl.isLoading = false
-      spyOn ctrl, 'getInvitations'
-      spyOn ctrl, 'getAddedMe'
+      spyOn ctrl, 'refresh'
 
       ctrl.manualRefresh()
 
     it 'should set a loading flag', ->
       expect(ctrl.isLoading).toBe true
 
-    it 'should get the invitations', ->
-      expect(ctrl.getInvitations).toHaveBeenCalled()
-
-    it 'should get people who added me', ->
-      expect(ctrl.getAddedMe).toHaveBeenCalled()
+    it 'should refresh the view', ->
+      expect(ctrl.refresh).toHaveBeenCalled()
 
 
   describe 'ionic\'s pull to refresh', ->
@@ -1022,6 +946,12 @@ describe 'events controller', ->
       spyOn ctrl, 'getAddedMe'
 
       ctrl.refresh()
+
+    it 'should clear the addedMe flag', ->
+      expect(ctrl.addedMeLoaded).toBe false
+
+    it 'should clear the got invitations flag', ->
+      expect(ctrl.invitationsLoaded).toBe false
 
     it 'should get the invitations', ->
       expect(ctrl.getInvitations).toHaveBeenCalled()
@@ -1208,7 +1138,8 @@ describe 'events controller', ->
       expect($state.go).toHaveBeenCalledWith 'createEvent'
 
 
-  describe 'toggling whether a friend is selected', ->
+  ##selectFriend
+  describe 'selecting a friend', ->
     item = null
     friend = null
     friendSelect = null
@@ -1225,26 +1156,8 @@ describe 'events controller', ->
       $event =
         stopPropagation: jasmine.createSpy '$event.stopPropagation'
       ctrl.FriendSelects =
-        remove: jasmine.createSpy 'FriendSelects.remove'
         insert: jasmine.createSpy 'FriendSelects.insert'
-
-    describe 'when they are selected', ->
-
-      beforeEach ->
-        spyOn(ctrl, 'isSelected').and.returnValue true
-
-        ctrl.toggleIsSelected item, $event
-
-      it 'should check if the friend is selected', ->
-        expect(ctrl.isSelected).toHaveBeenCalledWith item
-
-      it 'should prevent the default event', ->
-        expect($event.stopPropagation).toHaveBeenCalled()
-
-      it 'should remove the selectFriend object', ->
-        expect(ctrl.FriendSelects.remove).toHaveBeenCalledWith
-          _id: friendSelect._id
-
+      spyOn $mixpanel, 'track'
 
     describe 'when they aren\'t selected', ->
       userId = null
@@ -1258,7 +1171,7 @@ describe 'events controller', ->
         date = new Date 1438014089235
         jasmine.clock().mockDate date
 
-        ctrl.toggleIsSelected item, $event
+        ctrl.selectFriend item, $event
 
       afterEach ->
         jasmine.clock().uninstall()
@@ -1272,13 +1185,17 @@ describe 'events controller', ->
       it 'should insert a friend select', ->
         now = new Date().getTime()
         sixHours = 1000 * 60 * 60 * 6
-        sixHoursFromNow = new Date(now + sixHours)
+        sixHoursFromNow = new Date now+sixHours
         expect(ctrl.FriendSelects.insert).toHaveBeenCalledWith
           userId: "#{userId}"
           friendId: "#{friend.id}"
           expiresAt: sixHoursFromNow
 
+      it 'should track selecting the friend', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Select Friend'
 
+
+  ##isSelected
   describe 'checking whether a friend is selected', ->
     item = null
 
@@ -1290,7 +1207,7 @@ describe 'events controller', ->
             _id: 'asdfas'
 
       it 'should return true', ->
-        expect(ctrl.isSelected(item)).toBe true
+        expect(ctrl.isSelected item).toBe true
 
 
     describe 'when they aren\'t selected', ->
@@ -1300,4 +1217,82 @@ describe 'events controller', ->
           friendSelect: {}
 
       it 'should return false', ->
-        expect(ctrl.isSelected(item)).toBe false
+        expect(ctrl.isSelected item).toBe false
+
+
+  describe 'getting a match', ->
+    friendId = null
+    meteorObject = null
+    response = null
+
+    beforeEach ->
+      meteorObject = 'meteorObject'
+      scope.$meteorObject = jasmine.createSpy('scope.$meteorObject') \
+        .and.returnValue meteorObject
+      friendId = 1
+      response = ctrl.getMatch friendId
+
+    it 'should return an AngularMeteorObject', ->
+      expect(response).toBe meteorObject
+
+    it 'should filter by friendId and add a tranform for time remaining', ->
+      selector =
+        $or: [
+          firstUserId: "#{friendId}"
+        ,
+          secondUserId: "#{friendId}"
+        ]
+      options =
+        transform: ctrl.addPercentRemaining
+      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.Matches,
+          selector, false, options)
+
+
+  ##handleLoadedData
+  describe 'checking whether the data finished loading', ->
+
+    describe 'when it did', ->
+      finished = null
+      refreshComplete = null
+      items = null
+
+      beforeEach ->
+        # Listen to the refresh complete event to check whether we've broadcasted
+        # the event.
+        refreshComplete = false
+        scope.$on 'scroll.refreshComplete', ->
+          refreshComplete = true
+
+        ctrl.invitations = 'invitations'
+        items = 'items'
+        spyOn(ctrl, 'buildItems').and.returnValue items
+
+        ctrl.addedMeLoaded = true
+        ctrl.invitationsLoaded = true
+        ctrl.friendSelectsLoaded = true
+
+        finished = ctrl.handleLoadedData()
+
+      it 'should return true', ->
+        expect(finished).toBe true
+
+      it 'should clear a loading flag', ->
+        expect(ctrl.isLoading).toBe false
+
+      it 'should stop the spinner', ->
+        expect(refreshComplete).toBe true
+
+      it 'should build the items list', ->
+        expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
+
+      it 'should set the items on the controller', ->
+        expect(ctrl.items).toBe items
+
+
+    describe 'when it didn\'t', ->
+
+      beforeEach ->
+        ctrl.addedMeLoaded = false
+
+      it 'should return false', ->
+        expect(ctrl.handleLoadedData()).toBe false

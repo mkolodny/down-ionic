@@ -2,11 +2,11 @@ haversine = require 'haversine'
 
 class EventsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading',
-             '$ionicPlatform', '$meteor', '$scope', '$state', '$timeout', 'Auth',
-             'Friendship', 'Invitation', 'ngToast', 'User']
+             '$ionicPlatform', '$meteor', '$mixpanel', '$scope', '$state',
+             '$timeout', 'Auth', 'Friendship', 'Invitation', 'ngToast', 'User']
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading,
-                @$ionicPlatform, @$meteor, @$scope, @$state, @$timeout, @Auth,
-                @Friendship, @Invitation, @ngToast, @User) ->
+                @$ionicPlatform, @$meteor, @$mixpanel, @$scope, @$state, @$timeout,
+                @Auth, @Friendship, @Invitation, @ngToast, @User) ->
     # Init the view.
     @addedMe = []
     @invitations = {}
@@ -17,10 +17,15 @@ class EventsCtrl
     @Matches = @$meteor.getCollectionByName 'matches'
     @FriendSelects = @$meteor.getCollectionByName 'friendSelects'
 
+    # Subscribe to all chats for unread messages
+    @$meteor.subscribe 'allChats'
+
     # Subscribe to friendSelects data
     @$meteor.subscribe('friendSelects').then =>
       @newestMatch = @getNewestMatch()
-      @items = @buildItems @invitations
+
+      @friendSelectsLoaded = true
+      @handleLoadedData()
 
       # Watch for new matches
       @$scope.$watch =>
@@ -30,6 +35,10 @@ class EventsCtrl
         #   value will be equal
         if newValue isnt oldValue
           @handleNewMatch()
+
+    # Subscribe to chat latest messages
+    @$meteor.subscribe('newestMessages').then =>
+      @$meteor.subscribe 'allMessages'
 
     @$scope.$on '$ionicView.loaded', =>
       # Fetch the invitations to show on the view.
@@ -49,7 +58,7 @@ class EventsCtrl
       @friendsList = friendsList
 
     # Refresh the feed when the user comes back to the app.
-    @$ionicPlatform.on 'resume', @manualRefresh
+    #@$ionicPlatform.on 'resume', @manualRefresh
 
   buildItems: (invitationsDict) ->
     # Build the list of items to show on the view.
@@ -84,6 +93,7 @@ class EventsCtrl
           friend: friend
           id: match._id
           newestMessage: @getNewestMessage chatId
+          match: @getMatch friend.id
           friendSelect: @getFriendSelect friend.id
       for invitation in invitations
         items.push
@@ -134,7 +144,6 @@ class EventsCtrl
     items = []
     for friend in friends
       chatId = @Friendship.getChatId friend.id
-      @$scope.$meteorSubscribe 'chat', chatId
       items.push angular.extend
         isDivider: false
         friend: new @User friend
@@ -176,8 +185,8 @@ class EventsCtrl
         bLocation =
           latitude: b.friend.location.lat
           longitude: b.friend.location.long
-        distanceToA = haversine(userLocation, aLocation)
-        distanceToB = haversine(userLocation, bLocation)
+        distanceToA = haversine userLocation, aLocation
+        distanceToB = haversine userLocation, bLocation
         if distanceToA < distanceToB
           return -1
         else if distanceToA > distanceToB
@@ -192,11 +201,6 @@ class EventsCtrl
       0 # Neither user has a message or location
 
     items
-
-  eventsMessagesSubscribe: (events) ->
-    # Subscribe to the messages posted in each event.
-    for event in events
-      @$scope.$meteorSubscribe 'chat', "#{event.id}"
 
   getNewestMessage: (chatId) =>
     selector =
@@ -231,15 +235,26 @@ class EventsCtrl
     selector =
       friendId: "#{friendId}"
     options =
-      transform: @transformFriendSelect
+      transform: @addPercentRemaining
     @$scope.$meteorObject @FriendSelects, selector, false, options
 
-  transformFriendSelect: (friendSelect) =>
+  getMatch: (friendId) =>
+    selector =
+      $or: [
+        firstUserId: "#{friendId}"
+      ,
+        secondUserId: "#{friendId}"
+      ]
+    options =
+      transform: @addPercentRemaining
+    @$scope.$meteorObject @Matches, selector, false, options
+
+  addPercentRemaining: (obj) =>
     now = new Date().getTime()
-    timeRemaining = friendSelect.expiresAt.getTime() - now
+    timeRemaining = obj.expiresAt.getTime() - now
     sixHours = 1000 * 60 * 60 * 6
-    friendSelect.percentRemaining = (timeRemaining / sixHours) * 100
-    friendSelect
+    obj.percentRemaining = (timeRemaining / sixHours) * 100
+    obj
 
   getMatches: ->
     @$scope.$meteorCollection @Matches, false
@@ -251,34 +266,17 @@ class EventsCtrl
 
   handleNewMatch: =>
     # If second user in match, go into chat
-    if @newestMatch.secondUserId is "#{@Auth.user.id}"
+    isSecondUser = @newestMatch.secondUserId is "#{@Auth.user.id}"
+    if isSecondUser
       friendId = parseInt @newestMatch.firstUserId
       @$state.go 'friendship',
         friend: @Auth.user.friends[friendId]
         id: friendId
 
+    @$mixpanel.track 'Match Friend',
+      'is second user': isSecondUser
+
     # Re-build the items list.
-    @items = @buildItems @invitations
-
-  acceptInvitation: (item, $event) ->
-    @respondToInvitation item, $event, @Invitation.accepted
-
-  maybeInvitation: (item, $event) ->
-    @respondToInvitation item, $event, @Invitation.maybe
-
-  declineInvitation: (item, $event) ->
-    @respondToInvitation item, $event, @Invitation.declined
-
-  respondToInvitation: (item, $event, response) ->
-    # Prevent calling the ion-item element's ng-click.
-    $event.stopPropagation()
-
-    invitation = @invitations[item.invitation.id]
-    @Invitation.updateResponse invitation, response
-      .$promise.then null, =>
-        @items = @buildItems @invitations
-        @ngToast.create 'For some reason, that didn\'t work.'
-
     @items = @buildItems @invitations
 
   inviteFriends: ->
@@ -320,42 +318,37 @@ class EventsCtrl
         for invitation in invitations
           @invitations[invitation.id] = invitation
 
-        # Build the list of items to show in the view.
-        @items = @buildItems @invitations
-
-        # Subscribe to the messages for each event.
-        events = (invitation.event for invitation in invitations)
-        @eventsMessagesSubscribe events
-
         # Set `percentRemaining` as a property on each event as a workaround for
         #   stopping angular-chart.js from calling `getPercentRemaining` too many
         #   times.
+        events = (invitation.event for invitation in invitations)
         for event in events
           event.percentRemaining = event.getPercentRemaining()
       , =>
         @getInvitationsError = true
       .finally =>
-        @$scope.$broadcast 'scroll.refreshComplete'
-        @isLoading = false
+        @invitationsLoaded = true
+        @handleLoadedData()
 
   getAddedMe: ->
     @Auth.getAddedMe()
       .$promise.then (addedMe) =>
-        for user in addedMe
-          chatId = @Friendship.getChatId user.id
-          @$scope.$meteorSubscribe 'chat', chatId
-
         @addedMe = addedMe
-        @buildItems()
+      .finally =>
+        @addedMeLoaded = true
+        @handleLoadedData()
 
   refresh: ->
+    # Reset the data loaded flags.
+    @addedMeLoaded = false
+    @invitationsLoaded = false
+
     @getInvitations()
     @getAddedMe()
 
   manualRefresh: =>
     @isLoading = true
-    @getInvitations()
-    @getAddedMe()
+    @refresh()
 
   addByUsername: ->
     @$state.go 'addByUsername'
@@ -373,23 +366,32 @@ class EventsCtrl
     else
       "#{distanceAway} away"
 
-  toggleIsSelected: (item, $event) ->
+  selectFriend: (item, $event) ->
     $event.stopPropagation()
 
     if @isSelected item
-      # Remove friend select
-      @FriendSelects.remove {_id: item.friendSelect._id}
-    else
-      now = new Date().getTime()
-      sixHours = 1000 * 60 * 60 * 6
-      sixHoursFromNow = new Date now + sixHours
-      # Create new friendSelect
-      @FriendSelects.insert
-        userId: "#{@Auth.user.id}"
-        friendId: "#{item.friend.id}"
-        expiresAt: sixHoursFromNow
+      return
+
+    now = new Date().getTime()
+    sixHours = 1000 * 60 * 60 * 6
+    sixHoursFromNow = new Date now + sixHours
+    # Create new friendSelect
+    @FriendSelects.insert
+      userId: "#{@Auth.user.id}"
+      friendId: "#{item.friend.id}"
+      expiresAt: sixHoursFromNow
+    @$mixpanel.track 'Select Friend'
 
   isSelected: (item) ->
     angular.isDefined item.friendSelect._id
+
+  handleLoadedData: ->
+    if @addedMeLoaded and @invitationsLoaded and @friendSelectsLoaded
+      @items = @buildItems @invitations
+      @isLoading = false
+      @$scope.$broadcast 'scroll.refreshComplete'
+      true
+    else
+      false
 
 module.exports = EventsCtrl
