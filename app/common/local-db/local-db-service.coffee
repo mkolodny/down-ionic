@@ -7,8 +7,8 @@ class LocalDB
     deferred = @$q.defer()
 
     sqlitePluginInstalled = angular.isDefined @$window.sqlitePlugin
-    isWebView = @$window.ionic.Platform.isWebView()
-    if sqlitePluginInstalled or isWebView
+    isApp = @$window.ionic.Platform.isIOS() or @$window.ionic.Platform.isAndroid()
+    if sqlitePluginInstalled or !isApp
       # Open DB connection
       @db = @$cordovaSQLite.openDB
         name: 'rallytap.db'
@@ -35,8 +35,8 @@ class LocalDB
     deferred = @$q.defer()
 
     sqlitePluginInstalled = angular.isDefined @$window.sqlitePlugin
-    isWebView = @$window.ionic.Platform.isWebView()
-    if sqlitePluginInstalled or isWebView
+    isApp = @$window.ionic.Platform.isIOS() or @$window.ionic.Platform.isAndroid()
+    if sqlitePluginInstalled or !isApp
       query = "SELECT * FROM local_storage WHERE key='#{key}' LIMIT 1"
       @$cordovaSQLite.execute @db, query
         .then (sqlResultSet) ->
@@ -56,8 +56,8 @@ class LocalDB
     
   set: (key, value) ->
     sqlitePluginInstalled = angular.isDefined @$window.sqlitePlugin
-    isWebView = @$window.ionic.Platform.isWebView()
-    if sqlitePluginInstalled or isWebView
+    isApp = @$window.ionic.Platform.isIOS() or @$window.ionic.Platform.isAndroid()
+    if sqlitePluginInstalled or !isApp
       value = angular.toJson value
       query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES ('#{key}', '#{value}')"
       @$cordovaSQLite.execute(@db, query)

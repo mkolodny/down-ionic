@@ -112,8 +112,6 @@ describe 'LocalDB service', ->
 
       beforeEach ->
         delete $window.sqlitePlugin
-        spyOn($window.ionic.Platform, 'isWebView') \
-          .and.returnValue false
 
         LocalDB.init().then ->
           resolved = true
@@ -198,8 +196,6 @@ describe 'LocalDB service', ->
 
       beforeEach ->
         delete $window.sqlitePlugin
-        spyOn($window.ionic.Platform, 'isWebView') \
-          .and.returnValue false
         someKey = 'someKey'
         someValue = 'someValue'
         localStorage.set someKey, someValue
@@ -247,8 +243,6 @@ describe 'LocalDB service', ->
 
       beforeEach ->
         delete $window.sqlitePlugin
-        spyOn($window.ionic.Platform, 'isWebView') \
-          .and.returnValue false
         LocalDB.set(key, value).then ->
           resolved = true
         $rootScope.$apply()
