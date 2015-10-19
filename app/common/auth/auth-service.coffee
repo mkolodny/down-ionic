@@ -163,7 +163,7 @@ class Auth
     isIOS = ionic.Platform.isIOS()
     isAndroid = ionic.Platform.isAndroid()
 
-    if @localStorage.get('hasViewedTutorial') is null
+    if @flags.hasViewedTutorial is undefined
       @$state.go 'tutorial'
     else if not @phone?
       @$state.go 'login'
