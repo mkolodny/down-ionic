@@ -84,7 +84,7 @@ describe 'Auth service', ->
     $state = $injector.get '$state'
     $meteor = $injector.get '$meteor'
     apiRoot = $injector.get 'apiRoot'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     Invitation = $injector.get 'Invitation'
     scope = $rootScope.$new()
   )

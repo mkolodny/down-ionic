@@ -21,7 +21,7 @@ describe 'request location controller', ->
     $state = $injector.get '$state'
     $q = $injector.get '$q'
     scope = $rootScope.$new()
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
 
     ctrl = $controller RequestLocationCtrl,
       $scope: scope

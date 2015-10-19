@@ -37,7 +37,7 @@ describe 'find friends controller', ->
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     Contacts = $injector.get 'Contacts'
     scope = $rootScope
     User = $injector.get 'User'

@@ -14,7 +14,7 @@ describe 'tutorial controller', ->
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     localStorage = $injector.get 'localStorageService'
     scope = $injector.get '$rootScope'
 

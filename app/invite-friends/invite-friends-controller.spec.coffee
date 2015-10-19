@@ -45,7 +45,7 @@ describe 'invite friends controller', ->
     $q = $injector.get '$q'
     $state = angular.copy $injector.get('$state')
     $mixpanel = $injector.get '$mixpanel'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
     LocalDB = $injector.get 'LocalDB'

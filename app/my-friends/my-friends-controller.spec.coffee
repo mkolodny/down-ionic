@@ -24,7 +24,7 @@ describe 'MyFriends controller', ->
     $controller = $injector.get '$controller'
     $ionicHistory = $injector.get '$ionicHistory'
     $state = $injector.get '$state'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     scope = $injector.get '$rootScope'
 
     # Mock the logged in user.
