@@ -6,6 +6,10 @@ class LocalDB
   init: ->
     deferred = @$q.defer()
 
+    # Convert localStorage to use the new data
+    #   format (session, contacts)
+    @convertLocalStorage()
+
     sqlitePluginInstalled = angular.isDefined @$window.sqlitePlugin
     isApp = @$window.ionic.Platform.isIOS() or @$window.ionic.Platform.isAndroid()
     if sqlitePluginInstalled or !isApp
@@ -17,11 +21,13 @@ class LocalDB
       query = 'CREATE TABLE IF NOT EXISTS local_storage (key string primary key, value text)'
       @$cordovaSQLite.execute @db, query
         .then =>
-          if @localStorage.get('currentUser') is null
+          if @localStorage.get('session') is null
+            # Already converted to SQLite and 
+            #   localStorage has been cleared
             deferred.resolve()
           else
             # Convert old local storage to LocalDB
-            @convertLocalStorage().then =>
+            @convertLocalStorageToSQLite().then =>
               deferred.resolve()
         , ->
           deferred.reject()
@@ -68,7 +74,8 @@ class LocalDB
       deferred.promise
 
   convertLocalStorage: ->
-    deferred = @$q.defer()
+    # if already converted, do nothing
+    if @localStorage.get('session') isnt null then return
 
     # Get data from localStorage
     currentUser = @localStorage.get 'currentUser'
@@ -78,6 +85,7 @@ class LocalDB
     hasRequestedPushNotifications = @localStorage.get('hasRequestedPushNotifications') is true ? true : undefined
     hasRequestedContacts = @localStorage.get('hasRequestedContacts') is true ? true : undefined
     hasCompletedFindFriends = @localStorage.get('hasCompletedFindFriends') is true ? true : undefined
+    # Switch to session object
     session =
       user: currentUser
       phone: currentPhone
@@ -87,6 +95,12 @@ class LocalDB
         hasRequestedPushNotifications: hasRequestedPushNotifications
         hasRequestedContacts: hasRequestedContacts
         hasCompletedFindFriends: hasCompletedFindFriends
+    @localStorage.set 'session', session
+
+  convertLocalStorageToSQLite: ->
+    deferred = @$q.defer()
+
+    session = @localStorage.get 'session'
     @set 'session', session
       .then =>
         @convertContacts()

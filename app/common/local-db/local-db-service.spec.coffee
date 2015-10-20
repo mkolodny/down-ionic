@@ -28,6 +28,9 @@ describe 'LocalDB service', ->
     localStorage = $injector.get 'localStorageService'
   )
 
+  afterEach ->
+    localStorage.clearAll()
+
   describe 'initilizing the database', ->
     resolved = null
     rejected = null
@@ -44,11 +47,15 @@ describe 'LocalDB service', ->
         deferred = $q.defer()
         spyOn($cordovaSQLite, 'execute').and.returnValue deferred.promise
         
+        spyOn LocalDB, 'convertLocalStorage'
+
         LocalDB.init().then ->
           resolved = true
         , ->
           rejected = true
 
+      it 'should convert localstorage', ->
+        expect(LocalDB.convertLocalStorage).toHaveBeenCalled()
 
       it 'should initilize the database', ->
         expect($cordovaSQLite.openDB).toHaveBeenCalledWith
@@ -77,16 +84,16 @@ describe 'LocalDB service', ->
           convertDeferred = null
 
           beforeEach ->
-            localStorage.set 'currentUser', {}
+            localStorage.set 'session', {}
             convertDeferred = $q.defer()
-            spyOn(LocalDB, 'convertLocalStorage') \
+            spyOn(LocalDB, 'convertLocalStorageToSQLite') \
               .and.returnValue convertDeferred.promise
 
             deferred.resolve()
             $rootScope.$apply()
 
           it 'should convert the data', ->
-            expect(LocalDB.convertLocalStorage).toHaveBeenCalled()
+            expect(LocalDB.convertLocalStorageToSQLite).toHaveBeenCalled()
 
           describe 'when conversion is complete', ->
 
@@ -112,10 +119,16 @@ describe 'LocalDB service', ->
 
       beforeEach ->
         delete $window.sqlitePlugin
+        spyOn($window.ionic.Platform, 'isIOS').and.returnValue true
+
+        spyOn LocalDB, 'convertLocalStorage'
 
         LocalDB.init().then ->
           resolved = true
         $rootScope.$apply()
+
+      it 'should convert localstorage', ->
+        expect(LocalDB.convertLocalStorage).toHaveBeenCalled()
 
       it 'should resolve the promise', ->
         expect(resolved).toBe true
@@ -196,6 +209,8 @@ describe 'LocalDB service', ->
 
       beforeEach ->
         delete $window.sqlitePlugin
+        spyOn($window.ionic.Platform, 'isIOS').and.returnValue true
+
         someKey = 'someKey'
         someValue = 'someValue'
         localStorage.set someKey, someValue
@@ -243,6 +258,8 @@ describe 'LocalDB service', ->
 
       beforeEach ->
         delete $window.sqlitePlugin
+        spyOn($window.ionic.Platform, 'isIOS').and.returnValue true
+
         LocalDB.set(key, value).then ->
           resolved = true
         $rootScope.$apply()
@@ -255,12 +272,9 @@ describe 'LocalDB service', ->
 
 
   ##convertLocalStorage
-  describe 'converting localStorage data to SQLite', ->
-    resolved = null
-    rejected = null
+  describe 'converting to localstorage session object', ->
     currentUser = null
     currentPhone = null
-    deferred = null
 
     beforeEach ->
       # Mock localStorage data
@@ -276,14 +290,10 @@ describe 'LocalDB service', ->
       localStorage.set 'hasRequestedContacts', true
       localStorage.set 'hasCompletedFindFriends', true
 
-      deferred = $q.defer()
-      spyOn(LocalDB, 'set').and.returnValue deferred.promise
+      LocalDB.convertLocalStorage()
 
-      LocalDB.convertLocalStorage().then ->
-        resolved = true
-
-    it 'should save the session object', ->
-      expect(LocalDB.set).toHaveBeenCalledWith 'session',
+    it 'should set the session object in localStorage', ->
+      expect(localStorage.get('session')).toEqual
         user: currentUser
         phone: currentPhone
         flags:
@@ -292,6 +302,24 @@ describe 'LocalDB service', ->
           hasRequestedPushNotifications: true
           hasRequestedContacts: true
           hasCompletedFindFriends: true
+
+
+  ##convertLocalStorageToSQLite
+  describe 'converting localStorage data to SQLite', ->
+    resolved = null
+    rejected = null
+    deferred = null
+
+    beforeEach ->
+      deferred = $q.defer()
+      spyOn(LocalDB, 'set').and.returnValue deferred.promise
+
+      LocalDB.convertLocalStorageToSQLite().then ->
+        resolved = true
+
+    it 'should save the session object', ->
+      session = localStorage.get 'session'
+      expect(LocalDB.set).toHaveBeenCalledWith 'session', session
 
     describe 'when saved successfully', ->
       convertContactsDeferred = null
