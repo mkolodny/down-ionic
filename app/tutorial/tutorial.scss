@@ -39,21 +39,21 @@
   }
   .static-container {
     position: absolute;
-    top: 0;
-    height: 100%;
+    top: 30px;
+    height: calc(100% - 30px);
     width: 100%;
     display: flex;
     flex-direction: column;
     z-index: 2;
   }
   .spacer {
-    height: calc(80% + 6px); // 6px is 20% of 30px - the section icons' height
+    height: 80%;
   }
   .static-wrapper {
     z-index: 4;
     bottom: 0;
     position: relative;
-    height: calc(20% - 6px); // 6px is 20% of 30px - the section icons' height
+    height: 20%;
     width: 100%;
     padding-top: 7px;
   }

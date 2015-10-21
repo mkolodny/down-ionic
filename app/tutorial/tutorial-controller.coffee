@@ -12,6 +12,9 @@ class TutorialCtrl
   isCurrentSection: (index) ->
     @currentSection is index
 
+  setSection: (index) ->
+    @currentSection = index
+
   continue: ->
     @localStorage.set 'hasViewedTutorial', true
     @Auth.redirectForAuthState()

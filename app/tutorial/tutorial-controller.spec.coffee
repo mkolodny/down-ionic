@@ -86,3 +86,17 @@ describe 'tutorial controller', ->
 
     it 'should set a flag in local storage', ->
       expect(localStorage.get 'hasViewedTutorial').toBe true
+
+
+  ##setSection
+  describe 'setting the section', ->
+    section = null
+
+    beforeEach ->
+      ctrl.currentSection = 0
+      section = 1
+
+      ctrl.setSection section
+
+    it 'should set the section on the controller', ->
+      expect(ctrl.currentSection).toBe section

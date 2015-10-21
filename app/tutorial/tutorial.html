@@ -5,17 +5,20 @@
          ng-class="{
            'fa-circle-thin': tutorial.isCurrentSection(0),
            'fa-circle': !tutorial.isCurrentSection(0),
-         }"></i>
+         }"
+         ng-click="tutorial.setSection(0)"></i>
       <i class="section-icon fa fa-circle"
          ng-class="{
            'fa-circle-thin': tutorial.isCurrentSection(1),
            'fa-circle': !tutorial.isCurrentSection(1),
-         }"></i>
+         }"
+         ng-click="tutorial.setSection(1)"></i>
       <i class="section-icon fa fa-circle"
          ng-class="{
            'fa-circle-thin': tutorial.isCurrentSection(2),
            'fa-circle': !tutorial.isCurrentSection(2),
-         }"></i>
+         }"
+         ng-click="tutorial.setSection(2)"></i>
     </div>
     <ion-slide-box active-slide="tutorial.currentSection" show-pager="false">
       <ion-slide>
