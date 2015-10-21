@@ -1,9 +1,8 @@
 class FindFriendsCtrl
   @$inject: ['$ionicLoading', '$scope', '$state', 'Auth', 'Contacts',
-             'localStorageService', 'User']
+             'User']
   constructor: (@$ionicLoading, @$scope, @$state, @Auth, @Contacts,
-                localStorageService, @User) ->
-    @localStorage = localStorageService
+                @User) ->
 
     # Request Contacts Permission
     @isLoading = true
@@ -101,7 +100,7 @@ class FindFriendsCtrl
     initials.toUpperCase()
 
   done: ->
-    @localStorage.set 'hasCompletedFindFriends', true
+    @Auth.setFlag 'hasCompletedFindFriends', true
     @Auth.redirectForAuthState()
 
   search: (item) =>

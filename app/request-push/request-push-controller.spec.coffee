@@ -11,7 +11,6 @@ describe 'request push controller', ->
   $q = null
   scope = null
   ctrl = null
-  localStorage = null
   Auth = null
   PushNotifications = null
 
@@ -19,14 +18,11 @@ describe 'request push controller', ->
 
   beforeEach angular.mock.module('down.pushNotifications')
 
-  beforeEach angular.mock.module('LocalStorageModule')
-
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     scope = $rootScope.$new()
-    localStorage = $injector.get 'localStorageService'
     PushNotifications = $injector.get 'PushNotifications'
     Auth = $injector.get 'Auth'
 
@@ -36,14 +32,12 @@ describe 'request push controller', ->
       PushNotifications: PushNotifications
   )
 
-  afterEach ->
-    localStorage.clearAll()
-
   describe 'requesting push notifications permission', ->
     
     beforeEach ->
       spyOn PushNotifications, 'register'
       spyOn Auth, 'redirectForAuthState'
+      spyOn Auth, 'setFlag'
 
       ctrl.enablePush()
 
@@ -51,7 +45,7 @@ describe 'request push controller', ->
       expect(PushNotifications.register).toHaveBeenCalled()
 
     it 'should set a flag in local storage', ->
-      expect(localStorage.get 'hasRequestedPushNotifications').toBe true
+      expect(Auth.setFlag).toHaveBeenCalledWith 'hasRequestedPushNotifications', true
 
     it 'should redirect for auth state', ->
       expect(Auth.redirectForAuthState).toHaveBeenCalled()

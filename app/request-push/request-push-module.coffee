@@ -1,11 +1,11 @@
-require 'angular-local-storage'
 require '../common/push-notifications/push-notifications-module'
+require '../common/auth/auth-module'
 RequestPushCtrl = require './request-push-controller'
 
 angular.module 'down.requestPush', [
     'ui.router'
-    'LocalStorageModule'
     'down.pushNotifications'
+    'down.auth'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'requestPush',

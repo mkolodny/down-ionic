@@ -33,7 +33,7 @@ describe 'verify phone controller', ->
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     scope = $rootScope.$new()
 
     Auth.phone = '+15555555555'

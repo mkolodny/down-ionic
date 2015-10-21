@@ -1,5 +1,4 @@
 require 'angular-mocks'
-require 'angular-local-storage'
 require 'angular-animate' # for ngToast
 require 'angular-sanitize' # for ngToast
 require 'ng-cordova'
@@ -8,13 +7,14 @@ require './push-notifications-module'
 require '../resources/resources-module'
 require '../auth/auth-module'
 require '../env/env-module'
+require '../local-db/local-db-module'
 
 describe 'PushNotifications service', ->
   $cordovaPush = null
   $cordovaDevice = null
   $q = null
   $window = null
-  localStorage = null
+  LocalDB = null
   ngToast = null
   $rootScope = null
   APNSDevice = null
@@ -39,7 +39,7 @@ describe 'PushNotifications service', ->
 
   beforeEach angular.mock.module('down.resources')
 
-  beforeEach angular.mock.module('LocalStorageModule')
+  beforeEach angular.mock.module('down.localDB')
 
   beforeEach angular.mock.module(($provide) ->
     $cordovaPush =
@@ -52,9 +52,16 @@ describe 'PushNotifications service', ->
     $provide.value '$cordovaDevice', $cordovaDevice
 
     Auth =
+      flags: {}
       user:
         id: 1
     $provide.value 'Auth', Auth
+
+    LocalDB =
+      set: jasmine.createSpy 'LocalDB.set'
+      get: jasmine.createSpy 'LocalDB.get'
+    $provide.value 'LocalDB', LocalDB
+
     return
   )
 
@@ -65,13 +72,9 @@ describe 'PushNotifications service', ->
     APNSDevice = $injector.get 'APNSDevice'
     androidSenderID = $injector.get 'androidSenderID'
     GCMDevice = $injector.get 'GCMDevice'
-    localStorage = $injector.get 'localStorageService'
     ngToast = $injector.get 'ngToast'
     PushNotifications = $injector.get 'PushNotifications'
   )
-
-  afterEach ->
-    localStorage.clearAll()
 
   describe 'saving the device token', ->
 
@@ -185,6 +188,7 @@ describe 'PushNotifications service', ->
           expect(rejected).toBe true
 
 
+  ##listen
   describe 'listening for notifications', ->
 
     describe 'when using an iOS device', ->
@@ -192,7 +196,7 @@ describe 'PushNotifications service', ->
       describe 'when we have already request push permissions', ->
 
         beforeEach ->
-          localStorage.set 'hasRequestedPushNotifications', true
+          Auth.flags.hasRequestedPushNotifications = true
           $cordovaDevice.getPlatform.and.returnValue 'iOS'
           spyOn PushNotifications, 'register'
 

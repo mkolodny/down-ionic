@@ -1,12 +1,11 @@
 class RequestLocationCtrl
-  @$inject: ['$state', 'Auth', 'localStorageService']
-  constructor: (@$state, @Auth, localStorageService) ->
-    @localStorage = localStorageService
+  @$inject: ['$state', 'Auth']
+  constructor: (@$state, @Auth) ->
 
   enableLocation: ->
     @Auth.watchLocation()
       .then =>
-        @localStorage.set 'hasRequestedLocationServices', true
+        @Auth.setFlag 'hasRequestedLocationServices', true
         @Auth.redirectForAuthState()
       , =>
         @locationDenied = true

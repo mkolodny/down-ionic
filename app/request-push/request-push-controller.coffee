@@ -1,13 +1,10 @@
 class RequestPushCtrl
-  @$inject: ['$cordovaDevice', '$cordovaPush', 'PushNotifications', 'Auth',
-             'localStorageService']
-  constructor: (@$cordovaDevice, @$cordovaPush, @PushNotifications, @Auth,
-                localStorageService) ->
-    @localStorage = localStorageService
+  @$inject: ['$cordovaDevice', '$cordovaPush', 'PushNotifications', 'Auth']
+  constructor: (@$cordovaDevice, @$cordovaPush, @PushNotifications, @Auth) ->
 
   enablePush: ->
     @PushNotifications.register()
-    @localStorage.set 'hasRequestedPushNotifications', true
+    @Auth.setFlag 'hasRequestedPushNotifications', true
     @Auth.redirectForAuthState()
 
 module.exports = RequestPushCtrl

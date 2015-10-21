@@ -10,21 +10,15 @@ describe 'tutorial controller', ->
 
   beforeEach angular.mock.module('down.auth')
 
-  beforeEach angular.mock.module('LocalStorageModule')
-
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
-    Auth = angular.copy $injector.get('Auth')
-    localStorage = $injector.get 'localStorageService'
+    Auth = $injector.get 'Auth'
     scope = $injector.get '$rootScope'
 
     ctrl = $controller TutorialCtrl,
       $scope: scope
       Auth: Auth
   )
-
-  afterEach ->
-    localStorage.clearAll()
 
   it 'should init the current section', ->
     expect(ctrl.currentSection).toBe 0
@@ -78,6 +72,7 @@ describe 'tutorial controller', ->
 
     beforeEach ->
       spyOn Auth, 'redirectForAuthState'
+      spyOn Auth, 'setFlag'
 
       ctrl.continue()
 
@@ -85,7 +80,7 @@ describe 'tutorial controller', ->
       expect(Auth.redirectForAuthState).toHaveBeenCalled()
 
     it 'should set a flag in local storage', ->
-      expect(localStorage.get 'hasViewedTutorial').toBe true
+      expect(Auth.setFlag).toHaveBeenCalledWith 'hasViewedTutorial', true
 
 
   ##setSection
