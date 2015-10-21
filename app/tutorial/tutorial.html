@@ -1,5 +1,22 @@
 <ion-view id="tutorial" hide-nav-bar="true" can-swipe-back="false">
   <ion-content scroll="false">
+    <div class="section-icons">
+      <i class="section-icon fa fa-circle"
+         ng-class="{
+           'fa-circle-thin': tutorial.isCurrentSection(0),
+           'fa-circle': !tutorial.isCurrentSection(0),
+         }"></i>
+      <i class="section-icon fa fa-circle"
+         ng-class="{
+           'fa-circle-thin': tutorial.isCurrentSection(1),
+           'fa-circle': !tutorial.isCurrentSection(1),
+         }"></i>
+      <i class="section-icon fa fa-circle"
+         ng-class="{
+           'fa-circle-thin': tutorial.isCurrentSection(2),
+           'fa-circle': !tutorial.isCurrentSection(2),
+         }"></i>
+    </div>
     <ion-slide-box active-slide="tutorial.currentSection" show-pager="false">
       <ion-slide>
         <div class="explainer-container">
@@ -29,23 +46,6 @@
     <div class="static-container">
       <div class="spacer"></div>
       <div class="static-wrapper">
-        <div class="section-icons">
-          <i class="section-icon fa fa-circle"
-             ng-class="{
-               'fa-circle-thin': tutorial.isCurrentSection(0),
-               'fa-circle': !tutorial.isCurrentSection(0),
-             }"></i>
-          <i class="section-icon fa fa-circle"
-             ng-class="{
-               'fa-circle-thin': tutorial.isCurrentSection(1),
-               'fa-circle': !tutorial.isCurrentSection(1),
-             }"></i>
-          <i class="section-icon fa fa-circle"
-             ng-class="{
-               'fa-circle-thin': tutorial.isCurrentSection(2),
-               'fa-circle': !tutorial.isCurrentSection(2),
-             }"></i>
-        </div>
         <div class="button-wrapper">
           <button class="button button-block"
                   ng-click="tutorial.continue()"
