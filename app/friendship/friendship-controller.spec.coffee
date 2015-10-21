@@ -46,7 +46,7 @@ describe 'friendship controller', ->
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     $stateParams = angular.copy $injector.get('$stateParams')
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     Invitation = $injector.get 'Invitation'
     Friendship = $injector.get 'Friendship'
     ngToast = $injector.get 'ngToast'

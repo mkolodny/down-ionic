@@ -1,11 +1,10 @@
 require '../../vendor/intl-phone/libphonenumber-utils.js'
 
 class Contacts
-  @$inject: ['$http', '$cordovaContacts', '$q', 'Auth', 'localStorageService'
+  @$inject: ['$http', '$cordovaContacts', '$q', 'Auth', 'LocalDB'
              'UserPhone']
-  constructor: (@$http, @$cordovaContacts, @$q, @Auth, localStorageService,
+  constructor: (@$http, @$cordovaContacts, @$q, @Auth, @LocalDB,
                 @UserPhone) ->
-    @localStorage = localStorageService
 
   getContacts: ->
     deferred = @$q.defer()
@@ -33,7 +32,7 @@ class Contacts
         deferred.reject error
       .then (users) =>
         @saveContacts users
-        @localStorage.set 'hasRequestedContacts', true
+        @Auth.setFlag 'hasRequestedContacts', true
         deferred.resolve users
       , ->
         error =
@@ -198,6 +197,6 @@ class Contacts
     filteredUserPhones
 
   saveContacts: (contacts) ->
-    @localStorage.set 'contacts', contacts
+    @LocalDB.set 'contacts', contacts
 
 module.exports = Contacts

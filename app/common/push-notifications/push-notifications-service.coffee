@@ -1,11 +1,10 @@
 class PushNotifications
   @$inject: ['$cordovaDevice', '$cordovaPush', '$q', '$rootScope', '$window',
              'androidSenderID', 'Auth', 'APNSDevice', 'GCMDevice',
-             'localStorageService', 'ngToast']
+             'LocalDB', 'ngToast']
   constructor: (@$cordovaDevice, @$cordovaPush, @$q, @$rootScope, @$window,
                 @androidSenderID, @Auth, @APNSDevice, @GCMDevice,
-                localStorageService, @ngToast) ->
-    @localStorage = localStorageService
+                @LocalDB, @ngToast) ->
 
   saveToken: (deviceToken)->
     deferred = @$q.defer()
@@ -39,7 +38,7 @@ class PushNotifications
       # If we've already asked the user for push notifications permissions,
       #   register the `$cordovaPush` module so that we can send them in-app
       #   notifications. This is required to start listening for notifications.
-      if @localStorage.get 'hasRequestedPushNotifications'
+      if @Auth.flags.hasRequestedPushNotifications is true
         @register()
 
     else if platform is 'Android'

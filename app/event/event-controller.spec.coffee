@@ -78,7 +78,7 @@ describe 'event controller', ->
     $stateParams = angular.copy $injector.get('$stateParams')
     $timeout = $injector.get '$timeout'
     $window = $injector.get '$window'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
     LinkInvitation = $injector.get 'LinkInvitation'

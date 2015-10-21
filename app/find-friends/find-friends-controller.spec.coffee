@@ -4,7 +4,6 @@ require 'angular-animate'
 require 'angular-mocks'
 require 'angular-sanitize'
 require 'angular-ui-router'
-require 'angular-local-storage'
 require '../ionic/ionic-angular.js'
 require '../common/auth/auth-module'
 require '../common/contacts/contacts-module'
@@ -22,7 +21,6 @@ describe 'find friends controller', ->
   scope = null
   Contacts = null
   User = null
-  localStorage = null
   facebookFriend = null
 
   beforeEach angular.mock.module('ionic')
@@ -33,19 +31,16 @@ describe 'find friends controller', ->
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('LocalStorageModule')
-
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $ionicLoading = $injector.get '$ionicLoading'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     Contacts = $injector.get 'Contacts'
     scope = $rootScope
     User = $injector.get 'User'
-    localStorage = $injector.get 'localStorageService'
 
     contactsDeferred = $q.defer()
     spyOn(Contacts, 'getContacts').and.returnValue contactsDeferred.promise
@@ -63,9 +58,6 @@ describe 'find friends controller', ->
       $scope: scope
       Auth: Auth
   )
-
-  afterEach ->
-    localStorage.clearAll()
 
   it 'should set isLoading to true', ->
     expect(ctrl.isLoading).toEqual true
@@ -246,24 +238,7 @@ describe 'find friends controller', ->
       expect(result).toEqual items
 
 
-  describe 'when the user finishes', ->
-
-    beforeEach ->
-      spyOn Auth, 'redirectForAuthState'
-      localStorage.set 'hasCompletedFindFriends', false
-
-      ctrl.done()
-
-    afterEach ->
-      localStorage.clearAll()
-
-    it 'should set localStorage.hasCompletedFindFriends', ->
-      expect(localStorage.get 'hasCompletedFindFriends').toBe true
-
-    it 'should redirect for auth state', ->
-      expect(Auth.redirectForAuthState).toHaveBeenCalled()
-
-
+  ##getInitials
   describe 'getting a contact\'s initials', ->
 
     describe 'when they have multiple words in their name', ->
@@ -310,6 +285,23 @@ describe 'find friends controller', ->
         expect(ctrl.getInitials ' Jazzy Jeff').toBe 'JJ'
 
 
+  ##done
+  describe 'when the user finishes', ->
+
+    beforeEach ->
+      spyOn Auth, 'redirectForAuthState'
+      spyOn Auth, 'setFlag'
+
+      ctrl.done()
+
+    it 'should set hasCompletedFindFriends flag', ->
+      expect(Auth.setFlag).toHaveBeenCalledWith 'hasCompletedFindFriends', true
+
+    it 'should redirect for auth state', ->
+      expect(Auth.redirectForAuthState).toHaveBeenCalled()
+
+
+  ##search
   describe 'searching', ->
     isIncluded = null
 

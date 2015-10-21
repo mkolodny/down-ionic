@@ -1,93 +1,376 @@
+require '../../ionic/ionic.js'
 require 'angular'
 require 'angular-mocks'
-window.PouchDB = require 'pouchdb'
-# require './angular-pouchdb'
+require 'angular-local-storage'
+require '../ng-cordova/sqlite.js'
 require './local-db-module'
 
-xdescribe 'LocalDB service', ->
+describe 'LocalDB service', ->
+  $cordovaSQLite = null
   $rootScope = null
+  $q = null
+  $window = null
   LocalDB = null
-  pouchDB = null
-  $timeout = null
+  localStorage = null
 
   beforeEach angular.mock.module('down.localDB')
 
-  # beforeEach angular.mock.module('pouchdb')
+  beforeEach angular.mock.module('ngCordova.plugins.sqlite')
 
-
-  # beforeEach angular.mock.module(($provide) ->
-  #   db = {}
-  #   pouchDB = jasmine.createSpy('pouchDB').and.callFake ->
-  #     db
-  #   $provide.value 'pouchDB', pouchDB
-  #   return
-  # )
+  beforeEach angular.mock.module('LocalStorageModule')
 
   beforeEach inject(($injector) ->
-    # pouchDB = $injector.get 'pouchDB'
+    $cordovaSQLite = $injector.get '$cordovaSQLite'
     $rootScope = $injector.get '$rootScope'
+    $q = $injector.get '$q'
+    $window = $injector.get '$window'
     LocalDB = $injector.get 'LocalDB'
-    $timeout = $injector.get '$timeout'
+    localStorage = $injector.get 'localStorageService'
   )
 
+  afterEach ->
+    localStorage.clearAll()
+
   describe 'initilizing the database', ->
-    db = null
+    resolved = null
+    rejected = null
+
+    describe 'when the plugin exists', ->
+      db = null
+      deferred = null
+
+      beforeEach ->
+        $window.sqlitePlugin = {}
+        db = 'db'
+        spyOn($cordovaSQLite, 'openDB').and.returnValue db
+
+        deferred = $q.defer()
+        spyOn($cordovaSQLite, 'execute').and.returnValue deferred.promise
+        
+        spyOn LocalDB, 'convertLocalStorage'
+
+        LocalDB.init().then ->
+          resolved = true
+        , ->
+          rejected = true
+
+      it 'should convert localstorage', ->
+        expect(LocalDB.convertLocalStorage).toHaveBeenCalled()
+
+      it 'should initilize the database', ->
+        expect($cordovaSQLite.openDB).toHaveBeenCalledWith
+          name: 'rallytap.db'
+          location: 2
+         
+      it 'should set the db on the service', ->
+        expect(LocalDB.db).toBe db
+
+      it 'should create the localStorage table if it doesn\'t exist', ->
+        query = 'CREATE TABLE IF NOT EXISTS local_storage (key string primary key, value text)'
+        expect($cordovaSQLite.execute).toHaveBeenCalledWith LocalDB.db, query
+
+      describe 'table created successfully', ->
+
+        describe 'when no localStorage data is found', ->
+          
+          beforeEach ->
+            deferred.resolve()
+            $rootScope.$apply()
+
+          it 'should resolve the promise', ->
+            expect(resolved).toBe true
+
+        describe 'when converting old localStorage data', ->
+          convertDeferred = null
+
+          beforeEach ->
+            localStorage.set 'session', {}
+            convertDeferred = $q.defer()
+            spyOn(LocalDB, 'convertLocalStorageToSQLite') \
+              .and.returnValue convertDeferred.promise
+
+            deferred.resolve()
+            $rootScope.$apply()
+
+          it 'should convert the data', ->
+            expect(LocalDB.convertLocalStorageToSQLite).toHaveBeenCalled()
+
+          describe 'when conversion is complete', ->
+
+            beforeEach ->
+              convertDeferred.resolve()
+              $rootScope.$apply()
+
+            it 'should resolve the promise', ->
+              expect(resolved).toBe true
+
+
+      describe 'on error', ->
+
+        beforeEach ->
+          deferred.reject()
+          $rootScope.$apply()
+
+        it 'should reject the promise', ->
+          expect(rejected).toBe true
+
+
+    describe 'supporting backwards compatibility with localStorage', ->
+
+      beforeEach ->
+        delete $window.sqlitePlugin
+        spyOn($window.ionic.Platform, 'isIOS').and.returnValue true
+
+        spyOn LocalDB, 'convertLocalStorage'
+
+        LocalDB.init().then ->
+          resolved = true
+        $rootScope.$apply()
+
+      it 'should convert localstorage', ->
+        expect(LocalDB.convertLocalStorage).toHaveBeenCalled()
+
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
+
+
+  describe 'getting a value', ->
+
+    describe 'when the sqlite plugin is installed', ->
+
+      deferred = null
+      key = null
+      result = null
+      rejected = null
+
+      beforeEach ->
+        $window.sqlitePlugin = {} # mock plugin being installed
+        deferred = $q.defer()
+        spyOn($cordovaSQLite, 'execute').and.returnValue deferred.promise
+        key = 'someKey'
+        LocalDB.get(key).then (_result_) ->
+          result = _result_
+        , ->
+          rejected = true
+
+      it 'should query local_storage by key', ->
+        query = "SELECT * FROM local_storage WHERE key='#{key}' LIMIT 1"
+        expect($cordovaSQLite.execute).toHaveBeenCalledWith LocalDB.db, query
+
+      describe 'when the query executes successfully', ->
+
+        describe 'when data is found', ->
+          value = null
+
+          beforeEach ->
+            value = 
+              id: 2
+              name: 'Jimbo Walker'
+
+            sqlResultSet =
+              rows:
+                length: 1
+                item: ->
+                  key: key
+                  value: angular.toJson angular.copy(value)
+              
+
+            deferred.resolve sqlResultSet
+            $rootScope.$apply()
+
+          it 'should resolve the promise with the JSON value', ->
+            expect(result).toEqual value
+
+        describe 'when no data is found', ->
+
+          beforeEach ->
+            sqlResultSet =
+              rows: 
+                length: 0
+
+            deferred.resolve sqlResultSet
+            $rootScope.$apply()
+
+          it 'should return null', ->
+            expect(result).toBeNull()
+
+
+      describe 'when the query fails', ->
+
+        beforeEach ->
+          deferred.reject()
+          $rootScope.$apply()
+
+        it 'should reject the promise', ->
+          expect(rejected).toBe true
+
+
+    describe 'supporting backwards compatibility', ->
+      someKey = null
+      someValue = null
+      result = null
+
+      beforeEach ->
+        delete $window.sqlitePlugin
+        spyOn($window.ionic.Platform, 'isIOS').and.returnValue true
+
+        someKey = 'someKey'
+        someValue = 'someValue'
+        localStorage.set someKey, someValue
+        LocalDB.get(someKey).then (_result_) ->
+          result = _result_
+        $rootScope.$apply()
+
+      it 'should resolve the promise with the value from localstorage', ->
+        expect(result).toEqual someValue
+
+
+  describe 'setting a value', ->
+    key = null
+    value = null
 
     beforeEach ->
-      db = 'db'
-      spyOn(LocalDB, 'pouchDB').and.returnValue db
-      LocalDB.init()
-
-    it 'should initilize the database', ->
-      expect(LocalDB.pouchDB).toHaveBeenCalledWith 'localStorage',
-        location: 2
-        androidDatabaseImplementation: 2
-        adapter: 'websql'
-
-    it 'should set the db on the service', ->
-      expect(LocalDB.db).toBe db
-
-  describe 'saving to the database', ->
-    someValue = null
-    someKey = null
-    db = null
-    promise = null
-
-    beforeEach (done) ->
-      db = new window.PouchDB 'localStorage'
-      LocalDB.db = db
-
-      someKey = 'someKey'
-      someValue =
+      key = 'someKey'
+      value =
         id: 1
-        name: 'Some name'
+        name: 'Mike Pleb'
+        friends: 'none'
 
-      promise = LocalDB.set(someKey, someValue)
-      console.log promise
-      promise.then ->
-        console.log 'resolved'
-        done()
-      , ->
-        console.log 'rejected'
-        done()
+    describe 'when the plugin is installed', ->
+      promise = null
+      result = null
 
-      # $rootScope.$apply()
-      $timeout.flush()
+      beforeEach ->
+        $window.sqlitePlugin = {}
+        promise = 'promise'
+        spyOn($cordovaSQLite, 'execute').and.returnValue promise
+
+        result = LocalDB.set key, value
+
+      it 'should query local_storage by key', ->
+        value = angular.toJson value
+        query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES ('#{key}', '#{value}')"
+        expect($cordovaSQLite.execute).toHaveBeenCalledWith LocalDB.db, query
+
+      it 'should return the $cordovaSQLite.execute promise', ->
+        expect(result).toBe promise
 
 
-    afterEach ->
-      db.destroy()
+    describe 'supporting backwards compatibility', ->
+      resolved = null
 
-    it 'should save the item in the database', (done) ->
-      console.log promise
-      console.log 'here'
-      key = "_local/#{someKey}"
-      db.get(key).then (doc) ->
-        console.log doc
-        expect(doc).toEqual someValue
-        done()
-      , (err) ->
-        console.log err
-        done()
+      beforeEach ->
+        delete $window.sqlitePlugin
+        spyOn($window.ionic.Platform, 'isIOS').and.returnValue true
 
+        LocalDB.set(key, value).then ->
+          resolved = true
+        $rootScope.$apply()
+
+      it 'should set the value in localStorage', ->
+        expect(localStorage.get(key)).toEqual value
+
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
+
+
+  ##convertLocalStorage
+  describe 'converting to localstorage session object', ->
+    currentUser = null
+    currentPhone = null
+
+    beforeEach ->
+      # Mock localStorage data
+      currentUser =
+        id: 1
+        name: 'Jimbo Walker'
+      currentPhone = '+19252852230'
+      localStorage.set 'currentUser', currentUser
+      localStorage.set 'currentPhone', currentPhone
+      localStorage.set 'hasViewedTutorial', true
+      localStorage.set 'hasRequestedLocationServices', true
+      localStorage.set 'hasRequestedPushNotifications', true
+      localStorage.set 'hasRequestedContacts', true
+      localStorage.set 'hasCompletedFindFriends', true
+
+      LocalDB.convertLocalStorage()
+
+    it 'should set the session object in localStorage', ->
+      expect(localStorage.get('session')).toEqual
+        user: currentUser
+        phone: currentPhone
+        flags:
+          hasViewedTutorial: true
+          hasRequestedLocationServices: true
+          hasRequestedPushNotifications: true
+          hasRequestedContacts: true
+          hasCompletedFindFriends: true
+
+
+  ##convertLocalStorageToSQLite
+  describe 'converting localStorage data to SQLite', ->
+    resolved = null
+    rejected = null
+    deferred = null
+
+    beforeEach ->
+      deferred = $q.defer()
+      spyOn(LocalDB, 'set').and.returnValue deferred.promise
+
+      LocalDB.convertLocalStorageToSQLite().then ->
+        resolved = true
+
+    it 'should save the session object', ->
+      session = localStorage.get 'session'
+      expect(LocalDB.set).toHaveBeenCalledWith 'session', session
+
+    describe 'when saved successfully', ->
+      convertContactsDeferred = null
+
+      beforeEach ->
+        convertContactsDeferred = $q.defer()
+        spyOn(LocalDB, 'convertContacts') \
+        .and.returnValue convertContactsDeferred
+
+        deferred.resolve()
+        $rootScope.$apply()
+
+      it 'should convert contacts', ->
+        expect(LocalDB.convertContacts).toHaveBeenCalled()
+
+      describe 'when successful', ->
+
+        beforeEach ->
+          spyOn localStorage, 'clearAll'
+          convertContactsDeferred.resolve()
+          $rootScope.$apply()
+
+        it 'should clear localstorage', ->
+          expect(localStorage.get('currentUser')).toBeNull()
+
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
+
+
+  ##convertContacts
+  describe 'converting contacts from localstorage', ->
+    promise = null
+    result = null
+    contacts = null
+
+    beforeEach ->
+      promise = 'promise'
+      contacts =
+        2:
+          someKey: 'someValue'
+      localStorage.set 'contacts', contacts
+
+      spyOn(LocalDB, 'set').and.returnValue promise
+      result = LocalDB.convertContacts()
+
+    it 'should save contacts to LocalDB', ->
+      expect(LocalDB.set).toHaveBeenCalledWith 'contacts', contacts
+
+    it 'should return the LocalDB.set promise', ->
+      expect(result).toEqual promise
 

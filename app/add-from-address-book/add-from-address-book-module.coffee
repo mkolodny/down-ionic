@@ -1,6 +1,6 @@
-require 'angular-local-storage'
 require '../common/contacts/contacts-module'
 require '../common/friendship-button/friendship-button-module'
+require '../common/local-db/local-db-module'
 AddFromAddressBookCtrl = require './add-from-address-book-controller'
 
 angular.module 'down.addFromAddressBook', [
@@ -8,7 +8,7 @@ angular.module 'down.addFromAddressBook', [
     'ionic'
     'down.contacts'
     'down.friendshipButton'
-    'LocalStorageModule'
+    'down.localDB'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'addFromAddressBook',

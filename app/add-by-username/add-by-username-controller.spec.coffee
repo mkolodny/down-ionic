@@ -20,7 +20,7 @@ describe 'add by username controller', ->
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $timeout = $injector.get '$timeout'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     scope = $rootScope.$new true
     User = $injector.get 'User'
 

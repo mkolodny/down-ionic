@@ -15,7 +15,7 @@ describe 'AddedMe controller', ->
     $controller = $injector.get '$controller'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     Friendship = $injector.get 'Friendship'
     scope = $injector.get '$rootScope'
 

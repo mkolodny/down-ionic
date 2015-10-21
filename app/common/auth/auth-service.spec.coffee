@@ -2,11 +2,11 @@ require '../../ionic/ionic.js'
 require 'angular'
 require 'angular-mocks'
 require 'angular-ui-router'
-require 'angular-local-storage'
 require 'ng-cordova'
 require './auth-module'
 require '../mixpanel/mixpanel-module'
 require '../meteor/meteor-mocks'
+require '../local-db/local-db-module'
 
 describe 'Auth service', ->
   $cordovaGeolocation = null
@@ -14,6 +14,7 @@ describe 'Auth service', ->
   $httpBackend = null
   $mixpanel = null
   $meteor = null
+  $rootScope = null
   scope = null
   $state = null
   $q = null
@@ -22,7 +23,7 @@ describe 'Auth service', ->
   Invitation = null
   User = null
   deserializedUser = null
-  localStorage = null
+  LocalDB = null
 
   beforeEach angular.mock.module('angular-meteor')
 
@@ -36,7 +37,7 @@ describe 'Auth service', ->
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('LocalStorageModule')
+  beforeEach angular.mock.module('down.localDB')
 
   beforeEach angular.mock.module(($provide) ->
     $cordovaGeolocation =
@@ -68,6 +69,11 @@ describe 'Auth service', ->
         set: jasmine.createSpy '$mixpanel.people.set'
     $provide.value '$mixpanel', $mixpanel
 
+    LocalDB =
+      get: jasmine.createSpy 'LocalDB.get'
+      set: jasmine.createSpy 'LocalDB.set'
+    $provide.value 'LocalDB', LocalDB
+
     return
   )
 
@@ -78,24 +84,39 @@ describe 'Auth service', ->
     $state = $injector.get '$state'
     $meteor = $injector.get '$meteor'
     apiRoot = $injector.get 'apiRoot'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     Invitation = $injector.get 'Invitation'
     scope = $rootScope.$new()
-    localStorage = $injector.get 'localStorageService'
   )
-
-  afterEach ->
-    localStorage.clearAll()
 
   it 'should init the user', ->
     expect(Auth.user).toEqual {}
 
-  describe 'resume session', ->
+  it 'should init the flags', ->
+    expect(Auth.flags).toEqual {}
 
-    describe 'when a user is stored in local storage', ->
+  describe 'resume session', ->
+    deferred = null
+    resolved = null
+    rejected = null
+
+    beforeEach ->
+      deferred = $q.defer()
+      LocalDB.get.and.returnValue deferred.promise
+      Auth.resumeSession().then ->
+        resolved = true
+      , ->
+        rejected = true
+
+    it 'should get the session object from the LocalDB', ->
+      expect(LocalDB.get).toHaveBeenCalledWith 'session'
+
+    describe 'when a session is stored in local storage', ->
       user = null
       friends = null
       facebookFriends = null
+      phone = null
+      flags = null
 
       beforeEach ->
         friends =
@@ -112,11 +133,18 @@ describe 'Auth service', ->
           authtoken: 'asdfkasf'
           friends: friends
           facebookFriends: facebookFriends
-        localStorage.set 'currentUser', user
+        phone = '+19252852230'
+        flags = {}
+
+        session = 
+          user: user
+          phone: phone
+          flags: flags
 
         spyOn Auth, 'mixpanelIdentify'
 
-        Auth.resumeSession()
+        deferred.resolve session
+        $rootScope.$apply()
 
       it 'should set the user on Auth', ->
         expect(Auth.user).toAngularEqual user
@@ -126,6 +154,12 @@ describe 'Auth service', ->
 
       it 'should identify the user with mixpanel', ->
         expect(Auth.mixpanelIdentify).toHaveBeenCalled()
+
+      it 'should set the phone on Auth', ->
+        expect(Auth.phone).toEqual phone
+
+      it 'should set the flags on Auth', ->
+        expect(Auth.flags).toBe flags
 
       describe 'when a user has friends', ->
 
@@ -138,17 +172,72 @@ describe 'Auth service', ->
         it 'should set the facebookFriends on the user', ->
           expect(Auth.user.facebookFriends).toAngularEqual facebookFriends
 
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
 
-    describe 'when a phone is stored in localStorage', ->
-      phone = null
+
+    describe 'when there is a LocalDB error', ->
 
       beforeEach ->
-        phone = '+19252852230'
-        localStorage.set 'currentPhone', phone
-        Auth.resumeSession()
+        deferred.reject()
+        $rootScope.$apply()
 
-      it 'should set the phone on Auth', ->
-        expect(Auth.phone).toEqual phone
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
+
+
+  describe 'saving the session', ->
+    user = null
+    phone = null
+    flags = null
+    deferred = null
+    rejected = null
+    resolved = null
+
+    beforeEach ->
+      user =
+          id: 1
+          name: 'Andrew Linfoot'
+          authtoken: 'asdfkasf'
+      phone = '+19252852230'
+      flags = {}
+
+      Auth.user = user
+      Auth.phone = phone
+      Auth.flags = flags
+
+      deferred = $q.defer()
+      LocalDB.set.and.returnValue deferred.promise
+
+      Auth.saveSession().then ->
+        resolved = true
+      , ->
+        rejected = true
+
+    it 'should save the session to LocalDB', ->
+      expect(LocalDB.set).toHaveBeenCalledWith 'session',
+        user: user
+        phone: phone
+        flags: flags
+
+    describe 'saved successfully', ->
+
+      beforeEach ->
+        deferred.resolve()
+        $rootScope.$apply()
+
+      it 'should resolve the promise', ->
+        expect(resolved).toBe true
+
+
+    describe 'save fails', ->
+
+      beforeEach ->
+        deferred.reject()
+        $rootScope.$apply()
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
 
 
   describe 'mixpanel identify', ->
@@ -207,6 +296,8 @@ describe 'Auth service', ->
   describe 'set user', ->
     user = null
     expectedUser = null
+    saveSession = null
+    result = null
 
     beforeEach ->
       Auth.user =
@@ -220,32 +311,63 @@ describe 'Auth service', ->
       expectedUser = angular.extend({}, Auth.user, user)
 
       spyOn Auth, 'mixpanelIdentify'
+      saveSession = 'saveSession'
+      spyOn(Auth, 'saveSession').and.returnValue saveSession
 
-      Auth.setUser user
+      result = Auth.setUser user
 
     it 'should extend passed in user with auth.user', ->
       expect(Auth.user).toEqual expectedUser
 
-    it 'should save the user to localstorage', ->
-      expect(localStorage.get 'currentUser').toEqual expectedUser
-
     it 'should identify the user in mixpanel', ->
       expect(Auth.mixpanelIdentify).toHaveBeenCalled()
 
+    it 'should return the save session promise', ->
+      expect(result).toBe saveSession
 
+  ##setPhone
   describe 'set phone', ->
     phone = null
+    result = null
+    saveSession = null
 
     beforeEach ->
       Auth.phone = null
       phone = '19252852230'
-      Auth.setPhone phone
+      saveSession = 'saveSession'
+      spyOn(Auth, 'saveSession').and.returnValue saveSession
+
+      result = Auth.setPhone phone
 
     it 'should set Auth.phone', ->
       expect(Auth.phone).toEqual phone
 
-    it 'should save the phone to local storage', ->
-      expect(localStorage.get 'currentPhone').toEqual phone
+    it 'should return the save session promise', ->
+      expect(result).toBe saveSession
+
+
+  ##setFlag
+  describe 'setting a flag', ->
+    flagKey = null
+    flagValue = null
+    saveSession = null
+    result = null
+
+    beforeEach ->
+      flagKey = 'hasRequestedPushNotifications'
+      flagValue = true
+      Auth.flags = {}
+
+      saveSession = 'saveSession'
+      spyOn(Auth, 'saveSession').and.returnValue saveSession
+
+      result = Auth.setFlag flagKey, flagValue
+
+    it 'should set the flag on Auth', ->
+      expect(Auth.flags[flagKey]).toBe flagValue
+
+    it 'should return the save session promise', ->
+      expect(result).toBe saveSession
 
 
   describe 'checking whether the user is authenticated', ->
@@ -590,7 +712,7 @@ describe 'Auth service', ->
     describe 'no phone number entered', ->
 
       beforeEach ->
-        localStorage.set 'hasViewedTutorial', true
+        Auth.flags.hasViewedTutorial = true
         Auth.phone = undefined
         Auth.redirectForAuthState()
 
@@ -601,7 +723,7 @@ describe 'Auth service', ->
     describe 'no authenticated user', ->
 
       beforeEach ->
-        localStorage.set 'hasViewedTutorial', true
+        Auth.flags.hasViewedTutorial = true
         Auth.phone = '+19252852230'
         Auth.user = {}
         Auth.redirectForAuthState()
@@ -613,7 +735,7 @@ describe 'Auth service', ->
     describe 'the user doesn\'t have an image url', ->
 
       beforeEach ->
-        localStorage.set 'hasViewedTutorial', true
+        Auth.flags.hasViewedTutorial = true
         Auth.phone = '+19252852230'
         Auth.user =
           id: 1
@@ -626,7 +748,7 @@ describe 'Auth service', ->
     describe 'the user doesn\'t have a username', ->
 
       beforeEach ->
-        localStorage.set 'hasViewedTutorial', true
+        Auth.flags.hasViewedTutorial = true
         Auth.phone = '+19252852230'
         Auth.user =
           id: 1
@@ -641,7 +763,7 @@ describe 'Auth service', ->
     describe 'when using an iOS device', ->
 
       beforeEach ->
-        localStorage.set 'hasViewedTutorial', true
+        Auth.flags.hasViewedTutorial = true
         spyOn(ionic.Platform, 'isIOS').and.returnValue true
 
       describe 'we haven\'t requested location services', ->
@@ -673,7 +795,7 @@ describe 'Auth service', ->
               lat: 40.7265834
               long: -73.9821535
             username: 'tdog'
-          localStorage.set 'hasRequestedLocationServices', true
+          Auth.flags.hasRequestedLocationServices = true
           Auth.redirectForAuthState()
 
         it 'should go to the request push notifications view', ->
@@ -692,8 +814,8 @@ describe 'Auth service', ->
               lat: 40.7265834
               long: -73.9821535
             username: 'tdog'
-          localStorage.set 'hasRequestedLocationServices', true
-          localStorage.set 'hasRequestedPushNotifications', true
+          Auth.flags.hasRequestedLocationServices = true
+          Auth.flags.hasRequestedPushNotifications = true
           Auth.redirectForAuthState()
 
         it 'should go to the request contacts view', ->
@@ -702,7 +824,7 @@ describe 'Auth service', ->
     describe 'we haven\'t shown the find friends view', ->
 
       beforeEach ->
-        localStorage.set 'hasViewedTutorial', true
+        Auth.flags.hasViewedTutorial = true
         spyOn(ionic.Platform, 'isIOS').and.returnValue true
         spyOn(ionic.Platform, 'isAndroid').and.returnValue true
 
@@ -716,9 +838,9 @@ describe 'Auth service', ->
             lat: 40.7265834
             long: -73.9821535
           username: 'tdog'
-        localStorage.set 'hasRequestedLocationServices', true
-        localStorage.set 'hasRequestedPushNotifications', true
-        localStorage.set 'hasRequestedContacts', true
+        Auth.flags.hasRequestedLocationServices = true
+        Auth.flags.hasRequestedPushNotifications = true
+        Auth.flags.hasRequestedContacts = true
         Auth.redirectForAuthState()
 
       it 'should go to the find friends view', ->
@@ -728,7 +850,7 @@ describe 'Auth service', ->
     describe 'user has already completed sign up', ->
 
       beforeEach ->
-        localStorage.set 'hasViewedTutorial', true
+        Auth.flags.hasViewedTutorial = true
         Auth.phone = '+19252852230'
         Auth.user =
           id: 1
@@ -739,10 +861,10 @@ describe 'Auth service', ->
             lat: 40.7265834
             long: -73.9821535
           username: 'tdog'
-        localStorage.set 'hasRequestedLocationServices', true
-        localStorage.set 'hasRequestedPushNotifications', true
-        localStorage.set 'hasRequestedContacts', true
-        localStorage.set 'hasCompletedFindFriends', true
+        Auth.flags.hasRequestedLocationServices = true
+        Auth.flags.hasRequestedPushNotifications = true
+        Auth.flags.hasRequestedContacts = true
+        Auth.flags.hasCompletedFindFriends = true
         Auth.redirectForAuthState()
 
       it 'should go to the events view', ->

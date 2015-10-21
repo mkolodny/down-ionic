@@ -1,15 +1,15 @@
 require 'angular-mocks'
-require 'angular-local-storage'
 require 'ng-cordova'
 require './contacts-module'
 require '../resources/resources-module'
+require '../local-db/local-db-module'
 require '../auth/auth-module'
 
 describe 'Contacts service', ->
   $cordovaContacts = null
   scope = null
   $q = null
-  localStorage = null
+  LocalDB = null
   Auth = null
   Contacts = null
   UserPhone = null
@@ -22,7 +22,7 @@ describe 'Contacts service', ->
 
   beforeEach angular.mock.module('down.resources')
 
-  beforeEach angular.mock.module('LocalStorageModule')
+  beforeEach angular.mock.module('down.localDB')
 
   beforeEach angular.mock.module(($provide) ->
     $cordovaContacts =
@@ -31,7 +31,15 @@ describe 'Contacts service', ->
 
     Auth =
       phone: '+19252852235'
+      saveSession: jasmine.createSpy 'Auth.saveSession'
+      setFlag: jasmine.createSpy 'Auth.setFlag'
     $provide.value 'Auth', Auth
+
+    LocalDB =
+      get: jasmine.createSpy 'LocalDB.get'
+      set: jasmine.createSpy 'LocalDB.set'
+    $provide.value 'LocalDB', LocalDB
+
     return
   )
 
@@ -39,15 +47,11 @@ describe 'Contacts service', ->
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     scope = $rootScope.$new()
-    Auth = angular.copy $injector.get('Auth')
-    localStorage = $injector.get 'localStorageService'
     UserPhone = $injector.get 'UserPhone'
     Contacts = angular.copy $injector.get('Contacts')
   )
 
-  afterEach ->
-    localStorage.clearAll()
-
+  ##getContacts
   describe 'getting contacts', ->
     cordovaDeferred = null
     response = null
@@ -137,7 +141,7 @@ describe 'Contacts service', ->
           expect(Contacts.saveContacts).toHaveBeenCalledWith contacts
 
         it 'should set hasRequestedContacts to true', ->
-          expect(localStorage.get 'hasRequestedContacts').toEqual true
+          expect(Auth.setFlag).toHaveBeenCalledWith 'hasRequestedContacts', true
 
         it 'should resolve the promise with the contacts', ->
           expect(response).toEqual contacts
@@ -166,6 +170,7 @@ describe 'Contacts service', ->
         expect(error.code).toEqual 'PERMISSION_DENIED_ERROR'
 
 
+  ##identifyContacts
   describe 'identifying contacts', ->
     deferred = null
 
@@ -601,19 +606,25 @@ describe 'Contacts service', ->
 
 
   describe 'saving contacts', ->
-    contacts = null
+    contactsObject = null
+    result = null
+    promise = null
 
     beforeEach ->
       contact =
         id: '1234'
         name:
           formatted: 'Mike Pleb'
-      contacts = {}
-      contacts[contact.id] = contact
+      contactsObject = {}
+      contactsObject[contact.id] = contact
 
-      localStorage.set 'contacts', {}
-      Contacts.saveContacts contacts
+      promise = 'promise'
+      LocalDB.set.and.returnValue promise
+      result = Contacts.saveContacts contactsObject
 
-    it 'should save the contacts to localStorage', ->
-      savedContacts = localStorage.get 'contacts'
-      expect(savedContacts).toEqual contacts
+    it 'should save the contacts to the localDB', ->
+      expect(LocalDB.set).toHaveBeenCalledWith 'contacts', contactsObject
+
+    it 'should return the localdb promise', ->
+      expect(result).toBe promise
+

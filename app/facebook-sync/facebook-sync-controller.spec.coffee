@@ -35,7 +35,7 @@ describe 'facebook sync controller', ->
     $ionicLoading = $injector.get '$ionicLoading'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     scope = $rootScope.$new()
 
     # This is necessary because for some reason ionic is requesting this file

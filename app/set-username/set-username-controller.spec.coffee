@@ -31,7 +31,7 @@ describe 'set username controller', ->
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
     scope = $rootScope.$new()
     User = $injector.get 'User'
 

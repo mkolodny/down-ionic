@@ -1,22 +1,23 @@
 require 'angular'
-require 'angular-local-storage'
 require 'angular-mocks'
 require '../common/contacts/contacts-module'
 require '../common/resources/resources-module'
+require '../common/local-db/local-db-module'
 AddFromAddressBookCtrl = require './add-from-address-book-controller'
 
 describe 'add from address book controller', ->
   $controller = null
   $q = null
   Contacts = null
-  contacts = null
+  contactsObject = null
   ctrl = null
-  localStorage = null
+  LocalDB = null
+  localDBDeferred = null
   scope = null
   user = null
   User = null
 
-  beforeEach angular.mock.module('LocalStorageModule')
+  beforeEach angular.mock.module('down.localDB')
 
   beforeEach angular.mock.module('down.contacts')
 
@@ -27,7 +28,7 @@ describe 'add from address book controller', ->
     $q = $injector.get '$q'
     scope = $injector.get '$rootScope'
     Contacts = $injector.get 'Contacts'
-    localStorage = $injector.get 'localStorageService'
+    LocalDB = $injector.get 'LocalDB'
     User = $injector.get 'User'
 
     # Mock contacts being saved in local storage.
@@ -40,67 +41,105 @@ describe 'add from address book controller', ->
       location:
         lat: 40.7265834
         long: -73.9821535
-    contacts =
+    contactsObject =
       1:
         id: 1
         name: ' Bruce Lee' # Test a space in there
         username: null
       2: user
-    localStorage.set 'contacts', contacts
+
+    localDBDeferred = $q.defer()
+    spyOn(LocalDB, 'get').and.returnValue localDBDeferred.promise
 
     ctrl = $controller AddFromAddressBookCtrl,
       $scope: scope
   )
 
-  afterEach ->
-    localStorage.clearAll()
+  it 'should get the contacts', ->
+    expect(LocalDB.get).toHaveBeenCalledWith 'contacts'
 
-  it 'should set the contacts on the controller', ->
-    contact = contacts[1]
-    contact.name = contact.name.trim()
-    items = [
-      isDivider: true
-      title: 'A'
-    ,
-      isDivider: false
-      user: new User user
-    ,
-      isDivider: true
-      title: 'B'
-    ,
-      isDivider: false
-      user: new User contact
-    ]
-    expect(ctrl.items).toEqual items
+  describe 'when successful', ->
 
-  describe 'when the user\'s contacts haven\'t been saved yet', ->
+    describe 'when contacts are in the localDB', ->
+
+      beforeEach ->
+        spyOn ctrl, 'showContacts'
+
+        localDBDeferred.resolve contactsObject
+        scope.$apply()
+
+      it 'should show the contacts', ->
+        expect(ctrl.showContacts).toHaveBeenCalled()
+
+
+    describe 'when the user\'s contacts haven\'t been saved yet', ->
+
+      beforeEach ->
+        spyOn ctrl, 'refresh'
+
+        localDBDeferred.resolve null
+        scope.$apply()
+
+      it 'should show the loading spinner', ->
+        expect(ctrl.isLoading).toBe true
+
+      it 'should request the user\'s contacts', ->
+        expect(ctrl.refresh).toHaveBeenCalled()
+
+
+    describe 'on LocalDB error', ->
+
+      beforeEach ->
+        localDBDeferred.reject()
+        scope.$apply()
+
+      it 'should show an error', ->
+        expect(ctrl.getContactsError).toBe true
+
+
+  describe 'show contacts', ->
+
+    beforeEach ->
+      ctrl.showContacts contactsObject
+
+    it 'should set the contacts items on the controller', ->
+      contact = contactsObject[1]
+      contact.name = contact.name.trim()
+      items = [
+        isDivider: true
+        title: 'A'
+      ,
+        isDivider: false
+        user: new User user
+      ,
+        isDivider: true
+        title: 'B'
+      ,
+        isDivider: false
+        user: new User contact
+      ]
+      expect(ctrl.items).toEqual items
+
+
+  describe 'getting contacts', ->
     deferred = null
 
     beforeEach ->
-      localStorage.clearAll()
-
       deferred = $q.defer()
       spyOn(Contacts, 'getContacts').and.returnValue deferred.promise
 
-      ctrl = $controller AddFromAddressBookCtrl,
-        $scope: scope
-
-    it 'should show the loading spinner', ->
-      expect(ctrl.isLoading).toBe true
-
-    it 'should request the user\'s contacts', ->
-      expect(Contacts.getContacts).toHaveBeenCalled()
+      ctrl.refresh()
 
     describe 'when the load succeeds', ->
 
       beforeEach ->
         spyOn ctrl, 'showContacts'
 
-        deferred.resolve contacts
+        deferred.resolve contactsObject
         scope.$apply()
 
       it 'should show the friends', ->
-        expect(ctrl.showContacts).toHaveBeenCalledWith contacts
+        expect(ctrl.showContacts).toHaveBeenCalledWith contactsObject
 
       it 'should hide the loading spinner', ->
         expect(ctrl.isLoading).toBe false
@@ -143,7 +182,7 @@ describe 'add from address book controller', ->
       newContacts = null
 
       beforeEach ->
-        newContacts = angular.copy contacts
+        newContacts = angular.copy contactsObject
         newContacts[3] =
           name:
             formatted: 'Marie Curie'

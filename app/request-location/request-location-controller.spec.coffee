@@ -13,18 +13,15 @@ describe 'request location controller', ->
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('LocalStorageModule')
-
   beforeEach angular.mock.module('down.auth')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
-    localStorage = $injector.get 'localStorageService'
     $rootScope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     $q = $injector.get '$q'
     scope = $rootScope.$new()
-    Auth = angular.copy $injector.get('Auth')
+    Auth = $injector.get 'Auth'
 
     ctrl = $controller RequestLocationCtrl,
       $scope: scope
@@ -40,9 +37,6 @@ describe 'request location controller', ->
 
       ctrl.enableLocation()
 
-    afterEach ->
-      localStorage.clearAll()
-
     it 'should start watching the users location', ->
       expect(Auth.watchLocation).toHaveBeenCalled()
 
@@ -51,6 +45,7 @@ describe 'request location controller', ->
 
       beforeEach ->
         spyOn Auth, 'redirectForAuthState'
+        spyOn Auth, 'setFlag'
 
         deferred.resolve()
         scope.$apply()
@@ -58,8 +53,8 @@ describe 'request location controller', ->
       it 'should redirect for auth state', ->
         expect(Auth.redirectForAuthState).toHaveBeenCalled()
 
-      it 'should set the hasRequestLocationServices to true', ->
-        expect(localStorage.get 'hasRequestedLocationServices').toBe true
+      it 'should set the hasRequestLocationServices flag to true', ->
+        expect(Auth.setFlag).toHaveBeenCalledWith 'hasRequestedLocationServices', true
 
 
     describe 'permission denied', ->

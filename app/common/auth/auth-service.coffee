@@ -2,36 +2,56 @@ haversine = require 'haversine'
 
 class Auth
   @$inject: ['$http', '$q', '$meteor', '$mixpanel', 'apiRoot', 'User',
-             '$cordovaGeolocation', '$state', 'localStorageService']
+             '$cordovaGeolocation', '$state', 'LocalDB']
   constructor: (@$http, @$q, @$meteor, @$mixpanel, @apiRoot, @User,
-                @$cordovaGeolocation, @$state, localStorageService) ->
-    @localStorage = localStorageService
+                @$cordovaGeolocation, @$state, @LocalDB) ->
 
   user: {}
 
+  flags: {}
+
   resumeSession: ->
-    # Check local storage for currentUser
-    currentUser = @localStorage.get 'currentUser'
-    if currentUser isnt null
-      @user = new @User currentUser
+    deferred = @$q.defer()
 
-      # Set friends as instances of User resource
-      if @user.friends isnt undefined
-        for id, friend of @user.friends
-          @user.friends[id] = new @User friend
-      if @user.facebookFriends isnt undefined
-        for id, friend of @user.facebookFriends
-          @user.facebookFriends[id] = new @User friend
+    @LocalDB.get('session').then (session) =>
+      if session
+        @phone = session.phone
+        @flags = session.flags or {}
+        @user = new @User session.user
 
-      # re-establish Meteor auth
-      @$meteor.loginWithPassword "#{@user.id}", @user.authtoken
+        # Set friends as instances of User resource
+        if @user.friends isnt undefined
+          for id, friend of @user.friends
+            @user.friends[id] = new @User friend
+        if @user.facebookFriends isnt undefined
+          for id, friend of @user.facebookFriends
+            @user.facebookFriends[id] = new @User friend
 
-      @mixpanelIdentify()
+        # re-establish Meteor auth
+        if angular.isDefined @user.authtoken
+          @$meteor.loginWithPassword "#{@user.id}", @user.authtoken
 
-    # Check local storage for currentPhone
-    currentPhone = @localStorage.get 'currentPhone'
-    if currentPhone isnt null
-      @phone = currentPhone
+        @mixpanelIdentify()
+      deferred.resolve()
+    , (error) ->
+      deferred.reject()
+
+    deferred.promise
+
+  saveSession: ->
+    deferred = @$q.defer()
+
+    session =
+      flags: @flags
+      user: @user
+      phone: @phone
+
+    @LocalDB.set('session', session).then ->
+      deferred.resolve()
+    , ->
+      deferred.reject()
+
+    deferred.promise
 
   mixpanelIdentify: ->
     #identify and set user data with mixpanel
@@ -45,12 +65,16 @@ class Auth
 
   setUser: (user) ->
     @user = angular.extend @user, user
-    @localStorage.set 'currentUser', @user
     @mixpanelIdentify()
+    @saveSession()
 
   setPhone: (phone) ->
     @phone = phone
-    @localStorage.set 'currentPhone', @phone
+    @saveSession()
+
+  setFlag: (flagKey, flagValue) ->
+    @flags[flagKey] = flagValue
+    @saveSession()
 
   isAuthenticated: ->
     deferred = @$q.defer()
@@ -141,7 +165,7 @@ class Auth
     isIOS = ionic.Platform.isIOS()
     isAndroid = ionic.Platform.isAndroid()
 
-    if @localStorage.get('hasViewedTutorial') is null
+    if @flags.hasViewedTutorial isnt true
       @$state.go 'tutorial'
     else if not @phone?
       @$state.go 'login'
@@ -151,16 +175,16 @@ class Auth
       @$state.go 'facebookSync'
     else if not @user.username?
       @$state.go 'setUsername'
-    else if @localStorage.get('hasRequestedLocationServices') is null \
+    else if @flags.hasRequestedLocationServices isnt true \
          and isIOS
       @$state.go 'requestLocation'
-    else if @localStorage.get('hasRequestedPushNotifications') is null \
+    else if @flags.hasRequestedPushNotifications isnt true \
          and isIOS
       @$state.go 'requestPush'
-    else if @localStorage.get('hasRequestedContacts') is null \
+    else if @flags.hasRequestedContacts isnt true \
          and isIOS
       @$state.go 'requestContacts'
-    else if @localStorage.get('hasCompletedFindFriends') is null \
+    else if @flags.hasCompletedFindFriends isnt true \
          and (isIOS or isAndroid)
       @$state.go 'findFriends'
     else
