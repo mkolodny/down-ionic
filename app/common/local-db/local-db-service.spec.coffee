@@ -168,10 +168,12 @@ describe 'LocalDB service', ->
               name: 'Jimbo Walker'
 
             sqlResultSet =
-              rows: [
-                key: key
-                value: angular.toJson angular.copy(value)
-              ]
+              rows:
+                length: 1
+                item: ->
+                  key: key
+                  value: angular.toJson angular.copy(value)
+              
 
             deferred.resolve sqlResultSet
             $rootScope.$apply()
@@ -183,7 +185,8 @@ describe 'LocalDB service', ->
 
           beforeEach ->
             sqlResultSet =
-              rows: []
+              rows: 
+                length: 0
 
             deferred.resolve sqlResultSet
             $rootScope.$apply()

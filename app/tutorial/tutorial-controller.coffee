@@ -1,8 +1,6 @@
 class TutorialCtrl
-  @$inject: ['$scope', 'Auth', 'localStorageService']
-  constructor: (@$scope, @Auth, localStorageService) ->
-    @localStorage = localStorageService
-
+  @$inject: ['$scope', 'Auth']
+  constructor: (@$scope, @Auth) ->
     # Init the view.
     @currentSection = 0
 
@@ -13,7 +11,7 @@ class TutorialCtrl
     @currentSection is index
 
   continue: ->
-    @localStorage.set 'hasViewedTutorial', true
+    @Auth.setFlag 'hasViewedTutorial', true
     @Auth.redirectForAuthState()
 
 module.exports = TutorialCtrl

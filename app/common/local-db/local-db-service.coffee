@@ -50,7 +50,8 @@ class LocalDB
             # No data found
             deferred.resolve null
           else
-            value = sqlResultSet.rows[0]?.value
+            value = sqlResultSet.rows.item(0).value
+            value = value.replace /''/g, "'" # unescape '' to prevent JSON parsing
             deferred.resolve angular.fromJson(value)
         , (error) ->
           deferred.reject()
@@ -65,6 +66,7 @@ class LocalDB
     isApp = @$window.ionic.Platform.isIOS() or @$window.ionic.Platform.isAndroid()
     if sqlitePluginInstalled or !isApp
       value = angular.toJson value
+      value = value.replace /'/g, "" # escape ' to prevent SQL syntax errors
       query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES ('#{key}', '#{value}')"
       @$cordovaSQLite.execute(@db, query)
     else
@@ -74,11 +76,12 @@ class LocalDB
       deferred.promise
 
   convertLocalStorage: ->
-    # if already converted, do nothing
-    if @localStorage.get('session') isnt null then return
-
     # Get data from localStorage
     currentUser = @localStorage.get 'currentUser'
+
+    # if already converted, do nothing
+    if @localStorage.get('currentUser') is null then return
+
     currentPhone = @localStorage.get 'currentPhone'
     hasViewedTutorial = @localStorage.get('hasViewedTutorial') is true ? true : undefined
     hasRequestedLocationServices = @localStorage.get('hasRequestedLocationServices') is true ? true : undefined
@@ -97,6 +100,15 @@ class LocalDB
         hasCompletedFindFriends: hasCompletedFindFriends
     @localStorage.set 'session', session
 
+    # Remove old values
+    @localStorage.remove 'currentUser'
+    @localStorage.remove 'currentPhone'
+    @localStorage.remove 'hasViewedTutorial'
+    @localStorage.remove 'hasRequestedLocationServices'
+    @localStorage.remove 'hasRequestedPushNotifications'
+    @localStorage.remove 'hasRequestedContacts'
+    @localStorage.remove 'hasCompletedFindFriends'
+
   convertLocalStorageToSQLite: ->
     deferred = @$q.defer()
 
@@ -104,9 +116,13 @@ class LocalDB
     @set 'session', session
       .then =>
         @convertContacts()
+      , (err) ->
+        console.log err
       .then =>
         @localStorage.clearAll()
         deferred.resolve()
+      , (err) ->
+        console.log err
 
     deferred.promise
       
