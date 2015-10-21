@@ -19,6 +19,13 @@ $dark:                            #444 !default;
 $brand-color: #6a38ab;
 $new-event-margin-left: 5px;
 
+// Buttons
+$button-positive-bg: #ed6700;
+$button-positive-border: #ed6700;
+$button-positive-active-bg: darken(#ed6700, 10%);
+$button-positive-active-border: darken(#ed6700, 10%);
+$button-positive-text: #fff;
+
 // The path for our ionicons font files, relative to the built CSS in www/css
 //$ionicons-font-path: "../lib/ionic/fonts" !default;
 
