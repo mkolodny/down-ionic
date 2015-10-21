@@ -7,6 +7,7 @@ class Auth
                 @$cordovaGeolocation, @$state, @LocalDB) ->
 
   user: {}
+
   flags: {}
 
   resumeSession: ->
@@ -27,7 +28,8 @@ class Auth
             @user.facebookFriends[id] = new @User friend
 
         # re-establish Meteor auth
-        @$meteor.loginWithPassword "#{@user.id}", @user.authtoken
+        if angular.isDefined @user.authtoken
+          @$meteor.loginWithPassword "#{@user.id}", @user.authtoken
 
         @mixpanelIdentify()
       deferred.resolve()
