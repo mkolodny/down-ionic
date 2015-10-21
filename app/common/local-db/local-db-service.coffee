@@ -66,7 +66,7 @@ class LocalDB
     isApp = @$window.ionic.Platform.isIOS() or @$window.ionic.Platform.isAndroid()
     if sqlitePluginInstalled or !isApp
       value = angular.toJson value
-      value = value.replace /'/g, "" # escape ' to prevent SQL syntax errors
+      value = value.replace /'/g, "''" # escape ' to prevent SQL syntax errors
       query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES ('#{key}', '#{value}')"
       @$cordovaSQLite.execute(@db, query)
     else
