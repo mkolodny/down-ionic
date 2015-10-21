@@ -98,3 +98,11 @@
     }
   }
 }
+
+.platform-ios {
+  #tutorial {
+    ion-content {
+      margin-top: $ios-statusbar-height;
+    }
+  }
+}
