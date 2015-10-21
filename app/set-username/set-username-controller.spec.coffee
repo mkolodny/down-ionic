@@ -108,7 +108,28 @@ describe 'set username controller', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
         it 'should show an error', ->
-          expect(ctrl.error).toBe 'For some reason, that didn\'t work.'
+          expect(ctrl.error).toBe 'Unfortunately, that username is taken.'
+
+        describe 'then trying again', ->
+
+          beforeEach ->
+            ctrl.setUsername()
+
+          it 'should clear the error', ->
+            expect(ctrl.error).toBeNull()
+
+
+      describe 'when the username is rallytap', ->
+        user = null
+
+        beforeEach ->
+          ctrl.validate.and.returnValue true
+          ctrl.username = 'rallytap'
+
+          ctrl.setUsername()
+
+        it 'should show an error', ->
+          expect(ctrl.error).toBe 'Unfortunately, that username is taken.'
 
 
   describe 'validating the set username form', ->

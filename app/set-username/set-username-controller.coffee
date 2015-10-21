@@ -3,7 +3,15 @@ class SetUsernameCtrl
   constructor: (@$ionicLoading, @$scope, @$state, @Auth, @User) ->
 
   setUsername: ->
+    # Clear any previous error.
+    @error = null
+
     if not @validate()
+      return
+
+    # Don't let users take the username "rallytap".
+    if @username is 'rallytap'
+      @error = 'Unfortunately, that username is taken.'
       return
 
     @$ionicLoading.show
@@ -19,7 +27,7 @@ class SetUsernameCtrl
         @Auth.setUser user
         @Auth.redirectForAuthState()
       , =>
-        @error = 'For some reason, that didn\'t work.'
+        @error = 'Unfortunately, that username is taken.'
       .finally =>
         @$ionicLoading.hide()
 
