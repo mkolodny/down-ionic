@@ -5,7 +5,7 @@
     padding-right: 20px;
     padding-bottom: 10px;
     position: absolute;
-    top: $bar-height + $ios-statusbar-height;
+    top: $bar-height;
     width: 100%;
     z-index: 1;
     text-align: center;
@@ -69,6 +69,14 @@
   #friendship {
     .respond {
       padding-top: 3px;
+    }
+  }
+}
+
+.platform-ios {
+  #friendship {
+    #match-header {
+      top: $bar-height + $ios-statusbar-height;
     }
   }
 }
