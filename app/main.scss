@@ -299,7 +299,7 @@ ion-nav-back-button {
     position: relative;
     padding-left: 2px;
     font-size: 18px;
-    top: -14px !important;
+    top: -14px;
   }
 }
 #create-event-nav {
@@ -308,7 +308,7 @@ ion-nav-back-button {
 .platform-ios {
   #event-title {
     i {
-      top: 0 !important;
+      top: 0;
     }
   }
 }

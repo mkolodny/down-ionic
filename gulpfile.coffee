@@ -195,7 +195,6 @@ gulp.task 'build', [
   'templates'
   'data'
   'vendor'
-  #'minify'
 ]
 
 
