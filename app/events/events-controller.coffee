@@ -2,11 +2,13 @@ haversine = require 'haversine'
 
 class EventsCtrl
   @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading',
-             '$ionicPlatform', '$meteor', '$mixpanel', '$scope', '$state',
-             '$timeout', 'Auth', 'Friendship', 'Invitation', 'ngToast', 'User']
+             '$ionicPlatform', '$ionicPopup', '$meteor', '$mixpanel', '$scope',
+             '$state', '$timeout', 'Auth', 'Friendship', 'Invitation',
+             'ngToast', 'User']
   constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading,
-                @$ionicPlatform, @$meteor, @$mixpanel, @$scope, @$state, @$timeout,
-                @Auth, @Friendship, @Invitation, @ngToast, @User) ->
+                @$ionicPlatform, @$ionicPopup, @$meteor, @$mixpanel, @$scope,
+                @$state, @$timeout, @Auth, @Friendship, @Invitation,
+                @ngToast, @User) ->
     # Init the view.
     @addedMe = []
     @invitations = {}
@@ -372,6 +374,11 @@ class EventsCtrl
     if @isSelected item
       return
 
+    if not @Auth.flags.hasSelectedFriend
+      @Auth.setFlag 'hasSelectedFriend', true
+      @showSelectedFriendPopup item, $event
+      return
+
     now = new Date().getTime()
     sixHours = 1000 * 60 * 60 * 6
     sixHoursFromNow = new Date now + sixHours
@@ -384,6 +391,19 @@ class EventsCtrl
 
   isSelected: (item) ->
     angular.isDefined item.friendSelect._id
+
+  showSelectedFriendPopup: (item, $event) ->
+    @$ionicPopup.show
+      title: 'Tap?'
+      subTitle: 'Tapping on a friend indicates that you\'d be down to hang out with them. Your friend won\'t know that you tapped on them unless they tapped on you, too.'
+      scope: @$scope
+      buttons: [
+        text: 'Cancel'
+      ,
+        text: '<b>Tap</b>'
+        onTap: (e) =>
+          @selectFriend item, $event
+      ]
 
   handleLoadedData: ->
     if @addedMeLoaded and @invitationsLoaded and @friendSelectsLoaded

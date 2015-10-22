@@ -558,3 +558,40 @@ ion-nav-back-button {
     border-top: .5px solid #b2b2b2;
   }
 }
+
+// Popup
+.popup {
+  border-radius: 8px !important;
+}
+.popup-head {
+  padding: 15px 20px;
+}
+.popup-title {
+  font-size: 20px;
+}
+.popup-sub-title {
+  font-size: 15px;
+  margin-top: 10px;
+}
+.popup-buttons {
+  padding: 0;
+  min-height: 45px;
+
+  button {
+    margin-right: 0 !important;
+    border: none;
+    border-top: 1px solid #bababa;
+    border-radius: 0 !important;
+    background-color: inherit;
+    color: $link-color !important;
+    font-size: 17px;
+
+    &:first-child {
+      border-right: 1px solid #bababa;
+      border-bottom-left-radius: 8px !important;
+    }
+    &:last-child {
+      border-bottom-right-radius: 8px !important;
+    }
+  }
+}

@@ -17,6 +17,7 @@ describe 'events controller', ->
   $httpBackend = null
   $ionicHistory = null
   $ionicPlatform = null
+  $ionicPopup = null
   $meteor = null
   $mixpanel = null
   $q = null
@@ -64,6 +65,7 @@ describe 'events controller', ->
     $httpBackend = $injector.get '$httpBackend'
     $ionicHistory = $injector.get '$ionicHistory'
     $ionicPlatform = $injector.get '$ionicPlatform'
+    $ionicPopup = $injector.get '$ionicPopup'
     $meteor = $injector.get '$meteor'
     $mixpanel = $injector.get '$mixpanel'
     $rootScope = $injector.get '$rootScope'
@@ -1160,39 +1162,60 @@ describe 'events controller', ->
       spyOn $mixpanel, 'track'
 
     describe 'when they aren\'t selected', ->
-      userId = null
 
       beforeEach ->
         spyOn(ctrl, 'isSelected').and.returnValue false
-        userId = 1
-        Auth.user.id = userId
 
-        jasmine.clock().install()
-        date = new Date 1438014089235
-        jasmine.clock().mockDate date
+      describe 'and this is the user\'s first time', ->
 
-        ctrl.selectFriend item, $event
+        beforeEach ->
+          Auth.flags.hasSelectedFriend = false
+          spyOn Auth, 'setFlag'
+          spyOn ctrl, 'showSelectedFriendPopup'
 
-      afterEach ->
-        jasmine.clock().uninstall()
+          ctrl.selectFriend item, $event
 
-      it 'should check if the friend is selected', ->
-        expect(ctrl.isSelected).toHaveBeenCalledWith item
+        it 'should set a flag', ->
+          expect(Auth.setFlag).toHaveBeenCalledWith 'hasSelectedFriend', true
 
-      it 'should prevent the default event', ->
-        expect($event.stopPropagation).toHaveBeenCalled()
+        it 'should show a popup', ->
+          expect(ctrl.showSelectedFriendPopup).toHaveBeenCalledWith item, $event
 
-      it 'should insert a friend select', ->
-        now = new Date().getTime()
-        sixHours = 1000 * 60 * 60 * 6
-        sixHoursFromNow = new Date now+sixHours
-        expect(ctrl.FriendSelects.insert).toHaveBeenCalledWith
-          userId: "#{userId}"
-          friendId: "#{friend.id}"
-          expiresAt: sixHoursFromNow
 
-      it 'should track selecting the friend', ->
-        expect($mixpanel.track).toHaveBeenCalledWith 'Select Friend'
+      describe 'and this isn\'t the user\'s first time', ->
+        userId = null
+
+        beforeEach ->
+          Auth.flags.hasSelectedFriend = true
+          userId = 1
+          Auth.user.id = userId
+
+          jasmine.clock().install()
+          date = new Date 1438014089235
+          jasmine.clock().mockDate date
+
+          ctrl.selectFriend item, $event
+
+        afterEach ->
+          jasmine.clock().uninstall()
+
+        it 'should check if the friend is selected', ->
+          expect(ctrl.isSelected).toHaveBeenCalledWith item
+
+        it 'should prevent the default event', ->
+          expect($event.stopPropagation).toHaveBeenCalled()
+
+        it 'should insert a friend select', ->
+          now = new Date().getTime()
+          sixHours = 1000 * 60 * 60 * 6
+          sixHoursFromNow = new Date now+sixHours
+          expect(ctrl.FriendSelects.insert).toHaveBeenCalledWith
+            userId: "#{userId}"
+            friendId: "#{friend.id}"
+            expiresAt: sixHoursFromNow
+
+        it 'should track selecting the friend', ->
+          expect($mixpanel.track).toHaveBeenCalledWith 'Select Friend'
 
 
   ##isSelected
@@ -1218,6 +1241,43 @@ describe 'events controller', ->
 
       it 'should return false', ->
         expect(ctrl.isSelected item).toBe false
+
+
+  ##showSelectedFriendPopup
+  describe 'showing the selected friend popup', ->
+    popupOptions = null
+    item = null
+    event = null
+
+    beforeEach ->
+      spyOn($ionicPopup, 'show').and.callFake (options) ->
+        popupOptions = options
+
+      item = 'item'
+      event = 'event'
+      ctrl.showSelectedFriendPopup item, event
+
+    it 'should show an ionic popup', ->
+      expect($ionicPopup.show).toHaveBeenCalledWith
+        title: 'Tap?'
+        subTitle: 'Tapping on a friend indicates that you\'d be down to hang out. Your friend won\'t know that you tapped on them unless they tapped on you, too.'
+        scope: scope
+        buttons: [
+          text: 'Cancel'
+        ,
+          text: '<b>Tap</b>'
+          onTap: jasmine.any Function
+        ]
+
+    describe 'confirming', ->
+
+      beforeEach ->
+        spyOn ctrl, 'selectFriend'
+
+        popupOptions.buttons[1].onTap()
+
+      it 'should select the friend', ->
+        expect(ctrl.selectFriend).toHaveBeenCalledWith item, event
 
 
   describe 'getting a match', ->
