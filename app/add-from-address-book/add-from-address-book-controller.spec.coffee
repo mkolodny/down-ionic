@@ -32,7 +32,7 @@ describe 'add from address book controller', ->
     User = $injector.get 'User'
 
     # Mock contacts being saved in local storage.
-    user = # One of the contacts is a Down user.
+    user = # One of the contacts is a Rallytap user.
       id: 3
       email: 'aturing@gmail.com'
       name: 'Alan Turing'
