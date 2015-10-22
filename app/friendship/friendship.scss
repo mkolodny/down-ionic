@@ -81,7 +81,7 @@
   }
   .match-notification {
     & + ion-content {
-      top: $bar-height + $ios-statusbar-height + 30px;
+      top: $bar-height + $ios-statusbar-height + 30px !important;
       // 30px is the match header height
     }
   }
