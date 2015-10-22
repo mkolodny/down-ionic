@@ -17,15 +17,16 @@ class FriendshipCtrl
       @chatId = @Friendship.getChatId @friend.id
 
       # Subscribe to the event's chat.
-      @$scope.$meteorSubscribe('chat', @chatId).then =>
-        # Bind reactive variables
-        @messages = @$meteor.collection @getMessages, false
-        @match = @getMatch()
+      @$scope.$meteorSubscribe 'chat', @chatId
 
-        # Watch for changes in newest message
-        @watchNewestMessage()
+      # Bind reactive variables
+      @messages = @$meteor.collection @getMessages, false
+      @match = @getMatch()
 
-        @$rootScope.hideNavBottomBorder = angular.isDefined @match._id
+      # Watch for changes in newest message
+      @watchNewestMessage()
+
+      @$rootScope.hideNavBottomBorder = angular.isDefined @match._id
 
     @$scope.$on '$ionicView.leave', =>
       # Remove angular-meteor bindings.

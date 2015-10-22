@@ -472,27 +472,9 @@ describe 'invitation service', ->
           deferred.resolve invitation
           $rootScope.$apply()
 
-        it 'should get the messages collection', ->
-          expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
-
         it 'should track the response in mixpanel', ->
           expect($mixpanel.track).toHaveBeenCalledWith 'Update Response',
             status: 'declined'
-
-        it 'should save the message on the meteor server', ->
-          message =
-            creator:
-              id: "#{Auth.user.id}"
-              name: Auth.user.name
-              firstName: Auth.user.firstName
-              lastName: Auth.user.lastName
-              imageUrl: Auth.user.imageUrl
-            text: "#{Auth.user.name} can\'t make it."
-            chatId: "#{invitation.eventId}"
-            type: Invitation.declineAction
-            createdAt: date
-          expect(Messages.insert).toHaveBeenCalledWith(message,
-              Invitation.readMessage)
 
         it 'should update the original invitation', ->
           expect(invitationCopy.response).toBe Invitation.declined
