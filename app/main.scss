@@ -588,7 +588,8 @@ ion-nav-back-button {
     border-radius: 0 !important;
     background-color: inherit;
     color: $link-color !important;
-    font-size: 17px;
+    font-size: 18px;
+    line-height: 45px;
 
     &:first-child {
       border-right: 1px solid #bababa;
