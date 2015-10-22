@@ -1,7 +1,7 @@
 require 'ng-cordova'
 RequestContactsCtrl = require './request-contacts-controller'
 
-angular.module 'down.requestContacts', [
+angular.module 'rallytap.requestContacts', [
     'ui.router'
     'ngCordova'
   ]

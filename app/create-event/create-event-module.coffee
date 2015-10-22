@@ -1,7 +1,7 @@
 require 'ng-cordova'
 CreateEventCtrl = require './create-event-controller'
 
-angular.module 'down.createEvent', [
+angular.module 'rallytap.createEvent', [
     'ngCordova'
     'ui.router'
   ]

@@ -1,4 +1,4 @@
 placeAutocompleteDirective = require './place-autocomplete-directive'
 
-angular.module 'down.placeAutocomplete', []
+angular.module 'rallytap.placeAutocomplete', []
   .directive 'placeAutocomplete', placeAutocompleteDirective

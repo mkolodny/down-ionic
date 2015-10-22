@@ -1,5 +1,5 @@
 ### @if BUILD_ENV='prod' ###
-angular.module 'down.env', []
+angular.module 'rallytap.env', []
   ## Prod vars
   .constant 'skipIonicDeploy', false
   .constant 'apiRoot', 'https://down-prod.herokuapp.com/api'
@@ -10,7 +10,7 @@ angular.module 'down.env', []
 ### @endif ###
 
 ### @if BUILD_ENV='staging' ###
-angular.module 'down.env', []
+angular.module 'rallytap.env', []
   ## Staging vars
   .constant 'skipIonicDeploy', true
   .constant 'apiRoot', 'https://down-staging.herokuapp.com/api'
@@ -21,7 +21,7 @@ angular.module 'down.env', []
 ### @endif ###
 
 ### @if BUILD_ENV='local' ###
-angular.module 'down.env', []
+angular.module 'rallytap.env', []
   ## Dev vars
   .constant 'skipIonicDeploy', true
   .constant 'apiRoot', 'http://localhost:8000/api'

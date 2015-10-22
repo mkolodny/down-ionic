@@ -6,10 +6,10 @@ require '../../vendor/intl-phone/libphonenumber-utils.js'
 
 Contacts = require './contacts-service'
 
-angular.module 'down.contacts', [
-    'down.resources'
-    'down.auth'
-    'down.localDB'
+angular.module 'rallytap.contacts', [
+    'rallytap.resources'
+    'rallytap.auth'
+    'rallytap.localDB'
     'ngCordova'
   ]
   .service 'Contacts', Contacts

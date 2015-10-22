@@ -3,9 +3,9 @@ require 'ng-toast'
 require '../common/auth/auth-module'
 FriendshipCtrl = require './friendship-controller'
 
-angular.module 'down.friendship', [
+angular.module 'rallytap.friendship', [
     'ionic'
-    'down.auth'
+    'rallytap.auth'
     'monospaced.elastic'
     'ngToast'
     'ui.router'

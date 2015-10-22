@@ -6,15 +6,15 @@ require '../common/resources/resources-module'
 require '../common/view-place/view-place-module'
 EventCtrl = require './event-controller'
 
-angular.module 'down.event', [
+angular.module 'rallytap.event', [
     'angular-meteor'
     'analytics.mixpanel'
     'ionic'
     'ui.router'
     'monospaced.elastic'
-    'down.resources'
-    'down.auth'
-    'down.viewPlace'
+    'rallytap.resources'
+    'rallytap.auth'
+    'rallytap.viewPlace'
     'ngToast'
   ]
   .config ($stateProvider) ->

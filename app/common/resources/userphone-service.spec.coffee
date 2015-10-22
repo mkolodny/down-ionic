@@ -10,7 +10,7 @@ describe 'userphone service', ->
   User = null
   UserPhone = null
 
-  beforeEach angular.mock.module('down.resources')
+  beforeEach angular.mock.module('rallytap.resources')
 
   beforeEach angular.mock.module('LocalStorageModule')
 

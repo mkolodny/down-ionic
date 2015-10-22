@@ -20,9 +20,9 @@ describe 'facebook sync controller', ->
 
   beforeEach angular.mock.module('ionic')
 
-  beforeEach angular.mock.module('down.facebookSync')
+  beforeEach angular.mock.module('rallytap.facebookSync')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
   beforeEach angular.mock.module('ngCordova')
 

@@ -14,15 +14,15 @@ describe 'Contacts service', ->
   Contacts = null
   UserPhone = null
 
-  beforeEach angular.mock.module('down.contacts')
+  beforeEach angular.mock.module('rallytap.contacts')
 
   beforeEach angular.mock.module('ngCordova.plugins.contacts')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
-  beforeEach angular.mock.module('down.resources')
+  beforeEach angular.mock.module('rallytap.resources')
 
-  beforeEach angular.mock.module('down.localDB')
+  beforeEach angular.mock.module('rallytap.localDB')
 
   beforeEach angular.mock.module(($provide) ->
     $cordovaContacts =

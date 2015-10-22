@@ -1,6 +1,6 @@
 FriendsCtrl = require './friends-controller'
 
-angular.module 'down.friends', [
+angular.module 'rallytap.friends', [
     'ui.router'
   ]
   .config ($stateProvider) ->

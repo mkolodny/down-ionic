@@ -8,11 +8,11 @@ require '../local-db/local-db-module'
 
 PushNotifications = require './push-notifications-service'
 
-angular.module 'down.pushNotifications', [
-    'down.resources'
-    'down.auth'
-    'down.env'
-    'down.localDB'
+angular.module 'rallytap.pushNotifications', [
+    'rallytap.resources'
+    'rallytap.auth'
+    'rallytap.env'
+    'rallytap.localDB'
     'ngCordova'
     'ngToast'
     'ionic'

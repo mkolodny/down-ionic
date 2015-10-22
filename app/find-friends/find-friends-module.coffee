@@ -4,13 +4,13 @@ require '../common/resources/resources-module'
 require '../common/friendship-button/friendship-button-module'
 FindFriendsCtrl = require './find-friends-controller'
 
-angular.module 'down.findFriends', [
+angular.module 'rallytap.findFriends', [
     'ui.router'
     'ionic'
-    'down.resources'
-    'down.auth'
-    'down.contacts'
-    'down.friendshipButton'
+    'rallytap.resources'
+    'rallytap.auth'
+    'rallytap.contacts'
+    'rallytap.friendshipButton'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'findFriends',

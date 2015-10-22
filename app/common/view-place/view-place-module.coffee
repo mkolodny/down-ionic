@@ -1,7 +1,7 @@
 viewPlace = require './view-place-directive'
 
-angular.module 'down.viewPlace', [
+angular.module 'rallytap.viewPlace', [
     'ionic'
-    'down.resources'
+    'rallytap.resources'
   ]
   .directive 'viewPlace', viewPlace

@@ -29,7 +29,7 @@ describe 'Auth service', ->
 
   beforeEach angular.mock.module('analytics.mixpanel')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
   beforeEach angular.mock.module('ngCordova.plugins.geolocation')
 
@@ -37,7 +37,7 @@ describe 'Auth service', ->
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('down.localDB')
+  beforeEach angular.mock.module('rallytap.localDB')
 
   beforeEach angular.mock.module(($provide) ->
     $cordovaGeolocation =
@@ -136,7 +136,7 @@ describe 'Auth service', ->
         phone = '+19252852230'
         flags = {}
 
-        session = 
+        session =
           user: user
           phone: phone
           flags: flags

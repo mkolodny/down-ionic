@@ -2,10 +2,10 @@ require 'ng-cordova'
 require '../common/auth/auth-module'
 RequestLocationCtrl = require './request-location-controller'
 
-angular.module 'down.requestLocation', [
+angular.module 'rallytap.requestLocation', [
     'ui.router'
-    'ngCordova',
-    'down.auth'
+    'ngCordova'
+    'rallytap.auth'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'requestLocation',

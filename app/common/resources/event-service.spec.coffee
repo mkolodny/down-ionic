@@ -19,9 +19,9 @@ describe 'event service', ->
 
   beforeEach angular.mock.module('angular-meteor')
 
-  beforeEach angular.mock.module('down.resources')
+  beforeEach angular.mock.module('rallytap.resources')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
   beforeEach angular.mock.module(($provide) ->
     # Mock a logged in user.

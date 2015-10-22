@@ -8,7 +8,7 @@ describe 'tutorial controller', ->
   localStorage = null
   scope = null
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'

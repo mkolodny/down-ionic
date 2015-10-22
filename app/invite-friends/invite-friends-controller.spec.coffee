@@ -32,11 +32,11 @@ describe 'invite friends controller', ->
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
-  beforeEach angular.mock.module('down.resources')
+  beforeEach angular.mock.module('rallytap.resources')
 
-  beforeEach angular.mock.module('down.localDB')
+  beforeEach angular.mock.module('rallytap.localDB')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
@@ -363,7 +363,7 @@ describe 'invite friends controller', ->
 
       it 'should set a no items flag', ->
         expect(ctrl.noItems).toBe true
-      
+
 
   ##cleanupView
   describe 'cleaning up the view', ->

@@ -3,11 +3,11 @@ require '../common/auth/auth-module'
 require '../common/friendship-button/friendship-button-module'
 AddFromFacebookCtrl = require './add-from-facebook-controller'
 
-angular.module 'down.addFromFacebook', [
+angular.module 'rallytap.addFromFacebook', [
     'ui.router'
     'ionic'
-    'down.auth'
-    'down.friendshipButton'
+    'rallytap.auth'
+    'rallytap.friendshipButton'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'addFromFacebook',

@@ -71,7 +71,7 @@ class EventCtrl
       @chat.stop()
 
   watchNewestMessage: =>
-    # Mark messages as read as they come in 
+    # Mark messages as read as they come in
     #   and scroll to bottom
     @$scope.$watch =>
       newestMessage = @messages[@messages.length-1]
@@ -269,7 +269,7 @@ class EventCtrl
     @LinkInvitation.save linkInvitation
       .$promise.then (linkInvitation) =>
         @$mixpanel.track 'Get Link Invitation'
-        groupLink = "https://down.life/e/#{linkInvitation.linkId}"
+        groupLink = "https://rallytap.com/e/#{linkInvitation.linkId}"
         # Show a "Copy Group Link" popup when the social sharing plugin isn\'t
         #   installed for backwards compatibility.
         if angular.isDefined @$window.plugins.socialsharing

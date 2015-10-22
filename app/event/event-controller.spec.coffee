@@ -50,11 +50,11 @@ describe 'event controller', ->
 
   beforeEach angular.mock.module('ionic')
 
-  beforeEach angular.mock.module('down.resources')
+  beforeEach angular.mock.module('rallytap.resources')
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
   beforeEach angular.mock.module('ngToast')
 
@@ -983,7 +983,7 @@ describe 'event controller', ->
             message = eventMessage
             subject = eventMessage
             file = null
-            link = "https://down.life/e/#{linkId}"
+            link = "https://rallytap.com/e/#{linkId}"
             expect($cordovaSocialSharing.share).toHaveBeenCalledWith(message,
                 subject, file, link)
 

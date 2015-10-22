@@ -3,12 +3,12 @@ require '../common/friendship-button/friendship-button-module'
 require '../common/local-db/local-db-module'
 AddFromAddressBookCtrl = require './add-from-address-book-controller'
 
-angular.module 'down.addFromAddressBook', [
+angular.module 'rallytap.addFromAddressBook', [
     'ui.router'
     'ionic'
-    'down.contacts'
-    'down.friendshipButton'
-    'down.localDB'
+    'rallytap.contacts'
+    'rallytap.friendshipButton'
+    'rallytap.localDB'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'addFromAddressBook',

@@ -17,11 +17,11 @@ describe 'add from address book controller', ->
   user = null
   User = null
 
-  beforeEach angular.mock.module('down.localDB')
+  beforeEach angular.mock.module('rallytap.localDB')
 
-  beforeEach angular.mock.module('down.contacts')
+  beforeEach angular.mock.module('rallytap.contacts')
 
-  beforeEach angular.mock.module('down.resources')
+  beforeEach angular.mock.module('rallytap.resources')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'

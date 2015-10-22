@@ -1,9 +1,9 @@
 require '../common/auth/auth-module'
 MyFriendsCtrl = require './my-friends-controller'
 
-angular.module 'down.myFriends', [
+angular.module 'rallytap.myFriends', [
     'ui.router'
-    'down.auth'
+    'rallytap.auth'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'myFriends',

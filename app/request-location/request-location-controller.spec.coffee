@@ -13,7 +13,7 @@ describe 'request location controller', ->
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'

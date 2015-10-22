@@ -4,13 +4,13 @@ require '../common/mixpanel/mixpanel-module'
 require '../common/local-db/local-db-module'
 InviteFriendsCtrl = require './invite-friends-controller'
 
-angular.module 'down.inviteFriends', [
+angular.module 'rallytap.inviteFriends', [
     'analytics.mixpanel'
     'ionic'
     'ui.router'
-    'down.auth'
-    'down.resources'
-    'down.localDB'
+    'rallytap.auth'
+    'rallytap.resources'
+    'rallytap.localDB'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'inviteFriends',

@@ -7,7 +7,7 @@ describe 'apnsdevice service', ->
   APNSDevice = null
   listUrl = null
 
-  beforeEach angular.mock.module('down.resources')
+  beforeEach angular.mock.module('rallytap.resources')
 
   beforeEach inject(($injector) ->
     $httpBackend = $injector.get '$httpBackend'

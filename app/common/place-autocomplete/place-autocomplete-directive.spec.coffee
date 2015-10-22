@@ -11,7 +11,7 @@ describe 'place-autocomplete', ->
   modelName = null
   element = null
 
-  beforeEach angular.mock.module('down.placeAutocomplete')
+  beforeEach angular.mock.module('rallytap.placeAutocomplete')
 
   beforeEach inject(($injector) ->
     $compile = $injector.get '$compile'

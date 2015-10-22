@@ -19,7 +19,7 @@ describe 'login controller', ->
 
   beforeEach angular.mock.module('ionic')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
   beforeEach angular.mock.module('ui.router')
 

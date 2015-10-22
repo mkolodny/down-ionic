@@ -12,12 +12,12 @@ LinkInvitation = require './linkinvitation-service'
 User = require './user-service'
 UserPhone = require './userphone-service'
 
-angular.module 'down.resources', [
+angular.module 'rallytap.resources', [
     'angular-meteor' # required in app-module for tests
     'analytics.mixpanel'
     'ngResource'
-    'down.auth'
-    'down.env'
+    'rallytap.auth'
+    'rallytap.env'
     'LocalStorageModule'
   ]
   .factory 'APNSDevice', APNSDevice

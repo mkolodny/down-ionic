@@ -2,10 +2,10 @@ require '../common/push-notifications/push-notifications-module'
 require '../common/auth/auth-module'
 RequestPushCtrl = require './request-push-controller'
 
-angular.module 'down.requestPush', [
+angular.module 'rallytap.requestPush', [
     'ui.router'
-    'down.pushNotifications'
-    'down.auth'
+    'rallytap.pushNotifications'
+    'rallytap.auth'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'requestPush',

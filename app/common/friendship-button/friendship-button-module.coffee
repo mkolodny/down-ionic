@@ -1,7 +1,7 @@
 require '../mixpanel/mixpanel-module'
 friendshipButton = require './friendship-button-directive'
 
-angular.module 'down.friendshipButton', [
+angular.module 'rallytap.friendshipButton', [
     'analytics.mixpanel'
     'ui.router'
   ]

@@ -3,11 +3,11 @@ require '../common/friendship-button/friendship-button-module'
 require '../common/resources/resources-module'
 AddByUsernameCtrl = require './add-by-username-controller'
 
-angular.module 'down.addByUsername', [
+angular.module 'rallytap.addByUsername', [
     'ui.router'
-    'down.auth'
-    'down.resources'
-    'down.friendshipButton'
+    'rallytap.auth'
+    'rallytap.resources'
+    'rallytap.friendshipButton'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'addByUsername',

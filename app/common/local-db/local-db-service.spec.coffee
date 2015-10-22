@@ -13,7 +13,7 @@ describe 'LocalDB service', ->
   LocalDB = null
   localStorage = null
 
-  beforeEach angular.mock.module('down.localDB')
+  beforeEach angular.mock.module('rallytap.localDB')
 
   beforeEach angular.mock.module('ngCordova.plugins.sqlite')
 
@@ -46,7 +46,7 @@ describe 'LocalDB service', ->
 
         deferred = $q.defer()
         spyOn($cordovaSQLite, 'execute').and.returnValue deferred.promise
-        
+
         spyOn LocalDB, 'convertLocalStorage'
 
         LocalDB.init().then ->
@@ -61,7 +61,7 @@ describe 'LocalDB service', ->
         expect($cordovaSQLite.openDB).toHaveBeenCalledWith
           name: 'rallytap.db'
           location: 2
-         
+
       it 'should set the db on the service', ->
         expect(LocalDB.db).toBe db
 
@@ -72,7 +72,7 @@ describe 'LocalDB service', ->
       describe 'table created successfully', ->
 
         describe 'when no localStorage data is found', ->
-          
+
           beforeEach ->
             deferred.resolve()
             $rootScope.$apply()
@@ -163,7 +163,7 @@ describe 'LocalDB service', ->
           value = null
 
           beforeEach ->
-            value = 
+            value =
               id: 2
               name: 'Jimbo Walker'
 
@@ -173,7 +173,7 @@ describe 'LocalDB service', ->
                 item: ->
                   key: key
                   value: angular.toJson angular.copy(value)
-              
+
 
             deferred.resolve sqlResultSet
             $rootScope.$apply()
@@ -185,7 +185,7 @@ describe 'LocalDB service', ->
 
           beforeEach ->
             sqlResultSet =
-              rows: 
+              rows:
                 length: 0
 
             deferred.resolve sqlResultSet

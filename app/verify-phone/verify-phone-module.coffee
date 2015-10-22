@@ -1,10 +1,10 @@
 require '../common/auth/auth-module'
 VerifyPhoneCtrl = require './verify-phone-controller'
 
-angular.module 'down.verifyPhone', [
+angular.module 'rallytap.verifyPhone', [
     'angular-meteor' # required in app-module for tests
     'ui.router'
-    'down.auth'
+    'rallytap.auth'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'verifyPhone',

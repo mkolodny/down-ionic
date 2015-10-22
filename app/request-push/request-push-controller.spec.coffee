@@ -16,7 +16,7 @@ describe 'request push controller', ->
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('down.pushNotifications')
+  beforeEach angular.mock.module('rallytap.pushNotifications')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
@@ -33,7 +33,7 @@ describe 'request push controller', ->
   )
 
   describe 'requesting push notifications permission', ->
-    
+
     beforeEach ->
       spyOn PushNotifications, 'register'
       spyOn Auth, 'redirectForAuthState'

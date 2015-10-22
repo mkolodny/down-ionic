@@ -8,14 +8,14 @@ require '../common/mixpanel/mixpanel-module'
 require '../common/view-place/view-place-module'
 EventsCtrl = require './events-controller'
 
-angular.module 'down.events', [
+angular.module 'rallytap.events', [
     'angular-meteor' # required in app-module for tests
     'analytics.mixpanel'
     'chart.js'
-    'down.auth'
-    'down.placeAutocomplete'
-    'down.resources'
-    'down.viewPlace'
+    'rallytap.auth'
+    'rallytap.placeAutocomplete'
+    'rallytap.resources'
+    'rallytap.viewPlace'
     'ionic'
     'monospaced.elastic'
     'ngToast'

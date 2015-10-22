@@ -3,11 +3,11 @@ require '../common/friendship-button/friendship-button-module'
 require '../common/resources/resources-module'
 AddedMeCtrl = require './added-me-controller'
 
-angular.module 'down.addedMe', [
+angular.module 'rallytap.addedMe', [
     'ui.router'
-    'down.auth'
-    'down.friendshipButton'
-    'down.resources'
+    'rallytap.auth'
+    'rallytap.friendshipButton'
+    'rallytap.resources'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'addedMe',

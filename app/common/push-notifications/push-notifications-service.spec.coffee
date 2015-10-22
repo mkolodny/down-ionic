@@ -25,7 +25,7 @@ describe 'PushNotifications service', ->
 
   beforeEach angular.mock.module('ionic')
 
-  beforeEach angular.mock.module('down.pushNotifications')
+  beforeEach angular.mock.module('rallytap.pushNotifications')
 
   beforeEach angular.mock.module('ngCordova.plugins.push')
 
@@ -33,13 +33,13 @@ describe 'PushNotifications service', ->
 
   beforeEach angular.mock.module('ngToast')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
-  beforeEach angular.mock.module('down.env')
+  beforeEach angular.mock.module('rallytap.env')
 
-  beforeEach angular.mock.module('down.resources')
+  beforeEach angular.mock.module('rallytap.resources')
 
-  beforeEach angular.mock.module('down.localDB')
+  beforeEach angular.mock.module('rallytap.localDB')
 
   beforeEach angular.mock.module(($provide) ->
     $cordovaPush =

@@ -1,9 +1,9 @@
 require '../common/resources/resources-module'
 SetUsernameCtrl = require './set-username-controller'
 
-angular.module 'down.setUsername', [
+angular.module 'rallytap.setUsername', [
     'ui.router'
-    'down.resources'
+    'rallytap.resources'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'setUsername',

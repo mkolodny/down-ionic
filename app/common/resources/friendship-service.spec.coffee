@@ -10,7 +10,7 @@ describe 'friendship service', ->
   listUrl = null
   $meteor = null
 
-  beforeEach angular.mock.module('down.resources')
+  beforeEach angular.mock.module('rallytap.resources')
 
   beforeEach angular.mock.module('angular-meteor')
 

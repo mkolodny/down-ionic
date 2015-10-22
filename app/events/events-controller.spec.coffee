@@ -49,9 +49,9 @@ describe 'events controller', ->
 
   beforeEach angular.mock.module('ui.router')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
-  beforeEach angular.mock.module('down.events')
+  beforeEach angular.mock.module('rallytap.events')
 
   beforeEach angular.mock.module('ionic')
 

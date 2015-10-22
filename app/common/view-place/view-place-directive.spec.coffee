@@ -17,7 +17,7 @@ describe 'viewPlace directive', ->
 
   beforeEach angular.mock.module('ionic')
 
-  beforeEach angular.mock.module('down.viewPlace')
+  beforeEach angular.mock.module('rallytap.viewPlace')
 
   beforeEach inject(($injector) ->
     $compile = $injector.get '$compile'

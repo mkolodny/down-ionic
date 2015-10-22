@@ -25,9 +25,9 @@ describe 'find friends controller', ->
 
   beforeEach angular.mock.module('ionic')
 
-  beforeEach angular.mock.module('down.auth')
+  beforeEach angular.mock.module('rallytap.auth')
 
-  beforeEach angular.mock.module('down.contacts')
+  beforeEach angular.mock.module('rallytap.contacts')
 
   beforeEach angular.mock.module('ui.router')
 
