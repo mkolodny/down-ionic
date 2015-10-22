@@ -97,12 +97,9 @@
             </span>
           </p>
           <a href=""
-             class="match-button"
+             class="match-button icon"
              ng-click="events.selectFriend(item, $event)"
              ng-class="{'selected': events.isSelected(item)}">
-            <i class="icon fa fa-circle-thin"></i>
-            <i class="icon fa fa-circle"></i>
-            <i class="icon fa fa-hand-o-up"></i>
             <canvas class="chart chart-pie friend-select-pie"
                     data="[
                       (100 - item.friendSelect.percentRemaining),
@@ -111,7 +108,11 @@
                     labels="['', '']"
                     colours="['#ffffff', 'rgba(0,0,0,0)']" width="30" height="30"
                     options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
+                    ng-show="events.isSelected(item)"
                     ></canvas>
+            <i class="fa fa-hand-o-up"></i>
+            <i class="fa fa-circle-thin"></i>
+            <i class="fa fa-circle"></i>
           </a>
         </div>
       </ion-item>

@@ -13,7 +13,7 @@
   }
   .match-notification {
     & + ion-content {
-      top: $bar-height + $ios-statusbar-height + 30px;
+      top: $bar-height + 30px;
       // 30px is the match header height
     }
   }
@@ -77,6 +77,12 @@
   #friendship {
     #match-header {
       top: $bar-height + $ios-statusbar-height;
+    }
+  }
+  .match-notification {
+    & + ion-content {
+      top: $bar-height + $ios-statusbar-height + 30px;
+      // 30px is the match header height
     }
   }
 }
