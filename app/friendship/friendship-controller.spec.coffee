@@ -589,14 +589,11 @@ describe 'friendship controller', ->
     message = null
     messages = null
     matchObject = null
-    deferred = null
 
     beforeEach ->
       chatId = '1,2'
       spyOn(Friendship, 'getChatId').and.returnValue chatId
-      deferred = $q.defer()
-      scope.$meteorSubscribe = jasmine.createSpy('$scope.$meteorSubscribe') \
-        .and.returnValue deferred.promise
+      scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
       message =
         _id: 1
         creator: new User Auth.user
@@ -610,11 +607,10 @@ describe 'friendship controller', ->
       spyOn ctrl, 'getFriendInvitations'
       matchObject = {_id: '1'}
       spyOn(ctrl, 'getMatch').and.returnValue matchObject
+      spyOn ctrl, 'watchNewestMessage'
 
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
-
-    it 'should init shouldScrollBottom to false', ->
 
     it 'should get the chat id', ->
       expect(Friendship.getChatId).toHaveBeenCalledWith ctrl.friend.id
@@ -626,41 +622,34 @@ describe 'friendship controller', ->
       chatId = "#{friend.id},#{Auth.user.id}"
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', chatId
 
-    describe 'when the subscription is ready', ->
+    it 'should watch the newestMessage', ->
+      expect(ctrl.watchNewestMessage).toHaveBeenCalled()
+
+    it 'should get the messages', ->
+      expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
+
+    it 'should bind the messages to the controller', ->
+      expect(ctrl.messages).toBe messages
+
+    it 'should request the invitations to/from the friend', ->
+      expect(ctrl.getFriendInvitations).toHaveBeenCalled()
+
+    it 'should bind the match AngularMeteorObject to the controller', ->
+      expect(ctrl.match).toBe matchObject
+
+    it 'should hide the nav border', ->
+      expect(scope.hideNavBottomBorder).toBe true
+
+    describe 'when there is no match', ->
 
       beforeEach ->
-        spyOn ctrl, 'watchNewestMessage'
-        deferred.resolve()
+        delete matchObject._id
+
+        scope.$emit '$ionicView.beforeEnter'
         scope.$apply()
 
-      it 'should watch the newestMessage', ->
-        expect(ctrl.watchNewestMessage).toHaveBeenCalled()
-
-      it 'should get the messages', ->
-        expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
-
-      it 'should bind the messages to the controller', ->
-        expect(ctrl.messages).toBe messages
-
-      it 'should request the invitations to/from the friend', ->
-        expect(ctrl.getFriendInvitations).toHaveBeenCalled()
-
-      it 'should bind the match AngularMeteorObject to the controller', ->
-        expect(ctrl.match).toBe matchObject
-
-      it 'should hide the nav border', ->
-        expect(scope.hideNavBottomBorder).toBe true
-
-      describe 'when there is no match', ->
-
-        beforeEach ->
-          delete matchObject._id
-
-          scope.$emit '$ionicView.beforeEnter'
-          scope.$apply()
-
-        it 'should show the hideNavBottomBorder', ->
-          expect(scope.hideNavBottomBorder).toBe false
+      it 'should show the hideNavBottomBorder', ->
+        expect(scope.hideNavBottomBorder).toBe false
 
 
   ##watchNewestMessage

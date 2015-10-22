@@ -205,6 +205,7 @@ describe 'event controller', ->
       spyOn(ctrl, 'getChat').and.returnValue chat
 
       spyOn ctrl, 'handleChatMembersChange'
+      spyOn ctrl, 'watchNewestMessage'
 
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
@@ -212,43 +213,36 @@ describe 'event controller', ->
     it 'should subscribe to the events messages', ->
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'chat', "#{event.id}"
 
-    describe 'when the subscription is ready', ->
+    it 'should watch the newestMessage', ->
+      expect(ctrl.watchNewestMessage).toHaveBeenCalled()
+
+    it 'should bind the messages to the controller', ->
+      # TODO: Check that controller property is set
+      expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
+
+    it 'should bind the meteor event members to the controller', ->
+      expect(ctrl.chat).toEqual chat
+      expect(ctrl.getChat).toHaveBeenCalled()
+
+    it 'should update the members array', ->
+      expect(ctrl.updateMembers).toHaveBeenCalled()
+
+    describe 'when the chat changes', ->
+      chatMembers = null
 
       beforeEach ->
-        spyOn ctrl, 'watchNewestMessage'
-        deferred.resolve()
+        chatMembers = [
+          userId: '1'
+        ,
+          userId: '2'
+        ]
+        ctrl.chat.members = chatMembers
+
+        ctrl.handleChatMembersChange.calls.reset()
         scope.$apply()
 
-      it 'should watch the newestMessage', ->
-        expect(ctrl.watchNewestMessage).toHaveBeenCalled()
-
-      it 'should bind the messages to the controller', ->
-        # TODO: Check that controller property is set
-        expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
-
-      it 'should bind the meteor event members to the controller', ->
-        expect(ctrl.chat).toEqual chat
-        expect(ctrl.getChat).toHaveBeenCalled()
-
-      it 'should update the members array', ->
-        expect(ctrl.updateMembers).toHaveBeenCalled()
-
-      describe 'when the chat changes', ->
-        chatMembers = null
-
-        beforeEach ->
-          chatMembers = [
-            userId: '1'
-          ,
-            userId: '2'
-          ]
-          ctrl.chat.members = chatMembers
-
-          ctrl.handleChatMembersChange.calls.reset()
-          scope.$apply()
-
-        it 'should handle the change', ->
-          expect(ctrl.handleChatMembersChange).toHaveBeenCalled()
+      it 'should handle the change', ->
+        expect(ctrl.handleChatMembersChange).toHaveBeenCalled()
 
 
   ##watchNewestMessage
