@@ -796,6 +796,25 @@ describe 'events controller', ->
           options)
 
 
+  describe 'getting the user\'s matches', ->
+    meteorCollection = null
+    matches = null
+
+    beforeEach ->
+      ctrl.Matches = 'Matches'
+      meteorCollection = 'meteorCollection'
+      scope.$meteorCollection = jasmine.createSpy('scope.$meteorCollection') \
+        .and.returnValue meteorCollection
+
+      matches = ctrl.getMatches()
+
+    it 'should fetch the matches from mongo', ->
+      expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.Matches, false
+
+    it 'should return the meteorCollection', ->
+      expect(matches).toBe meteorCollection
+
+
   ##handleNewMatch
   describe 'handling the new match', ->
     friendId = null
@@ -822,13 +841,12 @@ describe 'events controller', ->
         ctrl.newestMatch =
           firstUserId: "#{friendId}"
           secondUserId: "#{Auth.user.id}"
-        spyOn $state, 'go'
+        spyOn ctrl, 'showMatchPopup'
+
         ctrl.handleNewMatch()
 
-      it 'should transition to the chat', ->
-        expect($state.go).toHaveBeenCalledWith 'friendship',
-          friend: friend
-          id: friendId
+      it 'should show a match popup', ->
+        expect(ctrl.showMatchPopup).toHaveBeenCalledWith friend
 
       it 'should build the items list', ->
         expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
@@ -860,23 +878,42 @@ describe 'events controller', ->
           'is second user': false
 
 
-  describe 'getting the user\'s matches', ->
-    meteorCollection = null
-    matches = null
+  ##showMatchPopup
+  describe 'showing a match popup', ->
+    popupOptions = null
+    friend = null
 
     beforeEach ->
-      ctrl.Matches = 'Matches'
-      meteorCollection = 'meteorCollection'
-      scope.$meteorCollection = jasmine.createSpy('scope.$meteorCollection') \
-        .and.returnValue meteorCollection
+      spyOn($ionicPopup, 'show').and.callFake (options) ->
+        popupOptions = options
 
-      matches = ctrl.getMatches()
+      friend =
+        id: 1
+        firstName: 'Belle'
+      ctrl.showMatchPopup friend
 
-    it 'should fetch the matches from mongo', ->
-      expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.Matches, false
+    it 'should show an ionic popup', ->
+      expect($ionicPopup.show).toHaveBeenCalledWith
+        title: 'It\'s go time!'
+        subTitle: "<p>You and #{friend.firstName} tapped on each other.</p><p>Chat to figure out a plan?</p>"
+        scope: scope
+        buttons: [
+          text: 'Later'
+        ,
+          text: '<b>Chat</b>'
+          onTap: jasmine.any Function
+        ]
 
-    it 'should return the meteorCollection', ->
-      expect(matches).toBe meteorCollection
+    describe 'confirming', ->
+
+      beforeEach ->
+        spyOn ctrl, 'viewFriendChat'
+
+        popupOptions.buttons[1].onTap()
+
+      it 'should show the friend chat', ->
+        item = {friend: friend}
+        expect(ctrl.viewFriendChat).toHaveBeenCalledWith item
 
 
   describe 'getting people who added me', ->
@@ -1260,7 +1297,7 @@ describe 'events controller', ->
     it 'should show an ionic popup', ->
       expect($ionicPopup.show).toHaveBeenCalledWith
         title: 'Tap?'
-        subTitle: 'Tapping on a friend indicates that you\'d be down to hang out. Your friend won\'t know that you tapped on them unless they tapped on you, too.'
+        subTitle: 'Tapping on a friend indicates that you\'d be down to hang out with them. Your friend won\'t know that you tapped on them unless they tapped on you, too.'
         scope: scope
         buttons: [
           text: 'Cancel'

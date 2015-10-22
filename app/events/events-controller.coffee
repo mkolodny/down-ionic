@@ -271,15 +271,27 @@ class EventsCtrl
     isSecondUser = @newestMatch.secondUserId is "#{@Auth.user.id}"
     if isSecondUser
       friendId = parseInt @newestMatch.firstUserId
-      @$state.go 'friendship',
-        friend: @Auth.user.friends[friendId]
-        id: friendId
+      friend = @Auth.user.friends[friendId]
+      @showMatchPopup friend
 
     @$mixpanel.track 'Match Friend',
       'is second user': isSecondUser
 
     # Re-build the items list.
     @items = @buildItems @invitations
+
+  showMatchPopup: (friend) =>
+    @$ionicPopup.show
+      title: 'It\'s go time!'
+      subTitle: "<p>You and #{friend.firstName} tapped on each other.</p><p>Chat to figure out a plan?</p>"
+      scope: @$scope
+      buttons: [
+        text: 'Later'
+      ,
+        text: '<b>Chat</b>'
+        onTap: (e) =>
+          @viewFriendChat {friend: friend}
+      ]
 
   inviteFriends: ->
     # Don't animate the transition to the invite friends view.

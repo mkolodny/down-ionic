@@ -572,6 +572,10 @@ ion-nav-back-button {
 .popup-sub-title {
   font-size: 15px;
   margin-top: 10px;
+
+  p:last-child {
+    margin-bottom: 0;
+  }
 }
 .popup-buttons {
   padding: 0;
