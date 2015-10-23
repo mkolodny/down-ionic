@@ -202,12 +202,14 @@ gulp.task 'watch', [
   'styles'
   'templates'
 ], ->
+  port = argv.p or '3000'
+
   scripts true
   gulp.watch "#{appDir}/**/*.scss", ['styles']
   gulp.watch "#{dataDir}/**/*", ['data']
   gulp.watch "#{vendorDir}/**/*", ['vendor']
   gulp.watch "#{appDir}/**/*.html", ['templates']
-  childProcess.spawn 'serve', ['www', '--no-logs'], stdio: 'inherit'
+  childProcess.spawn 'serve', ['www', '--no-logs', '--port', port], stdio: 'inherit'
   livereload.listen()
   gulp.watch "#{buildDir}/**/*"
     .on 'change', livereload.changed
