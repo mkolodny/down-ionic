@@ -13,17 +13,20 @@ class Auth
   resumeSession: ->
     deferred = @$q.defer()
 
-    @LocalDB.get('session').then (session) =>
-      if session
+    @LocalDB.get 'session'
+      .then (session) =>
+        if not session
+          deferred.resolve()
+
         @phone = session.phone
         @flags = session.flags or {}
         @user = new @User session.user
 
         # Set friends as instances of User resource
-        if @user.friends isnt undefined
+        if angular.isDefined @user.friends
           for id, friend of @user.friends
             @user.friends[id] = new @User friend
-        if @user.facebookFriends isnt undefined
+        if angular.isDefined @user.facebookFriends
           for id, friend of @user.facebookFriends
             @user.facebookFriends[id] = new @User friend
 
@@ -32,9 +35,10 @@ class Auth
           @$meteor.loginWithPassword "#{@user.id}", @user.authtoken
 
         @mixpanelIdentify()
-      deferred.resolve()
-    , (error) ->
-      deferred.reject()
+
+        deferred.resolve()
+      , (error) ->
+        deferred.reject()
 
     deferred.promise
 
@@ -46,21 +50,22 @@ class Auth
       user: @user
       phone: @phone
 
-    @LocalDB.set('session', session).then ->
-      deferred.resolve()
-    , ->
-      deferred.reject()
+    @LocalDB.set 'session', session
+      .then ->
+        deferred.resolve()
+      , ->
+        deferred.reject()
 
     deferred.promise
 
   mixpanelIdentify: ->
     #identify and set user data with mixpanel
     @$mixpanel.identify @user.id
-    if @user.name isnt undefined
+    if angular.isDefined @user.name
       @$mixpanel.people.set {$name: @user.name}
-    if @user.email isnt undefined
+    if angular.isDefined @user.email
       @$mixpanel.people.set {$email: @user.email}
-    if @user.username isnt undefined
+    if angular.isDefined @user.username
       @$mixpanel.people.set {$username: @user.username}
 
   setUser: (user) ->
@@ -277,5 +282,16 @@ class Auth
       '< 100 miles'
     else
       'really far'
+
+  getTeamRallytap: ->
+    deferred = @$q.defer()
+
+    @$http.get "#{@apiRoot}/sessions/teamrallytap"
+      .success (data, status) =>
+        deferred.resolve @User.deserialize(data)
+      .error (data, status) =>
+        deferred.reject()
+
+    {$promise: deferred.promise}
 
 module.exports = Auth

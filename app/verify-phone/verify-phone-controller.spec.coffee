@@ -39,7 +39,6 @@ describe 'verify phone controller', ->
     Auth.phone = '+15555555555'
 
     ctrl = $controller VerifyPhoneCtrl,
-      Auth: Auth
       $scope: scope
   )
 
@@ -160,7 +159,8 @@ describe 'verify phone controller', ->
       ctrl.meteorLogin user
 
     it 'should attempt to login', ->
-      expect($meteor.loginWithPassword).toHaveBeenCalledWith "#{user.id}", user.authtoken
+      expect($meteor.loginWithPassword).toHaveBeenCalledWith("#{user.id}",
+          user.authtoken)
 
     describe 'successfully', ->
 

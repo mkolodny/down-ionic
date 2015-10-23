@@ -103,10 +103,11 @@ describe 'Auth service', ->
     beforeEach ->
       deferred = $q.defer()
       LocalDB.get.and.returnValue deferred.promise
-      Auth.resumeSession().then ->
-        resolved = true
-      , ->
-        rejected = true
+      Auth.resumeSession()
+        .then ->
+          resolved = true
+        , ->
+          rejected = true
 
     it 'should get the session object from the LocalDB', ->
       expect(LocalDB.get).toHaveBeenCalledWith 'session'
@@ -150,7 +151,8 @@ describe 'Auth service', ->
         expect(Auth.user).toAngularEqual user
 
       it 'should log in to meteor', ->
-        expect($meteor.loginWithPassword).toHaveBeenCalledWith "#{user.id}", user.authtoken
+        expect($meteor.loginWithPassword).toHaveBeenCalledWith("#{user.id}",
+            user.authtoken)
 
       it 'should identify the user with mixpanel', ->
         expect(Auth.mixpanelIdentify).toHaveBeenCalled()
@@ -209,10 +211,11 @@ describe 'Auth service', ->
       deferred = $q.defer()
       LocalDB.set.and.returnValue deferred.promise
 
-      Auth.saveSession().then ->
-        resolved = true
-      , ->
-        rejected = true
+      Auth.saveSession()
+        .then ->
+          resolved = true
+        , ->
+          rejected = true
 
     it 'should save the session to LocalDB', ->
       expect(LocalDB.set).toHaveBeenCalledWith 'session',
@@ -383,8 +386,9 @@ describe 'Auth service', ->
           .respond 200, null
 
         result = null
-        Auth.isAuthenticated().then (_result_) ->
-          result = _result_
+        Auth.isAuthenticated()
+          .then (_result_) ->
+            result = _result_
         $httpBackend.flush 1
 
         expect(result).toBe true
@@ -397,8 +401,9 @@ describe 'Auth service', ->
           .respond 401, null
 
         result = null
-        Auth.isAuthenticated().then (_result_) ->
-          result = _result_
+        Auth.isAuthenticated()
+          .then (_result_) ->
+            result = _result_
         $httpBackend.flush 1
 
         expect(result).toBe false
@@ -411,8 +416,9 @@ describe 'Auth service', ->
           .respond 500, null
 
         rejected = false
-        Auth.isAuthenticated().then null, ->
-          rejected = true
+        Auth.isAuthenticated()
+          .then null, ->
+            rejected = true
         $httpBackend.flush 1
 
         expect(rejected).toBe true
@@ -461,8 +467,9 @@ describe 'Auth service', ->
         $httpBackend.expectPOST authenticateUrl, postData
           .respond 200, responseData
 
-        Auth.authenticate(phone, code).then (_response_) ->
-          response = _response_
+        Auth.authenticate(phone, code)
+          .then (_response_) ->
+            response = _response_
         $httpBackend.flush 1
 
       it 'should call deserialize with response data', ->
@@ -484,8 +491,9 @@ describe 'Auth service', ->
           .respond status, null
 
         rejectedStatus = null
-        Auth.authenticate(phone, code).then null, (_status_) ->
-          rejectedStatus = _status_
+        Auth.authenticate phone, code
+          .then null, (_status_) ->
+            rejectedStatus = _status_
         $httpBackend.flush 1
 
         expect(rejectedStatus).toEqual status
@@ -529,8 +537,9 @@ describe 'Auth service', ->
         $httpBackend.expectPOST fbAuthUrl, postData
           .respond 200, responseData
 
-        Auth.facebookLogin(accessToken).then (_response_) ->
-          response = _response_
+        Auth.facebookLogin accessToken
+          .then (_response_) ->
+            response = _response_
         $httpBackend.flush 1
 
       it 'should call deserialize with response data', ->
@@ -549,8 +558,9 @@ describe 'Auth service', ->
           .respond status, null
 
         rejectedStatus = null
-        Auth.facebookLogin(accessToken).then null, (_status_) ->
-          rejectedStatus = _status_
+        Auth.facebookLogin accessToken
+          .then null, (_status_) ->
+            rejectedStatus = _status_
         $httpBackend.flush 1
 
         expect(rejectedStatus).toEqual status
@@ -611,8 +621,9 @@ describe 'Auth service', ->
           facebookFriends: facebookFriends
         User.deserialize.and.returnValue deserializedUser
 
-        Auth.facebookSync(accessToken).then (_response_) ->
-          response = _response_
+        Auth.facebookSync accessToken
+          .then (_response_) ->
+            response = _response_
         $httpBackend.flush 1
 
       it 'should return the user', ->
@@ -630,8 +641,9 @@ describe 'Auth service', ->
           .respond status, null
 
         rejectedStatus = null
-        Auth.facebookSync(accessToken).then null, (_status_) ->
-          rejectedStatus = _status_
+        Auth.facebookSync accessToken
+          .then null, (_status_) ->
+            rejectedStatus = _status_
         $httpBackend.flush 1
 
         expect(rejectedStatus).toBe status
@@ -654,8 +666,9 @@ describe 'Auth service', ->
         $httpBackend.expectPOST verifyPhoneUrl, postData
           .respond 200, null
 
-        Auth.sendVerificationText(phone).then null, (_response_) ->
-          response = _response_
+        Auth.sendVerificationText phone
+          .then null, (_response_) ->
+            response = _response_
         $httpBackend.flush 1
 
       it 'should set Auth.phone', ->
@@ -668,8 +681,9 @@ describe 'Auth service', ->
           .respond 500, null
 
         rejected = false
-        Auth.sendVerificationText(phone).then null, ->
-          rejected = true
+        Auth.sendVerificationText phone
+          .then null, ->
+            rejected = true
         $httpBackend.flush 1
 
         expect(rejected).toBe true
@@ -948,7 +962,7 @@ describe 'Auth service', ->
 
         beforeEach ->
           resolved = false
-          promise.then ()->
+          promise.then ->
             resolved = true
 
           error =
@@ -1331,3 +1345,45 @@ describe 'Auth service', ->
 
       it 'should default to really far', ->
         expect(distanceAway).toBeNull()
+
+
+  describe 'getting team rallytap', ->
+    url = null
+    teamrallytap = null
+
+    beforeEach ->
+      url = "#{apiRoot}/sessions/teamrallytap"
+      teamrallytap =
+        id: 1
+
+    describe 'successfully', ->
+      result = null
+
+      beforeEach ->
+        $httpBackend.expectGET url
+          .respond 200, angular.copy(teamrallytap)
+
+        Auth.getTeamRallytap()
+          .$promise.then (_result_) ->
+            result = _result_
+        $httpBackend.flush 1
+
+      it 'should GET the user', ->
+        expect(result).toEqual User.deserialize(teamrallytap)
+
+
+    describe 'unsuccessfully', ->
+      rejected = null
+
+      beforeEach ->
+        $httpBackend.expectGET url
+          .respond 403, null
+
+        rejected = false
+        Auth.getTeamRallytap()
+          .$promise.then null, ->
+            rejected = true
+        $httpBackend.flush 1
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true

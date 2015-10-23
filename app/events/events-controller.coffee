@@ -252,6 +252,11 @@ class EventsCtrl
     @$scope.$meteorObject @Matches, selector, false, options
 
   addPercentRemaining: (obj) =>
+    # Add an exception for teamrallytap.
+    if obj.expiresAt is undefined
+      obj.percentRemaining = 100
+      return obj
+
     now = new Date().getTime()
     timeRemaining = obj.expiresAt.getTime() - now
     sixHours = 1000 * 60 * 60 * 6

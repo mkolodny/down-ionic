@@ -1,0 +1,12 @@
+<ion-view id="team"
+          class="onboard-view request-view"
+          hide-nav-bar="true">
+  <div id="button-container">
+    <button class="button button-positive" on-tap="team.login()">
+      Login as "teamrallytap"
+    </button>
+  </div>
+  <div id="login-error" ng-if="team.error">
+    {{team.error}}
+  </div>
+</ion-view>

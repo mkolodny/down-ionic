@@ -36,6 +36,7 @@ require './added-me/added-me-module'
 require './friendship/friendship-module'
 require './create-event/create-event-module'
 require './tutorial/tutorial-module'
+require './team/team-module'
 
 angular.module 'rallytap', [
     'analytics.mixpanel'
@@ -70,6 +71,7 @@ angular.module 'rallytap', [
     'rallytap.createEvent'
     'rallytap.localDB'
     'rallytap.tutorial'
+    'rallytap.team'
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]

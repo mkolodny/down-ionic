@@ -747,32 +747,47 @@ describe 'events controller', ->
           selector, false, options)
 
 
-  describe 'transforming the friendSelect', ->
+  describe 'adding the percentRemaining to an object', ->
     sixHours = null
     threeHours = null
     result = null
     friendSelect = null
 
-    beforeEach ->
-      jasmine.clock().install()
-      date = new Date 1438014089235
-      jasmine.clock().mockDate date
+    describe 'when the object has an expires at date', ->
 
-      sixHours = 1000 * 60 * 60 * 6
-      threeHours = 1000 * 60 * 60 * 3
+      beforeEach ->
+        jasmine.clock().install()
+        date = new Date 1438014089235
+        jasmine.clock().mockDate date
 
-      friendSelect =
-        _id: 'asdfasdf'
-        expiresAt: new Date(new Date().getTime() + threeHours)
+        sixHours = 1000 * 60 * 60 * 6
+        threeHours = 1000 * 60 * 60 * 3
 
-      result = ctrl.addPercentRemaining angular.copy(friendSelect)
+        friendSelect =
+          _id: 'asdfasdf'
+          expiresAt: new Date(new Date().getTime() + threeHours)
 
-    afterEach ->
-      jasmine.clock().uninstall()
+        result = ctrl.addPercentRemaining angular.copy(friendSelect)
 
-    it 'should set the percent remaining', ->
-      friendSelect.percentRemaining = 50
-      expect(result).toEqual friendSelect
+      afterEach ->
+        jasmine.clock().uninstall()
+
+      it 'should set the percent remaining', ->
+        friendSelect.percentRemaining = 50
+        expect(result).toEqual friendSelect
+
+
+    describe 'when the object doesn\'t have an expires at date', ->
+
+      beforeEach ->
+        friendSelect =
+          _id: 'asdfasdf'
+
+        result = ctrl.addPercentRemaining angular.copy(friendSelect)
+
+      it 'should set the percent remaining', ->
+        friendSelect.percentRemaining = 100
+        expect(result).toEqual friendSelect
 
 
   describe 'getting the newest match', ->
