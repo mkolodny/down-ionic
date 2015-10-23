@@ -3,7 +3,7 @@
           hide-nav-bar="true"
           can-swipe-back="false">
   <div id="explanation" class="explanation">
-    Rallytap uses your location while you use the app to make it easy to do fun stuff with your nearby friends.
+    Rallytap uses your location while you use the app to help you get together with nearby friends.
   </div>
   <div class="permission-denied" ng-if="requestLocation.locationDenied">
     <div class="message">
@@ -17,7 +17,7 @@
     </div>
   </div>
   <div id="button-container">
-    <button class="button" ng-click="requestLocation.enableLocation()">
+    <button class="button button-positive" ng-click="requestLocation.enableLocation()">
       Enable Location Services
     </button>
   </div>
