@@ -95,6 +95,18 @@ class Auth
 
     deferred.promise
 
+  getMe: ->
+    deferred = @$q.defer()
+
+    @$http.get "#{@apiRoot}/users/me"
+      .success (data, status) =>
+        user = @User.deserialize data
+        deferred.resolve user
+      .error (data, status) ->
+        deferred.reject()
+
+    deferred.promise
+
   ###*
    * Check verification code with the server
    *

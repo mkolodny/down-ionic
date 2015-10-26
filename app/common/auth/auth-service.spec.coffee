@@ -373,6 +373,7 @@ describe 'Auth service', ->
       expect(result).toBe saveSession
 
 
+  ##isAuthenticated
   describe 'checking whether the user is authenticated', ->
     testAuthUrl = null
 
@@ -417,6 +418,61 @@ describe 'Auth service', ->
 
         rejected = false
         Auth.isAuthenticated()
+          .then null, ->
+            rejected = true
+        $httpBackend.flush 1
+
+        expect(rejected).toBe true
+
+
+  ##getMe
+  describe 'getting the logged in user', ->
+    meUrl = null
+
+    beforeEach ->
+      meUrl = "#{apiRoot}/users/me"
+
+    describe 'when the user is authenticated', ->
+      user = null
+
+      it 'should return the user', ->
+        user = id: 1
+        $httpBackend.expectGET meUrl
+          .respond 200, user
+
+        result = null
+        Auth.getMe()
+          .then (_result_) ->
+            result = _result_
+        $httpBackend.flush 1
+
+        expect(result).toBe deserializedUser
+
+
+    describe 'when the user is not authenticated', ->
+      rejected = null
+
+      it 'should reject the promise', ->
+        $httpBackend.expectGET meUrl
+          .respond 401, null
+
+        rejected = false
+        Auth.getMe()
+          .then null, ->
+            rejected = true
+        $httpBackend.flush 1
+
+        expect(rejected).toBe true
+
+
+    describe 'when the request fails', ->
+
+      it 'should reject the promise', ->
+        $httpBackend.expectGET meUrl
+          .respond 500, null
+
+        rejected = false
+        Auth.getMe()
           .then null, ->
             rejected = true
         $httpBackend.flush 1
