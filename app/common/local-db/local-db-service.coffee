@@ -11,7 +11,7 @@ class LocalDB
     @convertLocalStorage()
 
     sqlitePluginInstalled = angular.isDefined @$window.sqlitePlugin
-    isApp = @$window.ionic.Platform.isIOS() or @$window.ionic.Platform.isAndroid()
+    isApp = @$window.ionic?.Platform.isIOS() or @$window.ionic?.Platform.isAndroid()
     if sqlitePluginInstalled or !isApp
       # Open DB connection
       @db = @$cordovaSQLite.openDB
@@ -22,7 +22,7 @@ class LocalDB
       @$cordovaSQLite.execute @db, query
         .then =>
           if @localStorage.get('session') is null
-            # Already converted to SQLite and 
+            # Already converted to SQLite and
             #   localStorage has been cleared
             deferred.resolve()
           else
@@ -41,7 +41,7 @@ class LocalDB
     deferred = @$q.defer()
 
     sqlitePluginInstalled = angular.isDefined @$window.sqlitePlugin
-    isApp = @$window.ionic.Platform.isIOS() or @$window.ionic.Platform.isAndroid()
+    isApp = @$window.ionic?.Platform.isIOS() or @$window.ionic?.Platform.isAndroid()
     if sqlitePluginInstalled or !isApp
       query = "SELECT * FROM local_storage WHERE key='#{key}' LIMIT 1"
       @$cordovaSQLite.execute @db, query
@@ -60,15 +60,15 @@ class LocalDB
       deferred.resolve @localStorage.get key
 
     deferred.promise
-    
+
   set: (key, value) ->
     sqlitePluginInstalled = angular.isDefined @$window.sqlitePlugin
-    isApp = @$window.ionic.Platform.isIOS() or @$window.ionic.Platform.isAndroid()
+    isApp = @$window.ionic?.Platform.isIOS() or @$window.ionic?.Platform.isAndroid()
     if sqlitePluginInstalled or !isApp
       value = angular.toJson value
       value = value.replace /'/g, "''" # escape ' to prevent SQL syntax errors
       query = "INSERT OR REPLACE INTO local_storage (key, value) VALUES ('#{key}', '#{value}')"
-      @$cordovaSQLite.execute(@db, query)
+      @$cordovaSQLite.execute @db, query
     else
       deferred = @$q.defer()
       @localStorage.set key, value
@@ -125,7 +125,7 @@ class LocalDB
         console.log err
 
     deferred.promise
-      
+
   convertContacts: ->
     contacts = @localStorage.get 'contacts'
     @set 'contacts', contacts
