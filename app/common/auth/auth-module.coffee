@@ -1,3 +1,5 @@
+require 'angular-meteor'
+require 'angular-ui-router'
 require 'ng-cordova'
 require '../mixpanel/mixpanel-module'
 require '../resources/resources-module'

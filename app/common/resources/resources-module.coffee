@@ -1,5 +1,7 @@
 require 'angular-local-storage'
+require 'angular-meteor'
 require 'angular-resource'
+require 'angular-ui-router'
 require '../auth/auth-module'
 require '../env/env-module'
 require '../mixpanel/mixpanel-module'
