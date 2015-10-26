@@ -1,4 +1,6 @@
 ### @if BUILD_ENV='prod' ###
+window.__meteor_runtime_config__ =
+  DDP_DEFAULT_CONNECTION_URL: 'https://down-meteor.herokuapp.com'
 angular.module 'rallytap.env', []
   ## Prod vars
   .constant 'skipIonicDeploy', false
@@ -10,6 +12,8 @@ angular.module 'rallytap.env', []
 ### @endif ###
 
 ### @if BUILD_ENV='staging' ###
+window.__meteor_runtime_config__ =
+  DDP_DEFAULT_CONNECTION_URL: 'https://down-meteor-staging.herokuapp.com'
 angular.module 'rallytap.env', []
   ## Staging vars
   .constant 'skipIonicDeploy', true
@@ -21,6 +25,8 @@ angular.module 'rallytap.env', []
 ### @endif ###
 
 ### @if BUILD_ENV='local' ###
+window.__meteor_runtime_config__ =
+  DDP_DEFAULT_CONNECTION_URL: 'http://localhost:3500'
 angular.module 'rallytap.env', []
   ## Dev vars
   .constant 'skipIonicDeploy', true

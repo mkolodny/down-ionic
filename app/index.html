@@ -9,28 +9,6 @@
     <link href="https://fonts.googleapis.com/css?family=Carter+One|Montserrat:700" rel="stylesheet">
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
-    <!-- Set Meteor Config Variable -->
-    <!-- @if BUILD_ENV='prod' -->
-    <script type="text/javascript">
-    window.__meteor_runtime_config__ = {
-        DDP_DEFAULT_CONNECTION_URL: 'https://down-meteor.herokuapp.com'
-    };
-    </script>
-    <!-- @endif -->
-    <!-- @if BUILD_ENV='staging' -->
-    <script type="text/javascript">
-    window.__meteor_runtime_config__ = {
-        DDP_DEFAULT_CONNECTION_URL: 'https://down-meteor-staging.herokuapp.com'
-    };
-    </script>
-    <!-- @endif -->
-    <!-- @if BUILD_ENV='local' -->
-    <script type="text/javascript">
-    window.__meteor_runtime_config__ = {
-        DDP_DEFAULT_CONNECTION_URL: 'http://localhost:3500'
-    };
-    </script>
-    <!-- @endif -->
     
     <script src="app/bundle.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>

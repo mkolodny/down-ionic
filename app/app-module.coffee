@@ -8,10 +8,10 @@ require './ionic/ionic-deploy.js'
 require './vendor/mixpanel/mixpanel-jslib-snippet'
 # Common
 require './common/local-db/local-db-module'
-require './common/meteor/meteor'
 require './common/mixpanel/mixpanel-module'
 require './common/auth/auth-module'
 require './common/env/env-module'
+require './common/meteor/meteor'
 require './common/resources/resources-module'
 require './common/push-notifications/push-notifications-module'
 # Views
