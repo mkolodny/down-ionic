@@ -67,6 +67,9 @@ describe 'MyFriends controller', ->
         location:
           lat: 40.79893 # just over 5 mi away
           long: -73.9821535
+      5:
+        id: 5
+        name: '+19252852230'
 
     ctrl = $controller MyFriendsCtrl,
       $scope: scope
@@ -101,6 +104,12 @@ describe 'MyFriends controller', ->
     ,
       isDivider: false
       friend: friends[2]
+    ,
+      isDivider: true
+      title: 'Added by phone number'
+    ,
+      isDivider: false
+      friend: friends[5]
     ]
     for item in alphabeticalItems
       items.push item

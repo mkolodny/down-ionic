@@ -80,6 +80,11 @@ class InviteFriendsCtrl
       # Only show unique users.
       friendsDict = {}
       for id, friend of @Auth.user.friends
+
+        # Filter out friends who have phone numbers as names
+        firstLetter = friend.name[0]
+        if firstLetter is '+' then continue
+
         friendsDict[id] = friend
       for id, friend of @Auth.user.facebookFriends
         friendsDict[id] = friend
@@ -119,8 +124,13 @@ class InviteFriendsCtrl
           return 1
       alphabeticalItems = []
       currentLetter = null
-      for friend in friends
-        if friend.name[0] != currentLetter
+      for friend in friends      
+        firstLetter = friend.name[0]
+
+        # Filter out friends who have phone numbers as names
+        if firstLetter is '+' then continue
+
+        if firstLetter != currentLetter
           alphabeticalItems.push
             isDivider: true
             title: friend.name[0]
