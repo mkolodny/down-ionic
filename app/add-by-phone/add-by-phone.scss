@@ -1,0 +1,32 @@
+#add-by-phone {
+  .fa-search {
+    position: absolute;
+    padding: 13px 16px;
+    color: #aaa;
+  }
+  .intl-tel-input {
+    width: 100%;
+  }
+  input {
+    width: 100%;
+    padding-left: 10px;
+    border: none;
+    border-bottom: 1px solid #e6e6e6;
+    padding: 21px 50px;
+    font-size: 16px;
+  }
+  #input-empty {
+    text-align: center;
+    margin-top: 10px;
+  }
+  #your-username {
+    color: #555;
+  }
+  #username-explanation {
+    color: #777;
+  }
+  .spinner {
+    stroke: #aaa;
+    fill: #aaa;
+  }
+}

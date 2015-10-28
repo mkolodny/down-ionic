@@ -21,17 +21,35 @@ class MyFriendsCtrl
       else
         return 1
     alphabeticalItems = []
+    phoneNameItems = []
     currentLetter = null
     for friend in friends
-      if friend.name[0] != currentLetter
+      firstLetter = friend.name[0]
+      if firstLetter != currentLetter and \
+         firstLetter isnt '+'
         alphabeticalItems.push
           isDivider: true
           title: friend.name[0]
         currentLetter = friend.name[0]
 
+      if firstLetter is '+'
+        # Add friends with phone 
+        #   numbers for names at the end
+        phoneNameItems.push
+          isDivider: false
+          friend: friend
+      else
+        alphabeticalItems.push
+          isDivider: false
+          friend: friend
+
+    # Add friends with a phone number for a 
+    #   name to the end of the friends list
+    if phoneNameItems.length > 0
       alphabeticalItems.push
-        isDivider: false
-        friend: friend
+        isDivider: true
+        title: 'Added by phone number'
+      alphabeticalItems = alphabeticalItems.concat phoneNameItems
 
     # Build the list of items to show in the collection.
     @items = []

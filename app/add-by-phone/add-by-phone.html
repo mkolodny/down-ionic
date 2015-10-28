@@ -1,0 +1,28 @@
+<ion-view id="add-by-phone" view-title="Add Phone">
+  <ion-content scroll="false">
+    <i class="fa fa-search"></i>
+    <form role="form" novalidate name="phoneForm">
+      <input intl-phone
+             required
+             ng-model="addByPhone.phone"
+             ng-model-options="{allowInvalid: true}"
+             name="phone" 
+             ng-change="addByPhone.search(phoneForm)">
+    <ion-list ng-if="addByPhone.phone">
+      <ion-item class="item-divider">
+        <span ng-if="!addByPhone.friend || addByPhone.friend.name === addByPhone.phone">Phone Number</span>
+        <span ng-if="addByPhone.friend && addByPhone.friend.name !== addByPhone.phone">Name</span>
+      </ion-item>
+      <ion-item class="item-icon-right">
+        <h2 ng-if="!addByPhone.friend">{{addByPhone.phone}}</h2>
+        <h2 ng-if="addByPhone.friend">{{addByPhone.friend.name}}</h2>
+        <friendship-button user="addByPhone.friend"
+                           ng-if="addByPhone.friend
+                                  && addByPhone.friend.id !== addByPhone.currentUser.id">
+        </friendship-button>
+        <i class="icon"><ion-spinner ng-if="addByPhone.isSearching" 
+            icon="bubbles"></ion-spinner></i>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

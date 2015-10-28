@@ -91,6 +91,9 @@ describe 'invite friends controller', ->
         location:
           lat: 40.79893 # just over 5 mi away
           long: -73.9821535
+      5:
+        id: 5
+        name: '+19252852230'
     Auth.user.facebookFriends =
       4: Auth.user.friends[4]
     contacts =

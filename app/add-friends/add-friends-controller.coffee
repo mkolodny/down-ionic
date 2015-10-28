@@ -11,6 +11,9 @@ class AddFriendsCtrl
   addFromFacebook: ->
     @$state.go 'addFromFacebook'
 
+  addByPhone: ->
+    @$state.go 'addByPhone'
+
   goBack: ->
     # Don't animate the transition to the events view.
     @$ionicHistory.nextViewOptions

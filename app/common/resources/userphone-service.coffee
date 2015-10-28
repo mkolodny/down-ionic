@@ -10,8 +10,10 @@ UserPhone = ['$http', '$q', '$resource', 'apiRoot', 'Auth', 'localStorageService
       method: 'post'
       transformRequest: (data, headersGetter) ->
         request =
-          user: User.serialize data.user
           phone: data.phone
+        if angular.isDefined(data.user)
+          request.user = User.serialize data.user
+
         angular.toJson request
       transformResponse: (data, headersGetter) ->
         data = angular.fromJson data

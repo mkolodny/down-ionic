@@ -60,6 +60,17 @@ describe 'add friends controller', ->
       expect($state.go).toHaveBeenCalledWith 'addFromFacebook'
 
 
+  describe 'tapping to add by phone', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.addByPhone()
+
+    it 'should go to the add by phone view', ->
+      expect($state.go).toHaveBeenCalledWith 'addByPhone'
+
+
   describe 'going back', ->
 
     beforeEach ->
