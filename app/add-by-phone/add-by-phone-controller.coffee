@@ -5,6 +5,7 @@ class AddByPhoneCtrl
 
   search: (form) ->
     @friend = null
+    form.phone.$validate()
     if form.$valid
       @isSearching = true
 

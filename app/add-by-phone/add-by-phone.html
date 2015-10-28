@@ -4,12 +4,14 @@
     <form role="form" novalidate name="phoneForm">
       <input intl-phone required
            ng-model="addByPhone.phone"
+           ng-model-options="{allowInvalid: true}"
            name="phone" 
            ng-change="addByPhone.search(phoneForm)">
     </form>
     <ion-list ng-if="addByPhone.phone">
       <ion-item class="item-divider">
-        <span>Username</span>
+        <span ng-if="!addByPhone.friend || addByPhone.friend.name === addByPhone.phone">Phone Number</span>
+        <span ng-if="addByPhone.friend && addByPhone.friend.name !== addByPhone.phone">Name</span>
       </ion-item>
       <ion-item class="item-icon-right">
         <h2 ng-if="!addByPhone.friend">{{addByPhone.phone}}</h2>
