@@ -2,10 +2,11 @@
   <ion-content scroll="false">
     <i class="fa fa-search"></i>
     <form role="form" novalidate name="phoneForm">
-      <input intl-phone required
-           ng-model="addByPhone.phone"
-           name="phone" 
-           ng-change="addByPhone.search(phoneForm)">
+      <input intl-phone
+             required
+             ng-model="addByPhone.phone"
+             name="phone" 
+             ng-change="addByPhone.search(phoneForm)">
     </form>
     <ion-list ng-if="addByPhone.phone">
       <ion-item class="item-divider">
