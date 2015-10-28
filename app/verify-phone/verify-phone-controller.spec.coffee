@@ -144,6 +144,7 @@ describe 'verify phone controller', ->
         expect(result).toBe false
 
 
+  ##meteorLogin
   describe 'logging into the meteor server', ->
     deferred = null
     user = null

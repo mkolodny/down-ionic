@@ -182,7 +182,7 @@ describe 'event controller', ->
 
     beforeEach ->
       deferred = $q.defer()
-      scope.$meteorSubscribe = jasmine.createSpy('$scope.$meteorSubscribe') \
+      scope.$meteorSubscribe = jasmine.createSpy '$scope.$meteorSubscribe'
         .and.returnValue deferred.promise
 
       spyOn ctrl, 'updateMembers'
@@ -265,7 +265,6 @@ describe 'event controller', ->
         # Trigger watch
         ctrl.messages = [message]
         scope.$apply()
-
 
       it 'should handle the new message', ->
         expect(ctrl.handleNewMessage).toHaveBeenCalled()
