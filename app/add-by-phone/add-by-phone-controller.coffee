@@ -9,7 +9,7 @@ class AddByPhoneCtrl
       @isSearching = true
 
       # Get user from phone number
-      @UserPhone.save({phone: @phone}).$promise
+      @UserPhone.save(phone: @phone).$promise
         .then (userPhone) =>
           @isSearching = false
           if userPhone.phone is @phone

@@ -12,8 +12,8 @@
         <span>Username</span>
       </ion-item>
       <ion-item class="item-icon-right">
-        <h2 ng-hide="addByPhone.friend.name">{{addByPhone.phone}}</h2>
-        <h2 ng-show="addByPhone.friend.name">{{addByPhone.friend.name}}</h2>
+        <h2 ng-if="!addByPhone.friend">{{addByPhone.phone}}</h2>
+        <h2 ng-if="addByPhone.friend">{{addByPhone.friend.name}}</h2>
         <friendship-button user="addByPhone.friend"
                            ng-if="addByPhone.friend
                                   && addByPhone.friend.id !== addByPhone.currentUser.id">
