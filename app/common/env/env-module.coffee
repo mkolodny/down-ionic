@@ -1,5 +1,5 @@
 ### @if BUILD_ENV='prod' ###
-window.__meteor_runtime_config__ = window.__meteor_runtime_config__ or
+window.__meteor_runtime_config__ = window.MeteorUrl or
   DDP_DEFAULT_CONNECTION_URL: 'https://down-meteor.herokuapp.com'
 apiRoot = window.ApiRoot or 'https://down-prod.herokuapp.com/api'
 branchKey = window.BranchKey or 'key_live_fihEW5pE0wsUP6nUmKi5zgfluBaUyQiJ'
@@ -9,7 +9,7 @@ ionicDeployChannel = 'production'
 ### @endif ###
 
 ### @if BUILD_ENV='staging' ###
-window.__meteor_runtime_config__ = window.__meteor_runtime_config__ or
+window.__meteor_runtime_config__ = window.MeteorUrl or
   DDP_DEFAULT_CONNECTION_URL: 'https://down-meteor-staging.herokuapp.com'
 apiRoot = window.ApiRoot or 'https://down-staging.herokuapp.com/api'
 branchKey = window.BranchKey or 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv'
@@ -19,7 +19,7 @@ ionicDeployChannel = 'dev'
 ### @endif ###
 
 ### @if BUILD_ENV='local' ###
-window.__meteor_runtime_config__ = window.__meteor_runtime_config__ or
+window.__meteor_runtime_config__ = window.MeteorUrl or
   DDP_DEFAULT_CONNECTION_URL: 'http://localhost:3500'
 apiRoot = window.ApiRoot or 'http://localhost:8000/api'
 branchKey = window.BranchKey or 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv'
