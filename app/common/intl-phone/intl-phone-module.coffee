@@ -1,5 +1,7 @@
 require './intlTelInput.js'
-intlPhone = require './intl-phone-directive'
+intlPhoneDirective = require './intl-phone-directive'
+formatPhoneFilter = require './format-phone-filter'
 
 angular.module 'rallytap.intlPhone', []
-  .directive 'intlPhone', intlPhone
+  .directive 'intlPhone', intlPhoneDirective
+  .filter 'formatPhone', formatPhoneFilter

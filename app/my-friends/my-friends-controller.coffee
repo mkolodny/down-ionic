@@ -1,3 +1,5 @@
+require '../vendor/intl-phone/libphonenumber-utils.js'
+
 class MyFriendsCtrl
   # TODO: Handle when the user's friends aren't saved yet. We have to update the
   #   friends' locations somehow.
@@ -33,7 +35,7 @@ class MyFriendsCtrl
         currentLetter = friend.name[0]
 
       if firstLetter is '+'
-        # Add friends with phone 
+        # Add friends with phone
         #   numbers for names at the end
         phoneNameItems.push
           isDivider: false
@@ -43,12 +45,12 @@ class MyFriendsCtrl
           isDivider: false
           friend: friend
 
-    # Add friends with a phone number for a 
+    # Add friends with a phone number for a
     #   name to the end of the friends list
     if phoneNameItems.length > 0
       alphabeticalItems.push
         isDivider: true
-        title: 'Added by phone number'
+        title: 'Added by phone #'
       alphabeticalItems = alphabeticalItems.concat phoneNameItems
 
     # Build the list of items to show in the collection.
@@ -63,6 +65,9 @@ class MyFriendsCtrl
         friend: friend
     for item in alphabeticalItems
       @items.push item
+
+    # Save the user's phone number for formatting phones.
+    @myPhone = @Auth.phone
 
   getInitials: (name) ->
     words = name.split ' '
@@ -81,5 +86,8 @@ class MyFriendsCtrl
     @$ionicHistory.nextViewOptions
       disableAnimate: true
     @$state.go 'addFriends'
+
+  isPhone: (name) ->
+    name[0] is '+' and intlTelInputUtils.isValidNumber name
 
 module.exports = MyFriendsCtrl

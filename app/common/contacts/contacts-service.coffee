@@ -1,10 +1,8 @@
 require '../../vendor/intl-phone/libphonenumber-utils.js'
 
 class Contacts
-  @$inject: ['$http', '$cordovaContacts', '$q', 'Auth', 'LocalDB'
-             'UserPhone']
-  constructor: (@$http, @$cordovaContacts, @$q, @Auth, @LocalDB,
-                @UserPhone) ->
+  @$inject: ['$http', '$cordovaContacts', '$q', 'Auth', 'LocalDB', 'UserPhone']
+  constructor: (@$http, @$cordovaContacts, @$q, @Auth, @LocalDB, @UserPhone) ->
 
   getContacts: ->
     deferred = @$q.defer()

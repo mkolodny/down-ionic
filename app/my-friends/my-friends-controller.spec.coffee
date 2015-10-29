@@ -4,7 +4,9 @@ require 'angular-mocks'
 require 'angular-sanitize'
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js'
+window.$ = window.jQuery = require 'jquery'
 require '../common/auth/auth-module'
+require '../common/intl-phone/intl-phone-module'
 MyFriendsCtrl = require './my-friends-controller'
 
 describe 'MyFriends controller', ->
@@ -17,6 +19,8 @@ describe 'MyFriends controller', ->
   beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('rallytap.auth')
+
+  beforeEach angular.mock.module('rallytap.intlPhone')
 
   beforeEach angular.mock.module('ui.router')
 
@@ -37,6 +41,7 @@ describe 'MyFriends controller', ->
       location:
         lat: 40.7265834
         long: -73.9821535
+    Auth.phone = '+19178233560'
 
     # Mock the user's friends.
     Auth.user.friends =
@@ -106,7 +111,7 @@ describe 'MyFriends controller', ->
       friend: friends[2]
     ,
       isDivider: true
-      title: 'Added by phone number'
+      title: 'Added by phone #'
     ,
       isDivider: false
       friend: friends[5]
@@ -114,6 +119,9 @@ describe 'MyFriends controller', ->
     for item in alphabeticalItems
       items.push item
     expect(ctrl.items).toEqual items
+
+  it 'should set the user\'s phone number on the controller', ->
+    expect(ctrl.myPhone).toBe Auth.phone
 
   describe 'getting a user\'s initials', ->
 
@@ -149,3 +157,25 @@ describe 'MyFriends controller', ->
 
     it 'should go to the add friends view', ->
       expect($state.go).toHaveBeenCalledWith 'addFriends'
+
+
+  ##isPhone
+  describe 'checking whether a name is a phone number', ->
+    isPhone = null
+
+    describe 'when it is', ->
+
+      beforeEach ->
+        isPhone = ctrl.isPhone '+19178233560'
+
+      it 'should return true', ->
+        expect(isPhone).toBe true
+
+
+    describe 'when it isn\'t', ->
+
+      beforeEach ->
+        isPhone = ctrl.isPhone 'Joey Baggadonuts'
+
+      it 'should return false', ->
+        expect(isPhone).toBe false

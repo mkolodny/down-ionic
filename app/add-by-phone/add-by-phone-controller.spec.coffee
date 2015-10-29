@@ -1,6 +1,8 @@
 require 'angular'
 require 'angular-mocks'
+window.$ = window.jQuery = require 'jquery'
 require '../common/auth/auth-module'
+require '../common/intl-phone/intl-phone-module'
 AddByPhoneCtrl = require './add-by-phone-controller'
 
 describe 'add by phone controller', ->
@@ -13,6 +15,8 @@ describe 'add by phone controller', ->
 
   beforeEach angular.mock.module('rallytap.auth')
 
+  beforeEach angular.mock.module('rallytap.intlPhone')
+
   beforeEach angular.mock.module('rallytap.resources')
 
   beforeEach inject(($injector) ->
@@ -24,6 +28,9 @@ describe 'add by phone controller', ->
     scope = $rootScope.$new true
     UserPhone = $injector.get 'UserPhone'
 
+    # Mock the current user's phone number.
+    Auth.phone = '+19178235670'
+
     ctrl = $controller AddByPhoneCtrl,
       $scope: scope
       Auth: Auth
@@ -32,6 +39,9 @@ describe 'add by phone controller', ->
 
   it 'should set the current user on the controller', ->
     expect(ctrl.currentUser).toBe Auth.user
+
+  it 'should save the user\'s phone on the controller', ->
+    expect(ctrl.myPhone).toBe Auth.phone
 
   describe 'searching for a user by phone', ->
     phone = null
@@ -44,7 +54,7 @@ describe 'add by phone controller', ->
 
       deferred = $q.defer()
       spyOn(UserPhone, 'save').and.returnValue {$promise: deferred.promise}
-      
+
       ctrl.search(phoneForm)
 
     it 'should set a searching flag', ->
@@ -73,7 +83,7 @@ describe 'add by phone controller', ->
         userPhone =
           phone: ctrl.phone
           user: user
-            
+
         deferred.resolve userPhone
         scope.$apply()
 
@@ -97,3 +107,25 @@ describe 'add by phone controller', ->
 
       it 'should set searching to false', ->
         expect(ctrl.isSearching).toBe false
+
+
+  ##isPhone
+  describe 'checking whether a name is a phone number', ->
+    isPhone = null
+
+    describe 'when it is', ->
+
+      beforeEach ->
+        isPhone = ctrl.isPhone '+19178233560'
+
+      it 'should return true', ->
+        expect(isPhone).toBe true
+
+
+    describe 'when it isn\'t', ->
+
+      beforeEach ->
+        isPhone = ctrl.isPhone 'Joey Baggadonuts'
+
+      it 'should return false', ->
+        expect(isPhone).toBe false

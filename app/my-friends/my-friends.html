@@ -24,13 +24,24 @@
           <p>{{item.friend.username}}</p>
         </div>
 
-        <!-- User Added Via SMS (no username, no picture) -->
-        <div ng-if="item.friend && !item.friend.username">
+        <!-- User Added by SMS (no username, no picture) -->
+        <div ng-if="item.friend
+                    && !item.friend.username
+                    && !myFriends.isPhone(item.friend.name)">
           <span class="contact-image item-image">
             {{myFriends.getInitials(item.friend.name)}}
           </span>
           <h2>{{item.friend.name}}</h2>
           <p>Added by SMS</p>
+        </div>
+
+        <!-- User Added by phone number -->
+        <div ng-if="item.friend
+                    && !item.friend.username
+                    && myFriends.isPhone(item.friend.name)">
+          <span class="contact-image item-image">#</span>
+          <h2>{{item.friend.name | formatPhone:myFriends.myPhone}}</h2>
+          <p>Added by phone #</p>
         </div>
       </ion-item>
     <ion-list>

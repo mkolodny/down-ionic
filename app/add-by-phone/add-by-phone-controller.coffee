@@ -1,7 +1,10 @@
+require '../vendor/intl-phone/libphonenumber-utils.js'
+
 class AddByPhoneCtrl
   @$inject: ['$scope', '$timeout', 'Auth', 'UserPhone']
   constructor: (@$scope, @$timeout, @Auth, @UserPhone) ->
     @currentUser = @Auth.user
+    @myPhone = @Auth.phone
 
   search: (form) ->
     @friend = null
@@ -21,5 +24,8 @@ class AddByPhoneCtrl
     else
       # Invalid phone, clear search
       @isSearching = false
+
+  isPhone: (name) ->
+    name[0] is '+' and intlTelInputUtils.isValidNumber name
 
 module.exports = AddByPhoneCtrl
