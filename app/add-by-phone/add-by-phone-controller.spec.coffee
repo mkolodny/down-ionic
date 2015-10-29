@@ -40,7 +40,10 @@ describe 'add by phone controller', ->
     beforeEach ->
       phone = '+19252852230'
       ctrl.phone = phone
-      phoneForm = {$valid: true}
+      phoneForm = 
+        $valid: true
+        phone:
+          $validate: ->
 
       deferred = $q.defer()
       spyOn(UserPhone, 'save').and.returnValue {$promise: deferred.promise}

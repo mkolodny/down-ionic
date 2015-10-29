@@ -14,7 +14,7 @@ class EventsCtrl
     @invitations = {}
 
     # Set Meteor collections on controller
-    @Messages = @$meteor.getCollectionByName 'messages'
+    @NewestMessages = @$meteor.getCollectionByName 'newestMessages'
     @Chats = @$meteor.getCollectionByName 'chats'
     @Matches = @$meteor.getCollectionByName 'matches'
     @FriendSelects = @$meteor.getCollectionByName 'friendSelects'
@@ -206,12 +206,10 @@ class EventsCtrl
 
   getNewestMessage: (chatId) =>
     selector =
-      chatId: chatId
+      _id: chatId
     options =
-      sort:
-        createdAt: -1
       transform: @transformMessage
-    @$scope.$meteorObject @Messages, selector, false, options
+    @$scope.$meteorObject @NewestMessages, selector, false, options
 
   transformMessage: (message) =>
     # Show senders first name

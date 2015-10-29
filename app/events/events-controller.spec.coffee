@@ -39,7 +39,7 @@ describe 'events controller', ->
   later = null
   Invitation = null
   matchesCollection = null
-  messagesCollection = null
+  newestMessagesCollection = null
   newestMessagesDeferred = null
   ngToast = null
   scope = null
@@ -129,12 +129,12 @@ describe 'events controller', ->
         deferredGetInvitations.promise
     spyOn $ionicPlatform, 'on'
 
-    messagesCollection = 'messagesCollection'
+    newestMessagesCollection = 'newestMessagesCollection'
     chatsCollection = 'chatsCollection'
     matchesCollection = 'matchesCollection'
     friendSelectsCollection = 'friendSelectsCollection'
     $meteor.getCollectionByName.and.callFake (collectionName) ->
-      if collectionName is 'messages' then return messagesCollection
+      if collectionName is 'newestMessages' then return newestMessagesCollection
       if collectionName is 'chats' then return chatsCollection
       if collectionName is 'matches' then return matchesCollection
       if collectionName is 'friendSelects' then return friendSelectsCollection
@@ -158,9 +158,9 @@ describe 'events controller', ->
   xit 'should listen for when the user comes back to the app', ->
     expect($ionicPlatform.on).toHaveBeenCalledWith 'resume', ctrl.manualRefresh
 
-  it 'should set the messages collection on the controller', ->
-    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
-    expect(ctrl.Messages).toBe messagesCollection
+  it 'should set the newestMessages collection on the controller', ->
+    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'newestMessages'
+    expect(ctrl.NewestMessages).toBe newestMessagesCollection
 
   it 'should set the events collection on the controller', ->
     expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
@@ -615,6 +615,7 @@ describe 'events controller', ->
           expect(returnedItems).toEqual items
 
 
+  ##getNewestMessage
   describe 'getting the newest message', ->
     chatId = null
     meteorObject = null
@@ -632,12 +633,10 @@ describe 'events controller', ->
 
     it 'should query, sort and transform the message', ->
       selector =
-        chatId: chatId
+        _id: chatId
       options =
-        sort:
-          createdAt: -1
         transform: ctrl.transformMessage
-      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.Messages, selector,
+      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.NewestMessages, selector,
           false, options)
 
 
