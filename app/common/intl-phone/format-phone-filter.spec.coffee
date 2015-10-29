@@ -3,7 +3,7 @@ require 'angular-mocks'
 window.$ = window.jQuery = require 'jquery'
 require './intl-phone-module'
 
-fdescribe 'format phone filter', ->
+describe 'format phone filter', ->
   formatPhone = null
 
   beforeEach angular.mock.module('rallytap.intlPhone')

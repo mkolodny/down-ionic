@@ -233,6 +233,22 @@ class Auth
     @User.update(user).$promise.then (user) =>
       @setUser user
 
+  getFriends: ->
+    deferred = @$q.defer()
+
+    @$http.get "#{@User.listUrl}/friends"
+      .success (data, status) =>
+        friendsArray = (@User.deserialize(user) for user in data)
+        @user.friends = {}
+        for friend in friendsArray
+          @user.friends[friend.id] = friend
+        @setUser @user
+        deferred.resolve @user.friends
+      .error (data, status) =>
+        deferred.reject()
+
+    {$promise: deferred.promise}
+
   getFacebookFriends: ->
     deferred = @$q.defer()
 

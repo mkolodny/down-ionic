@@ -1120,6 +1120,71 @@ describe 'Auth service', ->
         expect(Auth.isNearby user).toBe false
 
 
+  ##getFriends
+  describe 'querying the user\'s friends', ->
+    url = null
+
+    beforeEach ->
+      url = "#{User.listUrl}/friends"
+
+    describe 'successfully', ->
+      response = null
+      responseData = null
+
+      beforeEach ->
+        spyOn Auth, 'setUser'
+        responseData = [
+          id: 1
+          email: 'aturing@gmail.com'
+          name: 'Alan Turing'
+          username: 'tdog'
+          image_url: 'https://facebook.com/profile-pic/tdog'
+          location:
+            type: 'Point'
+            coordinates: [40.7265834, -73.9821535]
+        ]
+
+        $httpBackend.expectGET url
+          .respond 200, angular.toJson(responseData)
+
+        response = null
+        Auth.getFriends()
+          .$promise.then (_response_) ->
+            response = _response_
+        $httpBackend.flush 1
+
+      it 'should GET the users', ->
+        friend = User.deserialize responseData[0]
+        friends = {}
+        friends[friend.id] = friend
+        expect(response).toAngularEqual friends
+
+      it 'should save the friends on the user', ->
+        user = angular.copy Auth.user
+        friend = User.deserialize responseData[0]
+        user.friends = {}
+        user.friends[friend.id] = friend
+        expect(Auth.setUser).toHaveBeenCalledWith user
+
+
+    describe 'with a random error', ->
+      rejected = null
+
+      beforeEach ->
+        $httpBackend.expectGET url
+          .respond 500, ''
+
+        rejected = false
+        Auth.getFriends()
+          .$promise.then null, ->
+            rejected = true
+        $httpBackend.flush 1
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
+
+
+  ##getFacebookFriends
   describe 'querying the user\'s facebook friends', ->
     url = null
 

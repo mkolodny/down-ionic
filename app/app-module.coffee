@@ -120,6 +120,10 @@ angular.module 'rallytap', [
         # Resume session from localStorage
         Auth.resumeSession()
       .then ->
+        # Update the user's friend list in case a user they added by phone number
+        # signed up.
+        Auth.getFriends()
+
         # Hide the accessory bar by default (remove this to show the accessory bar
         # above the keyboard for form inputs)
         $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
