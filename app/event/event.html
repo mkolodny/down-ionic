@@ -45,7 +45,8 @@
                delegate-handle="event">
     <ion-list>
       <!-- We might need to use `track by item.id` to keep this quick. -->
-      <ion-item class="message-item" ng-repeat="message in event.messages">
+      <ion-item class="message-item"
+                ng-repeat="message in event.messages track by message._id">
         <div class="action-message" ng-if="event.isActionMessage(message)">
           {{message.text}}
         </div>

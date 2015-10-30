@@ -136,7 +136,7 @@ class EventsCtrl
         items.push angular.extend
           isDivider: false
           friend: user
-          id: user.id
+          id: chatId
           newestMessage: @getNewestMessage chatId
           friendSelect: @getFriendSelect user.id
 
@@ -153,7 +153,7 @@ class EventsCtrl
       items.push angular.extend
         isDivider: false
         friend: new @User friend
-        id: friend.id
+        id: chatId
         newestMessage: @getNewestMessage chatId
         friendSelect: @getFriendSelect friend.id
 

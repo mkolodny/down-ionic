@@ -456,7 +456,7 @@ describe 'events controller', ->
       items.push angular.extend
         isDivider: false
         friend: personWhoAddedMe
-        id: personWhoAddedMe.id
+        id: Friendship.getChatId personWhoAddedMe.id
         newestMessage: newestMessage
         friendSelect: friendSelect
 
@@ -490,7 +490,7 @@ describe 'events controller', ->
         username: 'smitty'
       stealthyFriendItem =
         isDivider: false
-        id: stealthyFriend.id
+        id: Friendship.getChatId stealthyFriend.id
         friend: new User stealthyFriend
         newestMessage: {}
         friendSelect: stealthyFriend.id
@@ -505,7 +505,7 @@ describe 'events controller', ->
         username: 'bignick'
       olderMessageFriendItem =
         isDivider: false
-        id: olderMessageFriend.id
+        id: Friendship.getChatId olderMessageFriend.id
         friend: new User olderMessageFriend
         newestMessage: olderMessage
         friendSelect: olderMessageFriend.id
@@ -518,7 +518,7 @@ describe 'events controller', ->
         username: 'drock'
       newerMessageFriendItem =
         isDivider: false
-        id: newerMessageFriend.id
+        id: Friendship.getChatId newerMessageFriend.id
         friend: new User newerMessageFriend
         newestMessage: newerMessage
         friendSelect: newerMessageFriend.id
@@ -532,7 +532,7 @@ describe 'events controller', ->
           long: -74.0069337
       fartherFriendItem =
         isDivider: false
-        id: fartherFriend.id
+        id: Friendship.getChatId fartherFriend.id
         friend: new User fartherFriend
         newestMessage: {}
         friendSelect: fartherFriend.id
@@ -544,7 +544,7 @@ describe 'events controller', ->
           long: -73.9957201
       nearerFriendItem =
         isDivider: false
-        id: nearerFriend.id
+        id: Friendship.getChatId nearerFriend.id
         friend: new User nearerFriend
         newestMessage: {}
         friendSelect: nearerFriend.id
@@ -554,12 +554,11 @@ describe 'events controller', ->
         id: 8
         username: null
 
-      spyOn(Friendship, 'getChatId').and.callFake (id) -> id
       spyOn(ctrl, 'getFriendSelect').and.callFake (id) -> id
       spyOn(ctrl, 'getNewestMessage').and.callFake (chatId) ->
-        if chatId is newerMessageFriend.id
+        if chatId is Friendship.getChatId(newerMessageFriend.id)
           newerMessage
-        else if chatId is olderMessageFriend.id
+        else if chatId is Friendship.getChatId(olderMessageFriend.id)
           olderMessage
         else
           {}
@@ -692,6 +691,7 @@ describe 'events controller', ->
 
       it 'should return a blank object', ->
         expect(result).toEqual {}
+
 
 
   describe 'transforming a message', ->

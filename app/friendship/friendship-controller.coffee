@@ -33,7 +33,7 @@ class FriendshipCtrl
       @messages.stop()
 
   watchNewestMessage: =>
-    # Mark messages as read as they come in 
+    # Mark messages as read as they come in
     #   and scroll to bottom
     @$scope.$watch =>
       newestMessage = @messages[@messages.length-1]
