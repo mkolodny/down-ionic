@@ -220,11 +220,23 @@ describe 'events controller', ->
   describe 'when the newestMessages subscription is ready', ->
 
     beforeEach ->
+      spyOn ctrl, 'handleLoadedData'
+      spyOn ctrl, 'watchNewMessages'
+
       newestMessagesDeferred.resolve()
       scope.$apply()
 
     it 'should subscribe to all messages', ->
       expect($meteor.subscribe).toHaveBeenCalledWith 'allMessages'
+
+    it 'should set a flag', ->
+      expect(ctrl.newestMessagesLoaded).toBe true
+
+    it 'should handle the loaded data', ->
+      expect(ctrl.handleLoadedData).toHaveBeenCalled()
+
+    it 'should watch for new messages', ->
+      expect(ctrl.watchNewMessages).toHaveBeenCalled()
 
 
   # Only called once http://ionicframework.com/docs/api/directive/ionView/
@@ -615,29 +627,71 @@ describe 'events controller', ->
           expect(returnedItems).toEqual items
 
 
-  ##getNewestMessage
-  describe 'getting the newest message', ->
-    chatId = null
-    meteorObject = null
-    result = null
+  ##watchNewMessages
+  describe 'watching for new messages', ->
 
     beforeEach ->
-      chatId = "3"
-      meteorObject = 'meteorObject'
-      scope.$meteorObject = jasmine.createSpy('scope.$meteorObject')
-        .and.returnValue meteorObject
-      result = ctrl.getNewestMessage chatId
+      scope.$meteorCollection = jasmine.createSpy('scope.$meteorCollection') \
+        .and.returnValue []
 
-    it 'should return an AngularMeteorObject', ->
-      expect(result).toBe meteorObject
+      ctrl.watchNewMessages()
 
-    it 'should query, sort and transform the message', ->
-      selector =
-        _id: chatId
-      options =
-        transform: ctrl.transformMessage
-      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.NewestMessages, selector,
-          false, options)
+    it 'should bind the newest messages to the controller', ->
+      expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.NewestMessages
+      expect(ctrl.newestMessages).toEqual []
+
+    describe 'when a new message comes in', ->
+
+      beforeEach ->
+        spyOn ctrl, 'handleLoadedData'
+        ctrl.newestMessages = [1]
+        scope.$apply()
+        ctrl.newestMessages = [2]
+        scope.$apply()
+
+      it 'should re-build the items', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
+
+
+  ##getNewestMessage
+  describe 'getting the newest message', ->
+
+    describe 'when there is a newest message', ->
+      chatId = null
+      newestMessage = null
+      result = null
+
+      beforeEach ->
+        chatId = "3"
+        newestMessage = 'newestMessage'
+        ctrl.NewestMessages =
+          findOne: jasmine.createSpy('NewestMessages.findOne') \
+            .and.returnValue newestMessage
+        result = ctrl.getNewestMessage chatId
+
+      it 'should return the newest message', ->
+        expect(result).toBe newestMessage
+
+      it 'should query, sort and transform the message', ->
+        selector =
+          _id: chatId
+        options =
+          transform: ctrl.transformMessage
+        expect(ctrl.NewestMessages.findOne).toHaveBeenCalledWith selector, options
+
+
+    describe 'when no newest message is found', ->
+      newestMessage = null
+      result = null
+
+      beforeEach ->
+        ctrl.NewestMessages =
+          findOne: jasmine.createSpy('NewestMessages.findOne') \
+            .and.returnValue undefined
+        result = ctrl.getNewestMessage '1234'
+
+      it 'should return a blank object', ->
+        expect(result).toEqual {}
 
 
   describe 'transforming a message', ->
@@ -1381,6 +1435,7 @@ describe 'events controller', ->
         ctrl.addedMeLoaded = true
         ctrl.invitationsLoaded = true
         ctrl.friendSelectsLoaded = true
+        ctrl.newestMessagesLoaded = true
 
         finished = ctrl.handleLoadedData()
 

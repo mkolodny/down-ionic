@@ -40,6 +40,10 @@ class EventsCtrl
 
     # Subscribe to chat latest messages
     @$meteor.subscribe('newestMessages').then =>
+      @newestMessagesLoaded = true
+      @handleLoadedData()
+      @watchNewMessages()
+
       @$meteor.subscribe 'allMessages'
 
     @$scope.$on '$ionicView.loaded', =>
@@ -204,12 +208,21 @@ class EventsCtrl
 
     items
 
+  watchNewMessages: ->
+    @newestMessages = @$scope.$meteorCollection @NewestMessages
+    @$scope.$watch =>
+      (message for message in @newestMessages)
+    , (oldValue, newValue) =>
+      if oldValue isnt newValue
+        @handleLoadedData()
+    , true
+
   getNewestMessage: (chatId) =>
     selector =
       _id: chatId
     options =
       transform: @transformMessage
-    @$scope.$meteorObject @NewestMessages, selector, false, options
+    @NewestMessages.findOne(selector, options) or {}
 
   transformMessage: (message) =>
     # Show senders first name
@@ -421,7 +434,8 @@ class EventsCtrl
       ]
 
   handleLoadedData: ->
-    if @addedMeLoaded and @invitationsLoaded and @friendSelectsLoaded
+    if @addedMeLoaded and @invitationsLoaded and \
+       @friendSelectsLoaded and @newestMessagesLoaded
       @items = @buildItems @invitations
       @isLoading = false
       @$scope.$broadcast 'scroll.refreshComplete'
