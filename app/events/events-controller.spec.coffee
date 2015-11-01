@@ -693,19 +693,14 @@ describe 'events controller', ->
         expect(result).toEqual {}
 
 
-
+  ##transformMessage
   describe 'transforming a message', ->
 
     describe 'when the message is of type text', ->
       message = null
       result = null
-      chat = null
 
       beforeEach ->
-        chat = 'chat'
-        scope.$meteorObject = jasmine.createSpy('scope.$meteorObject')
-          .and.returnValue chat
-
         message =
           type: 'text'
           text: 'Hi Guys!'
@@ -718,16 +713,30 @@ describe 'events controller', ->
         expectedText = "#{message.creator.firstName}: #{message.text}"
         expect(result.text).toEqual expectedText
 
-      it 'should bind the chat to the message', ->
-        expect(result.chat).toEqual chat
 
-
+  ##wasRead
   describe 'checking if a message was read', ->
 
-    describe 'when message the data has\'t loaded yet', ->
+    describe 'when the message data has\'t loaded yet', ->
       result = null
 
       beforeEach ->
+        ctrl.Chats =
+          findOne: jasmine.createSpy('Chats.findOne').and.returnValue undefined
+
+        result = ctrl.wasRead undefined
+
+      it 'should default to true', ->
+        expect(result).toBe true
+
+
+    describe 'when the chat data has\'t loaded yet', ->
+      result = null
+
+      beforeEach ->
+        ctrl.Chats =
+          findOne: jasmine.createSpy('Chats.findOne').and.returnValue undefined
+
         result = ctrl.wasRead undefined
 
       it 'should default to true', ->
@@ -743,11 +752,13 @@ describe 'events controller', ->
           id: 1
         message =
           createdAt: new Date 10
-          chat:
-            members: [
-              userId: "1",
-              lastRead: new Date 1000
-            ]
+        chat = 
+          members: [
+            userId: "1",
+            lastRead: new Date 1000
+          ]
+        ctrl.Chats =
+          findOne: jasmine.createSpy('Chats.findOne').and.returnValue chat
 
         result = ctrl.wasRead message
 
@@ -764,11 +775,13 @@ describe 'events controller', ->
           id: 1
         message =
           createdAt: new Date 1000
-          chat:
-            members: [
-              userId: "1",
-              lastRead: new Date 10
-            ]
+        chat =
+          members: [
+            userId: "1",
+            lastRead: new Date 10
+          ]
+        ctrl.Chats =
+          findOne: jasmine.createSpy('Chats.findOne').and.returnValue chat
 
         result = ctrl.wasRead message
 

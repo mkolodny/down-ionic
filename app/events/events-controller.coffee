@@ -230,16 +230,16 @@ class EventsCtrl
       firstName = message.creator.firstName
       message.text = "#{firstName}: #{message.text}"
 
-    # Bind chat for checking wasRead
-    message.chat = @$scope.$meteorObject @Chats, {chatId: message.chatId}, false
-
     message
 
   wasRead: (message) =>
-    # Default to read to stop flicker
-    if message?.chat is undefined then return true
+    # Get Chat object for message
+    chat = @Chats.findOne {_id: message?.chatId}
 
-    members = message.chat?.members or []
+    # Default to read to stop flicker
+    if chat is undefined then return true
+
+    members = chat.members or []
     lastRead = (member.lastRead for member in members \
         when "#{@Auth.user.id}" is member.userId)[0]
     lastRead >= message.createdAt
