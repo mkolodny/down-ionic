@@ -152,8 +152,8 @@ class EventsCtrl
       chatId = @Friendship.getChatId friend.id
       items.push angular.extend
         isDivider: false
-        friend: new @User friend
         id: chatId
+        friend: new @User friend
         newestMessage: @getNewestMessage chatId
         friendSelect: @getFriendSelect friend.id
 
@@ -164,19 +164,23 @@ class EventsCtrl
         latitude: @Auth.user.location.lat
         longitude: @Auth.user.location.long
 
-    items.sort (a, b) ->
+    items.sort (a, b) =>
       aHasMessage = angular.isDefined a.newestMessage._id
       bHasMessage = angular.isDefined b.newestMessage._id
-      if aHasMessage and bHasMessage
+
+      aIsRecentMessage = @isRecentMessage a.newestMessage
+      bIsRecentMessage = @isRecentMessage b.newestMessage
+
+      if aHasMessage and bHasMessage and aIsRecentMessage and bIsRecentMessage
         if a.newestMessage.createdAt > b.newestMessage.createdAt
           return -1
         else if a.newestMessage.createdAt < b.newestMessage.createdAt
           return 1
         else
           return 0
-      else if aHasMessage # only a has a message
+      else if aHasMessage and aIsRecentMessage # only a has a message
         return -1
-      else if bHasMessage # only b has a message
+      else if bHasMessage and bIsRecentMessage # only b has a message
         return 1
 
       if not userHasLocation
@@ -442,5 +446,12 @@ class EventsCtrl
       true
     else
       false
+
+  isRecentMessage: (message) ->
+    now = new Date().getTime()
+    twentyFourHours = 1000 * 60 * 60 * 24
+    twentyFourHoursAgo = new Date(now - twentyFourHours)
+    message?.createdAt > twentyFourHoursAgo
+
 
 module.exports = EventsCtrl

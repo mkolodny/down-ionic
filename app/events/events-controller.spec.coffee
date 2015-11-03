@@ -463,6 +463,7 @@ describe 'events controller', ->
       expect(builtItems).toEqual items
 
 
+  ##getFriendItems
   describe 'getting friend items', ->
     newerMessage = null
     newerMessageFriend = null
@@ -470,6 +471,9 @@ describe 'events controller', ->
     olderMessage = null
     olderMessageFriend = null
     olderMessageFriendItem = null
+    olderThan24HoursMessage = null
+    olderThan24HoursMessageFriend = null
+    olderThan24HoursMessageFriendItem = null
     nearerFriend = null
     nearerFriendItem = null
     fartherFriend = null
@@ -478,7 +482,15 @@ describe 'events controller', ->
     stealthyFriendItem = null
     returnedItems = null
 
+    afterEach ->
+      jasmine.clock().uninstall()
+
     beforeEach ->
+      jasmine.clock().install()
+      twentyFourHours = 1000 * 60 * 60 * 24
+      date = new Date twentyFourHours * 7
+      jasmine.clock().mockDate date
+
       # Mock the logged in user.
       Auth.user =
         id: 7
@@ -496,7 +508,7 @@ describe 'events controller', ->
         friendSelect: stealthyFriend.id
 
       # Mock friends who have sent/received messages from the user.
-      olderTimestamp = 1
+      olderTimestamp = new Date()
       olderMessage =
         _id: '1'
         createdAt: olderTimestamp
@@ -509,7 +521,8 @@ describe 'events controller', ->
         friend: new User olderMessageFriend
         newestMessage: olderMessage
         friendSelect: olderMessageFriend.id
-      newerTimestamp = 2
+      
+      newerTimestamp = new Date(date.getTime() + 1)
       newerMessage =
         _id: '2'
         createdAt: newerTimestamp
@@ -549,6 +562,22 @@ describe 'events controller', ->
         newestMessage: {}
         friendSelect: nearerFriend.id
 
+      # Mock friend with old message
+      olderThan24HoursTimestamp = new Date(date.getTime() - 2 * twentyFourHours)
+      olderThan24HoursMessage =
+        _id: '12341dfa'
+        createdAt: olderThan24HoursTimestamp
+      olderThan24HoursMessageFriend =
+        id: 4
+        username: 'jimbowalker'
+        location: fartherFriend.location
+      olderThan24HoursMessageFriendItem =
+        isDivider: false
+        id: Friendship.getChatId olderThan24HoursMessageFriend.id
+        friend: new User olderThan24HoursMessageFriend
+        newestMessage: olderThan24HoursMessage
+        friendSelect: olderThan24HoursMessageFriend.id
+
       # Mock a friend without a username.
       friendWithoutUsername =
         id: 8
@@ -560,6 +589,8 @@ describe 'events controller', ->
           newerMessage
         else if chatId is Friendship.getChatId(olderMessageFriend.id)
           olderMessage
+        else if chatId is Friendship.getChatId(olderThan24HoursMessageFriend.id)
+          olderThan24HoursMessage
         else
           {}
 
@@ -623,6 +654,20 @@ describe 'events controller', ->
 
         it 'should return the friend with a location before the one without', ->
           items = [fartherFriendItem, stealthyFriendItem]
+          expect(returnedItems).toEqual items
+
+
+      describe 'and messages are older than 24 hours', ->
+
+        beforeEach ->
+          friends = [nearerFriend, olderThan24HoursMessageFriend]
+          for friend in friends
+            Auth.user.friends[friend.id] = friend
+
+          returnedItems = ctrl.getFriendItems()
+
+        it 'should sort the olderthan 24 message friend by location', ->
+          items = [nearerFriendItem, olderThan24HoursMessageFriendItem]
           expect(returnedItems).toEqual items
 
 
@@ -1475,3 +1520,37 @@ describe 'events controller', ->
 
       it 'should return false', ->
         expect(ctrl.handleLoadedData()).toBe false
+
+
+  ##isRecentMessage
+  describe 'when a message is recent enough to appear at the top', ->
+    message = null
+    twentyFourHours = null
+    date = null
+
+    beforeEach ->
+      jasmine.clock().install()
+      twentyFourHours = 1000 * 60 * 60 * 24
+      date = new Date twentyFourHours * 7
+      jasmine.clock().mockDate date
+
+    afterEach ->
+      jasmine.clock().uninstall()
+
+    describe 'when the message was created over 24 hours ago', ->
+
+      beforeEach ->
+        message =
+          createdAt: new Date(date.getTime() - 2 * twentyFourHours)
+
+      it 'should return false', ->
+        expect(ctrl.isRecentMessage(message)).toBe false
+
+    describe 'when the message is newer than 24 hours', ->
+
+      beforeEach ->
+        message =
+          createdAt: new Date(date.getTime() - 1)
+
+      it 'should return true', ->
+        expect(ctrl.isRecentMessage(message)).toBe true

@@ -89,10 +89,10 @@
                   ></canvas>
           <h2>{{item.friend.name}}</h2>
           <p class="latest-message">
-            <span ng-if="item.newestMessage.text">
+            <span ng-if="item.newestMessage.text && events.isRecentMessage(item.newestMessage)">
               {{item.newestMessage.text}}
             </span>
-            <span ng-if="!item.newestMessage.text">
+            <span ng-if="!item.newestMessage.text || !events.isRecentMessage(item.newestMessage)">
               {{events.getDistanceAway(item.friend)}}
             </span>
           </p>
