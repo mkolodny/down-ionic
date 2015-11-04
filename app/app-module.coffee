@@ -187,7 +187,8 @@ angular.module 'rallytap', [
       $ionicDeploy.check()
         .then (hasUpdate) ->
           if not hasUpdate
-            return
+            bootstrap()
+            return 
 
           $ionicLoading.show
             template: '''
@@ -199,8 +200,8 @@ angular.module 'rallytap', [
           $ionicDeploy.update()
             .finally ->
               $ionicLoading.hide()
-        .finally ->
-          bootstrap()
+              bootstrap()
+
   .constant '$ionicLoadingConfig',
     template: '''
       <ion-spinner icon="bubbles"></ion-spinner>
