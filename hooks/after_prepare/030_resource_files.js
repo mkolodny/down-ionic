@@ -8,20 +8,23 @@
 // configure all the files to copy.  Key of object is the source file, value is the destination location.  It's fine to put all platforms' icons and splash screen files here, even if we don't build for all platforms on each developer's box.
 var filestocopy = [
     {
-        "data/images/android/push-icon/drawable-hdpi-push-icon.png": 
+        "resources/android/push-icon/drawable-hdpi-push-icon.png": 
         "platforms/android/res/drawable-hdpi/push_icon.png"
     }, {
-        "data/images/android/push-icon/drawable-ldpi-push-icon.png": 
+        "resources/android/push-icon/drawable-ldpi-push-icon.png": 
         "platforms/android/res/drawable-ldpi/push_icon.png"
     }, {
-        "data/images/android/push-icon/drawable-mdpi-push-icon.png": 
+        "resources/android/push-icon/drawable-mdpi-push-icon.png": 
         "platforms/android/res/drawable-mdpi/push_icon.png"
     }, {
-        "data/images/android/push-icon/drawable-xhdpi-push-icon.png": 
+        "resources/android/push-icon/drawable-xhdpi-push-icon.png": 
         "platforms/android/res/drawable-xhdpi/push_icon.png"
     }, {
-        "data/images/android/push-icon/drawable-xxhdpi-push-icon.png": 
+        "resources/android/push-icon/drawable-xxhdpi-push-icon.png": 
         "platforms/android/res/drawable-xxhdpi/push_icon.png"
+    }, {
+        "resources/android/push-icon/drawable-xxxhdpi-push-icon.png": 
+        "platforms/android/res/drawable-xxxhdpi/push_icon.png"
     }
 ];
 
