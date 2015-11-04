@@ -3,8 +3,7 @@ require 'ng-toast'
 require 'ng-cordova'
 # Lib
 require './ionic/angular-ios9-uiwebview.patch.js'
-require './ionic/ionic-core.js'
-require './ionic/ionic-deploy.js'
+require './ionic/ionic.io.min.js'
 require './vendor/mixpanel/mixpanel-jslib-snippet'
 # Common
 require './common/local-db/local-db-module'

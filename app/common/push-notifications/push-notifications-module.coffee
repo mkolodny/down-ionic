@@ -1,7 +1,6 @@
 require 'ng-cordova'
 require 'ng-toast'
 require '../auth/auth-module'
-require '../../ionic/ionic-core.js'
 require '../resources/resources-module'
 require '../env/env-module'
 require '../local-db/local-db-module'

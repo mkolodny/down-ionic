@@ -14,7 +14,7 @@ window.__meteor_runtime_config__ =
 apiRoot = window.ApiRoot or 'https://down-staging.herokuapp.com/api'
 branchKey = window.BranchKey or 'key_test_ogfq42bC7tuGVWdMjNm3sjflvDdOBJiv'
 mixpanelToken = window.MixpanelToken or 'd4d37f58ce26f5e423cbc6fa937c621b'
-skipIonicDeploy = true
+skipIonicDeploy = false
 ionicDeployChannel = 'dev'
 ### @endif ###
 
