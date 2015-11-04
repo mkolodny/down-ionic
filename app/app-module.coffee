@@ -187,6 +187,7 @@ angular.module 'rallytap', [
       $ionicDeploy.check()
         .then (hasUpdate) ->
           if not hasUpdate
+            # No update
             bootstrap()
             return 
 
@@ -201,6 +202,9 @@ angular.module 'rallytap', [
             .finally ->
               $ionicLoading.hide()
               bootstrap()
+        , ->
+          # Error checking for update
+          bootstrap()
 
   .constant '$ionicLoadingConfig',
     template: '''
