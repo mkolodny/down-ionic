@@ -466,6 +466,7 @@ ion-nav-back-button {
     background-color: #eee;
     padding-top: 8px;
     padding-bottom: 8px;
+    margin-left: 8px;
     padding-left: 12px;
     padding-right: 12px;
     border-radius: 13px;
@@ -513,8 +514,6 @@ ion-nav-back-button {
 .action-message,
 .text-message {
   border: none;
-  padding-left: 10px;
-  padding-right: 10px;
   padding-top: 0;
   padding-bottom: 0;
 }
