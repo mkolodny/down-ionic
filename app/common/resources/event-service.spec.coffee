@@ -5,6 +5,7 @@ require './resources-module'
 require '../meteor/meteor-mocks'
 
 describe 'event service', ->
+  $filter = null
   $httpBackend = null
   $rootScope = null
   $meteor = null
@@ -37,6 +38,7 @@ describe 'event service', ->
   )
 
   beforeEach inject(($injector) ->
+    $filter = $injector.get '$filter'
     $httpBackend = $injector.get '$httpBackend'
     $rootScope = $injector.get '$rootScope'
     $meteor = $injector.get '$meteor'
@@ -489,3 +491,71 @@ describe 'event service', ->
         $httpBackend.flush 1
 
         expect(rejected).toBe true
+
+
+  describe 'getting the event\'s share message', ->
+    eventMessage = null
+    event = null
+
+    beforeEach ->
+      event =
+        id: 1
+        title: 'bars?!?!!?'
+        creator: 2
+        canceled: false
+        datetime: new Date()
+        createdAt: new Date()
+        updatedAt: new Date()
+        place:
+          name: 'B Bar & Grill'
+          lat: 40.7270718
+          long: -73.9919324
+      event = new Event event
+
+    describe 'when the event has all possible properties', ->
+
+      beforeEach ->
+        eventMessage = event.getEventMessage()
+
+      it 'should return the message', ->
+        date = $filter('date') event.datetime, "EEE, MMM d 'at' h:mm a"
+        message = "#{event.title} at #{event.place.name} — #{date}"
+        expect(eventMessage).toBe message
+
+
+    describe 'when the event has a title and place', ->
+
+      beforeEach ->
+        delete event.datetime
+
+        eventMessage = event.getEventMessage()
+
+      it 'should return the message', ->
+        message = "#{event.title} at #{event.place.name}"
+        expect(eventMessage).toBe message
+
+
+    describe 'when the event has a title and datetime', ->
+
+      beforeEach ->
+        delete event.place
+
+        eventMessage = event.getEventMessage()
+
+      it 'should return the message', ->
+        date = $filter('date') event.datetime, "EEE, MMM d 'at' h:mm a"
+        message = "#{event.title} — #{date}"
+        expect(eventMessage).toBe message
+
+
+    describe 'when the event only has a title', ->
+
+      beforeEach ->
+        delete event.place
+        delete event.datetime
+
+        eventMessage = event.getEventMessage()
+
+      it 'should return the message', ->
+        expect(eventMessage).toBe event.title
+

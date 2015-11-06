@@ -99,6 +99,7 @@ describe 'event controller', ->
         name: 'B Bar & Grill'
         lat: 40.7270718
         long: -73.9919324
+    event = new Event event
     invitation =
       id: 1
       event: event
@@ -971,7 +972,7 @@ describe 'event controller', ->
             $window.plugins =
               socialsharing: 'socialsharing'
             eventMessage = 'eventMessage'
-            spyOn(ctrl, 'getEventMessage').and.returnValue eventMessage
+            spyOn(ctrl.event, 'getEventMessage').and.returnValue eventMessage
             spyOn $cordovaSocialSharing, 'share'
 
             linkId = 'mikepleb'
@@ -1251,57 +1252,3 @@ describe 'event controller', ->
 
       it 'should scroll to the bottom', ->
         expect(scrollHandle.scrollBottom).toHaveBeenCalledWith true
-
-
-  describe 'getting the event\'s share message', ->
-    eventMessage = null
-
-    beforeEach ->
-      ctrl.event = angular.copy event
-
-    describe 'when the event has all possible properties', ->
-
-      beforeEach ->
-        eventMessage = ctrl.getEventMessage()
-
-      it 'should return the message', ->
-        date = $filter('date') event.datetime, "EEE, MMM d 'at' h:mm a"
-        message = "#{event.title} at #{event.place.name} — #{date}"
-        expect(eventMessage).toBe message
-
-
-    describe 'when the event has a title and place', ->
-
-      beforeEach ->
-        delete ctrl.event.datetime
-
-        eventMessage = ctrl.getEventMessage()
-
-      it 'should return the message', ->
-        message = "#{event.title} at #{event.place.name}"
-        expect(eventMessage).toBe message
-
-
-    describe 'when the event has a title and datetime', ->
-
-      beforeEach ->
-        delete ctrl.event.place
-
-        eventMessage = ctrl.getEventMessage()
-
-      it 'should return the message', ->
-        date = $filter('date') event.datetime, "EEE, MMM d 'at' h:mm a"
-        message = "#{event.title} — #{date}"
-        expect(eventMessage).toBe message
-
-
-    describe 'when the event only has a title', ->
-
-      beforeEach ->
-        delete ctrl.event.place
-        delete ctrl.event.datetime
-
-        eventMessage = ctrl.getEventMessage()
-
-      it 'should return the message', ->
-        expect(eventMessage).toBe ctrl.event.title

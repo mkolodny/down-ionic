@@ -273,7 +273,7 @@ class EventCtrl
         # Show a "Copy Group Link" popup when the social sharing plugin isn\'t
         #   installed for backwards compatibility.
         if angular.isDefined @$window.plugins.socialsharing
-          eventMessage = @getEventMessage()
+          eventMessage = @event.getEventMessage()
           @$cordovaSocialSharing.share eventMessage, eventMessage, null, groupLink
         else
           @$ionicPopup.alert
@@ -289,20 +289,6 @@ class EventCtrl
       , =>
         @ngToast.create 'For some reason, that didn\'t work.'
         @$ionicLoading.hide()
-
-  getEventMessage: ->
-    if angular.isDefined @event.datetime
-      date = @$filter('date') @event.datetime, "EEE, MMM d 'at' h:mm a"
-      dateString = " — #{date}"
-    else
-      dateString = ''
-
-    if angular.isDefined @event.place
-      placeString = " at #{@event.place.name}"
-    else
-      placeString = ''
-
-    "#{@event.title}#{placeString}#{dateString}"
 
   toggleNotifications: ->
     @$ionicLoading.show()

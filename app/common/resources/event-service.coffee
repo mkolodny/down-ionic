@@ -1,6 +1,7 @@
-Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship', \
-         'User', \
-         ($http, $meteor, $q, $resource, apiRoot, Auth, Friendship, User) ->
+Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
+         'apiRoot', 'Auth', 'Friendship', 'User', \
+         ($http, $filter, $meteor, $q, $resource, apiRoot, \
+           Auth, Friendship, User) ->
   listUrl = "#{apiRoot}/events"
   detailUrl = "#{listUrl}/:id"
   serializeEvent = (event) ->
@@ -157,6 +158,20 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship',
         deferred.reject()
 
     deferred.promise
+
+  resource::getEventMessage = ->
+    if angular.isDefined @datetime
+      date = $filter('date') @datetime, "EEE, MMM d 'at' h:mm a"
+      dateString = " — #{date}"
+    else
+      dateString = ''
+
+    if angular.isDefined @place
+      placeString = " at #{@place.name}"
+    else
+      placeString = ''
+
+    "#{@title}#{placeString}#{dateString}"
 
   resource
 ]
