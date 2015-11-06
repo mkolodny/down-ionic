@@ -9,7 +9,6 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship',
       title: event.title
     optionalFields =
       id: 'id'
-      canceled: 'canceled'
       invitations: 'invitations'
     for serializedField, deserializedField of optionalFields
       if event[deserializedField]?
@@ -28,7 +27,6 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship',
       id: event.id
       creatorId: event.creator
       title: event.title
-      canceled: event.canceled
       createdAt: new Date event.created_at
       updatedAt: new Date event.updated_at
     if event.datetime?
@@ -40,10 +38,7 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship',
         long: event.place.geo.coordinates[1]
     new resource response
 
-  resource = $resource detailUrl, null,
-    cancel:
-      method: 'delete'
-      url: detailUrl
+  resource = $resource detailUrl
 
   resource.listUrl = listUrl
 

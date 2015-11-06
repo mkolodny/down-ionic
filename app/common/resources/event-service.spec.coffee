@@ -94,7 +94,6 @@ describe 'event service', ->
             name: 'B Bar & Grill'
             lat: 40.7270718
             long: -73.9919324
-          canceled: false
           createdAt: new Date()
           updatedAt: new Date()
           invitations: invitations
@@ -110,7 +109,6 @@ describe 'event service', ->
             geo:
               type: 'Point'
               coordinates: [event.place.lat, event.place.long]
-          canceled: event.canceled
           invitations: invitations
         expect(Event.serialize event).toEqual expectedEvent
 
@@ -125,7 +123,6 @@ describe 'event service', ->
           id: 1
           creator: 1
           title: 'bars?!?!!?'
-          canceled: false
           created_at: new Date().toISOString()
           updated_at: new Date().toISOString()
 
@@ -134,7 +131,6 @@ describe 'event service', ->
           id: response.id
           creatorId: response.creator
           title: response.title
-          canceled: response.canceled
           createdAt: new Date response.created_at
           updatedAt: new Date response.updated_at
         expect(Event.deserialize response).toAngularEqual expectedEvent
@@ -152,7 +148,6 @@ describe 'event service', ->
             geo:
               type: 'Point'
               coordinates: [40.7270718, -73.9919324]
-          canceled: false
           created_at: new Date().toISOString()
           updated_at: new Date().toISOString()
 
@@ -166,7 +161,6 @@ describe 'event service', ->
             name: response.place.name
             lat: response.place.geo.coordinates[0]
             long: response.place.geo.coordinates[1]
-          canceled: response.canceled
           createdAt: new Date response.created_at
           updatedAt: new Date response.updated_at
         expect(Event.deserialize response).toAngularEqual expectedEvent
@@ -211,7 +205,6 @@ describe 'event service', ->
             geo:
               type: 'Point'
               coordinates: [event.place.lat, event.place.long]
-          canceled: false
           created_at: new Date()
           updated_at: new Date()
 
@@ -313,7 +306,6 @@ describe 'event service', ->
         creatorId: 1
         title: 'bars?!?!!?'
         datetime: new Date()
-        canceled: false
         createdAt: new Date()
         updatedAt: new Date()
       text = 'I\'m in love with a robot.'
@@ -376,27 +368,6 @@ describe 'event service', ->
         expect(rejected).toBe true
 
 
-  describe 'canceling', ->
-
-    it 'should DELETE the event', ->
-      event =
-        id: 1
-        creatorId: 1
-        title: 'bars?!?!!?'
-        datetime: new Date()
-        canceled: false
-        createdAt: new Date()
-        updatedAt: new Date()
-
-      $httpBackend.expectDELETE "#{listUrl}/#{event.id}"
-        .respond 200
-
-      # TODO: Figure out how to remove excess params in a delete request so that we
-      # can just call `Event.cancel event`.
-      Event.cancel {id: event.id}
-      $httpBackend.flush 1
-
-
   describe 'getting the percent remaining for an event', ->
     currentDate = null
     event = null
@@ -411,7 +382,6 @@ describe 'event service', ->
         id: 1
         creatorId: 1
         title: 'bars?!?!!?'
-        canceled: false
         createdAt: new Date()
         updatedAt: new Date()
 
