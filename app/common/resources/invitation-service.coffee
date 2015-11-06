@@ -155,44 +155,45 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
 
     originalResponse = invitation.response
     invitation.response = newResponse
-    @update(invitation).$promise.then (_invitation) =>
-      # Re-subscribe to event messages
-      $meteor.subscribe 'chat', "#{_invitation.eventId}" # Meteor likes strings
+    @update invitation
+      .$promise.then (_invitation) =>
+        # Re-subscribe to event messages
+        $meteor.subscribe 'chat', "#{_invitation.eventId}" # Meteor likes strings
 
-      # Post an action message.
-      if _invitation.response is @accepted
-        text = "#{Auth.user.name} is down."
-        type = @acceptAction
-        status = 'accepted'
-      else if _invitation.response is @maybe
-        text = "#{Auth.user.name} joined the chat."
-        type = @maybeAction
-        status = 'maybe'
-      else if _invitation.response is @declined
-        status = 'declined'
-      $mixpanel.track 'Update Response', {status: status}
-      
-      if angular.isDefined text
-        # Only create message for accepted and maybe
-        #   can't messages are created serverside
-        Messages = $meteor.getCollectionByName 'messages'
-        Messages.insert
-          creator:
-            id: "#{Auth.user.id}" # Meteor likes strings
-            name: Auth.user.name
-            firstName: Auth.user.firstName
-            lastName: Auth.user.lastName
-            imageUrl: Auth.user.imageUrl
-          text: text
-          chatId: "#{_invitation.eventId}" # Meteor likes strings
-          type: type
-          createdAt: new Date()
-        , @readMessage
+        # Post an action message.
+        if _invitation.response is @accepted
+          text = "#{Auth.user.name} is down."
+          type = @acceptAction
+          status = 'accepted'
+        else if _invitation.response is @maybe
+          text = "#{Auth.user.name} joined the chat."
+          type = @maybeAction
+          status = 'maybe'
+        else if _invitation.response is @declined
+          status = 'declined'
+        $mixpanel.track 'Update Response', {status: status}
 
-      deferred.resolve invitation
-    , ->
-      invitation.response = originalResponse
-      deferred.reject()
+        if angular.isDefined text
+          # Only create message for accepted and maybe
+          #   can't messages are created serverside
+          Messages = $meteor.getCollectionByName 'messages'
+          Messages.insert
+            creator:
+              id: "#{Auth.user.id}" # Meteor likes strings
+              name: Auth.user.name
+              firstName: Auth.user.firstName
+              lastName: Auth.user.lastName
+              imageUrl: Auth.user.imageUrl
+            text: text
+            chatId: "#{_invitation.eventId}" # Meteor likes strings
+            type: type
+            createdAt: new Date()
+          , @readMessage
+
+        deferred.resolve invitation
+      , ->
+        invitation.response = originalResponse
+        deferred.reject()
 
     {$promise: deferred.promise}
 

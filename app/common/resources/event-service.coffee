@@ -9,7 +9,6 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship',
       title: event.title
     optionalFields =
       id: 'id'
-      comment: 'comment'
       canceled: 'canceled'
       invitations: 'invitations'
     for serializedField, deserializedField of optionalFields
@@ -39,8 +38,6 @@ Event = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', 'Friendship',
         name: event.place.name
         lat: event.place.geo.coordinates[0]
         long: event.place.geo.coordinates[1]
-    if event.comment?
-      response.comment = event.comment
     new resource response
 
   resource = $resource detailUrl, null,

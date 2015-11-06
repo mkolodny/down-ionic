@@ -94,7 +94,6 @@ describe 'event service', ->
             name: 'B Bar & Grill'
             lat: 40.7270718
             long: -73.9919324
-          comment: 'awwww yisssss'
           canceled: false
           createdAt: new Date()
           updatedAt: new Date()
@@ -111,7 +110,6 @@ describe 'event service', ->
             geo:
               type: 'Point'
               coordinates: [event.place.lat, event.place.long]
-          comment: 'awwww yisssss'
           canceled: event.canceled
           invitations: invitations
         expect(Event.serialize event).toEqual expectedEvent
@@ -154,7 +152,6 @@ describe 'event service', ->
             geo:
               type: 'Point'
               coordinates: [40.7270718, -73.9919324]
-          comment: 'awwww yisssss'
           canceled: false
           created_at: new Date().toISOString()
           updated_at: new Date().toISOString()
@@ -169,7 +166,6 @@ describe 'event service', ->
             name: response.place.name
             lat: response.place.geo.coordinates[0]
             long: response.place.geo.coordinates[1]
-          comment: 'awwww yisssss'
           canceled: response.canceled
           createdAt: new Date response.created_at
           updatedAt: new Date response.updated_at
@@ -194,7 +190,6 @@ describe 'event service', ->
           name: 'B Bar & Grill'
           lat: 40.7270718
           long: -73.9919324
-        comment: 'awwww yisssss'
         invitations: [invitation]
 
       requestData = Event.serialize event
