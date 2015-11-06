@@ -24,6 +24,8 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
           coordinates: [event.place?.lat, event.place?.long]
     if event.datetime?
       request.datetime = event.datetime.toISOString()
+    if event.minAccepted?
+      request.min_accepted = event.minAccepted
     request
   deserializeEvent = (event) ->
     response =
@@ -42,6 +44,8 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
         long: event.place.geo.coordinates[1]
     if event.comment?
       response.comment = event.comment
+    if event.min_accepted?
+      response.minAccepted = event.min_accepted
     new resource response
 
   resource = $resource detailUrl, null,

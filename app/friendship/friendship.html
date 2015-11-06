@@ -22,13 +22,13 @@
           <div class="text" ng-if="friendship.isTextMessage(message)">{{message.text}}</div>
           <div class="text invite-action"
                ng-if="message.invitation"
-               ng-class="{'was-joined': friendship.wasJoined(message)}"
-               ng-click="friendship.wasJoined(message) ? friendship.viewEvent(message.invitation) : null"
+               ng-class="{'was-joined': friendship.wasJoined(message) && !friendship.isLocked(message)}"
+               ng-click="friendship.wasJoined(message) && !friendship.isLocked(message) ? friendship.viewEvent(message.invitation) : null"
                ><span>{{message.invitation.event.title}}</span><span
                ng-if="message.invitation.event.place"
-               > at {{message.invitation.event.place.name}}</span><span ng-if="message.invitation.event.datetime"> &mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span><div
+               > at {{message.invitation.event.place.name}}</span><span ng-if="message.invitation.event.datetime"> &mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span><div ng-if="friendship.isLocked(message)"><div>{{message.invitation.event.minAccepted}} people minimum</div><div>{{message.membersCount.count}} down so far</div></div><div
                 class="respond-section"
-                ng-if="!friendship.wasJoined(message)">
+                ng-if="!friendship.wasJoined(message) && !friendship.isLocked(message)">
               <button class="respond"
                       ng-click="friendship.acceptInvitation(message.invitation)"
                       ontouchstart
@@ -42,7 +42,7 @@
                       ontouchstart
                       ng-disabled="friendship.isDeclined(message.invitation)"
                       >Pass</button>
-          </div></div>
+          </div><div ng-if="friendship.isLocked(message)">locked respond section</div></div>
           <div class="text invite-action"
                ng-if="friendship.isLoadingInvitation(message)"
                ><ion-spinner icon="bubbles"></ion-spinner></div>
