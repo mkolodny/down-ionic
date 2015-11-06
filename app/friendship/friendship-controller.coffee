@@ -11,6 +11,7 @@ class FriendshipCtrl
     @Messages = @$meteor.getCollectionByName 'messages'
     @Chats = @$meteor.getCollectionByName 'chats'
     @Matches = @$meteor.getCollectionByName 'matches'
+    @MembersCount = @$meteor.getCollectionByName 'membersCount'
 
     @$scope.$on '$ionicView.beforeEnter', =>
       @getFriendInvitations()
@@ -73,9 +74,11 @@ class FriendshipCtrl
             if angular.isDefined invitation
               message.invitation = invitation
               # If event is a locked event, subscribe 
-              #   to the members count
+              #   to the members count and bid the data
               if angular.isDefined invitation.event.minAccepted
-                @$scope.$meteorSubscribe 'membersCount', invitation.eventId
+                eventId = "#{invitation.eventId}"
+                @$scope.$meteorSubscribe 'membersCount', eventId
+                message.membersCount = @$scope.$meteorObject @MembersCount, eventId, false
             else
               # Delete expired invite_action message
               @messages.remove message._id

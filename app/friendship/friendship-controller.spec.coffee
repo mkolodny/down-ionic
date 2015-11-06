@@ -21,6 +21,7 @@ describe 'friendship controller', ->
   Invitation = null
   matchesCollection = null
   messagesCollection = null
+  membersCountCollection = null
   ngToast = null
   scope = null
   User = null
@@ -77,10 +78,12 @@ describe 'friendship controller', ->
     messagesCollection = 'messagesCollection'
     chatsCollection = 'chatsCollection'
     matchesCollection = 'matchesCollection'
+    membersCountCollection = 'membersCountCollection'
     $meteor.getCollectionByName.and.callFake (collectionName) ->
       if collectionName is 'messages' then return messagesCollection
       if collectionName is 'chats' then return chatsCollection
       if collectionName is 'matches' then return matchesCollection
+      if collectionName is 'membersCount' then return membersCountCollection
 
     ctrl = $controller FriendshipCtrl,
       $scope: scope
@@ -101,6 +104,9 @@ describe 'friendship controller', ->
 
   it 'should set the matches collection on the controller', ->
     expect(ctrl.Matches).toBe matchesCollection
+
+  it 'should set the membersCountCollection collection on the controller', ->
+    expect(ctrl.MembersCount).toBe membersCountCollection
 
   describe 'checking whether a message is an action message', ->
     message = null
@@ -798,11 +804,16 @@ describe 'friendship controller', ->
 
     describe 'successfully', ->
       invitation = null
+      meteorObject = null
 
       beforeEach ->
         ctrl.messages.remove = jasmine.createSpy 'messages.remove'
 
         scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
+        
+        meteorObject = 'meteorObject'
+        scope.$meteorObject = jasmine.createSpy('scope.$meteorObject') \
+          .and.returnValue meteorObject
 
         invitation = new Invitation
           id: 1
@@ -818,7 +829,11 @@ describe 'friendship controller', ->
         expect(message1.invitation).toBe invitation
 
       it 'should subscribe to the members count for locked events', ->
-        expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'membersCount', eventId
+        expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'membersCount', "#{eventId}"
+
+      it 'should bind the members count to the message', ->
+        expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.MembersCount, "#{eventId}", false
+        expect(message1.membersCount).toBe meteorObject
 
       it 'should delete expired invite_action messages', ->
         expect(ctrl.messages.remove).toHaveBeenCalledWith message2._id
