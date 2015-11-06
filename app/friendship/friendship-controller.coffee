@@ -72,6 +72,10 @@ class FriendshipCtrl
             invitation = events[message.meta.eventId]
             if angular.isDefined invitation
               message.invitation = invitation
+              # If event is a locked event, subscribe 
+              #   to the members count
+              if angular.isDefined invitation.event.minAccepted
+                @$scope.$meteorSubscribe 'membersCount', invitation.eventId
             else
               # Delete expired invite_action message
               @messages.remove message._id

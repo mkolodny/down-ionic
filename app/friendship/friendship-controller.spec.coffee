@@ -756,6 +756,7 @@ describe 'friendship controller', ->
       expect(ctrl.messages.stop).toHaveBeenCalled()
 
 
+  ##getFriendInvitations
   describe 'getting the invitations to/from the friend', ->
     deferred = null
     eventId = null
@@ -801,16 +802,23 @@ describe 'friendship controller', ->
       beforeEach ->
         ctrl.messages.remove = jasmine.createSpy 'messages.remove'
 
+        scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
+
         invitation = new Invitation
           id: 1
           eventId: eventId
           fromUserId: Auth.user.id
           toUserId: friend.id
+          event:
+            minAccepted: 5
         deferred.resolve [invitation]
         scope.$apply()
 
       it 'should set the invitation on the message', ->
         expect(message1.invitation).toBe invitation
+
+      it 'should subscribe to the members count for locked events', ->
+        expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'membersCount', eventId
 
       it 'should delete expired invite_action messages', ->
         expect(ctrl.messages.remove).toHaveBeenCalledWith message2._id
