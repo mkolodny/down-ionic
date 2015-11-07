@@ -302,6 +302,7 @@ describe 'events controller', ->
         expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
 
+  ##buildItems
   describe 'building the items list', ->
     acceptedInvitation = null
     maybeInvitation = null
@@ -521,7 +522,7 @@ describe 'events controller', ->
         friend: new User olderMessageFriend
         newestMessage: olderMessage
         friendSelect: olderMessageFriend.id
-      
+
       newerTimestamp = new Date(date.getTime() + 1)
       newerMessage =
         _id: '2'
@@ -797,7 +798,7 @@ describe 'events controller', ->
           id: 1
         message =
           createdAt: new Date 10
-        chat = 
+        chat =
           members: [
             userId: "1",
             lastRead: new Date 1000
@@ -1042,6 +1043,7 @@ describe 'events controller', ->
         expect(ctrl.viewFriendChat).toHaveBeenCalledWith item
 
 
+  ##getAddedMe
   describe 'getting people who added me', ->
     deferred = null
 

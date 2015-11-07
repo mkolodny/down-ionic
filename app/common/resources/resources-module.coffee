@@ -1,6 +1,8 @@
 require 'angular-local-storage'
 require 'angular-resource'
 require 'angular-ui-router'
+require 'angular-elastic'
+require 'ng-toast'
 require '../env/env-module'
 require '../auth/auth-module'
 require '../mixpanel/mixpanel-module'
@@ -20,6 +22,7 @@ angular.module 'rallytap.resources', [
     'rallytap.auth'
     'rallytap.env'
     'LocalStorageModule'
+    'ngToast'
   ]
   .factory 'APNSDevice', APNSDevice
   .factory 'Event', Event
