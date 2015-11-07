@@ -1,8 +1,8 @@
 LinkInvitation = ['$cordovaSocialSharing', '$ionicLoading', '$ionicPopup', '$mixpanel',\
-                  '$resource', '$window', 'apiRoot', \
+                  '$resource', '$window', 'apiRoot', '$state', \
                   'Auth', 'Event', 'Invitation', 'User', 'ngToast', \
                   ($cordovaSocialSharing, $ionicLoading, $ionicPopup, \
-                   $mixpanel, $resource, $window, apiRoot, \
+                   $mixpanel, $resource, $window, apiRoot, $state, \
                    Auth, Event, Invitation, User, ngToast) ->
   listUrl = "#{apiRoot}/link-invitations"
 
@@ -62,7 +62,8 @@ LinkInvitation = ['$cordovaSocialSharing', '$ionicLoading', '$ionicPopup', '$mix
       fromUserId: Auth.user.id
     @save linkInvitation
       .$promise.then (linkInvitation) =>
-        $mixpanel.track 'Get Link Invitation'
+        $mixpanel.track 'Get Link Invitation',
+          'from screen': $state.current.name
         groupLink = "https://rallytap.com/e/#{linkInvitation.linkId}"
         # Show a "Copy Group Link" popup when the social sharing plugin isn\'t
         #   installed for backwards compatibility.
