@@ -124,7 +124,7 @@ class InviteFriendsCtrl
           return 1
       alphabeticalItems = []
       currentLetter = null
-      for friend in friends      
+      for friend in friends
         firstLetter = friend.name[0]
 
         # Filter out friends who have phone numbers as names
@@ -228,7 +228,7 @@ class InviteFriendsCtrl
     @$ionicLoading.show
       template: '''
         <div class="loading-text">
-          Sending suggestion...
+          Sending...
         </div>
         <ion-spinner icon="bubbles"></ion-spinner>
         '''
