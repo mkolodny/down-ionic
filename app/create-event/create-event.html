@@ -1,4 +1,4 @@
-<ion-view id="create-event" view-title="Invite">
+<ion-view id="create-event" view-title="Activity">
   <ion-content>
     <div class="list" id="details">
       <div class="item" id="what">
@@ -24,6 +24,33 @@
         <i class="fa fa-times"
            ng-if="createEvent.place"
            ng-click="createEvent.place = null"></i>
+      </div>
+      <div class="item" id="min-accepted" ng-if="createEvent.showMinAccepted">
+        <div id="min-accepted-text"
+              ng-if="!createEvent.minAccepted"
+              >
+          1 Person Minimum <i class="fa fa-sort"></i>
+        </div>
+        <div id="min-accepted-text"
+              ng-if="createEvent.minAccepted"
+              >
+          {{createEvent.minAccepted}} People Minimum <i class="fa fa-sort"></i>
+        </div>
+        <select id="select-min-accepted"
+                ng-model="createEvent.minAccepted"
+                ng-options="option.value as option.name for option in createEvent.minAcceptedOptions">
+          <option value="">1 Person Minimum</option>
+        </select>
+        <i class="fa fa-times"
+           ng-if="createEvent.showMinAccepted"
+           ng-click="createEvent.showMinAccepted = false"></i>
+      </div>
+      <div class="item"
+           id="more"
+           ng-click="createEvent.showMoreOptions()"
+           ontouchstart
+           ng-if="!createEvent.showMinAccepted">
+        <i class="fa fa-ellipsis-h fa-2x"></i>
       </div>
     </div>
     <div class="list" id="button-list">

@@ -11,12 +11,15 @@ CreateEventCtrl = require './create-event-controller'
 describe 'create event controller', ->
   $cordovaDatePicker = null
   $filter = null
+  $ionicActionSheet = null
   $ionicHistory = null
   $ionicModal = null
   $q = null
   $state = null
+  $window = null
   ctrl = null
   deferredTemplate = null
+  LinkInvitation = null
   scope = null
 
   beforeEach angular.mock.module('ui.router')
@@ -25,14 +28,18 @@ describe 'create event controller', ->
 
   beforeEach angular.mock.module('ngCordova')
 
+  beforeEach angular.mock.module('rallytap.resources')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $cordovaDatePicker = $injector.get '$cordovaDatePicker'
     $filter = $injector.get '$filter'
+    $ionicActionSheet = $injector.get '$ionicActionSheet'
     $ionicHistory = $injector.get '$ionicHistory'
     $ionicModal = $injector.get '$ionicModal'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
+    $window = $injector.get '$window'
     scope = $injector.get '$rootScope'
 
     deferredTemplate = $q.defer()
@@ -47,6 +54,14 @@ describe 'create event controller', ->
     expect($ionicModal.fromTemplateUrl).toHaveBeenCalledWith templateUrl,
       scope: scope
       animation: 'slide-in-up'
+
+  it 'should set the min accepted options', ->
+    options = (option for option in [2..20])
+    for option in [25..100] by 5
+      options.push option
+    minAcceptedOptions = ({value: option, name: "#{option} People Minimum"} \
+        for option in options)
+    expect(ctrl.minAcceptedOptions).toEqual minAcceptedOptions
 
   describe 'when entering the view', ->
 
@@ -212,7 +227,7 @@ describe 'create event controller', ->
       expect($state.go).toHaveBeenCalledWith 'inviteFriends', {event: newEvent}
 
 
-  describe 'getting the new event', ->
+  fdescribe 'getting the new event', ->
     newEvent = null
 
     describe 'when everything is set', ->
@@ -224,6 +239,7 @@ describe 'create event controller', ->
           name: 'ice cream'
           lat: 40.6785872
           lng: -74.0419964
+        ctrl.minAccepted = 7
 
         newEvent = ctrl.getNewEvent()
 
@@ -232,6 +248,7 @@ describe 'create event controller', ->
           title: ctrl.title
           datetime: ctrl.datetime
           place: ctrl.place
+          minAccepted: ctrl.minAccepted
         expect(newEvent).toEqual event
 
 
@@ -248,3 +265,38 @@ describe 'create event controller', ->
         event =
           title: 'Let\'s do something!'
         expect(newEvent).toEqual event
+
+
+  ##showMoreOptions
+  describe 'showing more options', ->
+    buttonClickedCallback = null
+    hideSheet = null
+
+    beforeEach ->
+      $window.plugins = {}
+      spyOn($ionicActionSheet, 'show').and.callFake (options) ->
+        buttonClickedCallback = options.buttonClicked
+        hideSheet = jasmine.createSpy 'hideSheet'
+        hideSheet
+
+      ctrl.showMoreOptions()
+
+    it 'should show an action sheet', ->
+      options =
+        buttons: [
+          text: 'Set Minimum # of People'
+        ]
+        cancelText: 'Cancel'
+        buttonClicked: jasmine.any Function
+      expect($ionicActionSheet.show).toHaveBeenCalledWith options
+
+    describe 'tapping the set min button', ->
+
+      beforeEach ->
+        buttonClickedCallback 0
+
+      it 'should show the min accepted field', ->
+        expect(ctrl.showMinAccepted).toBe true
+
+      it 'should hide the action sheet', ->
+        expect(hideSheet).toHaveBeenCalled()

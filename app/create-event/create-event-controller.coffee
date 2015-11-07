@@ -1,8 +1,8 @@
 class CreateEventCtrl
-  @$inject: ['$cordovaDatePicker', '$filter', '$ionicHistory', '$ionicModal',
-             '$scope', '$state']
-  constructor: (@$cordovaDatePicker, @$filter, @$ionicHistory, @$ionicModal,
-                @$scope, @$state) ->
+  @$inject: ['$cordovaDatePicker', '$filter', '$ionicActionSheet',
+             '$ionicHistory', '$ionicModal', '$scope', '$state', '$window']
+  constructor: (@$cordovaDatePicker, @$filter, @$ionicActionSheet,
+                @$ionicHistory, @$ionicModal, @$scope, @$state, @$window) ->
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
         scope: @$scope
@@ -30,6 +30,13 @@ class CreateEventCtrl
       # Don't animate the transition to the invite friends view.
       @$ionicHistory.nextViewOptions
         disableAnimate: true
+
+    # Set the minimum accepted options.
+    options = (option for option in [2..20])
+    for option in [25..100] by 5
+      options.push option
+    @minAcceptedOptions = ({value: option, name: "#{option} People Minimum"} \
+        for option in options)
 
   showSetPlaceModal: ->
     @setPlaceModal.show()
@@ -62,6 +69,23 @@ class CreateEventCtrl
       newEvent.datetime = @datetime
     if @place
       newEvent.place = @place
+    if @minAccepted
+      newEvent.minAccepted = @minAccepted
     newEvent
+
+  showMoreOptions: ->
+    console.log @minAccepted
+    hideSheet = null
+    options =
+      buttons: [
+        text: 'Set Minimum # of People'
+      ]
+      cancelText: 'Cancel'
+      buttonClicked: (index) =>
+        if index is 0
+          @showMinAccepted = true
+          hideSheet()
+
+    hideSheet = @$ionicActionSheet.show options
 
 module.exports = CreateEventCtrl

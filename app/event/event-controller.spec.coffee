@@ -880,6 +880,7 @@ describe 'event controller', ->
       expect(ctrl.message).toBeNull()
 
 
+  ##showMoreOptions
   describe 'showing more options', ->
     buttonClickedCallback = null
     hideSheet = null

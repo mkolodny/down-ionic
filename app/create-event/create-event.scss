@@ -39,14 +39,43 @@
   }
   #what,
   #when,
-  #where {
+  #where,
+  #min-accepted,
+  #more {
     border-left: 1px solid #bbb;
     border-right: 1px solid #bbb;
   }
-  #where {
+  #min-accepted,
+  #more {
     border-bottom-left-radius: 30px;
     border-bottom-right-radius: 30px;
     border-bottom: 1px solid #bbb;
+  }
+  #more {
+    height: 55px;
+    color: #999;
+    text-align: center;
+    padding-top: 12px;
+  }
+  #min-accepted {
+    .fa-sort {
+      color: #aaa;
+      padding-left: 2px;
+    }
+  }
+  #select-min-accepted {
+    width: 100%;
+    appearance: none;
+    background-color: #fff;
+    border: none;
+    height: 55px;
+    opacity: 0;
+  }
+  #min-accepted-text {
+    position: absolute;
+    width: 100%;
+    padding-top: 17px;
+    text-align: center;
   }
   #invite-friends {
     background-color: $link-color;
