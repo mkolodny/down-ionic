@@ -150,10 +150,22 @@ class FriendshipCtrl
   respondToInvitation: (invitation, response) ->
     @$ionicLoading.show()
 
+    minAccepted = invitation.event.minAccepted
+    if response in [@Invitation.accepted, @Invitation.maybe] and \
+       minAccepted is undefined
+      # Not a locked event
+      enterChat = true
+    else if response is @Invitation.accepted
+      # Locked event
+      membersCount = @MembersCount.findOne({_id: "#{invitation.eventId}"})?.count
+      if minAccepted - membersCount is 1
+        # Last member needed to unlock
+        enterChat = true
+
+
     @Invitation.updateResponse invitation, response
       .$promise.then (invitation) =>
-        if invitation.response in [@Invitation.accepted, @Invitation.maybe] and \
-           invitation.event.minAccepted is undefined
+        if enterChat is true
           @$state.go 'event',
             invitation: invitation
             id: invitation.event.id

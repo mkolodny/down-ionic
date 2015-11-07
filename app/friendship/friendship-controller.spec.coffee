@@ -478,14 +478,40 @@ describe 'friendship controller', ->
 
         describe 'and the event is locked', ->
 
-          beforeEach ->
-            invitation.response = Invitation.accepted
-            invitation.event.minAccepted = 3
-            deferred.resolve invitation
-            scope.$apply()
+          describe 'and the user is the last member needed', ->
 
-          it 'should hide the loading overlay', ->
-            expect($ionicLoading.hide).toHaveBeenCalled()
+            beforeEach ->
+              invitation.response = Invitation.accepted
+              invitation.event.minAccepted = 3
+              ctrl.MembersCount =
+                findOne: jasmine.createSpy('MembersCount.findOne') \
+                  .and.returnValue 2
+
+              deferred.resolve invitation
+              scope.$apply()
+
+            it 'should hide the loading overlay', ->
+              expect($ionicLoading.hide).toHaveBeenCalled()
+
+            it 'should go to the event chat', ->
+              expect($state.go).toHaveBeenCalledWith 'event',
+                invitation: invitation
+                id: invitation.event.id
+
+          describe 'and the user is not the last member needed', ->
+
+            beforeEach ->
+              invitation.response = Invitation.accepted
+              invitation.event.minAccepted = 3
+              ctrl.MembersCount =
+                findOne: jasmine.createSpy('MembersCount.findOne') \
+                  .and.returnValue 1
+
+              deferred.resolve invitation
+              scope.$apply()
+
+            it 'should hide the loading overlay', ->
+              expect($ionicLoading.hide).toHaveBeenCalled()
 
 
         describe 'and the event is not locked', ->
