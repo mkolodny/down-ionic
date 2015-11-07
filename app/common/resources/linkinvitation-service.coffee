@@ -66,7 +66,7 @@ LinkInvitation = ['$cordovaSocialSharing', '$ionicLoading', '$ionicPopup', '$mix
         groupLink = "https://rallytap.com/e/#{linkInvitation.linkId}"
         # Show a "Copy Group Link" popup when the social sharing plugin isn\'t
         #   installed for backwards compatibility.
-        if angular.isDefined $window.plugins.socialsharing
+        if angular.isDefined $window.plugins?.socialsharing
           eventMessage = event.getEventMessage()
           $cordovaSocialSharing.share eventMessage, eventMessage, null, groupLink
         else
@@ -77,7 +77,6 @@ LinkInvitation = ['$cordovaSocialSharing', '$ionicLoading', '$ionicPopup', '$mix
               """
             buttons: [
               text: 'Done'
-              type: 'button-positive'
             ]
         $ionicLoading.hide()
       , =>

@@ -1,10 +1,10 @@
 class FriendshipCtrl
-  @$inject: ['$ionicLoading', '$ionicScrollDelegate', '$meteor', '$mixpanel',
-             '$scope', '$state', '$stateParams', 'Auth', 'Invitation',
-             'Friendship', 'ngToast', 'User', '$rootScope']
-  constructor: (@$ionicLoading, @$ionicScrollDelegate, @$meteor, @$mixpanel,
-                @$scope, @$state, @$stateParams, @Auth, @Invitation,
-                @Friendship, @ngToast, @User, @$rootScope) ->
+  @$inject: ['$ionicActionSheet', '$ionicLoading', '$ionicScrollDelegate', '$meteor', '$mixpanel',
+             '$scope', '$state', '$stateParams', '$window', 'Auth', 'Invitation',
+             'Friendship', 'ngToast', 'User', '$rootScope', 'LinkInvitation']
+  constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicScrollDelegate, @$meteor, @$mixpanel,
+                @$scope, @$state, @$stateParams, @$window, @Auth, @Invitation,
+                @Friendship, @ngToast, @User, @$rootScope, @LinkInvitation) ->
     @friend = @$stateParams.friend
 
     # Set Meteor collections on controller
@@ -152,7 +152,8 @@ class FriendshipCtrl
 
     @Invitation.updateResponse invitation, response
       .$promise.then (invitation) =>
-        if invitation.response in [@Invitation.accepted, @Invitation.maybe]
+        if invitation.response in [@Invitation.accepted, @Invitation.maybe] and \
+           invitation.event.minAccepted is undefined
           @$state.go 'event',
             invitation: invitation
             id: invitation.event.id
@@ -204,5 +205,28 @@ class FriendshipCtrl
       return true
 
     membersCount < minAccepted
+
+  shareEvent: (event) ->
+    hideSheet = null
+    hasSharingPlugin = angular.isDefined @$window.plugins?.socialsharing
+    shareText = if hasSharingPlugin then 'Share On...' else 'Copy Group Link'
+    options =
+      buttons: [
+        text: 'Send To...'
+      ,
+        text: shareText
+      ]
+      cancelText: 'Cancel'
+      buttonClicked: (index) =>
+        if index is 0
+          @$state.go 'inviteFriends',
+            event: event
+          hideSheet()
+        if index is 1
+          @LinkInvitation.share event
+          hideSheet()
+
+    hideSheet = @$ionicActionSheet.show options
+
 
 module.exports = FriendshipCtrl

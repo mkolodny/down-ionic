@@ -7,17 +7,20 @@ require '../common/meteor/meteor-mocks'
 FriendshipCtrl = require './friendship-controller'
 
 describe 'friendship controller', ->
+  $ionicActionSheet = null
   $ionicLoading = null
   $ionicScrollDelegate = null
   $meteor = null
   $mixpanel = null
   $q = null
   $state = null
+  $window = null
   Auth = null
   chatsCollection = null
   ctrl = null
   friend = null
   Friendship = null
+  LinkInvitation = null
   Invitation = null
   matchesCollection = null
   messagesCollection = null
@@ -40,16 +43,19 @@ describe 'friendship controller', ->
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $ionicActionSheet = $injector.get '$ionicActionSheet'
     $ionicLoading = $injector.get '$ionicLoading'
     $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
     $meteor = $injector.get '$meteor'
     $mixpanel = $injector.get '$mixpanel'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
+    $window = $injector.get '$window'
     $stateParams = angular.copy $injector.get('$stateParams')
     Auth = $injector.get 'Auth'
     Invitation = $injector.get 'Invitation'
     Friendship = $injector.get 'Friendship'
+    LinkInvitation = $injector.get 'LinkInvitation'
     ngToast = $injector.get 'ngToast'
     scope = $injector.get '$rootScope'
     User = $injector.get 'User'
@@ -430,6 +436,7 @@ describe 'friendship controller', ->
         expect(ctrl.wasJoined message).toBe false
 
 
+  ##respondToInvitation
   describe 'responding to an invitation', ->
     response = null
     invitation = null
@@ -469,18 +476,32 @@ describe 'friendship controller', ->
 
       describe 'and the response is accepted', ->
 
-        beforeEach ->
-          invitation.response = Invitation.accepted
-          deferred.resolve invitation
-          scope.$apply()
+        describe 'and the event is locked', ->
 
-        it 'should hide the loading overlay', ->
-          expect($ionicLoading.hide).toHaveBeenCalled()
+          beforeEach ->
+            invitation.response = Invitation.accepted
+            invitation.event.minAccepted = 3
+            deferred.resolve invitation
+            scope.$apply()
 
-        it 'should go to the event chat', ->
-          expect($state.go).toHaveBeenCalledWith 'event',
-            invitation: invitation
-            id: invitation.event.id
+          it 'should hide the loading overlay', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
+
+
+        describe 'and the event is not locked', ->
+
+          beforeEach ->
+            invitation.response = Invitation.accepted
+            deferred.resolve invitation
+            scope.$apply()
+
+          it 'should hide the loading overlay', ->
+            expect($ionicLoading.hide).toHaveBeenCalled()
+
+          it 'should go to the event chat', ->
+            expect($state.go).toHaveBeenCalledWith 'event',
+              invitation: invitation
+              id: invitation.event.id
 
 
       describe 'and the response is maybe', ->
@@ -957,6 +978,7 @@ describe 'friendship controller', ->
       it 'should show a generic placeholder', ->
         expect(placeholder).toBe 'Start a chat...'
 
+
   ##isLocked
   describe 'checking if an event is locked', ->
     message = null
@@ -1006,3 +1028,87 @@ describe 'friendship controller', ->
 
         it 'should return true', ->
           expect(ctrl.isLocked(message)).toBe true
+
+
+  ##shareEvent
+  describe 'sharing a locked event', ->
+    buttonClickedCallback = null
+    hideSheet = null
+
+    beforeEach ->
+      $window.plugins = {}
+      spyOn($ionicActionSheet, 'show').and.callFake (options) ->
+        buttonClickedCallback = options.buttonClicked
+        hideSheet = jasmine.createSpy 'hideSheet'
+        hideSheet
+
+    describe 'tapping the Send To.. button', ->
+
+      beforeEach ->
+        spyOn $state, 'go'
+
+        ctrl.shareEvent()
+        buttonClickedCallback 0
+
+      it 'should go to the invite friends view', ->
+        stateParams =
+          event: ctrl.event
+        expect($state.go).toHaveBeenCalledWith 'inviteFriends', stateParams
+
+      it 'should hide the action sheet', ->
+        expect(hideSheet).toHaveBeenCalled()
+
+
+    describe 'tapping the share on button', ->
+
+      beforeEach ->
+        spyOn LinkInvitation, 'share'
+        ctrl.shareEvent()
+        buttonClickedCallback 1
+
+      it 'should let the user share a link invitation', ->
+        expect(LinkInvitation.share).toHaveBeenCalledWith ctrl.event
+
+
+    describe 'when the social sharing plugin is installed', ->
+
+      beforeEach ->
+        $window.plugins =
+          socialsharing: 'socialsharing'
+
+        ctrl.shareEvent()
+
+      it 'should show an action sheet', ->
+        options =
+          buttons: [
+            text: 'Send To...'
+          ,
+            text: 'Share On...'
+          ]
+          cancelText: 'Cancel'
+          buttonClicked: jasmine.any Function
+        expect($ionicActionSheet.show).toHaveBeenCalledWith options
+
+
+    describe 'and the social sharing plugin isn\'t installed', ->
+
+      beforeEach ->
+        $window.plugins = {}
+
+        ctrl.shareEvent()
+
+      it 'should show an action sheet', ->
+        options =
+          buttons: [
+            text: 'Send To...'
+          ,
+            text: 'Copy Group Link'
+          ]
+          cancelText: 'Cancel'
+          buttonClicked: jasmine.any Function
+        expect($ionicActionSheet.show).toHaveBeenCalledWith options
+
+     
+
+
+    
