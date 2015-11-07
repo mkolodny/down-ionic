@@ -101,6 +101,7 @@ describe 'event service', ->
           createdAt: new Date()
           updatedAt: new Date()
           invitations: invitations
+          minAccepted: 5
 
       it 'should return the serialized event', ->
         expectedEvent =
@@ -116,6 +117,7 @@ describe 'event service', ->
           comment: 'awwww yisssss'
           canceled: event.canceled
           invitations: invitations
+          min_accepted: 5
         expect(Event.serialize event).toEqual expectedEvent
 
 
@@ -160,6 +162,7 @@ describe 'event service', ->
           canceled: false
           created_at: new Date().toISOString()
           updated_at: new Date().toISOString()
+          min_accepted: 5
 
       it 'should return the deserialized event', ->
         expectedEvent =
@@ -175,6 +178,7 @@ describe 'event service', ->
           canceled: response.canceled
           createdAt: new Date response.created_at
           updatedAt: new Date response.updated_at
+          minAccepted: 5
         expect(Event.deserialize response).toAngularEqual expectedEvent
 
 

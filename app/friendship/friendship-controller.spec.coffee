@@ -956,3 +956,53 @@ describe 'friendship controller', ->
 
       it 'should show a generic placeholder', ->
         expect(placeholder).toBe 'Start a chat...'
+
+  ##isLocked
+  describe 'checking if an event is locked', ->
+    message = null
+    event = null
+    invitation = null
+    membersCount = null
+
+    beforeEach ->
+      event =
+        id: 1
+      invitation = 
+        event: new Event event
+      membersCount =
+        count: 2
+      message =
+        invitation: invitation
+        membersCount: membersCount
+
+    describe 'when an event doesn\'t have a minimum requirement', ->
+
+      it 'should return false', ->
+        expect(ctrl.isLocked(message)).toBe false
+
+    describe 'when an event has a minimum requirement', ->
+
+      describe 'when the minimum has been met', ->
+
+        beforeEach ->
+          invitation.minAccepted = 1
+
+        it 'should return false', ->
+          expect(ctrl.isLocked(message)).toBe false
+
+      describe 'when the minimum has not been met', ->
+
+        beforeEach ->
+          invitation.event.minAccepted = 3
+
+        it 'should return true', ->
+          expect(ctrl.isLocked(message)).toBe true
+
+      describe 'when the members count data isn\'t availible', ->
+
+        beforeEach ->
+          invitation.event.minAccepted = 1
+          delete membersCount.count
+
+        it 'should return true', ->
+          expect(ctrl.isLocked(message)).toBe true

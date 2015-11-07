@@ -192,4 +192,17 @@ class FriendshipCtrl
     else
       "#{@friend.firstName} is #{distanceAway} away"
 
+  isLocked: (message) ->
+    minAccepted = message.invitation?.event?.minAccepted
+    membersCount = message.membersCount?.count
+
+    # Not a lockable event
+    if minAccepted is undefined
+      return false
+    # Members data not here yet
+    if membersCount is undefined
+      return true
+
+    membersCount < minAccepted
+
 module.exports = FriendshipCtrl
