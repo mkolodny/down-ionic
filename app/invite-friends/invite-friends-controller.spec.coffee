@@ -699,7 +699,7 @@ describe 'invite friends controller', ->
       it 'should show a loading spinner', ->
         template = '''
           <div class="loading-text">
-            Sending suggestion...
+            Sending...
           </div>
           <ion-spinner icon="bubbles"></ion-spinner>
           '''
