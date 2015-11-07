@@ -74,7 +74,6 @@ class CreateEventCtrl
     newEvent
 
   showMoreOptions: ->
-    console.log @minAccepted
     hideSheet = null
     options =
       buttons: [

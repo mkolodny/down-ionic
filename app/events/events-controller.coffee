@@ -71,7 +71,9 @@ class EventsCtrl
     items = []
 
     # Invitations Section
-    invitations = (invitation for id, invitation of invitationsDict)
+    # Ignore invitations that don't have enough members yet.
+    invitations = (invitation for id, invitation of invitationsDict \
+        when not invitation.minAccepted)
     invitations.sort (a, b) ->
       aCreatedAt = a.event.latestMessage?.createdAt or a.event.createdAt
       bCreatedAt = b.event.latestMessage?.createdAt or b.event.createdAt

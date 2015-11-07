@@ -227,7 +227,7 @@ describe 'create event controller', ->
       expect($state.go).toHaveBeenCalledWith 'inviteFriends', {event: newEvent}
 
 
-  fdescribe 'getting the new event', ->
+  describe 'getting the new event', ->
     newEvent = null
 
     describe 'when everything is set', ->
