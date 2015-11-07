@@ -1,16 +1,17 @@
 class FriendshipCtrl
-  @$inject: ['$ionicLoading', '$ionicScrollDelegate', '$meteor', '$mixpanel',
-             '$scope', '$state', '$stateParams', 'Auth', 'Invitation',
-             'Friendship', 'ngToast', 'User', '$rootScope']
-  constructor: (@$ionicLoading, @$ionicScrollDelegate, @$meteor, @$mixpanel,
-                @$scope, @$state, @$stateParams, @Auth, @Invitation,
-                @Friendship, @ngToast, @User, @$rootScope) ->
+  @$inject: ['$ionicActionSheet', '$ionicLoading', '$ionicScrollDelegate', '$meteor', '$mixpanel',
+             '$scope', '$state', '$stateParams', '$window', 'Auth', 'Invitation',
+             'Friendship', 'ngToast', 'User', '$rootScope', 'LinkInvitation']
+  constructor: (@$ionicActionSheet, @$ionicLoading, @$ionicScrollDelegate, @$meteor, @$mixpanel,
+                @$scope, @$state, @$stateParams, @$window, @Auth, @Invitation,
+                @Friendship, @ngToast, @User, @$rootScope, @LinkInvitation) ->
     @friend = @$stateParams.friend
 
     # Set Meteor collections on controller
     @Messages = @$meteor.getCollectionByName 'messages'
     @Chats = @$meteor.getCollectionByName 'chats'
     @Matches = @$meteor.getCollectionByName 'matches'
+    @MembersCount = @$meteor.getCollectionByName 'membersCount'
 
     @$scope.$on '$ionicView.beforeEnter', =>
       @getFriendInvitations()
@@ -72,6 +73,12 @@ class FriendshipCtrl
             invitation = events[message.meta.eventId]
             if angular.isDefined invitation
               message.invitation = invitation
+              # If event is a locked event, subscribe 
+              #   to the members count and bid the data
+              if angular.isDefined invitation.event.minAccepted
+                eventId = "#{invitation.eventId}"
+                @$scope.$meteorSubscribe 'membersCount', eventId
+                message.membersCount = @$scope.$meteorObject @MembersCount, eventId, false
             else
               # Delete expired invite_action message
               @messages.remove message._id
@@ -143,9 +150,22 @@ class FriendshipCtrl
   respondToInvitation: (invitation, response) ->
     @$ionicLoading.show()
 
+    minAccepted = invitation.event.minAccepted
+    if response in [@Invitation.accepted, @Invitation.maybe] and \
+       minAccepted is undefined
+      # Not a locked event
+      enterChat = true
+    else if response is @Invitation.accepted
+      # Locked event
+      membersCount = @MembersCount.findOne({_id: "#{invitation.eventId}"})?.count
+      if minAccepted - membersCount is 1
+        # Last member needed to unlock
+        enterChat = true
+
+
     @Invitation.updateResponse invitation, response
       .$promise.then (invitation) =>
-        if invitation.response in [@Invitation.accepted, @Invitation.maybe]
+        if enterChat is true
           @$state.go 'event',
             invitation: invitation
             id: invitation.event.id
@@ -184,5 +204,41 @@ class FriendshipCtrl
       'Start a chat...'
     else
       "#{@friend.firstName} is #{distanceAway} away"
+
+  isLocked: (message) ->
+    minAccepted = message.invitation?.event?.minAccepted
+    membersCount = message.membersCount?.count
+
+    # Not a lockable event
+    if minAccepted is undefined
+      return false
+    # Members data not here yet
+    if membersCount is undefined
+      return true
+
+    membersCount < minAccepted
+
+  shareEvent: (event) ->
+    hideSheet = null
+    hasSharingPlugin = angular.isDefined @$window.plugins?.socialsharing
+    shareText = if hasSharingPlugin then 'Share On...' else 'Copy Group Link'
+    options =
+      buttons: [
+        text: 'Send To...'
+      ,
+        text: shareText
+      ]
+      cancelText: 'Cancel'
+      buttonClicked: (index) =>
+        if index is 0
+          @$state.go 'inviteFriends',
+            event: event
+          hideSheet()
+        if index is 1
+          @LinkInvitation.share event
+          hideSheet()
+
+    hideSheet = @$ionicActionSheet.show options
+
 
 module.exports = FriendshipCtrl

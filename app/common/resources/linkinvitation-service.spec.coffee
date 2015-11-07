@@ -1,24 +1,53 @@
 require 'angular'
 require 'angular-mocks'
+require 'ng-cordova'
 require './resources-module'
 
 describe 'linkinvitation service', ->
+  $cordovaSocialSharing = null
   $httpBackend = null
+  $ionicLoading = null
+  $ionicPopup = null
+  $mixpanel = null
+  $q = null
+  $rootScope = null
+  $state = null
+  $window = null
+  Auth = null
   Event = null
   Invitation = null
   LinkInvitation = null
   listUrl = null
   User = null
+  ngToast = null
 
   beforeEach angular.mock.module('rallytap.resources')
+  
+  beforeEach angular.mock.module('analytics.mixpanel')
+  
+  beforeEach angular.mock.module('ionic')
+  
+  beforeEach angular.mock.module('ngCordova')
+
+  beforeEach angular.mock.module('ngToast')
 
   beforeEach inject(($injector) ->
+    $cordovaSocialSharing = $injector.get '$cordovaSocialSharing'
     $httpBackend = $injector.get '$httpBackend'
+    $ionicLoading = $injector.get '$ionicLoading'
+    $ionicPopup = $injector.get '$ionicPopup'
+    $mixpanel = $injector.get '$mixpanel'
+    $q = $injector.get '$q'
+    $rootScope = $injector.get '$rootScope'
+    $state = $injector.get '$state'
+    $window = $injector.get '$window'
+    Auth = $injector.get 'Auth'
     apiRoot = $injector.get 'apiRoot'
     Event = $injector.get 'Event'
     Invitation = $injector.get 'Invitation'
     LinkInvitation = $injector.get 'LinkInvitation'
     User = $injector.get 'User'
+    ngToast = $injector.get 'ngToast'
 
     listUrl = "#{apiRoot}/link-invitations"
   )
@@ -188,3 +217,110 @@ describe 'linkinvitation service', ->
 
       it 'should return null', ->
         expect(response).toBeNull()
+
+  ##share
+  describe 'sharing a link invitation', ->
+    deferred = null
+    event = null
+
+    beforeEach ->
+      deferred = $q.defer()
+      spyOn(LinkInvitation, 'save').and.returnValue {$promise: deferred.promise}
+      spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
+      event =
+        id: 1
+        title: 'bars?!?!!?'
+        creator: 2
+        canceled: false
+        datetime: new Date()
+        createdAt: new Date()
+        updatedAt: new Date()
+        place:
+          name: 'B Bar & Grill'
+          lat: 40.7270718
+          long: -73.9919324
+      event = new Event event
+      LinkInvitation.share event
+
+    it 'should show a loading overlay', ->
+      expect($ionicLoading.show).toHaveBeenCalled()
+
+    it 'should create a link invitation', ->
+      linkInvitation =
+        eventId: event.id
+        fromUserId: Auth.user.id
+      expect(LinkInvitation.save).toHaveBeenCalledWith linkInvitation
+
+    describe 'successfully', ->
+      linkId = null
+
+      beforeEach ->
+        $state.current.name = 'some state'
+        spyOn $mixpanel, 'track'
+
+      describe 'when the social sharing plugin isn\'t installed', ->
+
+        beforeEach ->
+          $window.plugins = {}
+          spyOn $ionicPopup, 'alert'
+
+          linkId = 'mikepleb'
+          deferred.resolve {linkId: linkId}
+          $rootScope.$apply()
+
+        it 'should show a modal with the share link', ->
+          expect($ionicPopup.alert).toHaveBeenCalled()
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
+        it 'should track the event in mixpanel', ->
+          expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation',
+            'from screen': $state.current.name
+
+
+      describe 'when the social sharing plugin is installed', ->
+        eventMessage = null
+
+        beforeEach ->
+          $window.plugins =
+            socialsharing: 'socialsharing'
+          eventMessage = 'eventMessage'
+          spyOn(event, 'getEventMessage').and.returnValue eventMessage
+          spyOn $cordovaSocialSharing, 'share'
+
+          linkId = 'mikepleb'
+          deferred.resolve {linkId: linkId}
+          $rootScope.$apply()
+
+        it 'should show a native share sheet', ->
+          message = eventMessage
+          subject = eventMessage
+          file = null
+          link = "https://rallytap.com/e/#{linkId}"
+          expect($cordovaSocialSharing.share).toHaveBeenCalledWith(message,
+              subject, file, link)
+
+        it 'should hide the loading overlay', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+        
+        it 'should track the event in mixpanel', ->
+          expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation',
+            'from screen': $state.current.name
+
+
+    describe 'on error', ->
+
+      beforeEach ->
+        spyOn ngToast, 'create'
+
+        deferred.reject()
+        $rootScope.$apply()
+
+      it 'should show an error', ->
+        error = 'For some reason, that didn\'t work.'
+        expect(ngToast.create).toHaveBeenCalledWith error
+
+      it 'should hide the loading overlay', ->
+        expect($ionicLoading.hide).toHaveBeenCalled()

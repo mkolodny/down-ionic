@@ -1,5 +1,9 @@
-LinkInvitation = ['$resource', 'apiRoot', 'Event', 'Invitation', 'User', \
-                  ($resource, apiRoot, Event, Invitation, User) ->
+LinkInvitation = ['$cordovaSocialSharing', '$ionicLoading', '$ionicPopup', '$mixpanel',\
+                  '$resource', '$window', 'apiRoot', '$state', \
+                  'Auth', 'Event', 'Invitation', 'User', 'ngToast', \
+                  ($cordovaSocialSharing, $ionicLoading, $ionicPopup, \
+                   $mixpanel, $resource, $window, apiRoot, $state, \
+                   Auth, Event, Invitation, User, ngToast) ->
   listUrl = "#{apiRoot}/link-invitations"
 
   serializeLinkInvitation = (linkInvitation) ->
@@ -49,6 +53,36 @@ LinkInvitation = ['$resource', 'apiRoot', 'Event', 'Invitation', 'User', \
 
   resource.serialize = serializeLinkInvitation
   resource.deserialize = deserializeLinkInvitation
+
+  resource.share = (event) ->
+    $ionicLoading.show()
+
+    linkInvitation =
+      eventId: event.id
+      fromUserId: Auth.user.id
+    @save linkInvitation
+      .$promise.then (linkInvitation) =>
+        $mixpanel.track 'Get Link Invitation',
+          'from screen': $state.current.name
+        groupLink = "https://rallytap.com/e/#{linkInvitation.linkId}"
+        # Show a "Copy Group Link" popup when the social sharing plugin isn\'t
+        #   installed for backwards compatibility.
+        if angular.isDefined $window.plugins?.socialsharing
+          eventMessage = event.getEventMessage()
+          $cordovaSocialSharing.share eventMessage, eventMessage, null, groupLink
+        else
+          $ionicPopup.alert
+            title: 'Copy Group Link'
+            template: """
+              <input id="share-link" value="#{groupLink}">
+              """
+            buttons: [
+              text: 'Done'
+            ]
+        $ionicLoading.hide()
+      , =>
+        ngToast.create 'For some reason, that didn\'t work.'
+        $ionicLoading.hide()
 
   resource
 ]

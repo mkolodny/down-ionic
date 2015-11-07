@@ -252,57 +252,13 @@ class EventCtrl
             event: @event
           hideSheet()
         if index is 1
-          @shareLinkInvitation()
+          @LinkInvitation.share @event
           hideSheet()
         if index is 2
           @toggleNotifications()
           hideSheet()
 
     hideSheet = @$ionicActionSheet.show options
-
-  shareLinkInvitation: ->
-    @$ionicLoading.show()
-
-    linkInvitation =
-      eventId: @event.id
-      fromUserId: @Auth.user.id
-    @LinkInvitation.save linkInvitation
-      .$promise.then (linkInvitation) =>
-        @$mixpanel.track 'Get Link Invitation'
-        groupLink = "https://rallytap.com/e/#{linkInvitation.linkId}"
-        # Show a "Copy Group Link" popup when the social sharing plugin isn\'t
-        #   installed for backwards compatibility.
-        if angular.isDefined @$window.plugins.socialsharing
-          eventMessage = @getEventMessage()
-          @$cordovaSocialSharing.share eventMessage, eventMessage, null, groupLink
-        else
-          @$ionicPopup.alert
-            title: 'Copy Group Link'
-            template: """
-              <input id="share-link" value="#{groupLink}">
-              """
-            buttons: [
-              text: 'Done'
-              type: 'button-positive'
-            ]
-        @$ionicLoading.hide()
-      , =>
-        @ngToast.create 'For some reason, that didn\'t work.'
-        @$ionicLoading.hide()
-
-  getEventMessage: ->
-    if angular.isDefined @event.datetime
-      date = @$filter('date') @event.datetime, "EEE, MMM d 'at' h:mm a"
-      dateString = " — #{date}"
-    else
-      dateString = ''
-
-    if angular.isDefined @event.place
-      placeString = " at #{@event.place.name}"
-    else
-      placeString = ''
-
-    "#{@event.title}#{placeString}#{dateString}"
 
   toggleNotifications: ->
     @$ionicLoading.show()
