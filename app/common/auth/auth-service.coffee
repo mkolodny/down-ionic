@@ -292,22 +292,14 @@ class Auth
       latitude: location.lat
       longitude: location.long
     distanceAway = haversine start, end, {unit: 'mile'}
-    if distanceAway < .094697 # 500 feet
-      '< 500 feet'
-    else if distanceAway < 1
-      '< 1 mile'
-    else if distanceAway < 2
-      '< 2 miles'
-    else if distanceAway < 5
-      '< 5 miles'
-    else if distanceAway < 10
-      '< 10 miles'
-    else if distanceAway < 25
-      '< 25 miles'
-    else if distanceAway < 50
-      '< 50 miles'
-    else if distanceAway < 100
-      '< 100 miles'
+    fiveHundredFeet = .094697
+    if distanceAway <= fiveHundredFeet
+      '500 feet'
+    else if fiveHundredFeet < distanceAway < 1.5
+      '1 mile'
+    else if fiveHundredFeet < distanceAway < 100
+      miles = Math.round distanceAway
+      "#{miles} miles"
     else
       'really far'
 
