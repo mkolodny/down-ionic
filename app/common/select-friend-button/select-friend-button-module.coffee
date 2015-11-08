@@ -1,5 +1,5 @@
-# require 'angular-chart.js'
-# require 'angular-elastic'
+require 'angular-chart.js'
+require 'angular-elastic'
 require 'ng-toast'
 require '../mixpanel/mixpanel-module'
 selectFriendButton = require './select-friend-button-directive'
@@ -7,7 +7,7 @@ selectFriendButton = require './select-friend-button-directive'
 angular.module 'rallytap.selectFriendButton', [
     'angular-meteor'
     'analytics.mixpanel'
-    # 'chart.js'
+    'chart.js'
     'ngToast'
     'ui.router'
   ]

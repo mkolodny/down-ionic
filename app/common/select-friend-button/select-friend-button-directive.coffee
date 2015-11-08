@@ -9,15 +9,21 @@ selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', '
        ng-click="selectFriend(user)"
        ng-disabled="isSelected(user)"
        ng-class="{'selected': isSelected(user)}">
-      <canvas class="chart chart-pie friend-select-pie"
+      <canvas ng-if="isSelected(user)"
+              class="chart chart-pie friend-select-pie"
               data="[
                 (100 - percentRemaining(user)),
                 percentRemaining(user)
               ]"
               labels="['', '']"
-              colours="['#ffffff', 'rgba(0,0,0,0)']" width="30" height="30"
-              options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
-              ng-if="isSelected(user)"
+              colours="['#ffffff', 'rgba(0,0,0,0)']"
+              width="30" height="30"
+              options="{
+                segmentShowStroke: false,
+                animation: false,
+                responsive: false,
+                showTooltips: false
+              }"
               ></canvas>
       <i class="fa fa-hand-o-up"></i>
       <i class="fa fa-circle-thin"></i>
@@ -39,7 +45,7 @@ selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', '
         .then (isMatch) ->
           $mixpanel.track 'Select Friend'
           if isMatch
-            $rootScope.$broadcast 'rallytap.newMatch', user
+            $rootScope.$broadcast 'selectFriendButton.newMatch', user
           else
             $scope.tempPercentRemaing = 100
         , ->
