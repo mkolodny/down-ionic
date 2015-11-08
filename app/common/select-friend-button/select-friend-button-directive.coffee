@@ -6,10 +6,9 @@ selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', '
   template: """
     <a href=""
        class="match-button icon"
-       ng-click="selectFriend(user)"
-       ng-disabled="isSelected(user)"
+       ng-click="selectFriend(user); $event.stopPropagation()"
        ng-class="{'selected': isSelected(user)}">
-      <canvas ng-if="isSelected(user)"
+      <canvas ng-if="isSelected(user) && !isLoading"
               class="chart chart-pie friend-select-pie"
               data="[
                 (100 - percentRemaining(user)),
@@ -25,9 +24,9 @@ selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', '
                 showTooltips: false
               }"
               ></canvas>
-      <i class="fa fa-hand-o-up"></i>
-      <i class="fa fa-circle-thin"></i>
-      <i class="fa fa-circle"></i>
+      <i ng-if="!isLoading" class="fa fa-hand-o-up"></i>
+      <i ng-if="!isLoading" class="fa fa-circle-thin"></i>
+      <i ng-if="!isLoading" class="fa fa-circle"></i>
       <i class="icon" ng-if="isLoading">
         <ion-spinner icon="bubbles"></ion-spinner>
       </i>
@@ -40,6 +39,8 @@ selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', '
       $scope.percentRemaining(user) isnt 0
 
     $scope.selectFriend = (user) ->
+      if $scope.isSelected(user) then return
+
       $scope.isLoading = true
       $meteor.call 'selectFriend', "#{user.id}"
         .then (isMatch) ->
@@ -80,7 +81,7 @@ selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', '
         now = new Date().getTime()
         timeRemaining = friendSelect.expiresAt.getTime() - now
         sixHours = 1000 * 60 * 60 * 6
-        return (timeRemaining / sixHours) * 100
+        return Math.round (timeRemaining / sixHours) * 100
   ]
 ]
 

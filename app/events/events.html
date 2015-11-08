@@ -96,24 +96,7 @@
               {{events.getDistanceAway(item.friend)}}
             </span>
           </p>
-          <a href=""
-             class="match-button icon"
-             ng-click="events.selectFriend(item, $event)"
-             ng-class="{'selected': events.isSelected(item)}">
-            <canvas class="chart chart-pie friend-select-pie"
-                    data="[
-                      (100 - item.friendSelect.percentRemaining),
-                      item.friendSelect.percentRemaining
-                    ]"
-                    labels="['', '']"
-                    colours="['#ffffff', 'rgba(0,0,0,0)']" width="30" height="30"
-                    options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
-                    ng-show="events.isSelected(item)"
-                    ></canvas>
-            <i class="fa fa-hand-o-up"></i>
-            <i class="fa fa-circle-thin"></i>
-            <i class="fa fa-circle"></i>
-          </a>
+          <select-friend-button user="item.friend"></select-friend-button>
         </div>
       </ion-item>
     </ion-list>
