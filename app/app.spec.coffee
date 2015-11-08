@@ -11,3 +11,7 @@ beforeEach ->
     toHaveClass: ->
       compare: (actual, expected) =>
         pass: actual.hasClass expected
+
+    toHaveProp: ->
+      compare: (actual, expected) =>
+        pass: actual.prop expected
