@@ -263,7 +263,7 @@ describe 'create event controller', ->
 
       it 'should return the event', ->
         event =
-          title: 'Let\'s do something!'
+          title: 'hang out'
         expect(newEvent).toEqual event
 
 

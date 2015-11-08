@@ -1,8 +1,10 @@
-<ion-view id="create-event" view-title="Activity">
+<ion-view id="create-event" view-title="Who's down to...">
   <ion-content>
     <div class="list" id="details">
       <div class="item" id="what">
-        <input ng-model="createEvent.title" placeholder="What?">
+        <input ng-model="createEvent.title"
+               autocapitalize="off"
+               placeholder="What?">
         <i class="fa fa-times"
            ng-if="createEvent.title"
            ng-click="createEvent.title = null"></i>

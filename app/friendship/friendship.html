@@ -3,7 +3,7 @@
        ng-show="friendship.match._id"
        class="ng-cloak"
        ng-class="{'match-notification': friendship.match._id}">
-    You and {{friendship.friend.firstName}} are down to do something.
+    You and {{friendship.friend.firstName}} are down to hang out.
   </div>
   <ion-content delegate-handle="friendship">
     <ion-list>
@@ -22,11 +22,13 @@
           <div class="text" ng-if="friendship.isTextMessage(message)">{{message.text}}</div>
           <div class="text invite-action"
                ng-if="message.invitation"
+               >Are you down to <span
+               class="invite"
                ng-class="{'was-joined': friendship.wasJoined(message) && !friendship.isLocked(message)}"
                ng-click="friendship.wasJoined(message) && !friendship.isLocked(message) ? friendship.viewEvent(message.invitation) : null"
                ><span>{{message.invitation.event.title}}</span><span
                ng-if="message.invitation.event.place"
-               > at {{message.invitation.event.place.name}}</span><span ng-if="message.invitation.event.datetime"> &mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span><div class="min-accepted-section" ng-if="friendship.isLocked(message)"><div><i class="fa fa-lock"></i>{{message.invitation.event.minAccepted}} people minimum</div><div><i class="fa fa-users"></i>{{message.membersCount.count}} down so far</div></div><div
+               > at {{message.invitation.event.place.name}}</span><span ng-if="message.invitation.event.datetime"> &mdash; {{message.invitation.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span></span>?<div class="min-accepted-section" ng-if="friendship.isLocked(message)"><div><i class="fa fa-lock"></i>{{message.invitation.event.minAccepted}} people minimum</div><div><i class="fa fa-users"></i>{{message.membersCount.count}} down so far</div></div><div
                 class="respond-section"
                 ng-if="!friendship.wasJoined(message) && !friendship.isLocked(message)">
               <button class="respond"
@@ -42,7 +44,9 @@
                       ontouchstart
                       ng-disabled="friendship.isDeclined(message.invitation)"
                       >Pass</button>
-          </div><div ng-if="friendship.isLocked(message)" class="respond-section">
+              </div><div
+                ng-if="friendship.isLocked(message)"
+                class="respond-section">
               <button class="respond"
                       ng-disabled="friendship.wasJoined(message)"
                       ng-click="friendship.acceptInvitation(message.invitation)"
