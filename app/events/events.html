@@ -45,18 +45,19 @@
           <img class="item-image"
                ng-src="{{item.invitation.fromUser.getImageUrl()}}">
           <canvas class="chart chart-pie avatar-pie"
-                  ng-repeat="color in ['#ffffff', 'rgb(217,217,217)']"
                   data="[
                     (100 - item.invitation.event.percentRemaining),
                     item.invitation.event.percentRemaining
                   ]"
-                  ng-class="{
-                    'white': (color==='#ffffff'),
-                    'gray': (color==='rgb(217,217,217)')
-                  }"
                   labels="['', '']"
-                  colours="[color, 'rgba(0,0,0,0)']" width="53" height="53"
-                  options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
+                  colours="['#ffffff', 'rgba(0,0,0,0)']" 
+                  width="53" height="53"
+                  options="{
+                    segmentShowStroke: false, 
+                    animation: false, 
+                    responsive: false, 
+                    showTooltips: false
+                  }"
                   ></canvas>
           <h2>{{item.invitation.event.title}}</h2>
           <p class="latest-message">
@@ -72,20 +73,20 @@
              ng-click="events.viewFriendChat(item)">
           <img class="item-image"
                ng-src="{{item.friend.getImageUrl()}}">
-          <canvas class="chart chart-pie avatar-pie"
-                  ng-if="item.match"
-                  ng-repeat="color in ['#ffffff', 'rgb(217,217,217)']"
+          <canvas ng-if="item.match"
+                  class="chart chart-pie avatar-pie"
                   data="[
                     (100 - item.match.percentRemaining),
                     item.match.percentRemaining
                   ]"
-                  ng-class="{
-                    'white': (color==='#ffffff'),
-                    'gray': (color==='rgb(217,217,217)')
-                  }"
                   labels="['', '']"
-                  colours="[color, 'rgba(0,0,0,0)']" width="53" height="53"
-                  options="{segmentShowStroke: false, animation: false, responsive: false, showTooltips: false}"
+                  colours="['#ffffff', 'rgba(0,0,0,0)']" width="53" height="53"
+                  options="{
+                    segmentShowStroke: false, 
+                    animation: false, 
+                    responsive: false, 
+                    showTooltips: false
+                  }"
                   ></canvas>
           <h2>{{item.friend.name}}</h2>
           <p class="latest-message">
