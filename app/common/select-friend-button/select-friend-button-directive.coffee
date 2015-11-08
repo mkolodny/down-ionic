@@ -1,4 +1,5 @@
-selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', ($rootScope, $state, $meteor, $mixpanel) ->
+selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', 'ngToast', \
+    ($rootScope, $state, $meteor, $mixpanel, ngToast) ->
   restrict: 'E'
   scope:
     user: '='
@@ -34,12 +35,15 @@ selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', (
 
     $scope.selectFriend = (user) ->
       $scope.isLoading = true
-      $meteor.call('selectFriend', "#{user.id}")
+      $meteor.call 'selectFriend', "#{user.id}"
         .then (isMatch) ->
+          $mixpanel.track 'Select Friend'
           if isMatch
             $rootScope.$broadcast 'rallytap.newMatch', user
           else
             $scope.tempPercentRemaing = 100
+        , ->
+          ngToast.create 'Oops, an error occurred.'
         .finally ->
           $scope.isLoading = false
 

@@ -1,6 +1,7 @@
 require 'angular'
 require 'angular-mocks'
 require 'angular-ui-router'
+require 'ng-toast'
 require '../auth/auth-module'
 require '../mixpanel/mixpanel-module'
 require '../meteor/meteor-mocks'
@@ -19,6 +20,7 @@ fdescribe 'select friend button directive', ->
   FriendSelects = null
   Friendship = null
   friend = null
+  ngToast = null
   scope = null
   User = null
 
@@ -46,6 +48,7 @@ fdescribe 'select friend button directive', ->
     $meteor = $injector.get '$meteor'
     $mixpanel = $injector.get '$mixpanel'
     $q = $injector.get '$q'
+    ngToast = $injector.get 'ngToast'
 
     FriendSelects = 
       findOne: jasmine.createSpy 'FriendSelects.findOne'
@@ -155,6 +158,9 @@ fdescribe 'select friend button directive', ->
 
       describe 'when the method returns successfully', ->
 
+        beforeEach ->
+          spyOn $mixpanel, 'track'
+
         describe 'when is is a match', ->
 
           beforeEach ->
@@ -169,6 +175,9 @@ fdescribe 'select friend button directive', ->
           it 'should broadcast a new match event', ->
             expect($rootScope.$broadcast).toHaveBeenCalledWith 'rallytap.newMatch', friend
 
+          it 'should track selecting a friend in mixpanel', ->
+            expect($mixpanel.track).toHaveBeenCalledWith 'Select Friend'
+
 
         describe 'when it is not a match', ->
 
@@ -176,18 +185,29 @@ fdescribe 'select friend button directive', ->
             deferred.resolve false
             scope.$apply()
 
+          it 'should hide the loading spinner', ->
+            spinner = element.find 'ion-spinner'
+            expect(spinner.length).toEqual 0
+
           it 'should set percent remaining to 100', ->
             isolatedScope = element.isolateScope()
             percentRemaining = isolatedScope.percentRemaining friend
             expect(percentRemaining).toEqual 100
 
+          it 'should track selecting a friend in mixpanel', ->
+            expect($mixpanel.track).toHaveBeenCalledWith 'Select Friend'
+
 
       describe 'when there is an error', ->
 
         beforeEach ->
+          spyOn ngToast, 'create'
           deferred.reject()
           scope.$apply()
 
         it 'should hide the loading spinner', ->
           spinner = element.find 'ion-spinner'
           expect(spinner.length).toEqual 0
+
+        it 'should show an error toast', ->
+          expect(ngToast.create).toHaveBeenCalledWith 'Oops, an error occurred.'
