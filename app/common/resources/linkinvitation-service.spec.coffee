@@ -11,6 +11,7 @@ describe 'linkinvitation service', ->
   $mixpanel = null
   $q = null
   $rootScope = null
+  $state = null
   $window = null
   Auth = null
   Event = null
@@ -38,6 +39,7 @@ describe 'linkinvitation service', ->
     $mixpanel = $injector.get '$mixpanel'
     $q = $injector.get '$q'
     $rootScope = $injector.get '$rootScope'
+    $state = $injector.get '$state'
     $window = $injector.get '$window'
     Auth = $injector.get 'Auth'
     apiRoot = $injector.get 'apiRoot'
@@ -254,6 +256,7 @@ describe 'linkinvitation service', ->
       linkId = null
 
       beforeEach ->
+        $state.current.name = 'some state'
         spyOn $mixpanel, 'track'
 
       describe 'when the social sharing plugin isn\'t installed', ->
@@ -273,7 +276,8 @@ describe 'linkinvitation service', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
         it 'should track the event in mixpanel', ->
-          expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation'
+          expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation',
+            'from screen': $state.current.name
 
 
       describe 'when the social sharing plugin is installed', ->
@@ -300,9 +304,10 @@ describe 'linkinvitation service', ->
 
         it 'should hide the loading overlay', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
-
+        
         it 'should track the event in mixpanel', ->
-          expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation'
+          expect($mixpanel.track).toHaveBeenCalledWith 'Get Link Invitation',
+            'from screen': $state.current.name
 
 
     describe 'on error', ->

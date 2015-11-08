@@ -39,6 +39,8 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
         name: event.place.name
         lat: event.place.geo.coordinates[0]
         long: event.place.geo.coordinates[1]
+    if event.comment?
+      response.comment = event.comment
     if event.min_accepted?
       response.minAccepted = event.min_accepted
     new resource response
