@@ -1,5 +1,5 @@
-selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', 'ngToast', \
-    ($rootScope, $state, $meteor, $mixpanel, ngToast) ->
+selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', 'Auth', 'ngToast', \
+    ($rootScope, $state, $meteor, $mixpanel, Auth, ngToast) ->
   restrict: 'E'
   scope:
     user: '='
@@ -45,6 +45,7 @@ selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', '
       $meteor.call 'selectFriend', "#{user.id}"
         .then (isMatch) ->
           $mixpanel.track 'Select Friend'
+          Auth.addPoints Auth.Points.selectedFriend
           if isMatch
             $rootScope.$broadcast 'selectFriendButton.newMatch', user
           else

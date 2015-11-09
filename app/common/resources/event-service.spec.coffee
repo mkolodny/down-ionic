@@ -33,6 +33,9 @@ describe 'event service', ->
         firstName: 'Alan'
         lastName: 'Turing'
         imageUrl: 'http://facebook.com/profile-pic/tdog'
+      addPoints: jasmine.createSpy 'Auth.addPoints'
+      Points:
+        sentInvitation: 1
     $provide.value 'Auth', Auth
     return
   )
@@ -249,6 +252,10 @@ describe 'event service', ->
           createdAt: new Date()
 
         expect(Messages.insert).toHaveBeenCalledWith message, Event.readMessage
+
+      it 'should add the points', ->
+        expectedPoints = Auth.Points.sentInvitation * responseData.invitations.length
+        expect(Auth.addPoints).toHaveBeenCalledWith expectedPoints
 
       it 'should create invite_action messages', ->
         inviteMessage =

@@ -1443,3 +1443,18 @@ describe 'Auth service', ->
 
       it 'should reject the promise', ->
         expect(rejected).toBe true
+
+
+  ##addPoints
+  describe 'adding points', ->
+
+    beforeEach ->
+      spyOn Auth, 'saveSession'
+      Auth.user.points = 1
+      Auth.addPoints 1
+
+    it 'should add the points', ->
+      expect(Auth.user.points).toEqual 2
+
+    it 'should save the session', ->
+      expect(Auth.saveSession).toHaveBeenCalled()

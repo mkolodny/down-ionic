@@ -314,4 +314,13 @@ class Auth
 
     {$promise: deferred.promise}
 
+  addPoints: (pointValue) ->
+    @user.points += pointValue
+    @saveSession()
+
+  Points:
+    sentInvitation: 1
+    selectedFriend: 1
+    acceptedInvitation: 5
+
 module.exports = Auth

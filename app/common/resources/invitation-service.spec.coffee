@@ -33,6 +33,10 @@ describe 'invitation service', ->
         firstName: 'Alan'
         lastName: 'Turing'
         imageUrl: 'http://facebook.com/profile-pic/tdog'
+      addPoints: jasmine.createSpy 'Auth.addPoints'
+      Points:
+        sentInvitation: 1
+        acceptedInvitation: 5
     $provide.value 'Auth', Auth
     return
   )
@@ -216,6 +220,7 @@ describe 'invitation service', ->
         expect(Invitation.deserialize response).toEqual expectedInvitation
 
 
+  ##bulkCreate
   describe 'bulk creating', ->
     invitations = null
     response = null
@@ -275,6 +280,10 @@ describe 'invitation service', ->
       expectedInvitations = (Invitation.deserialize invitation \
           for invitation in responseData)
       expect(response).toAngularEqual expectedInvitations
+
+    it 'should add the points', ->
+      expectedPoints = Auth.Points.sentInvitation * responseData.length
+      expect(Auth.addPoints).toHaveBeenCalledWith expectedPoints
 
     it 'should create invite action messages', ->
       expectedInvitations = (Invitation.deserialize invitation \
@@ -396,6 +405,9 @@ describe 'invitation service', ->
           expect($meteor.subscribe).toHaveBeenCalledWith(
               'chat', "#{invitation.eventId}")
 
+        it 'should add points', ->
+          expect(Auth.addPoints).toHaveBeenCalledWith Auth.Points.acceptedInvitation
+
         it 'should resolve the promise', ->
           expect(resolved).toBe true
 
@@ -464,6 +476,7 @@ describe 'invitation service', ->
 
         beforeEach ->
           invitationCopy = angular.copy invitation
+          invitationCopy.response = Invitation.accepted
           Invitation.updateResponse invitationCopy, Invitation.declined
             .$promise.then ->
               resolved = true
@@ -481,6 +494,26 @@ describe 'invitation service', ->
 
         it 'should resolve the promise', ->
           expect(resolved).toBe true
+
+        it 'should remove the points', ->
+          expect(Auth.addPoints).toHaveBeenCalledWith -Auth.Points.acceptedInvitation
+
+
+      describe 'from accepted to maybe', ->
+
+        beforeEach ->
+          invitationCopy = angular.copy invitation
+          invitationCopy.response = Invitation.accepted
+          Invitation.updateResponse invitationCopy, Invitation.maybe
+            .$promise.then ->
+              resolved = true
+
+          invitation.response = Invitation.declined
+          deferred.resolve invitation
+          $rootScope.$apply()
+
+        it 'should remove the points', ->
+          expect(Auth.addPoints).toHaveBeenCalledWith -Auth.Points.acceptedInvitation
 
 
     describe 'unsuccessfully', ->

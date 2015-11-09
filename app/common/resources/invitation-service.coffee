@@ -114,6 +114,10 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
       .success (data, status) =>
         invitations = (@deserialize invitation for invitation in data)
 
+        # Add points
+        totalPoints = Auth.Points.sentInvitation * invitations.length
+        Auth.addPoints totalPoints
+
         # Create invite_action messages
         Messages = $meteor.getCollectionByName 'messages'
         for invitation in invitations
@@ -160,16 +164,21 @@ Invitation = ['$http', '$meteor', '$mixpanel', '$q', '$resource', \
         # Re-subscribe to event messages
         $meteor.subscribe 'chat', "#{_invitation.eventId}" # Meteor likes strings
 
-        # Post an action message.
+        # Post an action message and adjust points
         if _invitation.response is @accepted
           text = "#{Auth.user.name} is down."
           type = @acceptAction
           status = 'accepted'
+          Auth.addPoints Auth.Points.acceptedInvitation
         else if _invitation.response is @maybe
+          if originalResponse is @accepted
+            Auth.addPoints -Auth.Points.acceptedInvitation
           text = "#{Auth.user.name} joined the chat."
           type = @maybeAction
           status = 'maybe'
         else if _invitation.response is @declined
+          if originalResponse is @accepted
+            Auth.addPoints -Auth.Points.acceptedInvitation
           status = 'declined'
         $mixpanel.track 'Update Response', {status: status}
 

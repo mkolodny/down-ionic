@@ -29,6 +29,8 @@ xdescribe 'select friend button directive', ->
 
   beforeEach angular.mock.module('rallytap.selectFriendButton')
 
+  beforeEach angular.mock.module('rallytap.auth')
+
   beforeEach angular.mock.module('angular-meteor')
 
   beforeEach inject(($injector) ->
@@ -39,6 +41,7 @@ xdescribe 'select friend button directive', ->
     $meteor = $injector.get '$meteor'
     $mixpanel = $injector.get '$mixpanel'
     $q = $injector.get '$q'
+    Auth = $injector.get 'Auth'
     ngToast = $injector.get 'ngToast'
 
     FriendSelects = 
@@ -150,6 +153,7 @@ xdescribe 'select friend button directive', ->
       describe 'when the method returns successfully', ->
 
         beforeEach ->
+          spyOn Auth, 'addPoints'
           spyOn $mixpanel, 'track'
 
         describe 'when is is a match', ->
@@ -158,6 +162,9 @@ xdescribe 'select friend button directive', ->
             spyOn $rootScope, '$broadcast'
             deferred.resolve true
             scope.$apply()
+
+          it 'should add points', ->
+            expect(Auth.addPoints).toHaveBeenCalledWith Auth.Points.selectedFriend
 
           it 'should hide the loading spinner', ->
             spinner = element.find 'ion-spinner'
@@ -175,6 +182,9 @@ xdescribe 'select friend button directive', ->
           beforeEach ->
             deferred.resolve false
             scope.$apply()
+
+          it 'should add points', ->
+            expect(Auth.addPoints).toHaveBeenCalledWith Auth.Points.selectedFriend
 
           it 'should hide the loading spinner', ->
             spinner = element.find 'ion-spinner'

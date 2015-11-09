@@ -821,6 +821,7 @@ describe 'invite friends controller', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
 
+  ##trackSendInvites
   describe 'tracking send invites', ->
 
     beforeEach ->

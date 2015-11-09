@@ -80,6 +80,10 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
           createdAt: new Date()
         , @readMessage
 
+        # Add the points
+        totalPoints = Auth.Points.sentInvitation * eventCopy.invitations.length
+        Auth.addPoints totalPoints
+
         # Create invite_action messages
         for invitation in eventCopy.invitations
           toUser = invitation.to_user # they are serialized for the server
