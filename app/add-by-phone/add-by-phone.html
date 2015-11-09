@@ -11,15 +11,21 @@
              ng-change="addByPhone.search(phoneForm)">
     <ion-list ng-if="addByPhone.phone">
       <ion-item class="item-divider">
-        <span ng-if="!addByPhone.friend || addByPhone.friend.name === addByPhone.phone">Phone Number</span>
-        <span ng-if="addByPhone.friend && addByPhone.friend.name !== addByPhone.phone">Name</span>
+        <span ng-if="!addByPhone.friend || addByPhone.friend.name === addByPhone.phone || !addByPhone.friend.username">Phone Number</span>
+        <span ng-if="addByPhone.friend && addByPhone.friend.name !== addByPhone.phone && addByPhone.friend.username">Name</span>
       </ion-item>
       <ion-item class="item-icon-right">
         <h2 ng-if="!addByPhone.friend
                    || (addByPhone.friend
-                       && addByPhone.isPhone(addByPhone.friend.name))"
-            >{{addByPhone.phone | formatPhone:addByPhone.myPhone}}</h2>
-        <h2 ng-if="addByPhone.friend && !addByPhone.isPhone(addByPhone.friend.name)">{{addByPhone.friend.name}}</h2>
+                       && addByPhone.isPhone(addByPhone.friend.name)) 
+                   || !addByPhone.friend.username">
+            {{addByPhone.phone | formatPhone:addByPhone.myPhone}}
+        </h2>
+        <h2 ng-if="addByPhone.friend
+                  && !addByPhone.isPhone(addByPhone.friend.name)
+                  && addByPhone.friend.username">
+            {{addByPhone.friend.name}}
+        </h2>
         <friendship-button user="addByPhone.friend"
                            ng-if="addByPhone.friend
                                   && addByPhone.friend.id !== addByPhone.currentUser.id">
