@@ -21,7 +21,7 @@
         <div ng-if="item.friend && item.friend.username">
           <img class="item-image" ng-src="{{item.friend.getImageUrl()}}">
           <h2>{{item.friend.name}}</h2>
-          <p>{{item.friend.username}} - {{item.friend.points | number:0}}</p>
+          <p>{{item.friend.username}} | {{item.friend.points | number:0}}</p>
         </div>
 
         <!-- User Added by SMS (no username, no picture) -->
