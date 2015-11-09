@@ -148,6 +148,13 @@
         z-index: 3;
       }
     }
+    .loading-spinner {
+      right: 3px;
+      .spinner {
+        fill: #aaa;
+        stroke: #aaa;
+      }
+    }
   }
   #add-friends {
     .item-avatar {

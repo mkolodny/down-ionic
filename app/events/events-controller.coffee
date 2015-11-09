@@ -38,6 +38,10 @@ class EventsCtrl
         if newValue isnt oldValue
           @handleNewMatch()
 
+      # Show match pop-up when there is a new match
+      @$scope.$on 'selectFriendButton.newMatch', (event, friend) =>
+        @showMatchPopup friend
+
     # Subscribe to chat latest messages
     @$meteor.subscribe('newestMessages').then =>
       @newestMessagesLoaded = true
@@ -108,11 +112,6 @@ class EventsCtrl
           isDivider: false
           invitation: invitation
           id: invitation.id
-          # DON'T SET THE METEOR ANGULAR VARIABLES ON THE EVENT ITSELF!!
-          #   AngularMeteorObject.getRawObject() breaks... not sure why...
-          #   When passing an AngularMeteorObject into $state.go,
-          #   AngularMeteor.getRawObject() is automatically called. Therefore, do
-          #   not pass AngularMeteorObjects into $state.go.
           newestMessage: @getNewestMessage "#{invitation.event.id}"
 
     # Friends section
@@ -266,7 +265,7 @@ class EventsCtrl
       ]
     options =
       transform: @addPercentRemaining
-    @$scope.$meteorObject @Matches, selector, false, options
+    @Matches.findOne selector, options
 
   addPercentRemaining: (obj) =>
     # Add an exception for teamrallytap.
@@ -277,7 +276,7 @@ class EventsCtrl
     now = new Date().getTime()
     timeRemaining = obj.expiresAt.getTime() - now
     sixHours = 1000 * 60 * 60 * 6
-    obj.percentRemaining = (timeRemaining / sixHours) * 100
+    obj.percentRemaining = Math.round (timeRemaining / sixHours) * 100
     obj
 
   getMatches: ->
@@ -289,13 +288,7 @@ class EventsCtrl
         expiresAt: -1
 
   handleNewMatch: =>
-    # If second user in match, go into chat
     isSecondUser = @newestMatch.secondUserId is "#{@Auth.user.id}"
-    if isSecondUser
-      friendId = parseInt @newestMatch.firstUserId
-      friend = @Auth.user.friends[friendId]
-      @showMatchPopup friend
-
     @$mixpanel.track 'Match Friend',
       'is second user': isSecondUser
 

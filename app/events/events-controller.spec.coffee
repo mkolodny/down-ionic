@@ -216,6 +216,18 @@ describe 'events controller', ->
       it 'should handle the new match', ->
         expect(ctrl.handleNewMatch).toHaveBeenCalled()
 
+    describe 'when a new match event is emitted', ->
+      friend = null
+
+      beforeEach ->
+        friend = 'friend'
+        spyOn ctrl, 'showMatchPopup'
+        scope.$broadcast 'selectFriendButton.newMatch', friend
+        scope.$apply()
+
+      it 'should show the new match popup', ->
+        expect(ctrl.showMatchPopup).toHaveBeenCalledWith friend
+
 
   describe 'when the newestMessages subscription is ready', ->
 
@@ -972,9 +984,6 @@ describe 'events controller', ->
 
         ctrl.handleNewMatch()
 
-      it 'should show a match popup', ->
-        expect(ctrl.showMatchPopup).toHaveBeenCalledWith friend
-
       it 'should build the items list', ->
         expect(ctrl.buildItems).toHaveBeenCalledWith ctrl.invitations
 
@@ -1445,20 +1454,22 @@ describe 'events controller', ->
         expect(ctrl.selectFriend).toHaveBeenCalledWith item, event
 
 
+  ##getMatch
   describe 'getting a match', ->
     friendId = null
-    meteorObject = null
+    matchObject = null
     response = null
 
     beforeEach ->
-      meteorObject = 'meteorObject'
-      scope.$meteorObject = jasmine.createSpy('scope.$meteorObject') \
-        .and.returnValue meteorObject
+      matchObject = 'matchObject'
+      ctrl.Matches = 
+        findOne: jasmine.createSpy('Matches.findOne') \
+          .and.returnValue matchObject
       friendId = 1
       response = ctrl.getMatch friendId
 
-    it 'should return an AngularMeteorObject', ->
-      expect(response).toBe meteorObject
+    it 'should return a matchObject', ->
+      expect(response).toBe matchObject
 
     it 'should filter by friendId and add a tranform for time remaining', ->
       selector =
@@ -1469,8 +1480,7 @@ describe 'events controller', ->
         ]
       options =
         transform: ctrl.addPercentRemaining
-      expect(scope.$meteorObject).toHaveBeenCalledWith(ctrl.Matches,
-          selector, false, options)
+      expect(ctrl.Matches.findOne).toHaveBeenCalledWith selector, options
 
 
   ##handleLoadedData
