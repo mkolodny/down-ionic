@@ -36,6 +36,8 @@ describe 'event service', ->
       addPoints: jasmine.createSpy 'Auth.addPoints'
       Points:
         sentInvitation: 1
+        acceptedInvitation: 5
+
     $provide.value 'Auth', Auth
     return
   )
@@ -255,6 +257,7 @@ describe 'event service', ->
 
       it 'should add the points', ->
         expectedPoints = Auth.Points.sentInvitation * responseData.invitations.length
+        expectedPoints += Auth.Points.acceptedInvitation
         expect(Auth.addPoints).toHaveBeenCalledWith expectedPoints
 
       it 'should create invite_action messages', ->

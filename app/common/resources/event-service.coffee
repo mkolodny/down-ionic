@@ -82,6 +82,7 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
 
         # Add the points
         totalPoints = Auth.Points.sentInvitation * eventCopy.invitations.length
+        totalPoints += Auth.Points.acceptedInvitation
         Auth.addPoints totalPoints
 
         # Create invite_action messages
