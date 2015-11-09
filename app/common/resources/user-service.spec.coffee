@@ -86,6 +86,7 @@ describe 'user service', ->
         last_name: 'Turing'
         username: 'tdog'
         image_url: 'https://facebook.com/profile-pic/tdog'
+        points: 100
         location:
           type: 'Point'
           coordinates: [40.7265834, -73.9821535]
@@ -101,6 +102,7 @@ describe 'user service', ->
           lastName: response.last_name
           username: response.username
           imageUrl: response.image_url
+          points: response.points
           location:
             lat: response.location.coordinates[0]
             long: response.location.coordinates[1]
@@ -121,6 +123,7 @@ describe 'user service', ->
           name: response.name
           username: response.username
           imageUrl: response.image_url
+          points: response.points
         expect(User.deserialize response).toEqual expectedUser
 
 
@@ -136,6 +139,7 @@ describe 'user service', ->
           last_name: 'Clarke'
           username: 'jmamba'
           image_url: 'http://imgur.com/jcke'
+          points: 100
           location:
             type: 'Point'
             coordinates: [40.7265836, -73.9821539]
@@ -152,6 +156,7 @@ describe 'user service', ->
           lastName: friend.last_name
           username: friend.username
           imageUrl: friend.image_url
+          points: friend.points
           location:
             lat: friend.location.coordinates[0]
             long: friend.location.coordinates[1]
@@ -167,6 +172,7 @@ describe 'user service', ->
           lastName: response.last_name
           username: response.username
           imageUrl: response.image_url
+          points: response.points
           location:
             lat: response.location.coordinates[0]
             long: response.location.coordinates[1]

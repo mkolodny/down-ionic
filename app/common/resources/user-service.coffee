@@ -23,6 +23,7 @@ User = ['$http', '$q', '$resource', 'apiRoot', ($http, $q, $resource, apiRoot) -
       name: data.name
       username: data.username
       imageUrl: data.image_url
+      points: data.points
     if data.first_name?
       user.firstName = data.first_name
     if data.last_name?
