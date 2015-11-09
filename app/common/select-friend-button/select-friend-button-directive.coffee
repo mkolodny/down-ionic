@@ -27,7 +27,7 @@ selectFriendButtonDirective = ['$rootScope', '$state', '$meteor', '$mixpanel', '
       <i ng-if="!isLoading" class="fa fa-hand-o-up"></i>
       <i ng-if="!isLoading" class="fa fa-circle-thin"></i>
       <i ng-if="!isLoading" class="fa fa-circle"></i>
-      <i class="icon" ng-if="isLoading">
+      <i class="icon loading-spinner" ng-if="isLoading">
         <ion-spinner icon="bubbles"></ion-spinner>
       </i>
     </a>
