@@ -119,10 +119,6 @@ angular.module 'rallytap', [
         # Resume session from localStorage
         Auth.resumeSession()
       .then ->
-        # Update the user's friend list in case a user they added by phone number
-        # signed up.
-        Auth.getFriends()
-
         # Hide the accessory bar by default (remove this to show the accessory bar
         # above the keyboard for form inputs)
         $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
@@ -163,9 +159,17 @@ angular.module 'rallytap', [
             $ionicHistory.goBack()
         , 100 # override action priority 100 (Return to previous view)
 
-        # Track App Opens
         $ionicPlatform.on 'resume', ->
+          # Track App Opens
           $mixpanel.track 'Open App'
+
+          # Update the user's friend list in case a user 
+          #   they added by phone number signed up.
+          Auth.getFriends()
+          
+          # Update the user for an accurate point count
+          Auth.getMe().then (user) ->
+            Auth.setUser user
 
         # Update the user's location while they use the app.
         if Auth.flags.hasRequestedLocationServices \

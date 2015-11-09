@@ -6,6 +6,7 @@ bower = require 'bower'
 childProcess = require 'child_process'
 del = require 'del'
 concat = require 'gulp-concat'
+fs = require 'fs'
 glob = require 'glob'
 gulp = require 'gulp'
 gutil = require 'gulp-util'
@@ -150,6 +151,8 @@ gulp.task 'minify', [
 
 
 gulp.task 'unit', ->
+  fs.unlinkSync "#{testDir}/test-bundle.js"
+  
   # Watch all test files for changes, and re-browserify.
   glob "#{appDir}/**/*.spec.coffee", null, (err, files) ->
     bundler = browserify

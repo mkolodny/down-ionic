@@ -10,6 +10,7 @@ class EventsCtrl
                 @$state, @$timeout, @Auth, @Friendship, @Invitation,
                 @ngToast, @User) ->
     # Init the view.
+    @currentUser = @Auth.user
     @addedMe = []
     @invitations = {}
 

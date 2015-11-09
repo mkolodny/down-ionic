@@ -152,6 +152,9 @@ describe 'events controller', ->
       Auth: Auth
   )
 
+  it 'should set the current user on the controller', ->
+    expect(ctrl.currentUser).toBe Auth.user
+
   it 'should init added me', ->
     expect(ctrl.addedMe).toEqual []
 
