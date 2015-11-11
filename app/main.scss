@@ -272,6 +272,11 @@ body {
   border-bottom-color: transparent !important;
   background-image: none;
   border-bottom: 1px solid darken($brand-color, 12%) !important;
+  font-family: 'Montserrat', 'Helvetica Neue', 'Roboto', 'Segoe UI', sans-serif !important;
+
+  .title {
+    font-family: 'Montserrat', 'Helvetica Neue', 'Roboto', 'Segoe UI', sans-serif !important;
+  }
 }
 .hide-nav-bottom-border {
   .bar-header {
