@@ -17,6 +17,7 @@ describe 'create event controller', ->
   $q = null
   $state = null
   $window = null
+  Auth = null
   ctrl = null
   deferredTemplate = null
   LinkInvitation = null
@@ -40,10 +41,14 @@ describe 'create event controller', ->
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     $window = $injector.get '$window'
+    Auth = $injector.get 'Auth'
     scope = $injector.get '$rootScope'
 
     deferredTemplate = $q.defer()
     spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
+
+    # Mock the current user.
+    Auth.currentUser = {id: 1}
 
     ctrl = $controller CreateEventCtrl,
       $scope: scope
@@ -62,6 +67,9 @@ describe 'create event controller', ->
     minAcceptedOptions = ({value: option, name: "#{option} People Minimum"} \
         for option in options)
     expect(ctrl.minAcceptedOptions).toEqual minAcceptedOptions
+
+  it 'should set the current user on the controller', ->
+    expect(ctrl.currentUser).toBe Auth.user
 
   describe 'when entering the view', ->
 
@@ -300,3 +308,15 @@ describe 'create event controller', ->
 
       it 'should hide the action sheet', ->
         expect(hideSheet).toHaveBeenCalled()
+
+
+  ##viewChats
+  describe 'viewing your chats', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.viewChats()
+
+    fit 'should go to the chats view', ->
+      expect($state.go).toHaveBeenCalledWith 'events'

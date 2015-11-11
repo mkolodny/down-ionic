@@ -25,7 +25,7 @@ angular.module 'rallytap.events', [
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'events',
-      url: '/'
+      url: '/events'
       templateUrl: 'app/events/events.html'
       controller: 'EventsCtrl as events'
   .controller 'EventsCtrl', EventsCtrl

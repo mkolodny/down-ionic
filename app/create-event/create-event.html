@@ -1,4 +1,17 @@
-<ion-view id="create-event" view-title="Who's down to...">
+<ion-view id="create-event"
+          view-title="Who's down to..."
+          hide-back-button="true"
+          can-swipe-back="false">
+  <ion-nav-buttons side="left">
+    <button class="button button-clear icon"
+            id="chats-nav"
+            ng-click="createEvent.viewChats()"
+            ontouchstart
+            ><i class="fa fa-comments fa-lg"></i></button>
+  </ion-nav-buttons>
+  <ion-nav-buttons side="right">
+    <span id="points-nav">{{createEvent.currentUser.points | number:0}}</span>
+  </ion-nav-buttons>
   <ion-content>
     <div class="list" id="details">
       <div class="item" id="what">

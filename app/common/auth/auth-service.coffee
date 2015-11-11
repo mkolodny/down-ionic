@@ -205,7 +205,7 @@ class Auth
          and (isIOS or isAndroid)
       @$state.go 'findFriends'
     else
-      @$state.go 'events'
+      @$state.go 'createEvent'
 
   watchLocation: ->
     deferred = @$q.defer()

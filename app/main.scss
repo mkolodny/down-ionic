@@ -281,7 +281,6 @@ body {
 ion-nav-back-button {
   display: none;
 }
-
 .bar {
   background-color: $brand-color;
 
@@ -311,6 +310,11 @@ ion-nav-back-button {
 }
 #create-event-nav {
   font-size: 20px;
+}
+#points-nav {
+  color: #fff;
+  font-size: 18px;
+  padding-top: 8px;
 }
 .platform-ios {
   #event-title {

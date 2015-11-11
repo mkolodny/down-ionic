@@ -152,9 +152,6 @@ describe 'events controller', ->
       Auth: Auth
   )
 
-  it 'should set the current user on the controller', ->
-    expect(ctrl.currentUser).toBe Auth.user
-
   it 'should init added me', ->
     expect(ctrl.addedMe).toEqual []
 
@@ -1465,7 +1462,7 @@ describe 'events controller', ->
 
     beforeEach ->
       matchObject = 'matchObject'
-      ctrl.Matches = 
+      ctrl.Matches =
         findOne: jasmine.createSpy('Matches.findOne') \
           .and.returnValue matchObject
       friendId = 1

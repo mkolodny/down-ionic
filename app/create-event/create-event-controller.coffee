@@ -1,8 +1,13 @@
 class CreateEventCtrl
   @$inject: ['$cordovaDatePicker', '$filter', '$ionicActionSheet',
-             '$ionicHistory', '$ionicModal', '$scope', '$state', '$window']
+             '$ionicHistory', '$ionicModal', '$scope', '$state', '$window',
+             'Auth']
   constructor: (@$cordovaDatePicker, @$filter, @$ionicActionSheet,
-                @$ionicHistory, @$ionicModal, @$scope, @$state, @$window) ->
+                @$ionicHistory, @$ionicModal, @$scope, @$state, @$window
+                @Auth) ->
+    # Init the view.
+    @currentUser = @Auth.user
+
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
         scope: @$scope
@@ -86,5 +91,8 @@ class CreateEventCtrl
           hideSheet()
 
     hideSheet = @$ionicActionSheet.show options
+
+  viewChats: ->
+    @$state.go 'events'
 
 module.exports = CreateEventCtrl

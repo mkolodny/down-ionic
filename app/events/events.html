@@ -1,19 +1,19 @@
-<ion-view id="events" hide-back-button="true" can-swipe-back="false">
-  <ion-nav-title>
-    <span id="nav-points">{{events.currentUser.points | number:0}}</span>
-  </ion-nav-title>
-  <ion-nav-buttons side="right">
-    <button class="button button-clear icon"
-            id="create-event-nav"
-            ng-click="events.createEvent()"
-            ontouchstart
-            ><i class="fa fa-edit fa-lg"></i></button>
-  </ion-nav-buttons>
+<ion-view id="events"
+          view-title="Chats"
+          hide-back-button="true"
+          can-swipe-back="false">
   <ion-nav-buttons side="left">
     <button class="button button-clear icon"
             ng-click="events.myFriends()"
             ontouchstart
             ><i class="fa fa-users fa-lg"></i></button>
+  </ion-nav-buttons>
+  <ion-nav-buttons side="right">
+    <button class="button button-clear icon"
+            id="create-event-nav"
+            ng-click="events.createEvent()"
+            ontouchstart
+            ><i class="fa fa-bullhorn fa-lg"></i></button>
   </ion-nav-buttons>
   <ion-content id="events-content">
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="events.refresh()"
