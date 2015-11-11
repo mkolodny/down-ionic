@@ -1,10 +1,10 @@
 class CreateEventCtrl
   @$inject: ['$cordovaDatePicker', '$filter', '$ionicActionSheet',
-             '$ionicHistory', '$ionicModal', '$scope', '$state', '$window',
-             'Auth']
+             '$ionicHistory', '$ionicModal', '$scope', '$state',
+             '$window', 'Auth']
   constructor: (@$cordovaDatePicker, @$filter, @$ionicActionSheet,
-                @$ionicHistory, @$ionicModal, @$scope, @$state, @$window
-                @Auth) ->
+                @$ionicHistory, @$ionicModal, @$scope, @$state,
+                @$window, @Auth) ->
     # Init the view.
     @currentUser = @Auth.user
 

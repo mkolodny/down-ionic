@@ -318,5 +318,5 @@ describe 'create event controller', ->
 
       ctrl.viewChats()
 
-    fit 'should go to the chats view', ->
+    it 'should go to the chats view', ->
       expect($state.go).toHaveBeenCalledWith 'events'

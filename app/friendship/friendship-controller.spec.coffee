@@ -857,7 +857,7 @@ describe 'friendship controller', ->
         ctrl.messages.remove = jasmine.createSpy 'messages.remove'
 
         scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
-        
+
         meteorObject = 'meteorObject'
         scope.$meteorObject = jasmine.createSpy('scope.$meteorObject') \
           .and.returnValue meteorObject
@@ -1015,7 +1015,7 @@ describe 'friendship controller', ->
     beforeEach ->
       event =
         id: 1
-      invitation = 
+      invitation =
         event: new Event event
       membersCount =
         count: 2
@@ -1133,8 +1133,3 @@ describe 'friendship controller', ->
           cancelText: 'Cancel'
           buttonClicked: jasmine.any Function
         expect($ionicActionSheet.show).toHaveBeenCalledWith options
-
-     
-
-
-    

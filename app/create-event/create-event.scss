@@ -1,5 +1,5 @@
 #create-event {
-  background-color: #eee;
+  background-color: $brand-color;
 
   .list {
     margin: auto;
@@ -25,31 +25,32 @@
     width: 100%;
     font-size: 16px;
     background-color: #fff;
+    font-family: 'Montserrat', 'Helvetica Neue', 'Roboto', 'Segoe UI', sans-serif;
   }
   .fa-times {
     color: #bbb;
     position: absolute;
     right: 15px;
-    top: 20px;
+    top: 18px;
   }
   #what {
     border-top-left-radius: 30px;
     border-top-right-radius: 30px;
-    border-top: 1px solid #bbb;
+    border-top: 1px solid darken($brand-color, 12%);
   }
   #what,
   #when,
   #where,
   #min-accepted,
   #more {
-    border-left: 1px solid #bbb;
-    border-right: 1px solid #bbb;
+    border-left: 1px solid darken($brand-color, 12%);
+    border-right: 1px solid darken($brand-color, 12%);
   }
   #min-accepted,
   #more {
     border-bottom-left-radius: 30px;
     border-bottom-right-radius: 30px;
-    border-bottom: 1px solid #bbb;
+    border-bottom: 1px solid darken($brand-color, 12%);
   }
   #more {
     height: 55px;
@@ -72,15 +73,16 @@
     opacity: 0;
   }
   #min-accepted-text {
+    font-family: 'Montserrat', 'Helvetica Neue', 'Roboto', 'Segoe UI', sans-serif;
     position: absolute;
     width: 100%;
-    padding-top: 17px;
+    padding-top: 18px;
     text-align: center;
     color: #000;
   }
   #invite-friends {
-    background-color: $link-color;
-    border: 1px solid $link-hover-color;
+    background-color: #ed6700;
+    border: 1px solid darken(#ed6700, 10%);
     padding-top: 11px;
     padding-bottom: 11px;
     border-radius: 30px;
@@ -90,7 +92,7 @@
     margin: auto;
 
     &.activated {
-      background-color: $link-hover-color;
+      background-color: darken(#ed6700, 10%);
     }
   }
 }
