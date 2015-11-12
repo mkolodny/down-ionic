@@ -279,6 +279,7 @@ class InviteFriendsCtrl
       'existing event': 'id' of @event
       'number of invites': @selectedFriends.length
       'all nearby': @isAllNearbyFriendsSelected
+      'is locked': angular.isDefined @event.minAccepted
 
   addFriends: ->
     @cleanupViewAfterLeave = false

@@ -834,6 +834,7 @@ describe 'invite friends controller', ->
       beforeEach ->
         ctrl.event =
           id: 1
+          minAccepted: 4
 
         ctrl.trackSendInvites()
 
@@ -842,12 +843,14 @@ describe 'invite friends controller', ->
           'existing event': true
           'number of invites': ctrl.selectedFriends.length
           'all nearby': ctrl.isAllNearbyFriendsSelected
+          'is locked': true
 
 
     describe 'when creating an event', ->
 
       beforeEach ->
-        ctrl.event = {}
+        ctrl.event = 
+          minAccepted: 4
 
         ctrl.trackSendInvites()
 
@@ -856,6 +859,7 @@ describe 'invite friends controller', ->
           'existing event': false
           'number of invites': ctrl.selectedFriends.length
           'all nearby': ctrl.isAllNearbyFriendsSelected
+          'is locked': true
 
 
   describe 'adding friends', ->
