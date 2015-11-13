@@ -166,6 +166,9 @@ describe 'Contacts service', ->
         cordovaDeferred.reject cordovaError
         scope.$apply()
 
+      it 'should set hasRequestedContacts to true', ->
+        expect(Auth.setFlag).toHaveBeenCalledWith 'hasRequestedContacts', true
+
       it 'should reject the promise', ->
         expect(error.code).toEqual 'PERMISSION_DENIED_ERROR'
 

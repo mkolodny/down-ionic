@@ -24,6 +24,7 @@ class Contacts
 
         @identifyContacts contacts
       , (error) =>
+        @Auth.setFlag 'hasRequestedContacts', true
         # Overwrite the error for now with a single error message.
         error =
           code: 'PERMISSION_DENIED_ERROR'
