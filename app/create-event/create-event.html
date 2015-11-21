@@ -2,13 +2,6 @@
           view-title="Who's down to..."
           hide-back-button="true"
           can-swipe-back="false">
-  <ion-nav-buttons side="left">
-    <button class="button button-clear icon"
-            id="chats-nav"
-            ng-click="createEvent.viewChats()"
-            ontouchstart
-            ><i class="fa fa-comments fa-lg"></i></button>
-  </ion-nav-buttons>
   <ion-nav-buttons side="right">
     <span id="points-nav">{{createEvent.currentUser.points | number:0}}</span>
   </ion-nav-buttons>
@@ -39,33 +32,6 @@
         <i class="fa fa-times"
            ng-if="createEvent.place"
            ng-click="createEvent.place = null"></i>
-      </div>
-      <div class="item" id="min-accepted" ng-if="createEvent.showMinAccepted">
-        <div id="min-accepted-text"
-              ng-if="!createEvent.minAccepted"
-              >
-          1 Person Minimum <i class="fa fa-sort"></i>
-        </div>
-        <div id="min-accepted-text"
-              ng-if="createEvent.minAccepted"
-              >
-          {{createEvent.minAccepted}} People Minimum <i class="fa fa-sort"></i>
-        </div>
-        <select id="select-min-accepted"
-                ng-model="createEvent.minAccepted"
-                ng-options="option.value as option.name for option in createEvent.minAcceptedOptions">
-          <option value="">1 Person Minimum</option>
-        </select>
-        <i class="fa fa-times"
-           ng-if="createEvent.showMinAccepted"
-           ng-click="createEvent.showMinAccepted = false"></i>
-      </div>
-      <div class="item"
-           id="more"
-           ng-click="createEvent.showMoreOptions()"
-           ontouchstart
-           ng-if="!createEvent.showMinAccepted">
-        <i class="fa fa-ellipsis-h fa-2x"></i>
       </div>
     </div>
     <div class="list" id="button-list">
