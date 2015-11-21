@@ -62,6 +62,13 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
     else
       "#{friendId},#{Auth.user.id}"
 
+  resource.parseChatId = (chatId) ->
+    ids = chatId.split ','
+    if ids[0] is "#{Auth.user.id}"
+      ids[1]
+    else
+      ids[0]
+
   resource
 ]
 

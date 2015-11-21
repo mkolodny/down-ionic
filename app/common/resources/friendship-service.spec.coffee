@@ -227,3 +227,17 @@ describe 'friendship service', ->
 
       it 'should return the friend\'s id first', ->
         expect(chatId).toBe "#{friendId},#{Auth.user.id}"
+
+
+  describe 'getting a friend id from a chat id', ->
+    friendId = null
+    result = null
+
+    beforeEach ->
+      Auth.user = {id: 1}
+      friendId = 2
+      chatId = Friendship.getChatId friendId
+      result = Friendship.parseChatId chatId
+
+    it 'should return the friend id', ->
+      expect(result).toBe "#{friendId}"

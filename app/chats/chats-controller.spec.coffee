@@ -1,44 +1,28 @@
-require '../ionic/ionic.js' # for ionic module
 require 'angular'
-require 'angular-animate' # for ionic module
 require 'angular-mocks'
-require 'angular-sanitize' # for ionic module
 require 'angular-ui-router'
-require '../ionic/ionic-angular.js' # for ionic module
-require 'ng-toast'
 require '../common/auth/auth-module'
 require '../common/meteor/meteor-mocks'
-require '../common/mixpanel/mixpanel-module'
 require './chats-module'
 ChatsCtrl = require './chats-controller'
 
-describe 'chats controller', ->
-  $compile = null
-  $httpBackend = null
-  $ionicHistory = null
-  $ionicPlatform = null
-  $ionicPopup = null
+fdescribe 'chats controller', ->
   $meteor = null
-  $mixpanel = null
   $q = null
   $state = null
-  $timeout = null
-  $window = null
+  allChatsDeferred = null
   Auth = null
+  chat1 = null
+  chat2 = null
   ctrl = null
   chatsCollection = null
-  deferredGetInvitations = null
-  deferredTemplate = null
+  chatIds = null
   earlier = null
-  Event = null
   Friendship = null
   item = null
-  invitation = null
+  messagesCollection = null
+  messagesDeferred = null
   later = null
-  Invitation = null
-  newestMessagesCollection = null
-  newestMessagesDeferred = null
-  ngToast = null
   scope = null
   User = null
 
@@ -52,120 +36,159 @@ describe 'chats controller', ->
 
   beforeEach angular.mock.module('ionic')
 
-  beforeEach angular.mock.module('ngToast')
-
-  beforeEach angular.mock.module('analytics.mixpanel')
-
   beforeEach inject(($injector) ->
-    $compile = $injector.get '$compile'
     $controller = $injector.get '$controller'
-    $httpBackend = $injector.get '$httpBackend'
-    $ionicHistory = $injector.get '$ionicHistory'
-    $ionicPlatform = $injector.get '$ionicPlatform'
-    $ionicPopup = $injector.get '$ionicPopup'
     $meteor = $injector.get '$meteor'
-    $mixpanel = $injector.get '$mixpanel'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
-    $timeout = $injector.get '$timeout'
-    $window = $injector.get '$window'
     Auth = $injector.get 'Auth'
     Event = $injector.get 'Event'
     Friendship = $injector.get 'Friendship'
-    Invitation = $injector.get 'Invitation'
-    ngToast = $injector.get 'ngToast'
     scope = $rootScope.$new()
     User = $injector.get 'User'
 
     earlier = new Date()
     later = new Date earlier.getTime()+1
-    invitation = new Invitation
-      id: 1
-      event: new Event
-        id: 1
-        title: 'bars?!?!!?'
-        creator: 2
-        canceled: false
-        datetime: new Date()
-        createdAt: new Date()
-        updatedAt: earlier
-        place:
-          name: 'B Bar & Grill'
-          lat: 40.7270718
-          long: -73.9919324
-      fromUser: new User
-        id: 3
-        email: 'aturing@gmail.com'
-        name: 'Alan Turing'
-        username: 'tdog'
-        imageUrl: 'https://facebook.com/profile-pics/tdog'
-        location:
-          lat: 40.7265834
-          long: -73.9821535
-      toUser: 4
-      response: Invitation.noResponse
-      open: false
-      muted: false
-      lastViewed: later
-      createdAt: new Date()
-      updatedAt: new Date()
-    item =
-      isDivider: false
-      invitation: invitation
-      id: invitation.id
 
-    # This is necessary because for some reason ionic is requesting this file
-    # when the promise gets resolved.
-    # TODO: Figure out why, and remove this.
-    $httpBackend.whenGET 'app/events/events.html'
-      .respond ''
 
-    deferredGetInvitations = $q.defer()
-    spyOn(Invitation, 'getMyInvitations').and.returnValue \
-        deferredGetInvitations.promise
-    spyOn $ionicPlatform, 'on'
-
-    newestMessagesCollection = 'newestMessagesCollection'
-    chatsCollection = 'chatsCollection'
+    # Mock chats
+    Auth.user =
+      id: 2
+    chat1 =
+      _id: '2,3'
+    chat2 =
+      _id: '2,4'
+    chats = [chat1, chat2]
+    chatIds = [chat1._id, chat2._id]
+    fetch = jasmine.createSpy('find.fetch').and.returnValue chats
+    chatsCollection =
+      find: jasmine.createSpy('Chats.find').and.returnValue {fetch: fetch}
+    messagesCollection = 'messagesCollection'
     $meteor.getCollectionByName.and.callFake (collectionName) ->
-      if collectionName is 'newestMessages' then return newestMessagesCollection
+      if collectionName is 'messages' then return messagesCollection
       if collectionName is 'chats' then return chatsCollection
 
-    newestMessagesDeferred = $q.defer()
-    $meteor.subscribe.and.callFake (subscriptionName) =>
-      if subscriptionName is 'newestMessages'
-        return newestMessagesDeferred.promise
+    allChatsDeferred = $q.defer()
+    messagesDeferred = $q.defer()
+    $meteor.subscribe.and.callFake (subscriptionName)->
+      if subscriptionName is 'allChats' then return allChatsDeferred.promise
+      if subscriptionName is 'messages' then return messagesDeferred.promise
 
     ctrl = $controller ChatsCtrl,
       $scope: scope
       Auth: Auth
   )
+  
+  it 'should init the users object', ->
+    expect(ctrl.users).toEqual {}
 
   it 'should set the Chats collection on the controller', ->
     expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
     expect(ctrl.Chats).toBe chatsCollection
 
-  it 'should subscribe to the newestMessages', ->
-    expect($meteor.subscribe).toHaveBeenCalledWith 'newestMessages'
-
   it 'should subscribe to all the chats', ->
     expect($meteor.subscribe).toHaveBeenCalledWith 'allChats'
 
-  describe 'when the newestMessages subscription is ready', ->
+  describe 'when the allChats subscription is ready', ->
 
     beforeEach ->
       spyOn ctrl, 'handleLoadedData'
       spyOn ctrl, 'watchNewMessages'
+      spyOn ctrl, 'watchNewChats'
+      spyOn ctrl, 'getChatUsers'
 
-      newestMessagesDeferred.resolve()
+      allChatsDeferred.resolve()
       scope.$apply()
 
-    it 'should subscribe to all messages', ->
-      expect($meteor.subscribe).toHaveBeenCalledWith 'allMessages'
+    it 'should set the all chats loaded flag', ->
+      expect(ctrl.allChatsLoaded).toBe true
 
-    it 'should watch for new messages', ->
-      expect(ctrl.watchNewMessages).toHaveBeenCalled()
+    it 'should subscribe to messages for all of the chats', ->
+      expect($meteor.subscribe).toHaveBeenCalledWith 'messages', chatIds
+
+    it 'should get the users for each chat', ->
+      expect(ctrl.getChatUsers).toHaveBeenCalledWith chatIds
+
+    describe 'when messages subscription is ready', ->
+
+      beforeEach ->
+        messagesDeferred.resolve()
+        scope.$apply()
+
+      it 'should set the messages loaded flag', ->
+        expect(ctrl.messagesLoaded).toBe true
+
+      it 'should watch for new messages', ->
+        expect(ctrl.watchNewMessages).toHaveBeenCalled()
+
+      it 'should watch for new chats', ->
+        expect(ctrl.watchNewChats).toHaveBeenCalled()
+
+      it 'should handleLoadedData', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
+
+
+  ##handleLoadedData
+  describe 'handling loaded data', ->
+
+    describe 'when all data is loaded', ->
+
+      beforeEach ->
+        ctrl.allChatsLoaded = true
+        ctrl.messagesLoaded = true
+        ctrl.chatUsersLoaded = true
+
+        spyOn(ctrl, 'buildItems').and.returnValue []
+
+        ctrl.handleLoadedData()
+
+      it 'should build the items and set them on the controller', ->
+        expect(ctrl.items).toEqual []
+
+
+  ##buildItems
+
+  ##watchNewChats
+  
+
+  ##getChatUsers
+  describe 'getting users from chat ids', ->
+    deferred = null
+
+    beforeEach ->
+      deferred = $q.defer()
+      spyOn(User, 'query').and.returnValue {$promise: deferred.promise}
+
+      ctrl.getChatUsers chatIds
+
+    it 'should request the users', ->
+      userIds = (Friendship.parseChatId(chatId) for chatId in chatIds)
+      expect(User.query).toHaveBeenCalledWith userIds
+
+    describe 'when the users are returned successfully', ->
+      user1 = null
+      user2 = null
+
+      beforeEach ->
+        user1 =
+          id: 1
+        user2 = 
+          id: 2
+        users = [user1, user2]
+
+        deferred.resolve users
+        scope.$apply()
+
+      it 'should set the users object on the controller', ->
+        usersObject =
+          1: user1
+          2: user2
+        expect(ctrl.users).toEqual usersObject
+
+      it 'should set the chat users loaded flag', ->
+        expect(ctrl.chatUsersLoaded).toBe true
+
 
   ##watchNewMessages
   describe 'watching for new messages', ->

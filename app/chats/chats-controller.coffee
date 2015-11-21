@@ -1,37 +1,53 @@
 haversine = require 'haversine'
 
 class ChatsCtrl
-  @$inject: ['$cordovaDatePicker', '$ionicHistory', '$ionicLoading',
-             '$ionicPlatform', '$ionicPopup', '$meteor', '$mixpanel', '$scope',
-             '$state', '$timeout', 'Auth', 'Friendship', 'Invitation',
-             'ngToast', 'User']
-  constructor: (@$cordovaDatePicker, @$ionicHistory, @$ionicLoading,
-                @$ionicPlatform, @$ionicPopup, @$meteor, @$mixpanel, @$scope,
-                @$state, @$timeout, @Auth, @Friendship, @Invitation,
-                @ngToast, @User) ->
+  @$inject: ['$ionicLoading', '$meteor', '$scope',
+             '$state', 'Auth', 'Friendship', 'User']
+  constructor: (@$ionicLoading, @$meteor, @$scope,
+                @$state, @Auth, @Friendship, @User) ->
+    # Init variables
+    @users = {}
+
     # Set Meteor collections on controller
     @Messages = @$meteor.getCollectionByName 'messages'
     @Chats = @$meteor.getCollectionByName 'chats'
 
-    # Subscribe to all chats for unread messages
-    @$meteor.subscribe 'allChats'
-
-    # Subscribe to chat latest messages
-    @$meteor.subscribe('newestMessages').then =>
+    # Subscribe to all chats
+    @$meteor.subscribe('allChats').then =>
+      @allChatsLoaded = true
+      # Subscribe to messages for all chats
+      allChats = @Chats.find().fetch()
+      chatIds = (chat._id for chat in allChats)
+      @$meteor.subscribe 'messages', chatIds
+      # Get users for chats
+      @getChatUsers chatIds
+    .then =>
+      @messagesLoaded = true
+      # messages subscription is ready
       @handleLoadedData()
       @watchNewMessages()
-
-      @$meteor.subscribe 'allMessages'
-
+      @watchNewChats()
 
   handleLoadedData: ->
+    if @allChatsLoaded and @messagesLoaded and @chatUsersLoaded
+      @items = @buildItems()
 
+  buildItems: ->
 
-  watchNewMessages: ->
-    @Messages = @$scope.$meteorCollection @Messages
+  watchNewChats: ->
+
+  getChatUsers: (chatIds) ->
+    userIds = (@Friendship.parseChatId(chatId) for chatId in chatIds)
+    @User.query(userIds).$promise.then (users) =>
+      for user in users
+        @users[user.id] = user
+      @chatUsersLoaded = true
+
+  watchNewMessages: =>
+    @messages = @$scope.$meteorCollection @Messages
     @$scope.$watch =>
       # TODO : Only compare newest
-      (message for message in @Messages)
+      (message for message in @messages)
     , (oldValue, newValue) =>
       if oldValue isnt newValue
         @handleLoadedData()
