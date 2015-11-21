@@ -10,7 +10,7 @@ angular.module 'rallytap.addedMe', [
     'rallytap.resources'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'addedMe',
+    $stateProvider.state 'friends.addedMe',
       url: '/added-me'
       templateUrl: 'app/added-me/added-me.html'
       controller: 'AddedMeCtrl as addedMe'

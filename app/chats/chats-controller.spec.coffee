@@ -9,10 +9,10 @@ require 'ng-toast'
 require '../common/auth/auth-module'
 require '../common/meteor/meteor-mocks'
 require '../common/mixpanel/mixpanel-module'
-require './events-module'
-EventsCtrl = require './events-controller'
+require './chats-module'
+ChatsCtrl = require './chats-controller'
 
-describe 'events controller', ->
+describe 'chats controller', ->
   $compile = null
   $httpBackend = null
   $ionicHistory = null
@@ -48,7 +48,7 @@ describe 'events controller', ->
 
   beforeEach angular.mock.module('rallytap.auth')
 
-  beforeEach angular.mock.module('rallytap.events')
+  beforeEach angular.mock.module('rallytap.chats')
 
   beforeEach angular.mock.module('ionic')
 
@@ -137,7 +137,7 @@ describe 'events controller', ->
       if subscriptionName is 'newestMessages'
         return newestMessagesDeferred.promise
 
-    ctrl = $controller EventsCtrl,
+    ctrl = $controller ChatsCtrl,
       $scope: scope
       Auth: Auth
   )

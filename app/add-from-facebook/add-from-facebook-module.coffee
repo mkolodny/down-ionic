@@ -10,7 +10,7 @@ angular.module 'rallytap.addFromFacebook', [
     'rallytap.friendshipButton'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'addFromFacebook',
+    $stateProvider.state 'friends.addFromFacebook',
       url: '/add-from-facebook'
       templateUrl: 'app/add-from-facebook/add-from-facebook.html'
       controller: 'AddFromFacebookCtrl as addFromFacebook'

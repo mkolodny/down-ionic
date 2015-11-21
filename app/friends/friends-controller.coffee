@@ -3,28 +3,21 @@ class FriendsCtrl
   constructor: (@$ionicHistory, @$state) ->
 
   showMyFriends: ->
-    @$state.go 'myFriends'
+    @$state.go 'friends.myFriends'
 
   showAddedMe: ->
-    @$state.go 'addedMe'
+    @$state.go 'friends.addedMe'
 
   addByUsername: ->
-    @$state.go 'addByUsername'
+    @$state.go 'friends.addByUsername'
 
   addFromAddressBook: ->
-    @$state.go 'addFromAddressBook'
+    @$state.go 'friends.addFromAddressBook'
 
   addFromFacebook: ->
-    @$state.go 'addFromFacebook'
+    @$state.go 'friends.addFromFacebook'
 
   addByPhone: ->
-    @$state.go 'addByPhone'
-
-  goBack: ->
-    # Don't animate the transition to the events view.
-    @$ionicHistory.nextViewOptions
-      disableAnimate: true
-
-    @$state.go 'events'
+    @$state.go 'friends.addByPhone'
 
 module.exports = FriendsCtrl

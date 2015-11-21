@@ -10,7 +10,7 @@ angular.module 'rallytap.addByUsername', [
     'rallytap.friendshipButton'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'addByUsername',
+    $stateProvider.state 'friends.addByUsername',
       url: '/add-by-username'
       templateUrl: 'app/add-by-username/add-by-username.html'
       controller: 'AddByUsernameCtrl as addByUsername'

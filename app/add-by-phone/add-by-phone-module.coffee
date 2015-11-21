@@ -12,7 +12,7 @@ angular.module 'rallytap.addByPhone', [
     'rallytap.friendshipButton'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'addByPhone',
+    $stateProvider.state 'friends.addByPhone',
       url: '/add-by-phone'
       templateUrl: 'app/add-by-phone/add-by-phone.html'
       controller: 'AddByPhoneCtrl as addByPhone'

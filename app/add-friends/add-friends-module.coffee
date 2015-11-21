@@ -4,7 +4,7 @@ angular.module 'rallytap.addFriends', [
     'ui.router'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'addFriends',
+    $stateProvider.state 'friends.addFriends',
       url: '/add-friends'
       templateUrl: 'app/add-friends/add-friends.html'
       controller: 'AddFriendsCtrl as addFriends'
