@@ -1,0 +1,55 @@
+<ion-view id="chats"
+          view-title="Chats"
+          hide-back-button="true"
+          can-swipe-back="false">
+  <ion-content id="chats-content">
+    <ion-list class="list-avatar" ng-if="chats.items.length > 0">
+      <ion-item collection-repeat="item in chats.items track by item.id"
+                item-width="100%"
+                item-height="item.isDivider ? '23px' : '72px'"
+                ng-class="{
+                  'item-divider': item.isDivider,
+                  'item-avatar': !item.isDivider,
+                  'item-icon-right': !item.isDivider,
+                  updated: !item.isDivider && !chats.wasRead(item.newestMessage),
+                  last: $last
+                }">
+        <!-- Divider -->
+        <div ng-if="item.isDivider">
+          <span class="divider-title">{{item.title}}</span>
+          <div class="divider-line"></div>
+        </div>
+
+        <!-- Friend -->
+        <div ng-if="item.friend"
+             ng-click="chats.viewFriendChat(item)">
+          <img class="item-image"
+               ng-src="{{item.friend.getImageUrl()}}">
+          <canvas class="chart chart-pie avatar-pie"
+                  data="[
+                    (100 - item.match.percentRemaining),
+                    item.match.percentRemaining
+                  ]"
+                  labels="['', '']"
+                  colours="['#ffffff', 'rgba(0,0,0,0)']" width="53" height="53"
+                  options="{
+                    segmentShowStroke: false, 
+                    animation: false, 
+                    responsive: false, 
+                    showTooltips: false
+                  }"
+                  ></canvas>
+          <h2>{{item.friend.name}}</h2>
+          <p class="latest-message">
+            <span ng-if="item.newestMessage.text && chats.isRecentMessage(item.newestMessage)">
+              {{item.newestMessage.text}}
+            </span>
+            <span ng-if="!item.newestMessage.text || !chats.isRecentMessage(item.newestMessage)">
+              {{chats.getDistanceAway(item.friend)}}
+            </span>
+          </p>
+        </div>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

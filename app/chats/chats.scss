@@ -1,4 +1,4 @@
-#events {
+#chats {
   #spinner-container {
     text-align: center;
     margin-top: 25px;
@@ -113,48 +113,6 @@
   .fa-hand-o-up {
     font-size: 19px;
     right: -25px;
-  }
-  .friend-select-pie {
-    position: absolute;
-  }
-  .match-button {
-    text-decoration: none;
-
-    i,
-    .friend-select-pie {
-      position: relative;
-    }
-    .fa-circle-thin,
-    .fa-circle {
-      right: 0;
-    }
-    &.selected {
-      .fa-circle-thin {
-        display: none;
-      }
-      .fa-circle {
-        display: flex;
-      }
-      .fa-hand-o-up {
-        color: #fff;
-        z-index: 2;
-        font-size: 20px;
-      }
-      .friend-select-pie {
-        display: block;
-        position: absolute;
-        top: 21px;
-        right: 2px;
-        z-index: 3;
-      }
-    }
-    .loading-spinner {
-      right: 3px;
-      .spinner {
-        fill: #aaa;
-        stroke: #aaa;
-      }
-    }
   }
   #add-friends {
     .item-avatar {

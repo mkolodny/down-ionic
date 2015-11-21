@@ -31,6 +31,8 @@ $button-positive-text: #fff;
 
 // Include all of Ionic
 @import "./ionic/scss/ionic";
+// TODO : REPLACE WITH FONTAWESOME
+@import "./ionic/ionicons/ionicons.scss";
 
 // Include each view's scss
 @import "./common/intl-phone/intlTelInput";

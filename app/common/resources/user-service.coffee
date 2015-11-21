@@ -99,6 +99,10 @@ User = ['$http', '$q', '$resource', 'apiRoot', ($http, $q, $resource, apiRoot) -
 
     deferred.promise
 
+  resource.getMyInvitationUsers = ->
+    # TODO: Make this work
+    # '/user/invitation-users'
+
   resource::getImageUrl = (size = 100) ->
     "#{@imageUrl}?width=#{size}&height=#{size}"
 

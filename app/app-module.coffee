@@ -22,7 +22,7 @@ require './request-push/request-push-module'
 require './request-location/request-location-module'
 require './request-contacts/request-contacts-module'
 require './find-friends/find-friends-module'
-require './events/events-module'
+require './chats/chats-module'
 require './invite-friends/invite-friends-module'
 require './add-by-phone/add-by-phone-module'
 require './add-by-username/add-by-username-module'
@@ -56,7 +56,7 @@ angular.module 'rallytap', [
     'rallytap.requestLocation'
     'rallytap.requestContacts'
     'rallytap.findFriends'
-    'rallytap.events'
+    'rallytap.chats'
     'rallytap.inviteFriends'
     'rallytap.addByPhone'
     'rallytap.addByUsername'
@@ -77,7 +77,7 @@ angular.module 'rallytap', [
     'ngIOS9UIWebViewPatch'
   ]
   .config ($httpProvider, $ionicConfigProvider, $mixpanelProvider,
-           $urlRouterProvider, mixpanelToken, ngToastProvider) ->
+           $urlRouterProvider, $stateProvider, mixpanelToken, ngToastProvider) ->
     acceptHeader = 'application/json; version=2.0'
     $httpProvider.defaults.headers.common['Accept'] = acceptHeader
     $httpProvider.interceptors.push ($injector) ->
@@ -104,6 +104,38 @@ angular.module 'rallytap', [
       animation: 'slide'
       maxNumber: 1
       dismissButton: true
+
+    # Abstract tab states
+    $stateProvider.state 'home',
+      abstract: true
+      url: '/home'
+      views:
+        feedTab:
+          template: '<ion-nav-view></ion-nav-view>'
+    $stateProvider.state 'chats',
+      abstract: true
+      url: '/chats'
+      views:
+        chats:
+          template: '<ion-nav-view></ion-nav-view>'
+    $stateProvider.state 'post',
+      abstract: true
+      url: '/post'
+      views:
+        post:
+          template: '<ion-nav-view></ion-nav-view>'
+    $stateProvider.state 'saved',
+      abstract: true
+      url: '/saved'
+      views:
+        saved:
+          template: '<ion-nav-view></ion-nav-view>'
+    $stateProvider.state 'friends',
+      abstract: true
+      url: '/friends'
+      views:
+        friends:
+          template: '<ion-nav-view></ion-nav-view>'
 
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel,
