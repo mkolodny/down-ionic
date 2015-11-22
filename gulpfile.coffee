@@ -151,7 +151,9 @@ gulp.task 'minify', [
 
 
 gulp.task 'unit', ->
-  fs.unlinkSync "#{testDir}/test-bundle.js"
+  # Delete old test file
+  if fs.existsSync "#{testDir}/test-bundle.js"
+    fs.unlinkSync "#{testDir}/test-bundle.js"
   
   # Watch all test files for changes, and re-browserify.
   glob "#{appDir}/**/*.spec.coffee", null, (err, files) ->

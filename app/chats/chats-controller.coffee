@@ -15,12 +15,11 @@ class ChatsCtrl
     # Subscribe to all chats
     @$meteor.subscribe('allChats').then =>
       @allChatsLoaded = true
-      # Subscribe to messages for all chats
+
       allChats = @Chats.find().fetch()
       chatIds = (chat._id for chat in allChats)
-      @$meteor.subscribe 'messages', chatIds
-      # Get users for chats
       @getChatUsers chatIds
+      @getChatMessages chatIds
     .then =>
       @messagesLoaded = true
       # messages subscription is ready
@@ -33,21 +32,57 @@ class ChatsCtrl
       @items = @buildItems()
 
   buildItems: ->
+    items = []
+
+    selector = {}
+    options = 
+      transform: @transformChat
+    chats = @Chats.find(selector, options).fetch()
+    for chat in chats
+      friendId = @Friendship.parseChatId chat._id
+      items.push
+        friend: @users[friendId]
+        chat: chat
+        newestMessage: @getNewestMessage chat._id
+
+    # Sort by newestMessage.createdAt
+    items.sort (a, b) ->
+      a.newestMessage.createdAt > b.newestMessage.createdAt
+    
+    items
 
   watchNewChats: ->
+    # When a new chat is added, subscribe to chat 
+    # messages and the the user for the chat
+    @chats = @$scope.$meteorCollection @Chats
+    @$scope.$watch =>
+      (chat._id for chat in @chats)
+    , (oldValue, newValue) =>
+      if oldValue isnt newValue
+        @getChatMessages newValue
+        @getChatUsers newValue
+    , true
+    
+  getChatMessages: (chatIds) ->
+    # TODO: only subscribe to new chats
+    @$meteor.subscribe 'messages', chatIds
 
   getChatUsers: (chatIds) ->
+    # TODO: Only grab users once
     userIds = (@Friendship.parseChatId(chatId) for chatId in chatIds)
     @User.query(userIds).$promise.then (users) =>
       for user in users
         @users[user.id] = user
       @chatUsersLoaded = true
+      @handleLoadedData()
 
   watchNewMessages: =>
-    @messages = @$scope.$meteorCollection @Messages
+    options =
+      sort:
+        createdAt: -1
+    @newestMessage = @$scope.$meteorObject @Messages, {}, false, options
     @$scope.$watch =>
-      # TODO : Only compare newest
-      (message for message in @messages)
+      @newestMessage._id
     , (oldValue, newValue) =>
       if oldValue isnt newValue
         @handleLoadedData()
@@ -55,10 +90,12 @@ class ChatsCtrl
 
   getNewestMessage: (chatId) =>
     selector =
-      _id: chatId
+      chatId: chatId
     options =
       transform: @transformMessage
-    @NewestMessages.findOne(selector, options) or {}
+      sort:
+        createdAt: -1
+    @Messages.findOne(selector, options) or {}
 
   transformMessage: (message) =>
     # Show senders first name
@@ -67,6 +104,15 @@ class ChatsCtrl
       message.text = "#{firstName}: #{message.text}"
 
     message
+
+  transformChat: (chat) =>
+    now = new Date().getTime()
+    timeRemaining = chat.expiresAt?.getTime() - now
+    twelveHours = 1000 * 60 * 60 * 12
+    chat.percentRemaining = Math.round (timeRemaining / twelveHours) * 100
+    if chat.percentRemaining > 100
+      chat.percentRemaining = 100
+    chat
 
   wasRead: (message) =>
     # Get Chat object for message

@@ -12,8 +12,8 @@ fdescribe 'chats controller', ->
   $state = null
   allChatsDeferred = null
   Auth = null
-  chat1 = null
-  chat2 = null
+  chat23 = null
+  chat24 = null
   ctrl = null
   chatsCollection = null
   chatIds = null
@@ -55,12 +55,12 @@ fdescribe 'chats controller', ->
     # Mock chats
     Auth.user =
       id: 2
-    chat1 =
+    chat23 =
       _id: '2,3'
-    chat2 =
+    chat24 =
       _id: '2,4'
-    chats = [chat1, chat2]
-    chatIds = [chat1._id, chat2._id]
+    chats = [chat23, chat24]
+    chatIds = [chat23._id, chat24._id]
     fetch = jasmine.createSpy('find.fetch').and.returnValue chats
     chatsCollection =
       find: jasmine.createSpy('Chats.find').and.returnValue {fetch: fetch}
@@ -97,6 +97,7 @@ fdescribe 'chats controller', ->
       spyOn ctrl, 'watchNewMessages'
       spyOn ctrl, 'watchNewChats'
       spyOn ctrl, 'getChatUsers'
+      spyOn ctrl, 'getChatMessages'
 
       allChatsDeferred.resolve()
       scope.$apply()
@@ -105,7 +106,7 @@ fdescribe 'chats controller', ->
       expect(ctrl.allChatsLoaded).toBe true
 
     it 'should subscribe to messages for all of the chats', ->
-      expect($meteor.subscribe).toHaveBeenCalledWith 'messages', chatIds
+      expect(ctrl.getChatMessages).toHaveBeenCalledWith chatIds
 
     it 'should get the users for each chat', ->
       expect(ctrl.getChatUsers).toHaveBeenCalledWith chatIds
@@ -148,9 +149,88 @@ fdescribe 'chats controller', ->
 
 
   ##buildItems
+  describe 'building the items', ->
+    newerMessage = null
+    olderMessage = null
+    user3 = null
+    user4 = null
+    items = null
+
+    beforeEach ->
+      user3 =
+        name: 'Andrew'
+      user4 =
+        name: 'Bob'
+      ctrl.users =
+        '3': user3
+        '4': user4
+      newerMessage =
+        createdAt: earlier
+      olderMessage =
+        createdAt: later
+      spyOn(ctrl, 'getNewestMessage').and.callFake (chatId) ->
+        if chatId is '2,3' then return newerMessage
+        if chatId is '2,4' then return olderMessage
+
+      items = ctrl.buildItems()
+
+    it 'should transform the chats', ->
+      selector = {}
+      options =
+        transform: ctrl.transformChat
+      expect(ctrl.Chats.find).toHaveBeenCalledWith selector, options
+
+    it 'should build the items', ->
+      expect(items).toEqual [
+        friend: user3
+        chat: chat23
+        newestMessage: newerMessage
+      ,
+        friend: user4
+        chat: chat24
+        newestMessage: olderMessage
+      ]
 
   ##watchNewChats
+  describe 'watching for new chats', ->
+
+    beforeEach ->
+      scope.$meteorCollection = jasmine.createSpy('scope.$meteorCollection') \
+        .and.returnValue []
+      spyOn ctrl, 'getChatMessages'
+      spyOn ctrl, 'getChatUsers'
+
+      ctrl.watchNewChats()
+
+    it 'should bind the chats to the controller', ->
+      expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.Chats
+      expect(ctrl.chats).toEqual []
   
+    describe 'when a new chat comes in', ->
+
+      beforeEach ->
+        ctrl.chats = [chat23]
+        scope.$apply()
+        ctrl.chats = [chat23, chat24]
+        scope.$apply()
+
+      it 'should subscribe to the chat messages', ->
+        expect(ctrl.getChatMessages).toHaveBeenCalled()
+
+      it 'should get the chat users', ->
+        expect(ctrl.getChatUsers).toHaveBeenCalled()
+
+
+  #getChatMessages
+  describe 'getting the messages for chats', ->
+
+    beforeEach ->
+      $meteor.subscribe.calls.reset()
+      ctrl.getChatMessages chatIds
+
+    it 'should subscribe to the chat messages', ->
+      expect($meteor.subscribe).toHaveBeenCalledWith 'messages', chatIds
+
 
   ##getChatUsers
   describe 'getting users from chat ids', ->
@@ -159,6 +239,7 @@ fdescribe 'chats controller', ->
     beforeEach ->
       deferred = $q.defer()
       spyOn(User, 'query').and.returnValue {$promise: deferred.promise}
+      spyOn ctrl, 'handleLoadedData'
 
       ctrl.getChatUsers chatIds
 
@@ -189,27 +270,38 @@ fdescribe 'chats controller', ->
       it 'should set the chat users loaded flag', ->
         expect(ctrl.chatUsersLoaded).toBe true
 
+      it 'should handle the loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
+
 
   ##watchNewMessages
   describe 'watching for new messages', ->
+    newestMessage = null
 
     beforeEach ->
-      scope.$meteorCollection = jasmine.createSpy('scope.$meteorCollection') \
-        .and.returnValue []
+      newestMessage = 
+        _id: 'asdflkjn;anoi'
+      scope.$meteorObject = jasmine.createSpy('scope.$meteorObject') \
+        .and.returnValue newestMessage
 
       ctrl.watchNewMessages()
 
-    it 'should bind the newest messages to the controller', ->
-      expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.NewestMessages
-      expect(ctrl.newestMessages).toEqual []
+    it 'should bind the newest message to the controller', ->
+      options =
+        sort:
+          createdAt: -1
+      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.Messages, {}, false, options
+      expect(ctrl.newestMessage).toEqual newestMessage
 
     describe 'when a new message comes in', ->
 
       beforeEach ->
         spyOn ctrl, 'handleLoadedData'
-        ctrl.newestMessages = [1]
+        ctrl.newestMessage =
+          _id: 'alkjsdfn'
         scope.$apply()
-        ctrl.newestMessages = [2]
+        ctrl.newestMessage = 
+          _id: 'aksdjfierfq'
         scope.$apply()
 
       it 'should re-build the items', ->
@@ -227,8 +319,8 @@ fdescribe 'chats controller', ->
       beforeEach ->
         chatId = "3"
         newestMessage = 'newestMessage'
-        ctrl.NewestMessages =
-          findOne: jasmine.createSpy('NewestMessages.findOne') \
+        ctrl.Messages =
+          findOne: jasmine.createSpy('Messages.findOne') \
             .and.returnValue newestMessage
         result = ctrl.getNewestMessage chatId
 
@@ -237,10 +329,12 @@ fdescribe 'chats controller', ->
 
       it 'should query, sort and transform the message', ->
         selector =
-          _id: chatId
+          chatId: chatId
         options =
           transform: ctrl.transformMessage
-        expect(ctrl.NewestMessages.findOne).toHaveBeenCalledWith selector, options
+          sort:
+            createdAt: -1
+        expect(ctrl.Messages.findOne).toHaveBeenCalledWith selector, options
 
 
     describe 'when no newest message is found', ->
@@ -248,7 +342,7 @@ fdescribe 'chats controller', ->
       result = null
 
       beforeEach ->
-        ctrl.NewestMessages =
+        ctrl.Messages =
           findOne: jasmine.createSpy('NewestMessages.findOne') \
             .and.returnValue undefined
         result = ctrl.getNewestMessage '1234'
@@ -276,6 +370,54 @@ fdescribe 'chats controller', ->
       it 'should update the message text', ->
         expectedText = "#{message.creator.firstName}: #{message.text}"
         expect(result.text).toEqual expectedText
+
+
+  ##transformChat
+  describe 'transforming a chat', ->
+    fourteenHours = null
+    sixHours = null
+    result = null
+    chat = null
+
+    beforeEach ->
+      jasmine.clock().install()
+      date = new Date 1438014089235
+      jasmine.clock().mockDate date
+
+    describe 'when the chat has less than 12 hours left', ->
+
+      beforeEach ->
+        sixHours = 1000 * 60 * 60 * 6
+        chat =
+          _id: 'asdfasdf'
+          expiresAt: new Date(new Date().getTime() + sixHours)
+
+        result = ctrl.transformChat angular.copy(chat)
+
+      afterEach ->
+        jasmine.clock().uninstall()
+
+      it 'should set the percent remaining', ->
+        chat.percentRemaining = 50
+        expect(result).toEqual chat
+
+
+    describe 'when the chat has more than 12 hours left', ->
+
+      beforeEach ->
+        fourteenHours = 1000 * 60 * 60 * 14
+        chat =
+          _id: 'asdfasdf'
+          expiresAt: new Date(new Date().getTime() + fourteenHours)
+
+        result = ctrl.transformChat angular.copy(chat)
+
+      afterEach ->
+        jasmine.clock().uninstall()
+
+      it 'should set the percent remaining', ->
+        chat.percentRemaining = 100
+        expect(result).toEqual chat
 
 
   ##wasRead
