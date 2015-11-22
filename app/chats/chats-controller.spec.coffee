@@ -496,20 +496,19 @@ fdescribe 'chats controller', ->
 
   ##viewChat
   xdescribe 'viewing a chat', ->
-  #   invitation = null
+    friend = null
 
-  #   beforeEach ->
-  #     spyOn $state, 'go'
-  #     invitation =
-  #       event:
-  #         id: 1
-  #     item =
-  #       invitation: invitation
-  #     ctrl.viewEventChat item
+    beforeEach ->
+      spyOn $state, 'go'
+      friend =
+        id: 4
+      item =
+        friend: friend
+      ctrl.viewChat item
 
-  #   it 'should go to the event chat', ->
-  #     expect($state.go).toHaveBeenCalledWith 'event',
-  #       invitation: invitation
-  #       id: invitation.event.id
+    it 'should go to the friendship chat', ->
+      expect($state.go).toHaveBeenCalledWith 'chats.friendship',
+        friend: friend
+        id: friend.id
 
 

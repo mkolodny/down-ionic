@@ -11,7 +11,7 @@ angular.module 'rallytap.friendship', [
     'ui.router'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'friendship',
+    $stateProvider.state 'chats.friendship',
       url: '/friendship/:id'
       templateUrl: 'app/friendship/friendship.html'
       controller: 'FriendshipCtrl as friendship'

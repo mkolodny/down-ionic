@@ -126,10 +126,10 @@ class ChatsCtrl
         when "#{@Auth.user.id}" is member.userId)[0]
     lastRead >= message.createdAt
 
-  # viewChat: (item) ->
-  #   @$state.go 'event',
-  #     invitation: item.invitation
-  #     id: item.invitation.event.id
+  viewChat: (item) ->
+    @$state.go 'chats.friendship',
+      friend: item.friend
+      id: item.friend.id
 
 
 module.exports = ChatsCtrl
