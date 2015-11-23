@@ -495,7 +495,7 @@ fdescribe 'chats controller', ->
         expect(result).toBe false
 
   ##viewChat
-  xdescribe 'viewing a chat', ->
+  describe 'viewing a chat', ->
     friend = null
 
     beforeEach ->
