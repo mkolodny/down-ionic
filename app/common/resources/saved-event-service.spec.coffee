@@ -20,3 +20,10 @@ describe 'SavedEvent service', ->
   afterEach ->
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
+
+  it 'should have a list url', ->
+    expect(SavedEvent.listUrl).toBe listUrl
+
+  describe 'serializing a saved event', ->
+
+  describe 'deserializing a saved event', ->

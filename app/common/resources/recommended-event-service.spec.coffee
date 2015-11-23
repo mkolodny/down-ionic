@@ -20,3 +20,10 @@ describe 'RecommendedEvent service', ->
   afterEach ->
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
+
+  it 'should have a list url', ->
+    expect(RecommendedEvent.listUrl).toBe listUrl
+
+  describe 'serializing a recommended event', ->
+
+  describe 'deserializing a recommended event', ->

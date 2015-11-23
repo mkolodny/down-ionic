@@ -51,7 +51,7 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
       type: 'text'
       createdAt: new Date()
 
-    # Save the message on the django server.
+    # Send push notification from DJANGO!.
     url = "#{listUrl}/#{friendId}/messages"
     requestData = {text: text}
     $http.post url, requestData
