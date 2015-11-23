@@ -6,7 +6,7 @@ require '../common/meteor/meteor-mocks'
 require './chats-module'
 ChatsCtrl = require './chats-controller'
 
-fdescribe 'chats controller', ->
+describe 'chats controller', ->
   $meteor = null
   $q = null
   $state = null
@@ -506,8 +506,8 @@ fdescribe 'chats controller', ->
         friend: friend
       ctrl.viewChat item
 
-    it 'should go to the friendship chat', ->
-      expect($state.go).toHaveBeenCalledWith 'chats.friendship',
+    it 'should go to the friend chat', ->
+      expect($state.go).toHaveBeenCalledWith 'chats.friendChat',
         friend: friend
         id: friend.id
 

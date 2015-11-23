@@ -127,7 +127,7 @@ class ChatsCtrl
     lastRead >= message.createdAt
 
   viewChat: (item) ->
-    @$state.go 'chats.friendship',
+    @$state.go 'chats.friendChat',
       friend: item.friend
       id: item.friend.id
 

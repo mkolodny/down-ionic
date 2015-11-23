@@ -1,20 +1,18 @@
 require 'angular-elastic'
-require 'ng-toast'
 require '../common/auth/auth-module'
-FriendshipCtrl = require './friendship-controller'
+FriendChatCtrl = require './friend-chat-controller'
 
-angular.module 'rallytap.friendship', [
+angular.module 'rallytap.friendChat', [
     'ionic'
     'rallytap.auth'
     'monospaced.elastic'
-    'ngToast'
     'ui.router'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'chats.friendship',
-      url: '/friendship/:id'
-      templateUrl: 'app/friendship/friendship.html'
-      controller: 'FriendshipCtrl as friendship'
+    $stateProvider.state 'chats.friendChat',
+      url: '/friend/:id'
+      templateUrl: 'app/friend-chat/friend-chat.html'
+      controller: 'FriendChatCtrl as friendChat'
       params:
         ###
         friend =
@@ -28,4 +26,4 @@ angular.module 'rallytap.friendship', [
             long: -73.9821535
         ###
         friend: null
-  .controller 'FriendshipCtrl', FriendshipCtrl
+  .controller 'FriendChatCtrl', FriendChatCtrl

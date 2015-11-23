@@ -1,0 +1,37 @@
+<ion-view id="friendChat" view-title="{{friendChat.friend.name}}">
+  <ion-content delegate-handle="friendChat">
+    <ion-list>
+      <ion-item class="message-item" ng-repeat="message in friendChat.messages">
+        <div class="text-message"
+             ng-class="{mine: friendChat.isMyMessage(message)}">
+          <!-- Text message -->
+          <div class="text" ng-if="friendChat.isTextMessage(message)">{{message.text}}</div>
+          <!-- Invite action messages -->
+          <div class="text invite-action"
+               ng-if="friendChat.isInviteAction(message)"
+               >Are you down to <span
+               class="invite"
+               ng-class="{'was-joined': friendChat.wasJoined(message) && !friendChat.isLocked(message)}"
+               ng-click="friendChat.wasJoined(message) && !friendChat.isLocked(message) ? friendChat.viewEvent(message.invitation) : null"
+               ><span>{{message.meta.event.title}}</span><span
+               ng-if="message.meta.event.place"
+               > at {{message.meta.event.place.name}}</span><span ng-if="message.meta.event.datetime"> &mdash; {{message.meta.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span></span>?
+              </div>
+        </div>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+  <ion-footer-bar class="bar-light new-message-bar" keyboard-attach>
+    <textarea class="new-message"
+              ng-model="friendChat.message"
+              placeholder=" Type a message..."
+              msd-elastic
+              rows="1"
+              ></textarea>
+    <button class="button button-clear send-message"
+            ng-disabled="!friendChat.message"
+            ng-click="friendChat.sendMessage()"
+            ontouchstart
+            >Send</button>
+  </ion-footer-bar>
+</ion-view>
