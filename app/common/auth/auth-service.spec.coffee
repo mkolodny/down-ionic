@@ -20,7 +20,6 @@ describe 'Auth service', ->
   $q = null
   apiRoot = null
   Auth = null
-  Invitation = null
   User = null
   deserializedUser = null
   LocalDB = null
@@ -85,7 +84,6 @@ describe 'Auth service', ->
     $meteor = $injector.get '$meteor'
     apiRoot = $injector.get 'apiRoot'
     Auth = $injector.get 'Auth'
-    Invitation = $injector.get 'Invitation'
     scope = $rootScope.$new()
   )
 

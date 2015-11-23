@@ -13,7 +13,6 @@ describe 'event service', ->
   Auth = null
   Event = null
   Friendship = null
-  Invitation = null
   Messages = null
   User = null
   listUrl = null
@@ -52,7 +51,6 @@ describe 'event service', ->
     User = $injector.get 'User'
     Event = $injector.get 'Event'
     Friendship = $injector.get 'Friendship'
-    Invitation = $injector.get 'Invitation'
 
     # Mock Messages collection
     Messages =
@@ -69,6 +67,7 @@ describe 'event service', ->
   it 'should have a list url', ->
     expect(Event.listUrl).toBe listUrl
 
+  ##serializeEvent
   describe 'serializing an event', ->
     event = null
 
@@ -122,6 +121,7 @@ describe 'event service', ->
         expect(Event.serialize event).toEqual expectedEvent
 
 
+  ##deserializeEvent
   describe 'deserializing an event', ->
     response = null
 
@@ -177,16 +177,14 @@ describe 'event service', ->
         expect(Event.deserialize response).toAngularEqual expectedEvent
 
 
+  ##resource.save
   describe 'creating', ->
     event = null
-    invitation = null
     response = null
     responseData = null
     requestData = null
 
     beforeEach ->
-      invitation =
-        to_user: 2
       event =
         title: 'bars?!?!!?'
         creatorId: 1
@@ -195,17 +193,12 @@ describe 'event service', ->
           name: 'B Bar & Grill'
           lat: 40.7270718
           long: -73.9919324
-        invitations: [invitation]
 
       requestData = Event.serialize event
 
     describe 'successfully', ->
-      messagesDeferred = null
 
       beforeEach ->
-        messagesDeferred = $q.defer()
-        Messages.insert.and.returnValue {remote: messagesDeferred.promise}
-
         jasmine.clock().install()
         date = new Date 1438195002656
         jasmine.clock().mockDate date
@@ -222,8 +215,6 @@ describe 'event service', ->
         $httpBackend.expectPOST listUrl, requestData
           .respond 201, angular.toJson(responseData)
 
-        spyOn Event, 'readMessage'
-
         response = null
         Event.save event
           .$promise.then (_response_) ->
@@ -237,46 +228,6 @@ describe 'event service', ->
         expectedEvent = Event.deserialize responseData
         expect(response).toAngularEqual expectedEvent
 
-      it 'should get the messages collection', ->
-        expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
-
-      it 'should create an accept action message', ->
-        message =
-          creator:
-            id: "#{Auth.user.id}" # meteor likes strings
-            name: Auth.user.name
-            firstName: Auth.user.firstName
-            lastName: Auth.user.lastName
-            imageUrl: Auth.user.imageUrl
-          text: "#{Auth.user.name} is down."
-          chatId: "#{responseData.id}" # meteor likes strings
-          type: Invitation.acceptAction
-          createdAt: new Date()
-
-        expect(Messages.insert).toHaveBeenCalledWith message, Event.readMessage
-
-      it 'should add the points', ->
-        expectedPoints = Auth.Points.sentInvitation * responseData.invitations.length
-        expectedPoints += Auth.Points.acceptedInvitation
-        expect(Auth.addPoints).toHaveBeenCalledWith expectedPoints
-
-      it 'should create invite_action messages', ->
-        inviteMessage =
-          creator:
-            id: "#{Auth.user.id}" # meteor likes strings
-            name: Auth.user.name
-            firstName: Auth.user.firstName
-            lastName: Auth.user.lastName
-            imageUrl: Auth.user.imageUrl
-          text: "#{Auth.user.firstName}: Down?"
-          chatId: Friendship.getChatId invitation.to_user # meteor likes strings
-          type: Invitation.inviteAction
-          createdAt: new Date()
-          meta:
-            eventId: "#{responseData.id}"
-
-        expect(Messages.insert).toHaveBeenCalledWith(inviteMessage,
-            Event.readMessage)
 
     describe 'unsuccessfully', ->
       rejected = null
@@ -295,95 +246,49 @@ describe 'event service', ->
         expect(rejected).toBe true
 
 
-  describe 'marking a message as read', ->
-    messageId = null
-
-    beforeEach ->
-      error = null
-      messageId = 'asdf'
-      Event.readMessage error, messageId
-
-    it 'should call readMessage with the message id', ->
-      expect($meteor.call).toHaveBeenCalledWith 'readMessage', messageId
-
-
-  describe 'sending a message', ->
+  ##resource.getInvitedIds
+  describe 'getting invited ids', ->
     event = null
-    text = null
     url = null
-    requestData = null
 
     beforeEach ->
-      # Mock the current user.
-      Auth.user = id: 1
-
       event =
         id: 1
-        creatorId: 1
-        title: 'bars?!?!!?'
-        datetime: new Date()
-        createdAt: new Date()
-        updatedAt: new Date()
-      text = 'I\'m in love with a robot.'
-      url = "#{listUrl}/#{event.id}/messages"
-      requestData = {text: text}
+      url = "#{listUrl}/#{event.id}/invited-ids"
 
-    describe 'successfully', ->
-      resolved = false
+    describe 'when successful', ->
 
-      beforeEach ->
-        jasmine.clock().install()
-        date = new Date 1438195002656
-        jasmine.clock().mockDate date
+      it 'should resolve the promise with user ids', ->
+        invitedIds = [1, 2, 3]
 
-        $httpBackend.expectPOST url, requestData
-          .respond 201, null
+        $httpBackend.expectGET url
+          .respond 200, invitedIds
 
-        Event.sendMessage event, text
-          .then ->
-            resolved = true
+        result = null
+        Event.getInvitedIds(event).then (_result_) ->
+          result = _result_
         $httpBackend.flush 1
 
-      afterEach ->
-        jasmine.clock().uninstall()
-
-      it 'should resolve the promise', ->
-        expect(resolved).toBe true
-
-      it 'should get the messages collection', ->
-        expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
-
-      it 'should save the message in the meteor server', ->
-        message =
-          creator:
-            id: "#{Auth.user.id}"
-            name: Auth.user.name
-            firstName: Auth.user.firstName
-            lastName: Auth.user.lastName
-            imageUrl: Auth.user.imageUrl
-          text: text
-          chatId: "#{event.id}"
-          type: 'text'
-          createdAt: new Date()
-        expect(Messages.insert).toHaveBeenCalledWith message
+        expect(result).toEqual invitedIds
 
 
-    describe 'unsuccessfully', ->
-      rejected = false
+    describe 'when error', ->
 
-      beforeEach ->
-        $httpBackend.expectPOST url, requestData
-          .respond 500, null
+      it 'should reject the promise', ->
+        # TODO : Is this the right status code?
+        $httpBackend.expectGET url
+          .respond 400
 
-        Event.sendMessage event, text
+        rejected = null
+        Event.getInvitedIds event
           .then null, ->
             rejected = true
         $httpBackend.flush 1
 
-      it 'should reject the promise', ->
         expect(rejected).toBe true
 
 
+  ##resource::getPercentRemaining
   describe 'getting the percent remaining for an event', ->
     currentDate = null
     event = null
@@ -431,47 +336,7 @@ describe 'event service', ->
         expect(result).toBe 50
 
 
-  describe 'getting invited ids', ->
-    event = null
-    url = null
-
-    beforeEach ->
-      event =
-        id: 1
-      url = "#{listUrl}/#{event.id}/invited-ids"
-
-    describe 'when successful', ->
-
-      it 'should resolve the promise with user ids', ->
-        invitedIds = [1, 2, 3]
-
-        $httpBackend.expectGET url
-          .respond 200, invitedIds
-
-        result = null
-        Event.getInvitedIds(event).then (_result_) ->
-          result = _result_
-        $httpBackend.flush 1
-
-        expect(result).toEqual invitedIds
-
-
-    describe 'when error', ->
-
-      it 'should reject the promise', ->
-        # TODO : Is this the right status code?
-        $httpBackend.expectGET url
-          .respond 400
-
-        rejected = null
-        Event.getInvitedIds event
-          .then null, ->
-            rejected = true
-        $httpBackend.flush 1
-
-        expect(rejected).toBe true
-
-
+  ##resource::getEventMessage
   describe 'getting the event\'s share message', ->
     eventMessage = null
     event = null
