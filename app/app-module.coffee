@@ -35,6 +35,7 @@ require './friend-chat/friend-chat-module'
 require './create-event/create-event-module'
 require './tutorial/tutorial-module'
 require './team/team-module'
+require './events/events-module'
 
 angular.module 'rallytap', [
     'analytics.mixpanel'
@@ -69,6 +70,7 @@ angular.module 'rallytap', [
     'rallytap.localDB'
     'rallytap.tutorial'
     'rallytap.team'
+    'rallytap.events'
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]
@@ -106,7 +108,7 @@ angular.module 'rallytap', [
       abstract: true
       url: '/home'
       views:
-        feedTab:
+        home:
           template: '<ion-nav-view></ion-nav-view>'
     $stateProvider.state 'chats',
       abstract: true
@@ -170,6 +172,7 @@ angular.module 'rallytap', [
 
         # Prevent hardware back button from returning
         #   to login views on Android
+        #   TODO : update states
         $ionicPlatform.registerBackButtonAction (event) ->
           currentState = $state.current.name
           # States where going back is disabled, therefore the

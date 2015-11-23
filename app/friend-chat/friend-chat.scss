@@ -1,22 +1,4 @@
-#friendship {
-  #match-header {
-    background-color: $brand-color;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-bottom: 10px;
-    position: absolute;
-    top: $bar-height;
-    width: 100%;
-    z-index: 1;
-    text-align: center;
-    color: #fff;
-  }
-  .match-notification {
-    & + ion-content {
-      top: $bar-height + 30px;
-      // 30px is the match header height
-    }
-  }
+#friendChat {
   .respond-section {
     white-space: normal;
     border-top: 1px solid #ccc;
@@ -39,23 +21,6 @@
       border: 1px solid #fff;
     }
   }
-  .min-accepted-section {
-    padding-top: 5px;
-    font-weight: 400;
-
-    .fa-lock {
-      margin-right: 14px;
-      margin-bottom: 4px;
-    }
-    .fa-users {
-      margin-right: 7px;
-    }
-  }
-  .share {
-    background-color: transparent;
-    border: none;
-    color: #fff;
-  }
   .invite-action {
     background-color: $brand-color;
     border-color: $brand-color;
@@ -76,29 +41,11 @@
   .was-joined {
     text-decoration: underline;
   }
-  ion-spinner {
-    stroke: #fff;
-    fill: #fff;
-  }
 }
 .platform-ios {
   #friendship {
     .respond {
       padding-top: 3px;
-    }
-  }
-}
-
-.platform-ios {
-  #friendship {
-    #match-header {
-      top: $bar-height + $ios-statusbar-height;
-    }
-  }
-  .match-notification {
-    & + ion-content {
-      top: $bar-height + $ios-statusbar-height + 30px !important;
-      // 30px is the match header height
     }
   }
 }

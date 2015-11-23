@@ -31,8 +31,6 @@ $button-positive-text: #fff;
 
 // Include all of Ionic
 @import "./ionic/scss/ionic";
-// TODO : REPLACE WITH FONTAWESOME
-@import "./ionic/ionicons/ionicons.scss";
 
 // Include each view's scss
 @import "./common/intl-phone/intlTelInput";
@@ -278,11 +276,6 @@ body {
 
   .title {
     font-family: 'Montserrat', 'Helvetica Neue', 'Roboto', 'Segoe UI', sans-serif !important;
-  }
-}
-.hide-nav-bottom-border {
-  .bar-header {
-    border-bottom: 0 !important;
   }
 }
 ion-nav-back-button {
