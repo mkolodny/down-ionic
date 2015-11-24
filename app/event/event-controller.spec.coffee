@@ -72,12 +72,17 @@ describe 'event controller', ->
     comments = null
 
     beforeEach ->
+      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
+
       comments = []
       scope.$meteorCollection = jasmine.createSpy('scope.$meteorCollection') \
         .and.returnValue comments
 
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
+
+    it 'should subscribe to the event comments', ->
+      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'comments', "#{ctrl.event.id}"
 
     it 'should bind the comments to the controller', ->
       expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.getComments, false

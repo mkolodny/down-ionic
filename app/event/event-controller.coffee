@@ -5,6 +5,7 @@ class EventsCtrl
     @Comments = @$meteor.getCollectionByName 'comments'
 
     @$scope.$on '$ionicView.beforeEnter', =>
+      @$scope.$meteorSubscribe 'comments', "#{@event.id}"
       @comments = @$scope.$meteorCollection @getComments, false
 
   getComments: ->
@@ -26,7 +27,7 @@ class EventsCtrl
       eventId: "#{@event.id}"
       createdAt: new Date()
       text: @newComment
-      
+
     @newComment = null
 
 
