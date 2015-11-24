@@ -1262,6 +1262,7 @@ describe 'Auth service', ->
         expect(error).toBe 'MISSING_SOCIAL_ACCOUNT'
 
 
+  ##getAddedMe
   describe 'querying the users who added the current user', ->
     url = null
 
@@ -1315,6 +1316,7 @@ describe 'Auth service', ->
         expect(rejected).toBe true
 
 
+  ##getDistanceAway
   describe 'getting how far away a location is', ->
     user = null
     distanceAway = null
