@@ -65,22 +65,28 @@ describe 'SavedEvent service', ->
     response = null
     expectedSavedEvent = null
     user = null
+    friend1 = null
+    friend2 = null
+    totalNumInterested = null
     event = null
 
     beforeEach ->
-      response =
-        id: 1
       user =
         id: 1
         email: 'aturing@gmail.com'
         name: 'Alan Turing'
-        firstName: 'Alan'
-        lastName: 'Turing'
+        first_name: 'Alan'
+        last_name: 'Turing'
         username: 'tdog'
         image_url: 'https://facebook.com/profile-pic/tdog'
         location:
           type: 'Point'
           coordinates: [40.7265834, -73.9821535]
+      friend1 = angular.extend {}, user
+      friend1.id = 2
+      friend2 = angular.extend {}, user
+      friend2.id = 3
+      totalNumInterested = 2
       event =
         id: 2
         title: 'bars?!??!'
@@ -94,16 +100,39 @@ describe 'SavedEvent service', ->
           geo:
             type: 'Point'
             coordinates: [40.7285098, -73.9871264]
+
+      response =
+        id: 1
+        event: event.id
+        user: user.id
+        interested_friends: [friend1, friend2]
+        total_num_interested: totalNumInterested
+
       expectedSavedEvent =
         id: response.id
         eventId: event.id
         userId: user.id
+        totalNumInterested: totalNumInterested
+        interestedFriends: [ 
+          User.deserialize friend1
+        ,
+          User.deserialize friend2
+        ]
 
-    describe 'when the relations are ids', ->
+    describe 'with the minimum amount of data', ->
 
       beforeEach ->
-        response.event = event.id
-        response.user = user.id
+        delete response.interested_friends
+        delete response.total_num_interested
+
+        delete expectedSavedEvent.interestedFriends
+        delete expectedSavedEvent.totalNumInterested
+
+      it 'should deserialize the event', ->
+        expect(SavedEvent.deserialize response).toEqual expectedSavedEvent
+
+
+    describe 'when the relations are ids', ->
 
       it 'should deserialize the saved event', ->
         expect(SavedEvent.deserialize response).toEqual expectedSavedEvent

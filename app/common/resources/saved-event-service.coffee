@@ -34,6 +34,13 @@ SavedEvent = ['$resource', 'apiRoot', 'Event', 'User', \
       savedEvent.user = User.deserialize response.user
       savedEvent.userId = savedEvent.user.id
 
+    # Optional fields
+    if angular.isArray response.interested_friends
+      savedEvent.interestedFriends = (User.deserialize(friend) for friend in response.interested_friends)
+
+    if angular.isDefined response.total_num_interested
+      savedEvent.totalNumInterested = response.total_num_interested
+
     savedEvent
 
   resource = $resource '#{listUrl}/:id', null,
