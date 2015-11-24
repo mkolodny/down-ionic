@@ -1,0 +1,25 @@
+<ion-view id="event"
+          view-title="Rallytap">
+  <ion-content>
+    <ion-list>
+      <ion-item collection-repeat="comment in event.comments"
+                item-width="100%"
+                item-height="200px">
+                comment here
+      </ion-item>
+    </ion-list>
+  </ion-content>
+  <ion-footer-bar class="bar-light new-message-bar" keyboard-attach>
+    <textarea class="new-message"
+              ng-model="event.newComment"
+              placeholder=" Add a comment..."
+              msd-elastic
+              rows="1"
+              ></textarea>
+    <button class="button button-clear send-message"
+            ng-disabled="!event.newComment"
+            ng-click="event.postComment()"
+            ontouchstart
+            >Post</button>
+  </ion-footer-bar>
+</ion-view>

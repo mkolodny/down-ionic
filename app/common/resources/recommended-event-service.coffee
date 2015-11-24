@@ -6,7 +6,7 @@ RecommendedEvent = ['$resource', 'apiRoot', ($resource, apiRoot) ->
   deserializeRecommendedEvent = (data) ->
 
   resource = $resource "#{listUrl}/:id", null,
-    save: {}
+    query: {}
 
   resource.listUrl = listUrl
 

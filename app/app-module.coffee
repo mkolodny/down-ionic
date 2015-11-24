@@ -36,6 +36,7 @@ require './create-event/create-event-module'
 require './tutorial/tutorial-module'
 require './team/team-module'
 require './events/events-module'
+require './event/event-module'
 
 angular.module 'rallytap', [
     'analytics.mixpanel'
@@ -71,6 +72,7 @@ angular.module 'rallytap', [
     'rallytap.tutorial'
     'rallytap.team'
     'rallytap.events'
+    'rallytap.event'
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]
