@@ -1,6 +1,5 @@
 require 'angular'
 require 'angular-mocks'
-require '../auth/auth-module'
 require './resources-module'
 require '../meteor/meteor-mocks'
 
@@ -10,7 +9,6 @@ describe 'event service', ->
   $rootScope = null
   $meteor = null
   $q = null
-  Auth = null
   Event = null
   Friendship = null
   Messages = null
@@ -20,26 +18,6 @@ describe 'event service', ->
   beforeEach angular.mock.module('angular-meteor')
 
   beforeEach angular.mock.module('rallytap.resources')
-
-  beforeEach angular.mock.module('rallytap.auth')
-
-  beforeEach angular.mock.module(($provide) ->
-    # Mock a logged in user.
-    Auth =
-      user:
-        id: 1
-        name: 'Alan Turing'
-        firstName: 'Alan'
-        lastName: 'Turing'
-        imageUrl: 'http://facebook.com/profile-pic/tdog'
-      addPoints: jasmine.createSpy 'Auth.addPoints'
-      Points:
-        sentInvitation: 1
-        acceptedInvitation: 5
-
-    $provide.value 'Auth', Auth
-    return
-  )
 
   beforeEach inject(($injector) ->
     $filter = $injector.get '$filter'

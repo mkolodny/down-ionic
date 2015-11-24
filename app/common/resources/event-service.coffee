@@ -1,7 +1,7 @@
 Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
-         'apiRoot', 'Auth', 'Friendship', 'User', \
+         'apiRoot', 'Friendship', 'User', \
          ($http, $filter, $meteor, $q, $resource, apiRoot, \
-           Auth, Friendship, User) ->
+          Friendship, User) ->
   listUrl = "#{apiRoot}/events"
   detailUrl = "#{listUrl}/:id"
   serializeEvent = (event) ->
