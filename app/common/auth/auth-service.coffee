@@ -2,9 +2,9 @@ haversine = require 'haversine'
 
 class Auth
   @$inject: ['$http', '$q', '$meteor', '$mixpanel', 'apiRoot', 'User',
-             '$cordovaGeolocation', '$state', 'LocalDB']
+             '$cordovaGeolocation', '$state', 'LocalDB', 'SavedEvent']
   constructor: (@$http, @$q, @$meteor, @$mixpanel, @apiRoot, @User,
-                @$cordovaGeolocation, @$state, @LocalDB) ->
+                @$cordovaGeolocation, @$state, @LocalDB, @SavedEvent) ->
 
   user: {}
 
@@ -313,6 +313,19 @@ class Auth
         deferred.reject()
 
     {$promise: deferred.promise}
+
+  getSavedEvents: ->
+    deferred = @$q.defer()
+
+    @$http.get "#{@User.listUrl}/saved-events"
+      .success (data, status) =>
+        deferred.resolve (@SavedEvent.deserialize(savedEvent) for savedEvent in data)
+      .error ->
+        deferred.reject()
+
+
+    {$promise: deferred.promise}
+
 
   addPoints: (pointValue) ->
     @user.points += pointValue

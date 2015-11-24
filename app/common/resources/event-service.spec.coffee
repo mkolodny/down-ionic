@@ -10,7 +10,6 @@ describe 'event service', ->
   $meteor = null
   $q = null
   Event = null
-  Friendship = null
   Messages = null
   User = null
   listUrl = null
@@ -28,7 +27,6 @@ describe 'event service', ->
     apiRoot = $injector.get 'apiRoot'
     User = $injector.get 'User'
     Event = $injector.get 'Event'
-    Friendship = $injector.get 'Friendship'
 
     # Mock Messages collection
     Messages =

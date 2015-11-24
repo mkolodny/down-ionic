@@ -23,6 +23,7 @@ describe 'Auth service', ->
   User = null
   deserializedUser = null
   LocalDB = null
+  SavedEvent = null
 
   beforeEach angular.mock.module('angular-meteor')
 
@@ -84,6 +85,7 @@ describe 'Auth service', ->
     $meteor = $injector.get '$meteor'
     apiRoot = $injector.get 'apiRoot'
     Auth = $injector.get 'Auth'
+    SavedEvent = $injector.get 'SavedEvent'
     scope = $rootScope.$new()
   )
 
@@ -1437,6 +1439,55 @@ describe 'Auth service', ->
 
         rejected = false
         Auth.getTeamRallytap()
+          .$promise.then null, ->
+            rejected = true
+        $httpBackend.flush 1
+
+      it 'should reject the promise', ->
+        expect(rejected).toBe true
+
+
+  ##getSavedEvents
+  describe 'getting the current users saved events', ->
+    url = null
+
+    beforeEach ->
+      url = "#{User.listUrl}/saved-events"
+
+    describe 'successfully', ->
+      response = null
+      responseData = null
+
+      beforeEach ->
+        responseData = [
+          id: 1
+          event: 2
+          user: 3
+        ]
+
+        $httpBackend.expectGET url
+          .respond 200, angular.toJson(responseData)
+
+        response = null
+        Auth.getSavedEvents()
+          .$promise.then (_response_) ->
+            response = _response_
+        $httpBackend.flush 1
+
+      it 'should GET the saved events', ->
+        savedEvent = SavedEvent.deserialize responseData[0]
+        expect(response).toAngularEqual [savedEvent]
+
+
+    describe 'on error', ->
+      rejected = null
+
+      beforeEach ->
+        $httpBackend.expectGET url
+          .respond 500, ''
+
+        rejected = false
+        Auth.getSavedEvents()
           .$promise.then null, ->
             rejected = true
         $httpBackend.flush 1
