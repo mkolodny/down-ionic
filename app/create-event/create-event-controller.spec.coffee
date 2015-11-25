@@ -6,6 +6,8 @@ require 'angular-sanitize' # for ionic module
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js' # for ionic module
 require 'ng-cordova'
+require 'ng-toast'
+require '../common/resources/resources-module'
 CreateEventCtrl = require './create-event-controller'
 
 describe 'create event controller', ->
@@ -20,8 +22,9 @@ describe 'create event controller', ->
   Auth = null
   ctrl = null
   deferredTemplate = null
-  LinkInvitation = null
+  Event = null
   scope = null
+  ngToast = null
 
   beforeEach angular.mock.module('ui.router')
 
@@ -30,6 +33,8 @@ describe 'create event controller', ->
   beforeEach angular.mock.module('ngCordova')
 
   beforeEach angular.mock.module('rallytap.resources')
+
+  beforeEach angular.mock.module('ngToast')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
@@ -42,7 +47,9 @@ describe 'create event controller', ->
     $state = $injector.get '$state'
     $window = $injector.get '$window'
     Auth = $injector.get 'Auth'
+    Event = $injector.get 'Event'
     scope = $injector.get '$rootScope'
+    ngToast = $injector.get 'ngToast'
 
     deferredTemplate = $q.defer()
     spyOn($ionicModal, 'fromTemplateUrl').and.returnValue deferredTemplate.promise
@@ -60,28 +67,8 @@ describe 'create event controller', ->
       scope: scope
       animation: 'slide-in-up'
 
-  it 'should set the min accepted options', ->
-    options = (option for option in [2..20])
-    for option in [25..100] by 5
-      options.push option
-    minAcceptedOptions = ({value: option, name: "#{option} People Minimum"} \
-        for option in options)
-    expect(ctrl.minAcceptedOptions).toEqual minAcceptedOptions
-
   it 'should set the current user on the controller', ->
     expect(ctrl.currentUser).toBe Auth.user
-
-  describe 'when entering the view', ->
-
-    beforeEach ->
-      spyOn $ionicHistory, 'nextViewOptions'
-
-      scope.$broadcast '$ionicView.enter'
-      scope.$apply()
-
-    it 'should disable animating the transition to the next view', ->
-      options = {disableAnimate: true}
-      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
 
 
   describe 'when the place modal loads', ->
@@ -126,6 +113,7 @@ describe 'create event controller', ->
         expect(modal.hide).toHaveBeenCalled()
 
 
+  ##$scope.$on 'placeAutocomplete:placeChanged'
   describe 'when the place changes', ->
     name = null
     lat = null
@@ -157,6 +145,7 @@ describe 'create event controller', ->
       expect(scope.hidePlaceModal).toHaveBeenCalled()
 
 
+  ##showDatePicker
   describe 'showing the date picker', ->
     deferred = null
 
@@ -218,23 +207,7 @@ describe 'create event controller', ->
         expect($cordovaDatePicker.show).toHaveBeenCalledWith options
 
 
-  describe 'inviting friends', ->
-    newEvent = null
-
-    beforeEach ->
-      newEvent = 'newEvent'
-      spyOn(ctrl, 'getNewEvent').and.returnValue newEvent
-      spyOn $state, 'go'
-
-      ctrl.inviteFriends()
-
-    it 'should get the new event', ->
-      expect(ctrl.getNewEvent).toHaveBeenCalled()
-
-    it 'should go to the invite friends view', ->
-      expect($state.go).toHaveBeenCalledWith 'inviteFriends', {event: newEvent}
-
-
+  ##getNewEvent
   describe 'getting the new event', ->
     newEvent = null
 
@@ -247,7 +220,6 @@ describe 'create event controller', ->
           name: 'ice cream'
           lat: 40.6785872
           lng: -74.0419964
-        ctrl.minAccepted = 7
 
         newEvent = ctrl.getNewEvent()
 
@@ -256,7 +228,6 @@ describe 'create event controller', ->
           title: ctrl.title
           datetime: ctrl.datetime
           place: ctrl.place
-          minAccepted: ctrl.minAccepted
         expect(newEvent).toEqual event
 
 
@@ -275,48 +246,48 @@ describe 'create event controller', ->
         expect(newEvent).toEqual event
 
 
-  ##showMoreOptions
-  describe 'showing more options', ->
-    buttonClickedCallback = null
-    hideSheet = null
+  ##createEvent
+  describe 'creating an event', ->
+    deferred = null
+    event = null
 
     beforeEach ->
-      $window.plugins = {}
-      spyOn($ionicActionSheet, 'show').and.callFake (options) ->
-        buttonClickedCallback = options.buttonClicked
-        hideSheet = jasmine.createSpy 'hideSheet'
-        hideSheet
+      deferred = $q.defer()
+      spyOn(Event, 'save').and.returnValue {$promise: deferred.promise}
+      
+      event =
+        title: 'bars?!?'
+      spyOn(ctrl, 'getNewEvent').and.returnValue event
+      ctrl.title = event.title
 
-      ctrl.showMoreOptions()
+      ctrl.createEvent()
 
-    it 'should show an action sheet', ->
-      options =
-        buttons: [
-          text: 'Set Minimum # of People'
-        ]
-        cancelText: 'Cancel'
-        buttonClicked: jasmine.any Function
-      expect($ionicActionSheet.show).toHaveBeenCalledWith options
+    it 'should save the event', ->
+      expect(Event.save).toHaveBeenCalledWith event
 
-    describe 'tapping the set min button', ->
+    describe 'sucessfully', ->
 
       beforeEach ->
-        buttonClickedCallback 0
+        deferred.resolve()
+        scope.$apply()
 
-      it 'should show the min accepted field', ->
-        expect(ctrl.showMinAccepted).toBe true
+      it 'should clear the form', ->
+        expect(ctrl.title).toBe undefined
+        expect(ctrl.datetime).toBe undefined
+        expect(ctrl.place).toBe undefined
 
-      it 'should hide the action sheet', ->
-        expect(hideSheet).toHaveBeenCalled()
+
+    describe 'on error', ->
+
+      beforeEach ->
+        spyOn ngToast, 'create'
+
+        deferred.reject()
+        scope.$apply()
+
+      it 'should show an error', ->
+        expect(ngToast.create).toHaveBeenCalledWith 'Oops.. an error occurred..'
 
 
-  ##viewChats
-  describe 'viewing your chats', ->
 
-    beforeEach ->
-      spyOn $state, 'go'
 
-      ctrl.viewChats()
-
-    it 'should go to the chats view', ->
-      expect($state.go).toHaveBeenCalledWith 'events'
