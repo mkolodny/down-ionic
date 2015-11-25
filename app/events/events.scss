@@ -1,10 +1,30 @@
 #events {
+  #create-event-prompt {
+    background-color: #fff;
+    width: calc(100% - 30px);
+    margin-left: 15px;
+    margin-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 1px solid #ccc;
+  }
+  h2,
+  #create-event-prompt {
+    font-size: 20px;
+    font-weight: 700;
+  }
   .item-divider {
     text-align: center;
     padding-left: 0;
     padding-right: 0 !important;
     padding-bottom: 0;
     min-height: 26px;
+  }
+  .saved-event {
+    padding-top: 4px;
+    padding-bottom: 4px;
   }
   .divider-title {
     background-color: #fff;
@@ -15,13 +35,70 @@
     border-top: 1px solid #eee;
     margin-top: -11px;
   }
+  .saved-event {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  .event-actions {
+    padding-top: 7px;
+  }
+  .event-action {
+    background-color: #fff;
+    border: none;
+    padding-left: 0;
+  }
   .fa-star,
   .event-action-count,
   .num-interested-friends {
     color: $brand-color;
   }
   .fa-star-o,
-  .fa-comment-o {
+  .fa-comment-o,
+  .fa-ellipsis-h {
     color: #999;
+  }
+  .event-action-count {
+    font-weight: 700;
+    margin-right: 20px;
+    position: relative;
+    bottom: 5px;
+  }
+  .num-interested-friends {
+    margin-top: 5px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+    font-weight: 700;
+  }
+  .item-avatar {
+    padding-left: 60px;
+    padding-right: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+    min-height: 50px;
+    margin-left: -11px;
+    margin-right: -17px;
+  }
+  .item-image {
+    max-width: 36px;
+    max-height: 36px;
+  }
+  h3 {
+    font-size: 16px;
+    margin-top: 3px;
+    font-weight: 400;
+    padding-right: 100px;
+  }
+  .invite {
+    margin-top: 4px;
+    background-color: #fff;
+    font-weight: 500;
+    font-size: 16px;
+    color: #999;
+    border-color: #999;
+  }
+  .invited {
+    background-color: $brand-color;
+    border-color: $brand-color;
+    color: #fff;
   }
 }
