@@ -11,7 +11,7 @@ angular.module 'rallytap.addFromAddressBook', [
     'rallytap.localDB'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'friends.addFromAddressBook',
+    $stateProvider.state 'tabs.friends.addFromAddressBook',
       url: '/add-from-address-book'
       templateUrl: 'app/add-from-address-book/add-from-address-book.html'
       controller: 'AddFromAddressBookCtrl as addFromAddressBook'

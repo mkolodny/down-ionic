@@ -6,7 +6,7 @@ angular.module 'rallytap.createEvent', [
     'ui.router'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'post.createEvent',
+    $stateProvider.state 'tabs.post.createEvent',
       url: ''
       templateUrl: 'app/create-event/create-event.html'
       controller: 'CreateEventCtrl as createEvent'

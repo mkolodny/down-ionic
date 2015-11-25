@@ -507,7 +507,7 @@ describe 'chats controller', ->
       ctrl.viewChat item
 
     it 'should go to the friend chat', ->
-      expect($state.go).toHaveBeenCalledWith 'chats.friendChat',
+      expect($state.go).toHaveBeenCalledWith 'tabs.chats.friendChat',
         friend: friend
         id: friend.id
 

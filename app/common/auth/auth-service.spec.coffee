@@ -938,7 +938,7 @@ describe 'Auth service', ->
         Auth.redirectForAuthState()
 
       it 'should go to the events view', ->
-        expect($state.go).toHaveBeenCalledWith 'home.events'
+        expect($state.go).toHaveBeenCalledWith 'tabs.home.events'
 
 
   describe 'watching the users location', ->

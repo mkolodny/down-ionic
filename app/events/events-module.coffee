@@ -9,7 +9,7 @@ angular.module 'rallytap.events', [
     'ngToast'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'home.events',
+    $stateProvider.state 'tabs.home.events',
       url: ''
       templateUrl: 'app/events/events.html'
       controller: 'EventsCtrl as events'
