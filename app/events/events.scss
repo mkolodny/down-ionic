@@ -1,3 +1,27 @@
 #events {
-
+  .item-divider {
+    text-align: center;
+    padding-left: 0;
+    padding-right: 0 !important;
+    padding-bottom: 0;
+    min-height: 26px;
+  }
+  .divider-title {
+    background-color: #fff;
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+  .divider-line {
+    border-top: 1px solid #eee;
+    margin-top: -11px;
+  }
+  .fa-star,
+  .event-action-count,
+  .num-interested-friends {
+    color: $brand-color;
+  }
+  .fa-star-o,
+  .fa-comment-o {
+    color: #999;
+  }
 }

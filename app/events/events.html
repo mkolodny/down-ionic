@@ -3,14 +3,75 @@
           hide-back-button="true"
           can-swipe-back="false">
   <ion-content>
-    <ion-refresher pulling-text="Pull to refresh..." on-refresh="events.refresh()"
-                   ng-if="!events.isLoading" spinner="bubbles">
+    <ion-refresher pulling-text="Pull to refresh..."
+                   on-refresh="events.refresh()"
+                   ng-if="!events.isLoading"
+                   spinner="bubbles">
     </ion-refresher>
+    <input id="create-event-prompt"
+           readonly
+           ng-mousedown="events.createEvent()"
+           ontouchstart>
     <ion-list>
-      <ion-item collection-repeat="item in events.items"
-                item-width="100%"
-                item-height="200px">
-                event here
+      <ion-item ng-repeat="item in events.items"
+                ng-class="{'item-divider': item.isDivider}">
+        <!-- Divider -->
+        <div ng-if="item.isDivider">
+          <span class="divider-title">{{item.title}}</span>
+          <div class="divider-line"></div>
+        </div>
+
+        <!-- Event -->
+        <div class="list" ng-if="item.savedEvent">
+          <div class="item item-body">
+            <h2>
+               {{item.savedEvent.event.title}}<span
+               ng-if="item.savedEvent.event.place"
+               > at {{item.savedEvent.event.place.name}}</span><span
+               ng-if="item.savedEvent.event.datetime"
+               > &mdash; {{item.savedEvent.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
+            </h2>
+            <div class="event-actions">
+              <button class="event-action"
+                      ng-disabled="events.didUserSaveEvent(item.savedEvent)"
+                      ng-mousedown="events.saveEvent(item.savedEvent.event)"
+                      ontouchstart>
+                <i class="fa-2x"
+                   ng-class="{
+                     fa-star: events.didUserSaveEvent(item.savedEvent)}
+                     fa-star-o: !events.didUserSaveEvent(item.savedEvent)}
+                   "}></i>
+              </button>
+              <span class="event-action-count"></span>
+              <button class="event-action"
+                      ng-mousedown="events.viewComments(item.savedEvent.event)"
+                      ontouchstart>
+                <i class="fa-comment-o fa-2x"></i>
+              </button>
+              <span class="event-action-count"></span>
+              <button class="event-action"
+                      ng-mousedown="events.viewMoreOptions(item.savedEvent.event)"
+                      ontouchstart>
+                <i class="fa-ellipsis-h fa-2x"></i>
+              </button>
+            </div>
+            <div class="num-interested-friends"
+                 ng-if="item.savedEvent.numInterestedFriends > 0">
+              {{item.savedEvent.numInterestedFriends}} friends are interested
+            </div>
+          </div>
+          <div class="item item-avatar"
+               ng-if="item.savedEvent.interestedFriends"
+               ng-repeat="friend in item.savedEvent.interestedFriends">
+            <img class="item-image" ng-src="{{friend.getImageUrl()}}">
+            <h2>{{friend.name}}</h2>
+            <button class="icon invite"
+                    ng-class="{invited: events.wasInvited(friend, item.savedEvent.event)}"
+                    ng-disabled="events.wasInvited(friend, item.savedEvent.event)"
+                    ng-mousedown="events.invite(friend, item.savedEvent.event)"
+                    >Down?</button>
+          </div>
+        </div>
       </ion-item>
     </ion-list>
   </ion-content>
