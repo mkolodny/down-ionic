@@ -106,9 +106,90 @@ describe 'events controller', ->
       expect(ctrl.getRecommendedEvents).toHaveBeenCalled()
 
 
-
   ##buildItems
   describe 'building the items', ->
+    savedEvent = null
+    savedEventItem = null
+    savedEventFromRecommendedEvent = null
+    savedEventFromRecommendedEventItem = null
+    recommendedEvent = null
+    recommendedEventItem = null
+    recommendedEventsDivider = null
+
+    beforeEach ->
+      savedEvent =
+        id: 1
+      savedEventItem =
+        isDivider: false
+        savedEvent: savedEvent
+
+      savedEventFromRecommendedEvent =
+        id: 2
+        event:
+          recommendedEvent: 1
+      savedEventFromRecommendedEventItem =
+        isDivider: false
+        savedEvent: savedEventFromRecommendedEvent
+
+      recommendedEvent =
+        id: 1
+      recommendedEventsDivider =
+        isDivider: true
+        title: 'Recommended'
+      recommendedEventItem = 
+        isDivider: false
+        recommendedEvent: recommendedEvent
+
+    describe 'when there are saved events and recommended events', ->
+      
+      it 'should build the items', ->
+        ctrl.savedEvents = [savedEvent]
+        ctrl.recommendedEvents = [recommendedEvent]
+        expectedItems = [
+          savedEventItem
+        ,
+          recommendedEventsDivider
+        ,
+          recommendedEventItem
+        ]
+        expect(ctrl.buildItems()).toEqual expectedItems
+
+
+    describe 'when a saved event is created from a recommended event', ->
+      
+      it 'should build the items', ->
+        ctrl.savedEvents = [savedEvent, savedEventFromRecommendedEvent]
+        ctrl.recommendedEvents = [recommendedEvent]
+        expectedItems = [
+          savedEventItem
+        ,
+          savedEventFromRecommendedEventItem
+        ]
+        expect(ctrl.buildItems()).toEqual expectedItems
+
+
+    describe 'when there are no saved events', ->
+      
+      it 'should build the items', ->
+        ctrl.savedEvents = []
+        ctrl.recommendedEvents = [recommendedEvent]
+        expectedItems = [
+          recommendedEventsDivider
+        ,
+          recommendedEventItem
+        ]
+        expect(ctrl.buildItems()).toEqual expectedItems
+
+
+    describe 'when there are no recommended events', ->
+      
+      it 'should build the items', ->
+        ctrl.savedEvents = [savedEvent]
+        ctrl.recommendedEvents = []
+        expectedItems = [
+          savedEventItem
+        ]
+        expect(ctrl.buildItems()).toEqual expectedItems
 
 
   ##getSavedEvents
