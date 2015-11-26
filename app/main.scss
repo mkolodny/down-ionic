@@ -32,10 +32,11 @@ $button-positive-text: #fff;
 // The path for our ionicons font files, relative to the built CSS in www/css
 //$ionicons-font-path: "../lib/ionic/fonts" !default;
 
-// Include all of Ionic
+// Libraries
 @import "./ionic/scss/ionic";
+@import "./common/font-awesome/scss/font-awesome";
 
-// Include each view's scss
+// Views
 @import "./common/intl-phone/intlTelInput";
 @import "./login/login";
 @import "./verify-phone/verify-phone";
@@ -79,6 +80,21 @@ body {
 }
 .buttons-right {
   padding-right: 3px;
+}
+
+// Tabs
+.tab-item-active {
+  color: $brand-color;
+}
+.tab-nav {
+  color: #999 !important;
+
+  .fa-star {
+    font-size: 30px;
+  }
+  .fa-users {
+    font-size: 26px;
+  }
 }
 
 // Items
