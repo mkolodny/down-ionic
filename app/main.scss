@@ -89,12 +89,21 @@ body {
 .tab-nav {
   color: #999 !important;
 
+  .fa-plus {
+    background-color: #ed6700;
+    height: 100%;
+    border-radius: 4px;
+    color: #fff;
+  }
   .fa-star {
     font-size: 30px;
   }
   .fa-users {
     font-size: 26px;
   }
+}
+.tab-item {
+  opacity: 1;
 }
 
 // Items
