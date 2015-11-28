@@ -151,3 +151,27 @@ describe 'SavedEvent service', ->
         expect(SavedEvent.deserialize response).toEqual expectedSavedEvent
 
 
+  ##resource.query
+  describe 'querying', ->
+
+    it 'should GET the saved events', ->
+      responseData = [
+        id: 1
+        event: 2
+        user: 2
+      ]
+
+      $httpBackend.expectGET listUrl
+        .respond 200, angular.toJson(responseData)
+
+      response = null
+      SavedEvent.query().$promise
+        .then (_response_) ->
+          response = _response_
+      $httpBackend.flush 1
+
+      expectedSavedEventData = SavedEvent.deserialize responseData[0]
+      expectedSavedEvents = [new SavedEvent expectedSavedEventData]
+      expect(response).toAngularEqual expectedSavedEvents
+
+

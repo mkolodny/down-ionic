@@ -10,7 +10,6 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
       title: event.title
     optionalFields =
       id: 'id'
-      invitations: 'invitations'
     for serializedField, deserializedField of optionalFields
       if event[deserializedField]?
         request[serializedField] = event[deserializedField]
@@ -22,8 +21,7 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
           coordinates: [event.place?.lat, event.place?.long]
     if event.datetime?
       request.datetime = event.datetime.toISOString()
-    if event.minAccepted?
-      request.min_accepted = event.minAccepted
+
     request
   deserializeEvent = (event) ->
     response =
@@ -39,10 +37,7 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
         name: event.place.name
         lat: event.place.geo.coordinates[0]
         long: event.place.geo.coordinates[1]
-    if event.comment?
-      response.comment = event.comment
-    if event.min_accepted?
-      response.minAccepted = event.min_accepted
+
     new resource response
 
   resource = $resource detailUrl
@@ -64,17 +59,6 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
         deferred.reject()
 
     {$promise: deferred.promise}
-
-  resource.getInvitedIds = (event) ->
-    deferred = $q.defer()
-
-    $http.get "#{listUrl}/#{event.id}/invited-ids"
-      .success (data, status) ->
-        deferred.resolve data
-      .error (data, status) ->
-        deferred.reject()
-
-    deferred.promise
 
   resource::getPercentRemaining = ->
     currentDate = new Date()

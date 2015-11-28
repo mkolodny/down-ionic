@@ -13,7 +13,7 @@ angular.module 'rallytap.chats', [
     'ui.router'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'chats.list',
+    $stateProvider.state 'tabs.chats.list',
       url: ''
       templateUrl: 'app/chats/chats.html'
       controller: 'ChatsCtrl as chats'

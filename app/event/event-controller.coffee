@@ -30,6 +30,4 @@ class EventsCtrl
 
     @newComment = null
 
-
-
 module.exports = EventsCtrl

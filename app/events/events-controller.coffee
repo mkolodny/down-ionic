@@ -20,6 +20,33 @@ class EventsCtrl
     @getRecommendedEvents()
 
   buildItems: ->
+    items = []
+
+    recommendedEventsMap = {}
+    for savedEvent in @savedEvents
+      items.push
+        isDivider: false
+        savedEvent: savedEvent
+
+      recommendedEvent = savedEvent.event?.recommendedEvent
+      if angular.isDefined recommendedEvent
+        recommendedEventsMap[recommendedEvent] = true
+
+    recommendedEventItems = []
+    for recommendedEvent in @recommendedEvents
+      if recommendedEventsMap[recommendedEvent.id] is undefined
+        recommendedEventItems.push
+          isDivider: false
+          recommendedEvent: recommendedEvent
+
+    if recommendedEventItems.length > 0
+      items.push
+        isDivider: true
+        title: 'Recommended'
+      items = items.concat recommendedEventItems
+
+    items
+
 
   getSavedEvents: ->
     @SavedEvent.query().$promise
@@ -51,6 +78,5 @@ class EventsCtrl
 
   isUserSavedEvent: (savedEvent) ->
     angular.isArray savedEvent.interestedFriends
-
 
 module.exports = EventsCtrl

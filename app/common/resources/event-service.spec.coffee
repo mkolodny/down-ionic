@@ -78,8 +78,6 @@ describe 'event service', ->
             long: -73.9919324
           createdAt: new Date()
           updatedAt: new Date()
-          invitations: invitations
-          minAccepted: 5
 
       it 'should return the serialized event', ->
         expectedEvent =
@@ -92,8 +90,6 @@ describe 'event service', ->
             geo:
               type: 'Point'
               coordinates: [event.place.lat, event.place.long]
-          invitations: invitations
-          min_accepted: 5
         expect(Event.serialize event).toEqual expectedEvent
 
 
@@ -135,7 +131,6 @@ describe 'event service', ->
               coordinates: [40.7270718, -73.9919324]
           created_at: new Date().toISOString()
           updated_at: new Date().toISOString()
-          min_accepted: 5
 
       it 'should return the deserialized event', ->
         expectedEvent =
@@ -149,7 +144,6 @@ describe 'event service', ->
             long: response.place.geo.coordinates[1]
           createdAt: new Date response.created_at
           updatedAt: new Date response.updated_at
-          minAccepted: 5
         expect(Event.deserialize response).toAngularEqual expectedEvent
 
 
@@ -219,48 +213,6 @@ describe 'event service', ->
         $httpBackend.flush 1
 
       it 'should reject the promise', ->
-        expect(rejected).toBe true
-
-
-  ##resource.getInvitedIds
-  describe 'getting invited ids', ->
-    event = null
-    url = null
-
-    beforeEach ->
-      event =
-        id: 1
-      url = "#{listUrl}/#{event.id}/invited-ids"
-
-    describe 'when successful', ->
-
-      it 'should resolve the promise with user ids', ->
-        invitedIds = [1, 2, 3]
-
-        $httpBackend.expectGET url
-          .respond 200, invitedIds
-
-        result = null
-        Event.getInvitedIds(event).then (_result_) ->
-          result = _result_
-        $httpBackend.flush 1
-
-        expect(result).toEqual invitedIds
-
-
-    describe 'when error', ->
-
-      it 'should reject the promise', ->
-        # TODO : Is this the right status code?
-        $httpBackend.expectGET url
-          .respond 400
-
-        rejected = null
-        Event.getInvitedIds event
-          .then null, ->
-            rejected = true
-        $httpBackend.flush 1
-
         expect(rejected).toBe true
 
 

@@ -14,6 +14,7 @@ require './common/meteor/meteor'
 require './common/resources/resources-module'
 require './common/push-notifications/push-notifications-module'
 # Views
+require './tabs/tabs-module'
 require './login/login-module'
 require './verify-phone/verify-phone-module'
 require './facebook-sync/facebook-sync-module'
@@ -45,6 +46,7 @@ angular.module 'rallytap', [
     'ionic.service.deploy'
     'ngCordova'
     'ngToast'
+    'rallytap.tabs'
     'rallytap.auth'
     'rallytap.env'
     'rallytap.resources'
@@ -104,38 +106,6 @@ angular.module 'rallytap', [
       animation: 'slide'
       maxNumber: 1
       dismissButton: true
-
-    # Abstract tab states
-    $stateProvider.state 'home',
-      abstract: true
-      url: '/home'
-      views:
-        home:
-          template: '<ion-nav-view></ion-nav-view>'
-    $stateProvider.state 'chats',
-      abstract: true
-      url: '/chats'
-      views:
-        chats:
-          template: '<ion-nav-view></ion-nav-view>'
-    $stateProvider.state 'post',
-      abstract: true
-      url: '/post'
-      views:
-        post:
-          template: '<ion-nav-view></ion-nav-view>'
-    $stateProvider.state 'saved',
-      abstract: true
-      url: '/saved'
-      views:
-        saved:
-          template: '<ion-nav-view></ion-nav-view>'
-    $stateProvider.state 'friends',
-      abstract: true
-      url: '/friends'
-      views:
-        friends:
-          template: '<ion-nav-view></ion-nav-view>'
 
   .run ($cordovaPush, $cordovaStatusbar, $ionicDeploy, $ionicLoading,
         $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel,

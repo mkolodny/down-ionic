@@ -8,7 +8,7 @@ angular.module 'rallytap.myFriends', [
     'rallytap.intlPhone'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'friends.myFriends',
+    $stateProvider.state 'tabs.friends.myFriends',
       url: '/my-friends'
       templateUrl: 'app/my-friends/my-friends.html'
       controller: 'MyFriendsCtrl as myFriends'

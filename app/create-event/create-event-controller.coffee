@@ -1,10 +1,10 @@
 class CreateEventCtrl
-  @$inject: ['$cordovaDatePicker', '$filter', '$ionicActionSheet',
-             '$ionicHistory', '$ionicModal', '$scope', '$state',
-             '$window', 'Auth']
-  constructor: (@$cordovaDatePicker, @$filter, @$ionicActionSheet,
-                @$ionicHistory, @$ionicModal, @$scope, @$state,
-                @$window, @Auth) ->
+  @$inject: ['$cordovaDatePicker', '$filter',
+             '$ionicModal', '$scope', '$state',
+             'Auth', 'Event', 'ngToast']
+  constructor: (@$cordovaDatePicker, @$filter,
+                @$ionicModal, @$scope, @$state,
+                @Auth, @Event, @ngToast) ->
     # Init the view.
     @currentUser = @Auth.user
 
@@ -31,18 +31,6 @@ class CreateEventCtrl
         long: place.geometry.location.lng()
       @$scope.hidePlaceModal()
 
-    @$scope.$on '$ionicView.enter', =>
-      # Don't animate the transition to the invite friends view.
-      @$ionicHistory.nextViewOptions
-        disableAnimate: true
-
-    # Set the minimum accepted options.
-    options = (option for option in [2..20])
-    for option in [25..100] by 5
-      options.push option
-    @minAcceptedOptions = ({value: option, name: "#{option} People Minimum"} \
-        for option in options)
-
   showSetPlaceModal: ->
     @setPlaceModal.show()
 
@@ -60,10 +48,6 @@ class CreateEventCtrl
         @datetime = date
         @dateString = @$filter('date') @datetime, "EEE, MMM d 'at' h:mm a"
 
-  inviteFriends: ->
-    newEvent = @getNewEvent()
-    @$state.go 'inviteFriends', {event: newEvent}
-
   getNewEvent: ->
     newEvent = {}
     if @title
@@ -74,25 +58,17 @@ class CreateEventCtrl
       newEvent.datetime = @datetime
     if @place
       newEvent.place = @place
-    if @minAccepted
-      newEvent.minAccepted = @minAccepted
+
     newEvent
 
-  showMoreOptions: ->
-    hideSheet = null
-    options =
-      buttons: [
-        text: 'Set Minimum # of People'
-      ]
-      cancelText: 'Cancel'
-      buttonClicked: (index) =>
-        if index is 0
-          @showMinAccepted = true
-          hideSheet()
-
-    hideSheet = @$ionicActionSheet.show options
-
-  viewChats: ->
-    @$state.go 'events'
+  createEvent: ->
+    newEvent = @getNewEvent()
+    @Event.save(newEvent).$promise
+      .then (event) =>
+        delete @title
+        delete @datetime
+        delete @place
+      , =>
+        @ngToast.create 'Oops.. an error occurred..'
 
 module.exports = CreateEventCtrl
