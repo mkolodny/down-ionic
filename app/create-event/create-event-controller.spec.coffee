@@ -254,7 +254,7 @@ describe 'create event controller', ->
     beforeEach ->
       deferred = $q.defer()
       spyOn(Event, 'save').and.returnValue {$promise: deferred.promise}
-      
+
       event =
         title: 'bars?!?'
       spyOn(ctrl, 'getNewEvent').and.returnValue event
@@ -287,7 +287,3 @@ describe 'create event controller', ->
 
       it 'should show an error', ->
         expect(ngToast.create).toHaveBeenCalledWith 'Oops.. an error occurred..'
-
-
-
-

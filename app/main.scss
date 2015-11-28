@@ -19,20 +19,24 @@ $dark:                            #444 !default;
 $brand-color: #6a38ab;
 $new-event-margin-left: 5px;
 
+// Colors
+$positive: #ed6700;
+
 // Buttons
-$button-positive-bg: #ed6700;
-$button-positive-border: #ed6700;
-$button-positive-active-bg: darken(#ed6700, 10%);
-$button-positive-active-border: darken(#ed6700, 10%);
+$button-positive-bg: $positive;
+$button-positive-border: $positive;
+$button-positive-active-bg: darken($positive, 10%);
+$button-positive-active-border: darken($positive, 10%);
 $button-positive-text: #fff;
 
 // The path for our ionicons font files, relative to the built CSS in www/css
 //$ionicons-font-path: "../lib/ionic/fonts" !default;
 
-// Include all of Ionic
+// Libraries
 @import "./ionic/scss/ionic";
+@import "./common/font-awesome/scss/font-awesome";
 
-// Include each view's scss
+// Views
 @import "./common/intl-phone/intlTelInput";
 @import "./login/login";
 @import "./verify-phone/verify-phone";
@@ -44,7 +48,6 @@ $button-positive-text: #fff;
 @import "./find-friends/find-friends";
 @import "./events/events";
 @import "./set-place/set-place";
-@import "./invite-friends/invite-friends";
 @import "./add-by-phone/add-by-phone";
 @import "./add-by-username/add-by-username";
 @import "./add-from-address-book/add-from-address-book";
@@ -55,7 +58,6 @@ $button-positive-text: #fff;
 @import "./friends/friends";
 @import "./guest-list/guest-list";
 @import "./added-me/added-me";
-@import "./friendship/friendship";
 @import "./create-event/create-event";
 @import "./tutorial/tutorial";
 @import "./team/team";
@@ -78,6 +80,30 @@ body {
 }
 .buttons-right {
   padding-right: 3px;
+}
+
+// Tabs
+.tab-item-active {
+  color: $brand-color;
+}
+.tab-nav {
+  color: #ccc !important;
+
+  .fa-plus {
+    background-color: #ed6700;
+    height: 100%;
+    border-radius: 4px;
+    color: #fff;
+  }
+  .fa-star {
+    font-size: 30px;
+  }
+  .fa-users {
+    font-size: 26px;
+  }
+}
+.tab-item {
+  opacity: 1;
 }
 
 // Items
@@ -116,7 +142,7 @@ body {
   text-transform: uppercase;
   background-color: #fff;
   color: $brand-color;
-  font-size: 12px;
+  font-size: 14px;
   border: none;
 
   &.activated {
@@ -332,17 +358,6 @@ ion-nav-back-button {
   #expanded-header {
     // Offset for ios-status-bar
     top: $bar-height + $ios-statusbar-height !important;
-  }
-}
-
-// Events
-.platform-ios {
-  #events {
-    #event-comment {
-      & > i {
-        margin-right: 28px;
-      }
-    }
   }
 }
 

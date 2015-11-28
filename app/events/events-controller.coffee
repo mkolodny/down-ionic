@@ -79,5 +79,4 @@ class EventsCtrl
   isUserSavedEvent: (savedEvent) ->
     angular.isArray savedEvent.interestedFriends
 
-
 module.exports = EventsCtrl

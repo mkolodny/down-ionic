@@ -71,6 +71,4 @@ class CreateEventCtrl
       , =>
         @ngToast.create 'Oops.. an error occurred..'
 
-
-
 module.exports = CreateEventCtrl
