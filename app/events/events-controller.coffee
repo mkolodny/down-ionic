@@ -1,6 +1,33 @@
 class EventsCtrl
-  @$inject: ['$meteor', '$scope', 'Auth', 'SavedEvent', 'RecommendedEvent', 'ngToast']
-  constructor: (@$meteor, @$scope, @Auth, @SavedEvent, @RecommendedEvent, @ngToast) ->
+  @$inject: ['$meteor', '$scope', 'Auth', 'SavedEvent', 'RecommendedEvent',
+             'ngToast', 'User']
+  constructor: (@$meteor, @$scope, @Auth, @SavedEvent, @RecommendedEvent,
+                @ngToast, @User) ->
+    # Mock data
+    @items = [
+      isDivider: true
+      title: 'Friends'
+    ,
+      isDivider: false
+      savedEvent:
+        event:
+          title: 'Get jiggy with it'
+        numInterestedFriends: 7
+        interestedFriends: [new @User(
+          name: 'Chris MacPherson'
+          imageUrl: 'https://graph.facebook.com/v2.2/1012980509/picture')
+        , new @User(
+          name: 'Chris MacPherson'
+          imageUrl: 'https://graph.facebook.com/v2.2/1012980509/picture')
+        ]
+    ,
+      isDivider: false
+      savedEvent:
+        event:
+          title: 'Pickup bball'
+        numInterestedFriends: 7
+    ]
+
     @$scope.$on '$ionicView.loaded', =>
       @refresh()
 
