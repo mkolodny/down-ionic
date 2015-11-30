@@ -29,6 +29,9 @@ $button-positive-active-bg: darken($positive, 10%);
 $button-positive-active-border: darken($positive, 10%);
 $button-positive-text: #fff;
 
+// Fonts
+$font-family-sans-serif: 'Open Sans', 'Helvetica Neue', 'Roboto', 'Segoe UI', sans-serif;
+
 // The path for our ionicons font files, relative to the built CSS in www/css
 //$ionicons-font-path: "../lib/ionic/fonts" !default;
 
@@ -130,7 +133,6 @@ body {
     color: #fff;
     padding-top: 14px;
     font-size: 20px;
-    font-weight: 500;
   }
   &.item-divider {
     margin-bottom: 0;
@@ -304,22 +306,18 @@ body {
   border-bottom-color: transparent !important;
   background-image: none;
   border-bottom: 1px solid darken($brand-color, 12%) !important;
-  font-family: 'Montserrat', 'Helvetica Neue', 'Roboto', 'Segoe UI', sans-serif !important;
-
-  .title {
-    font-family: 'Montserrat', 'Helvetica Neue', 'Roboto', 'Segoe UI', sans-serif !important;
-  }
 }
 ion-nav-back-button {
   display: none;
 }
 .bar {
   background-color: $brand-color;
+  font-weight: 700;
 
   .title {
     color: #fff;
     font-size: 21px;
-    font-weight: 400;
+    font-weight: 700;
   }
   i { 
     color: #fff;
