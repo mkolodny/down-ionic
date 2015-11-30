@@ -73,7 +73,7 @@ class EventsCtrl
       , ->
         item.saveError = true
 
-  isUserSavedEvent: (savedEvent) ->
+  didUserSaveEvent: (savedEvent) ->
     angular.isArray savedEvent.interestedFriends
 
 module.exports = EventsCtrl
