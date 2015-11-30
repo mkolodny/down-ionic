@@ -35,8 +35,12 @@
                  'calendar-star-selected': events.didUserSaveEvent(item.savedEvent),
                  'calendar-star-default': !events.didUserSaveEvent(item.savedEvent)
                }"></i>
-            <span class="total-num-interested">{{item.savedEvent.totalNumInterested}}76</span>
           </button>
+          <div class="total-num-interested"
+               ng-class="{selected: item.savedEvent.event.title==='Get jiggy with it'}">
+               <!--ng-class="{selected: events.didUserSaveEvent(item.savedEvent)}">-->
+            {{item.savedEvent.totalNumInterested}}76
+          </div>
           <h2>
              {{item.savedEvent.event.title}}<span
              ng-if="item.savedEvent.event.place"
