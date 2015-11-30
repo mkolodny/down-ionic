@@ -34,65 +34,42 @@
     top: 18px;
   }
   #what {
-    border-top-left-radius: 30px;
-    border-top-right-radius: 30px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
     border-top: 1px solid darken($brand-color, 12%);
   }
   #what,
   #when,
-  #where,
-  #min-accepted,
-  #more {
+  #where {
     border-left: 1px solid darken($brand-color, 12%);
     border-right: 1px solid darken($brand-color, 12%);
   }
-  #min-accepted,
-  #more {
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
+  #where {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
     border-bottom: 1px solid darken($brand-color, 12%);
-  }
-  #more {
-    height: 55px;
-    color: #999;
-    text-align: center;
-    padding-top: 12px;
-  }
-  #min-accepted {
-    .fa-sort {
-      color: #aaa;
-      padding-left: 2px;
-    }
-  }
-  #select-min-accepted {
-    width: 100%;
-    appearance: none;
-    background-color: #fff;
-    border: none;
-    height: 55px;
-    opacity: 0;
-  }
-  #min-accepted-text {
-    font-family: 'Montserrat', 'Helvetica Neue', 'Roboto', 'Segoe UI', sans-serif;
-    position: absolute;
-    width: 100%;
-    padding-top: 18px;
-    text-align: center;
-    color: #000;
   }
   #invite-friends {
     background-color: #ed6700;
     border: 1px solid darken(#ed6700, 10%);
     padding-top: 11px;
     padding-bottom: 11px;
-    border-radius: 30px;
+    border-radius: 8px;
     color: #fff;
     text-align: center;
-    width: 80%;
+    width: 100%;
     margin: auto;
 
     &.activated {
       background-color: darken(#ed6700, 10%);
     }
+  }
+  #invite-text {
+    font-size: 21px;
+  }
+  .fa-arrow-right {
+    position: relative;
+    top: -2px;
+    left: 2px;
   }
 }
