@@ -1,6 +1,11 @@
 <ion-view id="my-events"
           view-title="Rallytap">
   <ion-content>
+    <ion-refresher pulling-text="Pull to refresh..."
+                   on-refresh="myEvents.getSavedEvents()"
+                   ng-if="!myEvents.isLoading"
+                   spinner="bubbles">
+    </ion-refresher>
     <ion-list>
       <ion-item collection-repeat="item in myEvents.items"
                 item-width="100%"

@@ -11,8 +11,8 @@ angular.module 'rallytap.myEvents', [
     'ngToast'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'saved.myEvents',
-      url: '/my-events'
+    $stateProvider.state 'tabs.saved.myEvents',
+      url: ''
       templateUrl: 'app/my-events/my-events.html'
       controller: 'MyEventsCtrl as myEvents'
   .controller 'MyEventsCtrl', MyEventsCtrl

@@ -48,6 +48,19 @@ describe 'my events controller', ->
   it 'should init the items', ->
     expect(ctrl.items).toEqual []
 
+  ##$ionicView.loaded
+  describe 'when the view is loaded', ->
+
+    beforeEach ->
+      spyOn ctrl, 'getSavedEvents'
+
+      scope.$emit '$ionicView.loaded'
+      scope.$apply()
+
+    it 'should get the saved events', ->
+      expect(ctrl.getSavedEvents).toHaveBeenCalled()
+
+
   ##getSavedEvents
   describe 'getting a users saved events', ->
     deferred = null
@@ -61,6 +74,9 @@ describe 'my events controller', ->
 
     it 'should get the saved events', ->
       expect(Auth.getSavedEvents).toHaveBeenCalled()
+
+    it 'should set a loading flag', ->
+      expect(ctrl.isLoading).toBe true
 
     describe 'successfully', ->
       items = null
@@ -83,6 +99,10 @@ describe 'my events controller', ->
       it 'should set the items on the controller', ->
         expect(ctrl.items).toBe items
 
+      it 'should remove a loading flag', ->
+        expect(ctrl.isLoading).toBe false
+
+
     describe 'on error', ->
 
       beforeEach ->
@@ -92,6 +112,9 @@ describe 'my events controller', ->
 
       it 'should throw an error', ->
         expect(ngToast.create).toHaveBeenCalled()
+
+      it 'should remove a loading flag', ->
+        expect(ctrl.isLoading).toBe false
 
 
   ##buildItems

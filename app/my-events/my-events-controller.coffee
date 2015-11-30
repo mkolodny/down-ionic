@@ -3,13 +3,20 @@ class MyEventsCtrl
   constructor: (@$scope, @$stateParams, @Auth, @ngToast) ->
     @items = []
 
+    @$scope.$on '$ionicView.loaded', =>
+      @getSavedEvents()
+
   getSavedEvents: ->
+    @isLoading = true
+
     @Auth.getSavedEvents().$promise
       .then (savedEvents) =>
         @savedEvents = savedEvents
         @items = @buildItems()
       , =>
         @ngToast.create 'Oops.. an error occurred..'
+      .finally =>
+        @isLoading = false
 
   buildItems: ->
     items = []
@@ -19,5 +26,5 @@ class MyEventsCtrl
         savedEvent: savedEvent
 
     items
-    
+
 module.exports = MyEventsCtrl
