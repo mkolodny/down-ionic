@@ -33,13 +33,10 @@ class EventsCtrl
 
   handleLoadedData: ->
     if @savedEventsLoaded and @recommendedEventsLoaded
-      delete @isLoading
-
       @items = @buildItems()
+      @$scope.$broadcast 'scroll.refreshComplete'
 
   refresh: ->
-    @isLoading = true
-
     delete @savedEventsLoaded
     delete @recommendedEventsLoaded
 
@@ -103,7 +100,7 @@ class EventsCtrl
       , ->
         item.saveError = true
 
-  isUserSavedEvent: (savedEvent) ->
+  didUserSaveEvent: (savedEvent) ->
     angular.isArray savedEvent.interestedFriends
 
 module.exports = EventsCtrl

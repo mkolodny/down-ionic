@@ -64,14 +64,15 @@ describe 'events controller', ->
     describe 'when all of the data has loaded', ->
 
       beforeEach ->
-        ctrl.isLoading = true
+        spyOn scope, '$broadcast'
+
         ctrl.savedEventsLoaded = true
         ctrl.recommendedEventsLoaded = true
 
         ctrl.handleLoadedData()
 
-      it 'should remove the isLoading flag', ->
-        expect(ctrl.isLoading).toBe undefined
+      it 'should stop the ion-refresher', ->
+        expect(scope.$broadcast).toHaveBeenCalledWith 'scroll.refreshComplete'
 
       it 'should build the items', ->
         expect(ctrl.buildItems).toHaveBeenCalled()
@@ -91,9 +92,6 @@ describe 'events controller', ->
       spyOn ctrl, 'getRecommendedEvents'
 
       ctrl.refresh()
-
-    it 'should set the isLoading flag', ->
-      expect(ctrl.isLoading).toBe true
 
     it 'should clear the loaded flags', ->
       expect(ctrl.savedEventsLoaded).toBe undefined

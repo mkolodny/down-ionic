@@ -3,11 +3,13 @@
           hide-back-button="true"
           can-swipe-back="false">
   <ion-content id="chats-content">
+    <!-- No chats placeholder -->
     <div class="placeholder"
          ng-if="chats.items.length === 0">
       <div>You don't have any chats</div>
     </div>
 
+    <!-- Chats list -->
     <ion-list class="list-avatar" ng-if="chats.items.length > 0">
       <ion-item collection-repeat="item in chats.items"
                 item-width="100%"

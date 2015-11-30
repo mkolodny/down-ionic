@@ -57,6 +57,13 @@
     padding: 0;
     padding-top: 8px;
     left: 20px;
+    color: #999;
+
+    &[disabled],
+    &.disabled {
+      opacity: 1;
+      color: $brand-color;
+    }
   }
   .calendar-star-selected,
   .calendar-star-default {
@@ -71,10 +78,6 @@
     font-weight: 700;
     width: 26px;
     text-align: center;
-  }
-  .mark-interested,
-  .total-num-interested {
-    color: #999;
   }
   .date-posted {
     color: #999;
