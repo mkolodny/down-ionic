@@ -89,7 +89,7 @@ body {
 .tab-nav {
   color: #ccc !important;
 
-  .fa-plus {
+  .fa-lightbulb-o {
     background-color: #ed6700;
     height: 100%;
     border-radius: 4px;
@@ -100,6 +100,11 @@ body {
   }
   .fa-users {
     font-size: 26px;
+  }
+  .calendar-star-tab {
+    width: 26px;
+    height: 26px;
+    margin-top: 11px;
   }
 }
 .tab-item {
@@ -620,4 +625,15 @@ ion-nav-back-button {
       border-bottom-right-radius: 8px !important;
     }
   }
+}
+
+// Icon
+.calendar-star-default {
+  background-image: url('/images/calendar-star-999.svg');
+}
+.calendar-star-selected {
+  background-image: url('/images/calendar-star-6a38ab.svg');
+}
+.calendar-star-tab {
+  background-image: url('/images/calendar-star-ccc.svg');
 }

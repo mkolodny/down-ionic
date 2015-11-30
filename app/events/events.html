@@ -9,7 +9,7 @@
                    spinner="bubbles">
     </ion-refresher>
     <div id="create-event-container">
-      <i class="fa fa-star"></i>
+      <i class="calendar-star-selected"></i>
       <input id="create-event-prompt"
              readonly
              ng-mousedown="events.createEvent()"
@@ -31,10 +31,10 @@
                   ng-disabled="events.didUserSaveEvent(item.savedEvent)"
                   ng-mousedown="events.saveEvent(item.savedEvent.event)"
                   ontouchstart>
-            <i class="icon fa fa-star-o"
+            <i class="icon"
                ng-class="{
-                 'fa-star': events.didUserSaveEvent(item.savedEvent),
-                 'fa-star-o': !events.didUserSaveEvent(item.savedEvent)
+                 'calendar-star-selected': events.didUserSaveEvent(item.savedEvent),
+                 'calendar-star-default': !events.didUserSaveEvent(item.savedEvent)
                }"></i>
             <span class="total-num-interested">{{item.savedEvent.totalNumInterested}}76</span>
           </button>
