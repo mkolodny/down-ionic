@@ -87,6 +87,8 @@ describe 'my events controller', ->
         spyOn(ctrl, 'buildItems').and.returnValue items
         savedEvents = 'savedEvents'
 
+        spyOn scope, '$broadcast'
+
         deferred.resolve savedEvents
         scope.$apply()
 
@@ -99,8 +101,8 @@ describe 'my events controller', ->
       it 'should set the items on the controller', ->
         expect(ctrl.items).toBe items
 
-      it 'should remove a loading flag', ->
-        expect(ctrl.isLoading).toBe false
+      it 'should stop the ion-refresher', ->
+        expect(scope.$broadcast).toHaveBeenCalledWith 'scroll.refreshComplete'
 
 
     describe 'on error', ->
@@ -113,8 +115,8 @@ describe 'my events controller', ->
       it 'should throw an error', ->
         expect(ngToast.create).toHaveBeenCalled()
 
-      it 'should remove a loading flag', ->
-        expect(ctrl.isLoading).toBe false
+      it 'should stop the ion-refresher', ->
+        expect(scope.$broadcast).toHaveBeenCalledWith 'scroll.refreshComplete'
 
 
   ##buildItems

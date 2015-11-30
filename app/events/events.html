@@ -5,7 +5,6 @@
   <ion-content>
     <ion-refresher pulling-text="Pull to refresh..."
                    on-refresh="events.refresh()"
-                   ng-if="!events.isLoading"
                    spinner="bubbles">
     </ion-refresher>
     <input id="create-event-prompt"
@@ -42,13 +41,13 @@
                    'fa-star-o': !events.didUserSaveEvent(item.savedEvent)
                  }"></i>
             </button>
-            <span class="event-action-count">{{item.savedEvent.totalNumInterested}}76</span>
+            <span class="event-action-count">{{item.savedEvent.totalNumInterested}}</span>
             <button class="event-action"
                     ng-mousedown="events.viewComments(item.savedEvent.event)"
                     ontouchstart>
               <i class="fa fa-comment-o fa-2x"></i>
             </button>
-            <span class="event-action-count">{{item.savedEvent.numComments}}16</span>
+            <span class="event-action-count">{{item.savedEvent.numComments}}</span>
             <button class="event-action"
                     ng-mousedown="events.viewMoreOptions(item.savedEvent.event)"
                     ontouchstart>

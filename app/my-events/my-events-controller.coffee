@@ -7,8 +7,6 @@ class MyEventsCtrl
       @getSavedEvents()
 
   getSavedEvents: ->
-    @isLoading = true
-
     @Auth.getSavedEvents().$promise
       .then (savedEvents) =>
         @savedEvents = savedEvents
@@ -16,7 +14,7 @@ class MyEventsCtrl
       , =>
         @ngToast.create 'Oops.. an error occurred..'
       .finally =>
-        @isLoading = false
+        @$scope.$broadcast 'scroll.refreshComplete'
 
   buildItems: ->
     items = []

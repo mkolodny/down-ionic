@@ -6,13 +6,10 @@ class EventsCtrl
 
   handleLoadedData: ->
     if @savedEventsLoaded and @recommendedEventsLoaded
-      delete @isLoading
-
       @items = @buildItems()
+      @$scope.$broadcast 'scroll.refreshComplete'
 
   refresh: ->
-    @isLoading = true
-
     delete @savedEventsLoaded
     delete @recommendedEventsLoaded
 
