@@ -85,7 +85,7 @@ class MyFriendsCtrl
   addFriends: ->
     @$ionicHistory.nextViewOptions
       disableAnimate: true
-    @$state.go 'addFriends'
+    @$state.go 'tabs.friends.addFriends'
 
   isPhone: (name) ->
     name[0] is '+' and intlTelInputUtils.isValidNumber name
