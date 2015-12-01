@@ -10,11 +10,10 @@
                    spinner="bubbles">
     </ion-refresher>
     <div id="create-event-container">
-      <i class="calendar-star-selected"></i>
+      <i class="calendar-star-selected" ng-click="events.createEvent()"></i>
       <input id="create-event-prompt"
-             readonly
              ng-mousedown="events.createEvent()"
-             ontouchstart
+             readonly
              placeholder="What sounds fun?">
     </div>
     <ion-list>

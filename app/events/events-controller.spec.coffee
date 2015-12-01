@@ -134,12 +134,12 @@ describe 'events controller', ->
       recommendedEventsDivider =
         isDivider: true
         title: 'Recommended'
-      recommendedEventItem = 
+      recommendedEventItem =
         isDivider: false
         recommendedEvent: recommendedEvent
 
     describe 'when there are saved events and recommended events', ->
-      
+
       it 'should build the items', ->
         ctrl.savedEvents = [savedEvent]
         ctrl.recommendedEvents = [recommendedEvent]
@@ -154,7 +154,7 @@ describe 'events controller', ->
 
 
     describe 'when a saved event is created from a recommended event', ->
-      
+
       it 'should build the items', ->
         ctrl.savedEvents = [savedEvent, savedEventFromRecommendedEvent]
         ctrl.recommendedEvents = [recommendedEvent]
@@ -167,7 +167,7 @@ describe 'events controller', ->
 
 
     describe 'when there are no saved events', ->
-      
+
       it 'should build the items', ->
         ctrl.savedEvents = []
         ctrl.recommendedEvents = [recommendedEvent]
@@ -180,7 +180,7 @@ describe 'events controller', ->
 
 
     describe 'when there are no recommended events', ->
-      
+
       it 'should build the items', ->
         ctrl.savedEvents = [savedEvent]
         ctrl.recommendedEvents = []
@@ -335,10 +335,10 @@ describe 'events controller', ->
         expect(item.saveError).toBe true
 
 
-  ##isUserSavedEvent
+  ##didUserSaveEvent
   describe 'checking if the currrent user saved the event', ->
     savedEvent = null
-    
+
     beforeEach ->
       savedEvent =
         id: 1
@@ -349,7 +349,7 @@ describe 'events controller', ->
     describe 'when the user has saved the event', ->
 
       it 'should return true', ->
-        expect(ctrl.isUserSavedEvent(savedEvent)).toBe true
+        expect(ctrl.didUserSaveEvent savedEvent).toBe true
 
 
     describe 'when the user has not saved the event', ->
@@ -358,10 +358,16 @@ describe 'events controller', ->
         delete savedEvent.interestedFriends
 
       it 'should return false', ->
-        expect(ctrl.isUserSavedEvent(savedEvent)).toBe false
-      
+        expect(ctrl.didUserSaveEvent savedEvent).toBe false
 
 
+  ##createEvent
+  describe 'creating an event', ->
 
+    beforeEach ->
+      spyOn $state, 'go'
 
-  
+      ctrl.createEvent()
+
+    it 'should go to the create event view', ->
+      expect($state.go).toHaveBeenCalledWith 'tabs.post.createEvent'

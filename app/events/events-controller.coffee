@@ -1,7 +1,7 @@
 class EventsCtrl
-  @$inject: ['$meteor', '$scope', 'Auth', 'SavedEvent', 'RecommendedEvent',
-             'ngToast', 'User']
-  constructor: (@$meteor, @$scope, @Auth, @SavedEvent, @RecommendedEvent,
+  @$inject: ['$meteor', '$scope', '$state', 'Auth', 'SavedEvent',
+             'RecommendedEvent', 'ngToast', 'User']
+  constructor: (@$meteor, @$scope, @$state, @Auth, @SavedEvent, @RecommendedEvent,
                 @ngToast, @User) ->
     # Mock data
     @items = [
@@ -71,10 +71,9 @@ class EventsCtrl
 
     items
 
-
   getSavedEvents: ->
-    @SavedEvent.query().$promise
-      .then (savedEvents) =>
+    @SavedEvent.query()
+      .$promise.then (savedEvents) =>
         @savedEvents = savedEvents
         @savedEventsLoaded = true
         @handleLoadedData()
@@ -82,8 +81,8 @@ class EventsCtrl
         @ngToast.create 'Oops.. an error occurred..'
 
   getRecommendedEvents: ->
-    @RecommendedEvent.query().$promise
-      .then (recommendedEvents) =>
+    @RecommendedEvent.query()
+      .$promise.then (recommendedEvents) =>
         @recommendedEvents = recommendedEvents
         @recommendedEventsLoaded = true
         @handleLoadedData()
@@ -94,13 +93,16 @@ class EventsCtrl
     newSavedEvent =
       userId: @Auth.user.id
       eventId: item.savedEvent.eventId
-    @SavedEvent.save(newSavedEvent).$promise
-      .then (newSavedEvent) =>
+    @SavedEvent.save newSavedEvent
+      .$promise.then (newSavedEvent) =>
         item.savedEvent.interestedFriends = newSavedEvent.interestedFriends
       , ->
         item.saveError = true
 
   didUserSaveEvent: (savedEvent) ->
     angular.isArray savedEvent.interestedFriends
+
+  createEvent: ->
+    @$state.go 'tabs.post.createEvent'
 
 module.exports = EventsCtrl
