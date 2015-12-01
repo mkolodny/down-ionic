@@ -1,5 +1,5 @@
 <ion-view id="create-event"
-          view-title="What sounds fun?"
+          view-title="Who's interested in..."
           hide-back-button="true"
           can-swipe-back="false">
   <ion-nav-buttons side="right">
@@ -42,6 +42,12 @@
               ng-disabled="!createEvent.title">
         <span id="invite-text">Post</span>
         <i class="fa fa-arrow-right fa-lg"></i>
+      </button>
+    </div>
+    <div id="who-can-join">
+      To: 
+      <button id="select-privacy" class="button-clear">
+        <i class="fa fa-link"></i> Connections
       </button>
     </div>
   </ion-content>

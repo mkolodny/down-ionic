@@ -72,4 +72,20 @@
     top: -2px;
     left: 2px;
   }
+  #who-can-join {
+    margin-top: 10px;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+  }
+  #select-privacy {
+    background-color: transparent;
+    color: #fff;
+    text-decoration: underline;
+    font-size: 16px;
+
+    .fa-link {
+      text-decoration: underline;
+    }
+  }
 }
