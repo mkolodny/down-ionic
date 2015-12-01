@@ -89,6 +89,13 @@ body {
 .tab-item-active {
   color: $brand-color;
 }
+.tab-item {
+  opacity: 1;
+  
+  .icon {
+    font-size: 34px;
+  }
+}
 .tab-nav {
   color: #ccc !important;
 
@@ -97,23 +104,20 @@ body {
     height: 100%;
     border-radius: 4px;
     color: #fff;
-    font-size: 28px;
-  }
-  .fa-star {
     font-size: 30px;
   }
+  .fa-star {
+    font-size: 32px;
+  }
   .fa-users {
-    font-size: 26px;
+    font-size: 28px;
   }
   .calendar-star-tab,
   .calendar-star-selected {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     margin-top: 11px;
   }
-}
-.tab-item {
-  opacity: 1;
 }
 
 // Items
