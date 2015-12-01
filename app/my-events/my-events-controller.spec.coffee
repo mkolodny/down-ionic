@@ -33,7 +33,7 @@ describe 'my events controller', ->
     ngToast = $injector.get 'ngToast'
 
     # Mock the current user.
-    Auth.user = 
+    Auth.user =
       id: 1
       name: 'Andrew Linfoot'
       firstName: 'Andrew'
