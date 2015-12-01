@@ -68,7 +68,7 @@ class FriendChatCtrl
     @message = null
 
   scrollBottom: ->
-    @$ionicScrollDelegate.$getByHandle('friendChat')
+    @$ionicScrollDelegate.$getByHandle 'friendChat'
       .scrollBottom true
 
 module.exports = FriendChatCtrl

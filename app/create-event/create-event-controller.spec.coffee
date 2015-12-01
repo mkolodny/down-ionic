@@ -70,6 +70,25 @@ describe 'create event controller', ->
   it 'should set the current user on the controller', ->
     expect(ctrl.currentUser).toBe Auth.user
 
+  describe 'after entering the view', ->
+
+    beforeEach ->
+      scope.$emit '$ionicView.afterEnter'
+      scope.$apply()
+
+    it 'should hide the nav border', ->
+      expect(scope.hideNavBottomBorder).toBe true
+
+
+  describe 'after leaving the view', ->
+
+    beforeEach ->
+      scope.$emit '$ionicView.leave'
+      scope.$apply()
+
+    it 'should show the nav border', ->
+      expect(scope.hideNavBottomBorder).toBe false
+
 
   describe 'when the place modal loads', ->
     modal = null

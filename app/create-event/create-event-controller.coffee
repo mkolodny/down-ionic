@@ -1,12 +1,18 @@
 class CreateEventCtrl
   @$inject: ['$cordovaDatePicker', '$filter',
-             '$ionicModal', '$scope', '$state',
+             '$ionicModal', '$rootScope', '$scope', '$state',
              'Auth', 'Event', 'ngToast']
   constructor: (@$cordovaDatePicker, @$filter,
-                @$ionicModal, @$scope, @$state,
+                @$ionicModal, @$rootScope, @$scope, @$state,
                 @Auth, @Event, @ngToast) ->
     # Init the view.
     @currentUser = @Auth.user
+
+    @$scope.$on '$ionicView.afterEnter', =>
+      @$rootScope.hideNavBottomBorder = true
+
+    @$scope.$on '$ionicView.leave', =>
+      @$rootScope.hideNavBottomBorder = false
 
     # Init the set place modal.
     @$ionicModal.fromTemplateUrl 'app/set-place/set-place.html',
