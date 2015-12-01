@@ -56,21 +56,17 @@ class CreateEventCtrl
 
   getNewEvent: ->
     newEvent = {}
-    if @title
-      newEvent.title = @title
-    else
-      newEvent.title = 'hang out'
+    newEvent.title = @title
     if @datetime
       newEvent.datetime = @datetime
     if @place
       newEvent.place = @place
-
     newEvent
 
   createEvent: ->
     newEvent = @getNewEvent()
-    @Event.save(newEvent).$promise
-      .then (event) =>
+    @Event.save newEvent
+      .$promise.then (event) =>
         delete @title
         delete @datetime
         delete @place

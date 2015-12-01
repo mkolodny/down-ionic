@@ -9,7 +9,6 @@
     <div class="list" id="details">
       <div class="item" id="what">
         <input ng-model="createEvent.title"
-               autocapitalize="off"
                placeholder="What?">
         <i class="fa fa-times"
            ng-if="createEvent.title"
@@ -22,7 +21,8 @@
                readonly>
         <i class="fa fa-times"
            ng-if="createEvent.datetime"
-           ng-click="createEvent.datetime = null; createEvent.dateString = null"></i>
+           ng-click="createEvent.datetime = null; createEvent.dateString = null"
+           ></i>
       </div>
       <div class="item" id="where">
         <input ng-model="createEvent.place.name"
@@ -38,7 +38,8 @@
       <button class="item"
               id="invite-friends"
               ng-click="createEvent.createEvent()"
-              ontouchstart>
+              ontouchstart
+              ng-disabled="!createEvent.title">
         <span id="invite-text">Post</span>
         <i class="fa fa-arrow-right fa-lg"></i>
       </button>

@@ -250,21 +250,6 @@ describe 'create event controller', ->
         expect(newEvent).toEqual event
 
 
-    describe 'when the title isn\'t set', ->
-
-      beforeEach ->
-        ctrl.title = null
-        ctrl.datetime = null
-        ctrl.place = null
-
-        newEvent = ctrl.getNewEvent()
-
-      it 'should return the event', ->
-        event =
-          title: 'hang out'
-        expect(newEvent).toEqual event
-
-
   ##createEvent
   describe 'creating an event', ->
     deferred = null
