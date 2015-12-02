@@ -1,7 +1,7 @@
 SavedEvent = ['$resource', 'apiRoot', 'Event', 'User', \
               ($resource, apiRoot, Event, User) ->
   listUrl = "#{apiRoot}/saved-events"
-  
+
   serializeSavedEvent = (savedEvent) ->
     request =
       user: savedEvent.userId
@@ -36,7 +36,8 @@ SavedEvent = ['$resource', 'apiRoot', 'Event', 'User', \
 
     # Optional fields
     if angular.isArray response.interested_friends
-      savedEvent.interestedFriends = (User.deserialize(friend) for friend in response.interested_friends)
+      savedEvent.interestedFriends = (User.deserialize(friend) \
+          for friend in response.interested_friends)
 
     if angular.isDefined response.total_num_interested
       savedEvent.totalNumInterested = response.total_num_interested
