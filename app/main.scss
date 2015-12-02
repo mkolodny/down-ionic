@@ -99,12 +99,12 @@ body {
 .tab-nav {
   color: #ccc !important;
 
-  .fa-bullhorn {
+  .fa-calendar-plus-o {
     background-color: #ed6700;
     height: 100%;
     border-radius: 4px;
     color: #fff;
-    font-size: 30px;
+    font-size: 28px;
   }
   .fa-star {
     font-size: 32px;
@@ -721,4 +721,7 @@ ion-nav-back-button {
 }
 .calendar-star-tab {
   background-image: url('/images/calendar-star-ccc.svg');
+}
+.calendar-plus-ccc {
+  background-image: url('/images/calendar-plus-ccc.svg');
 }

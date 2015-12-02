@@ -4,9 +4,8 @@
 
     > i {
       position: absolute;
-      color: $brand-color;
+      color: #aaa;
       font-size: 1.6em;
-      padding-top: 23px;
       top: 23px;
       left: 20px;
     }
@@ -42,9 +41,5 @@
   .divider-line {
     border-top: 1px solid #eee;
     margin-top: -11px;
-  }
-  .calendar-star-selected {
-    padding-top: 23px;
-    width: 23px;
   }
 }
