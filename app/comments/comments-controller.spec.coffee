@@ -3,9 +3,9 @@ require 'angular-mocks'
 require 'angular-ui-router'
 require '../common/auth/auth-module'
 require '../common/meteor/meteor-mocks'
-EventCtrl = require './event-controller'
+CommentsCtrl = require './comments-controller'
 
-describe 'event controller', ->
+describe 'comments controller', ->
   $q = null
   $state = null
   $stateParams = null
@@ -56,7 +56,7 @@ describe 'event controller', ->
     $meteor.getCollectionByName.and.callFake (collectionName) ->
       if collectionName is 'comments' then return commentsCollection
 
-    ctrl = $controller EventCtrl,
+    ctrl = $controller CommentsCtrl,
       $scope: scope
       $stateParams: $stateParams
   )
