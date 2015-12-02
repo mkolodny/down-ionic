@@ -54,7 +54,8 @@
           <div class="extra-details"
                ng-if="events.didUserSaveEvent(item.savedEvent)">
             <span class="section interested"
-                  ng-if="item.savedEvent.numInterestedFriends > 0">interested</span>
+                  ng-click="events.viewInterested(item.savedEvent.event)"
+                  ng-if="item.savedEvent.totalNumInterested > 0">interested</span>
             <span class="section"
                   ng-click="events.viewComments(item.savedEvent.event)">comment</span>
             <div class="item item-avatar item-button-right"

@@ -1,0 +1,36 @@
+<ion-view id="interested"
+          view-title="Interested">
+  <ion-nav-buttons side="left">
+    <button class="button button-icon icon"
+            ng-click="$ionicGoBack()"
+            ontouchstart>
+      <i class="fa fa-chevron-left fa-lg"></i>
+    </button>
+  </ion-nav-buttons>
+  <ion-content>
+    <ion-list class="list-avatar">
+      <ion-item collection-repeat="item in interested.items track by item.user.id"
+                ng-class="{
+                  'item-divider': item.isDivider,
+                  'item-avatar': !item.isDivider,
+                  'item-icon-right': !item.isDivider
+                }"
+                item-height="item.isDivider ? '36px' : '79px'"
+                item-width="100%">
+        <!-- Divider -->
+        <div ng-if="item.isDivider">
+          {{item.title}}
+        </div>
+
+        <!-- User -->
+        <div ng-if="!item.isDivider">
+          <img class="item-image" ng-src="{{item.user.getImageUrl()}}">
+          <h2>{{item.user.name}}</h2>
+          <p>{{item.user.username}}</p>
+          <invite-button user="item.user"
+                         event="interested.event">
+        </div>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>
