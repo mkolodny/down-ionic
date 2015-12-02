@@ -79,7 +79,7 @@ describe 'chats controller', ->
       $scope: scope
       Auth: Auth
   )
-  
+
   it 'should init the users object', ->
     expect(ctrl.users).toEqual {}
 
@@ -205,7 +205,7 @@ describe 'chats controller', ->
     it 'should bind the chats to the controller', ->
       expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.Chats
       expect(ctrl.chats).toEqual []
-  
+
     describe 'when a new chat comes in', ->
 
       beforeEach ->
@@ -254,7 +254,7 @@ describe 'chats controller', ->
       beforeEach ->
         user1 =
           id: 1
-        user2 = 
+        user2 =
           id: 2
         users = [user1, user2]
 
@@ -279,7 +279,7 @@ describe 'chats controller', ->
     newestMessage = null
 
     beforeEach ->
-      newestMessage = 
+      newestMessage =
         _id: 'asdflkjn;anoi'
       scope.$meteorObject = jasmine.createSpy('scope.$meteorObject') \
         .and.returnValue newestMessage
@@ -300,7 +300,7 @@ describe 'chats controller', ->
         ctrl.newestMessage =
           _id: 'alkjsdfn'
         scope.$apply()
-        ctrl.newestMessage = 
+        ctrl.newestMessage =
           _id: 'aksdjfierfq'
         scope.$apply()
 
@@ -507,7 +507,7 @@ describe 'chats controller', ->
       ctrl.viewChat item
 
     it 'should go to the friend chat', ->
-      expect($state.go).toHaveBeenCalledWith 'tabs.chats.friendChat',
+      expect($state.go).toHaveBeenCalledWith 'friendChat',
         friend: friend
         id: friend.id
 

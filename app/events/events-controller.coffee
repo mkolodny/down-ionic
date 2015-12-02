@@ -80,6 +80,6 @@ class EventsCtrl
     angular.isArray savedEvent.interestedFriends
 
   createEvent: ->
-    @$state.go 'tabs.post.createEvent'
+    @$state.go 'createEvent'
 
 module.exports = EventsCtrl

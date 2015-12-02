@@ -3,16 +3,16 @@ class AddFriendsCtrl
   constructor: (@$ionicHistory, @$state) ->
 
   addByUsername: ->
-    @$state.go 'tabs.friends.addByUsername'
+    @$state.go 'addByUsername'
 
   addFromAddressBook: ->
-    @$state.go 'tabs.friends.addFromAddressBook'
+    @$state.go 'addFromAddressBook'
 
   addFromFacebook: ->
-    @$state.go 'tabs.friends.addFromFacebook'
+    @$state.go 'addFromFacebook'
 
   addByPhone: ->
-    @$state.go 'tabs.friends.addByPhone'
+    @$state.go 'addByPhone'
 
   goBack: ->
     # Don't animate the transition to the events view.

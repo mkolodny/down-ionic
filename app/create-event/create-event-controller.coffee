@@ -61,11 +61,14 @@ class CreateEventCtrl
       newEvent.datetime = @datetime
     if @place
       newEvent.place = @place
+    if angular.isDefined @friendsOnly
+      newEvent.friendsOnly = @friendsOnly
     newEvent
 
   createEvent: ->
-    newEvent = @getNewEvent()
     @$ionicLoading.show()
+
+    newEvent = @getNewEvent()
     @Event.save newEvent
       .$promise.then (event) =>
         # Clear form
@@ -73,27 +76,28 @@ class CreateEventCtrl
         delete @datetime
         delete @place
 
-        @$state.go 'tabs.home.events'
+        @$state.go 'events'
       , =>
-        @ngToast.create 'Oops.. an error occurred..'
+        @ngToast.create 'Oops... an error occurred.'
       .finally =>
         @$ionicLoading.hide()
 
   changePrivacy: ->
     @hideActionSheet = @$ionicActionSheet.show
         buttons: [
-          text: 'Connections'
+          text: '<i class="fa fa-link"></i> Connections'
         ,
-          text: 'Friends Only'
+          text: '<i class="fa fa-users"></i> Friends'
         ]
         cancelText: 'Cancel'
         buttonClicked: @selectPrivacy
 
   selectPrivacy: (actionSheetIndex) =>
+    if actionSheetIndex is 0
+      @friendsOnly = false
+    else if actionSheetIndex is 1
+      @friendsOnly = true
 
     @hideActionSheet()
-
-
-
 
 module.exports = CreateEventCtrl

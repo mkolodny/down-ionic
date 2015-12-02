@@ -35,7 +35,7 @@ class ChatsCtrl
     items = []
 
     selector = {}
-    options = 
+    options =
       transform: @transformChat
     chats = @Chats.find(selector, options).fetch()
     for chat in chats
@@ -48,11 +48,11 @@ class ChatsCtrl
     # Sort by newestMessage.createdAt
     items.sort (a, b) ->
       a.newestMessage.createdAt > b.newestMessage.createdAt
-    
+
     items
 
   watchNewChats: ->
-    # When a new chat is added, subscribe to chat 
+    # When a new chat is added, subscribe to chat
     # messages and the the user for the chat
     @chats = @$scope.$meteorCollection @Chats
     @$scope.$watch =>
@@ -62,7 +62,7 @@ class ChatsCtrl
         @getChatMessages newValue
         @getChatUsers newValue
     , true
-    
+
   getChatMessages: (chatIds) ->
     # TODO: only subscribe to new chats
     @$meteor.subscribe 'messages', chatIds
@@ -127,9 +127,8 @@ class ChatsCtrl
     lastRead >= message.createdAt
 
   viewChat: (item) ->
-    @$state.go 'tabs.chats.friendChat',
+    @$state.go 'friendChat',
       friend: item.friend
       id: item.friend.id
-
 
 module.exports = ChatsCtrl

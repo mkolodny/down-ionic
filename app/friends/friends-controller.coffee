@@ -3,21 +3,21 @@ class FriendsCtrl
   constructor: (@$ionicHistory, @$state) ->
 
   showMyFriends: ->
-    @$state.go 'tabs.friends.myFriends'
+    @$state.go 'myFriends'
 
   showAddedMe: ->
-    @$state.go 'tabs.friends.addedMe'
+    @$state.go 'addedMe'
 
   addByUsername: ->
-    @$state.go 'tabs.friends.addByUsername'
+    @$state.go 'addByUsername'
 
   addFromAddressBook: ->
-    @$state.go 'tabs.friends.addFromAddressBook'
+    @$state.go 'addFromAddressBook'
 
   addFromFacebook: ->
-    @$state.go 'tabs.friends.addFromFacebook'
+    @$state.go 'addFromFacebook'
 
   addByPhone: ->
-    @$state.go 'tabs.friends.addByPhone'
+    @$state.go 'addByPhone'
 
 module.exports = FriendsCtrl

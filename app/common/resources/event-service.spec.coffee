@@ -76,6 +76,7 @@ describe 'event service', ->
             name: 'B Bar & Grill'
             lat: 40.7270718
             long: -73.9919324
+          friendsOnly: true
           createdAt: new Date()
           updatedAt: new Date()
 
@@ -90,6 +91,7 @@ describe 'event service', ->
             geo:
               type: 'Point'
               coordinates: [event.place.lat, event.place.long]
+          friends_only: event.friendsOnly
         expect(Event.serialize event).toEqual expectedEvent
 
 
@@ -104,6 +106,7 @@ describe 'event service', ->
           id: 1
           creator: 1
           title: 'bars?!?!!?'
+          friends_only: false
           created_at: new Date().toISOString()
           updated_at: new Date().toISOString()
 
@@ -112,6 +115,7 @@ describe 'event service', ->
           id: response.id
           creatorId: response.creator
           title: response.title
+          friendsOnly: response.friends_only
           createdAt: new Date response.created_at
           updatedAt: new Date response.updated_at
         expect(Event.deserialize response).toAngularEqual expectedEvent
@@ -129,6 +133,7 @@ describe 'event service', ->
             geo:
               type: 'Point'
               coordinates: [40.7270718, -73.9919324]
+          friendsOnly: false
           created_at: new Date().toISOString()
           updated_at: new Date().toISOString()
 
@@ -142,6 +147,7 @@ describe 'event service', ->
             name: response.place.name
             lat: response.place.geo.coordinates[0]
             long: response.place.geo.coordinates[1]
+          friendsOnly: response.friendsOnly
           createdAt: new Date response.created_at
           updatedAt: new Date response.updated_at
         expect(Event.deserialize response).toAngularEqual expectedEvent

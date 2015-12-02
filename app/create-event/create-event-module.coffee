@@ -10,8 +10,9 @@ angular.module 'rallytap.createEvent', [
     'ngToast'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'tabs.post.createEvent',
+    $stateProvider.state 'createEvent',
       url: ''
+      parent: 'post'
       templateUrl: 'app/create-event/create-event.html'
       controller: 'CreateEventCtrl as createEvent'
   .controller 'CreateEventCtrl', CreateEventCtrl

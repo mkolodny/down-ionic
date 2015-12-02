@@ -8,36 +8,41 @@ angular.module 'rallytap.tabs', [
       templateUrl: 'app/tabs/tabs.html'
 
     # Abstract tab states
-    $stateProvider.state 'tabs.home',
+    $stateProvider.state 'home',
       abstract: true
       url: '/home'
+      parent: 'tabs'
       views:
         home:
           template: '<ion-nav-view></ion-nav-view>'
-    $stateProvider.state 'tabs.chats',
+    $stateProvider.state 'chats',
       abstract: true
       url: '/chats'
+      parent: 'tabs'
       views:
         chats:
           template: '<ion-nav-view></ion-nav-view>'
-    $stateProvider.state 'tabs.post',
+    $stateProvider.state 'post',
       abstract: true
       url: '/post'
+      parent: 'tabs'
       views:
         post:
           template: '<ion-nav-view></ion-nav-view>'
-    $stateProvider.state 'tabs.saved',
+    $stateProvider.state 'saved',
       abstract: true
       url: '/saved'
+      parent: 'tabs'
       views:
         saved:
           template: '<ion-nav-view></ion-nav-view>'
-    $stateProvider.state 'tabs.friends',
+    $stateProvider.state 'friends',
       abstract: true
       url: '/friends'
+      parent: 'tabs'
       views:
         friends:
           template: '<ion-nav-view></ion-nav-view>'
-    
+
     # Default tab
     #$urlRouterProvider.otherwise '/tabs/home'

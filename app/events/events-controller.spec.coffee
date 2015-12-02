@@ -369,4 +369,4 @@ describe 'events controller', ->
       ctrl.createEvent()
 
     it 'should go to the create event view', ->
-      expect($state.go).toHaveBeenCalledWith 'tabs.post.createEvent'
+      expect($state.go).toHaveBeenCalledWith 'createEvent'

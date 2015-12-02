@@ -722,3 +722,11 @@ ion-nav-back-button {
 .calendar-star-tab {
   background-image: url('/images/calendar-star-ccc.svg');
 }
+
+// Action Sheet
+.action-sheet-option {
+  & > i {
+    font-size: 18px;
+    margin-right: 2px;
+  }
+}

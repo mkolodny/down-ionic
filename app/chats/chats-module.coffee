@@ -13,8 +13,9 @@ angular.module 'rallytap.chats', [
     'ui.router'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'tabs.chats.list',
+    $stateProvider.state 'list',
       url: ''
+      parent: 'chats'
       templateUrl: 'app/chats/chats.html'
       controller: 'ChatsCtrl as chats'
   .controller 'ChatsCtrl', ChatsCtrl
