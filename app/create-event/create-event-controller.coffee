@@ -75,7 +75,7 @@ class CreateEventCtrl
 
         @$state.go 'tabs.home.events'
       , =>
-        @ngToast.create 'Oops.. an error occurred..'
+        @ngToast.create 'Oops... an error occurred.'
       .finally =>
         @$ionicLoading.hide()
 

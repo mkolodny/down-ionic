@@ -303,8 +303,8 @@ describe 'create event controller', ->
         scope.$apply()
 
       it 'should show an error', ->
-        expect(ngToast.create).toHaveBeenCalledWith 'Oops.. an error occurred..'
-      
+        expect(ngToast.create).toHaveBeenCalledWith 'Oops... an error occurred.'
+
       it 'should hide a loading spinner', ->
         expect($ionicLoading.hide).toHaveBeenCalled()
 
