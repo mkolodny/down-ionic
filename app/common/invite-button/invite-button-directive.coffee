@@ -5,10 +5,11 @@ inviteButtonDirective = ['$state', '$meteor', '$mixpanel', 'Auth', 'Friendship',
     user: '='
     event: '='
   template: """
-    <a ng-click="inviteUser(user, event)"
-       class="invite-button"
+    <a ng-mousedown="inviteUser(user, event)"
+       ng-disabled="hasBeenInvited(user, event)"
+       class="button invite"
        ng-class="{
-        'selected': hasBeenInvited(user, event)
+        'invited': hasBeenInvited(user, event)
        }">
       <span ng-if="!isLoading">
         Down?

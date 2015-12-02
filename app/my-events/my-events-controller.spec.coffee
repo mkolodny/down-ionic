@@ -69,14 +69,12 @@ describe 'my events controller', ->
       deferred = $q.defer()
 
       spyOn(Auth, 'getSavedEvents').and.returnValue {$promise: deferred.promise}
+      spyOn(scope, '$broadcast').and.callThrough()
 
       ctrl.getSavedEvents()
 
     it 'should get the saved events', ->
       expect(Auth.getSavedEvents).toHaveBeenCalled()
-
-    it 'should set a loading flag', ->
-      expect(ctrl.isLoading).toBe true
 
     describe 'successfully', ->
       items = null
@@ -86,8 +84,6 @@ describe 'my events controller', ->
         items = []
         spyOn(ctrl, 'buildItems').and.returnValue items
         savedEvents = 'savedEvents'
-
-        spyOn scope, '$broadcast'
 
         deferred.resolve savedEvents
         scope.$apply()

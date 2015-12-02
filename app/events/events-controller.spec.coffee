@@ -65,7 +65,6 @@ describe 'events controller', ->
 
       beforeEach ->
         spyOn scope, '$broadcast'
-
         ctrl.savedEventsLoaded = true
         ctrl.recommendedEventsLoaded = true
 

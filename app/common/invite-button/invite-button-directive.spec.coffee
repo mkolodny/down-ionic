@@ -83,6 +83,7 @@ describe 'invite button directive', ->
 
       $compile(element) scope
       isolateScope = element.isolateScope()
+      spyOn(isolateScope, 'hasBeenInvited').and.returnValue false
       scope.$apply()
 
     it 'should show an invite button', ->
@@ -97,7 +98,7 @@ describe 'invite button directive', ->
         $meteor.call.and.returnValue deferred.promise
 
         anchor = element.find 'a'
-        anchor.triggerHandler 'click'
+        anchor.triggerHandler 'mousedown'
 
       it 'should call the send invite meteor method', ->
         creator =
@@ -154,7 +155,7 @@ describe 'invite button directive', ->
     it 'should show a disabled invite button', ->
       anchor = element.find 'a'
       expect(anchor.length).toBe 1
-      expect(anchor).toHaveClass 'selected'
+      expect(anchor).toHaveProp 'disabled'
 
 
   ##$scope.trackInvite
