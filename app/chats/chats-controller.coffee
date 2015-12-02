@@ -69,12 +69,13 @@ class ChatsCtrl
 
   getChatUsers: (chatIds) ->
     # TODO: Only grab users once
-    userIds = (@Friendship.parseChatId(chatId) for chatId in chatIds)
-    @User.query(userIds).$promise.then (users) =>
-      for user in users
-        @users[user.id] = user
-      @chatUsersLoaded = true
-      @handleLoadedData()
+    userIds = (@Friendship.parseChatId(chatId) for chatId in chatIds).join ','
+    @User.query {ids: userIds}
+      .$promise.then (users) =>
+        for user in users
+          @users[user.id] = user
+        @chatUsersLoaded = true
+        @handleLoadedData()
 
   watchNewMessages: =>
     options =

@@ -244,8 +244,8 @@ describe 'chats controller', ->
       ctrl.getChatUsers chatIds
 
     it 'should request the users', ->
-      userIds = (Friendship.parseChatId(chatId) for chatId in chatIds)
-      expect(User.query).toHaveBeenCalledWith userIds
+      userIds = (Friendship.parseChatId(chatId) for chatId in chatIds).join ','
+      expect(User.query).toHaveBeenCalledWith {ids: userIds}
 
     describe 'when the users are returned successfully', ->
       user1 = null
