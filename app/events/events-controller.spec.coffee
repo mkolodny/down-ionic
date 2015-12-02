@@ -371,6 +371,7 @@ describe 'events controller', ->
     it 'should go to the create event view', ->
       expect($state.go).toHaveBeenCalledWith 'createEvent'
 
+
   ##viewComments
   describe 'viewing the comments', ->
     event = null
@@ -382,7 +383,24 @@ describe 'events controller', ->
 
       ctrl.viewComments event
 
-    it 'should go to the event view', ->
-      expect($state.go).toHaveBeenCalledWith 'event',
+    it 'should go to the comments view', ->
+      expect($state.go).toHaveBeenCalledWith 'comments',
+        id: event.id
+        event: event
+
+
+  ##viewInterested
+  describe 'viewing people who are interested', ->
+    event = null
+
+    beforeEach ->
+      spyOn $state, 'go'
+      event =
+        id: 1
+
+      ctrl.viewInterested event
+
+    it 'should go to the interested view', ->
+      expect($state.go).toHaveBeenCalledWith 'interested',
         id: event.id
         event: event

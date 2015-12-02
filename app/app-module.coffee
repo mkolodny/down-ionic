@@ -37,7 +37,7 @@ require './create-event/create-event-module'
 require './tutorial/tutorial-module'
 require './team/team-module'
 require './events/events-module'
-require './event/event-module'
+require './comments/comments-module'
 require './my-events/my-events-module'
 
 angular.module 'rallytap', [
@@ -75,7 +75,7 @@ angular.module 'rallytap', [
     'rallytap.tutorial'
     'rallytap.team'
     'rallytap.events'
-    'rallytap.event'
+    'rallytap.comments'
     'rallytap.myEvents'
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'

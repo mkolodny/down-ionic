@@ -83,7 +83,12 @@ class EventsCtrl
     @$state.go 'createEvent'
 
   viewComments: (event) ->
-    @$state.go 'event',
+    @$state.go 'comments',
+      id: event.id
+      event: event
+
+  viewInterested: (event) ->
+    @$state.go 'interested',
       id: event.id
       event: event
 

@@ -1,19 +1,19 @@
 require 'angular-ui-router'
 require '../common/resources/resources-module'
 require '../common/auth/auth-module'
-EventCtrl = require './event-controller'
+CommentsCtrl = require './comments-controller'
 
-angular.module 'rallytap.event', [
+angular.module 'rallytap.comments', [
     'angular-meteor'
     'rallytap.auth'
     'rallytap.resources'
     'ui.router'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'event',
-      url: '/event/:id'
-      templateUrl: 'app/event/event.html'
-      controller: 'EventCtrl as event'
+    $stateProvider.state 'comments',
+      url: '/comments/:id'
+      templateUrl: 'app/comments/comments.html'
+      controller: 'CommentsCtrl as comments'
       params:
         ###
         event =
@@ -27,4 +27,4 @@ angular.module 'rallytap.event', [
           createdAt: new Date()
         ###
         event: null
-  .controller 'EventCtrl', EventCtrl
+  .controller 'CommentsCtrl', CommentsCtrl

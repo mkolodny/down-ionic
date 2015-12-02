@@ -1,4 +1,4 @@
-class EventsCtrl
+class CommentsCtrl
   @$inject: ['$meteor', '$scope', '$stateParams', 'Auth']
   constructor: (@$meteor, @$scope, @$stateParams, @Auth) ->
     @event = @$stateParams.event
@@ -30,4 +30,4 @@ class EventsCtrl
 
     @newComment = null
 
-module.exports = EventsCtrl
+module.exports = CommentsCtrl
