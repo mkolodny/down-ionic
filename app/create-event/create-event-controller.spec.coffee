@@ -239,6 +239,7 @@ describe 'create event controller', ->
           name: 'ice cream'
           lat: 40.6785872
           lng: -74.0419964
+        ctrl.friendsOnly = true
 
         newEvent = ctrl.getNewEvent()
 
@@ -247,6 +248,20 @@ describe 'create event controller', ->
           title: ctrl.title
           datetime: ctrl.datetime
           place: ctrl.place
+          friendsOnly: ctrl.friendsOnly
+        expect(newEvent).toEqual event
+
+
+    describe 'when only the title is set', ->
+
+      beforeEach ->
+        ctrl.title = 'bars?!?!?'
+
+        newEvent = ctrl.getNewEvent()
+
+      it 'should return the event', ->
+        event =
+          title: ctrl.title
         expect(newEvent).toEqual event
 
 
@@ -321,9 +336,9 @@ describe 'create event controller', ->
     it 'should show an action sheet', ->
       expect($ionicActionSheet.show).toHaveBeenCalledWith
         buttons: [
-          text: 'Connections'
+          text: '<i class="fa fa-link"></i> Connections'
         ,
-          text: 'Friends Only'
+          text: '<i class="fa fa-users"></i> Friends'
         ]
         cancelText: 'Cancel'
         buttonClicked: ctrl.selectPrivacy
@@ -347,7 +362,8 @@ describe 'create event controller', ->
       beforeEach ->
         ctrl.selectPrivacy actionSheetButtonsMap.connections
 
-      xit 'should set the privacy settings to connections', ->
+      it 'should set the privacy settings to connections', ->
+        expect(ctrl.friendsOnly).toBe false
 
       it 'should hide the action sheet', ->
         expect(ctrl.hideActionSheet).toHaveBeenCalled()
@@ -358,7 +374,8 @@ describe 'create event controller', ->
       beforeEach ->
         ctrl.selectPrivacy actionSheetButtonsMap.friends
 
-      xit 'should the privacy settings to friends', ->
+      it 'should the privacy settings to friends only', ->
+        expect(ctrl.friendsOnly).toBe true
 
       it 'should hide the action sheet', ->
         expect(ctrl.hideActionSheet).toHaveBeenCalled()

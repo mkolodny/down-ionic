@@ -11,33 +11,34 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
     optionalFields =
       id: 'id'
     for serializedField, deserializedField of optionalFields
-      if event[deserializedField]?
+      if angular.isDefined event[deserializedField]
         request[serializedField] = event[deserializedField]
-    if event.place?
+    if angular.isObject event.place
       request.place =
         name: event.place?.name
         geo:
           type: 'Point'
           coordinates: [event.place?.lat, event.place?.long]
-    if event.datetime?
+    if angular.isDate event.datetime
       request.datetime = event.datetime.toISOString()
-
+    if angular.isDefined event.friendsOnly
+      request.friends_only = event.friendsOnly
     request
   deserializeEvent = (event) ->
     response =
       id: event.id
       creatorId: event.creator
       title: event.title
+      friendsOnly: event.friends_only
       createdAt: new Date event.created_at
       updatedAt: new Date event.updated_at
-    if event.datetime?
+    if angular.isString event.datetime
       response.datetime = new Date event.datetime
-    if event.place?
+    if angular.isObject event.place
       response.place =
         name: event.place.name
         lat: event.place.geo.coordinates[0]
         long: event.place.geo.coordinates[1]
-
     new resource response
 
   resource = $resource detailUrl
