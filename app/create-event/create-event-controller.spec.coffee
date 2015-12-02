@@ -14,7 +14,7 @@ describe 'create event controller', ->
   $cordovaDatePicker = null
   $filter = null
   $ionicActionSheet = null
-  $ionicHistory = null
+  $ionicLoading = null
   $ionicModal = null
   $q = null
   $state = null
@@ -41,7 +41,7 @@ describe 'create event controller', ->
     $cordovaDatePicker = $injector.get '$cordovaDatePicker'
     $filter = $injector.get '$filter'
     $ionicActionSheet = $injector.get '$ionicActionSheet'
-    $ionicHistory = $injector.get '$ionicHistory'
+    $ionicLoading = $injector.get '$ionicLoading'
     $ionicModal = $injector.get '$ionicModal'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
@@ -264,10 +264,17 @@ describe 'create event controller', ->
       spyOn(ctrl, 'getNewEvent').and.returnValue event
       ctrl.title = event.title
 
+      spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
+      spyOn $state, 'go'
+
       ctrl.createEvent()
 
     it 'should save the event', ->
       expect(Event.save).toHaveBeenCalledWith event
+
+    it 'should show a loading spinner', ->
+      expect($ionicLoading.show).toHaveBeenCalled()
 
     describe 'sucessfully', ->
 
@@ -280,6 +287,12 @@ describe 'create event controller', ->
         expect(ctrl.datetime).toBe undefined
         expect(ctrl.place).toBe undefined
 
+      it 'should hide a loading spinner', ->
+        expect($ionicLoading.hide).toHaveBeenCalled()
+
+      it 'should go the the events feed', ->
+        expect($state.go).toHaveBeenCalledWith 'tabs.home.events'
+
 
     describe 'on error', ->
 
@@ -291,3 +304,61 @@ describe 'create event controller', ->
 
       it 'should show an error', ->
         expect(ngToast.create).toHaveBeenCalledWith 'Oops.. an error occurred..'
+      
+      it 'should hide a loading spinner', ->
+        expect($ionicLoading.hide).toHaveBeenCalled()
+
+
+  ##changePrivacy
+  describe 'changing post privacy settings', ->
+    hideActionSheet = null
+
+    beforeEach ->
+      hideActionSheet = 'hideActionSheet'
+      spyOn($ionicActionSheet, 'show').and.returnValue hideActionSheet
+      ctrl.changePrivacy()
+
+    it 'should show an action sheet', ->
+      expect($ionicActionSheet.show).toHaveBeenCalledWith
+        buttons: [
+          text: 'Connections'
+        ,
+          text: 'Friends Only'
+        ]
+        cancelText: 'Cancel'
+        buttonClicked: ctrl.selectPrivacy
+
+    it 'should set the hideSheet function on the controller', ->
+      expect(ctrl.hideActionSheet).toBe hideActionSheet
+
+
+  ##selectPrivacy
+  describe 'selecting a privacy setting', ->
+    actionSheetButtonsMap = null
+
+    beforeEach ->
+      ctrl.hideActionSheet = jasmine.createSpy 'ctrl.hideActionSheet'
+      actionSheetButtonsMap =
+        connections: 0
+        friends: 1
+
+    describe 'when choosing connections', ->
+
+      beforeEach ->
+        ctrl.selectPrivacy actionSheetButtonsMap.connections
+
+      xit 'should set the privacy settings to connections', ->
+
+      it 'should hide the action sheet', ->
+        expect(ctrl.hideActionSheet).toHaveBeenCalled()
+
+
+    describe 'when choosing friends', ->
+
+      beforeEach ->
+        ctrl.selectPrivacy actionSheetButtonsMap.friends
+
+      xit 'should the privacy settings to friends', ->
+
+      it 'should hide the action sheet', ->
+        expect(ctrl.hideActionSheet).toHaveBeenCalled()

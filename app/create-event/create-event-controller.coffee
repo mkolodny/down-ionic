@@ -1,10 +1,10 @@
 class CreateEventCtrl
-  @$inject: ['$cordovaDatePicker', '$filter',
+  @$inject: ['$cordovaDatePicker', '$filter', '$ionicLoading',
              '$ionicModal', '$rootScope', '$scope', '$state',
-             'Auth', 'Event', 'ngToast']
-  constructor: (@$cordovaDatePicker, @$filter,
+             'Auth', 'Event', 'ngToast', '$ionicActionSheet']
+  constructor: (@$cordovaDatePicker, @$filter, @$ionicLoading,
                 @$ionicModal, @$rootScope, @$scope, @$state,
-                @Auth, @Event, @ngToast) ->
+                @Auth, @Event, @ngToast, @$ionicActionSheet) ->
     # Init the view.
     @currentUser = @Auth.user
 
@@ -65,12 +65,35 @@ class CreateEventCtrl
 
   createEvent: ->
     newEvent = @getNewEvent()
+    @$ionicLoading.show()
     @Event.save newEvent
       .$promise.then (event) =>
+        # Clear form
         delete @title
         delete @datetime
         delete @place
+
+        @$state.go 'tabs.home.events'
       , =>
         @ngToast.create 'Oops.. an error occurred..'
+      .finally =>
+        @$ionicLoading.hide()
+
+  changePrivacy: ->
+    @hideActionSheet = @$ionicActionSheet.show
+        buttons: [
+          text: 'Connections'
+        ,
+          text: 'Friends Only'
+        ]
+        cancelText: 'Cancel'
+        buttonClicked: @selectPrivacy
+
+  selectPrivacy: (actionSheetIndex) =>
+
+    @hideActionSheet()
+
+
+
 
 module.exports = CreateEventCtrl
