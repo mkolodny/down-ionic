@@ -82,4 +82,10 @@ class EventsCtrl
   createEvent: ->
     @$state.go 'createEvent'
 
+  viewComments: (event) ->
+    @$state.go 'event',
+      id: event.id
+      event: event
+
+
 module.exports = EventsCtrl

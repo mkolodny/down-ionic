@@ -8,7 +8,7 @@ class EventsCtrl
       @$scope.$meteorSubscribe 'comments', "#{@event.id}"
       @comments = @$scope.$meteorCollection @getComments, false
 
-  getComments: ->
+  getComments: =>
     selector =
       eventId: "#{@event.id}"
     options =
