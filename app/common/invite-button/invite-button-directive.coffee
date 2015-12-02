@@ -23,11 +23,12 @@ inviteButtonDirective = ['$state', '$meteor', '$mixpanel', 'Auth', 'Friendship',
     Messages = $meteor.getCollectionByName 'messages'
 
     $scope.hasBeenInvited = (user, event) ->
-      chatId = Friendship.getChatId user
-      Messages.findOne
+      chatId = Friendship.getChatId user.id
+      selector = 
         chatId: chatId
         type: 'invite_action'
         'meta.event.id': event.id
+      angular.isDefined Messages.findOne(selector)
 
     $scope.inviteUser = (user, event) ->
       $scope.isLoading = true
