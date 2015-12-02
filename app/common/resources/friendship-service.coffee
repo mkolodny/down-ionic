@@ -51,11 +51,6 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
       type: 'text'
       createdAt: new Date()
 
-    # Send push notification from DJANGO!.
-    url = "#{listUrl}/#{friendId}/messages"
-    requestData = {text: text}
-    $http.post url, requestData
-
   resource.getChatId = (friendId) ->
     if Auth.user.id < friendId
       "#{Auth.user.id},#{friendId}"

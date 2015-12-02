@@ -118,8 +118,6 @@ describe 'friendship service', ->
   describe 'sending a message', ->
     friend = null
     text = null
-    url = null
-    requestData = null
     Messages = null
 
     beforeEach ->
@@ -143,64 +141,33 @@ describe 'friendship service', ->
         username: 'easye'
         imageUrl: 'https://facebook.com/profile-pics/easye'
       text = 'I\'m in love with a robot.'
-      url = "#{listUrl}/#{friend.id}/messages"
-      requestData = {text: text}
 
-    describe 'successfully', ->
-      resolved = false
+      # Mock the current time.
+      jasmine.clock().install()
+      currentDate = new Date 1438195002656
+      jasmine.clock().mockDate currentDate
 
-      beforeEach ->
-        # Mock the current time.
-        jasmine.clock().install()
-        currentDate = new Date 1438195002656
-        jasmine.clock().mockDate currentDate
+      Friendship.sendMessage friend, text
 
-        $httpBackend.expectPOST url, requestData
-          .respond 201, null
+    afterEach ->
+      jasmine.clock().uninstall()
 
-        Friendship.sendMessage friend, text
-          .then ->
-            resolved = true
-        $httpBackend.flush 1
+    it 'should get the eventMessages collection', ->
+      expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
 
-      afterEach ->
-        jasmine.clock().uninstall()
-
-      it 'should resolve the promise', ->
-        expect(resolved).toBe true
-
-      it 'should get the eventMessages collection', ->
-        expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
-
-      it 'should save the message in the meteor server', ->
-        message =
-          creator:
-            id: "#{Auth.user.id}"
-            name: Auth.user.name
-            firstName: Auth.user.firstName
-            lastName: Auth.user.lastName
-            imageUrl: Auth.user.imageUrl
-          text: text
-          chatId: "#{Auth.user.id},#{friend.id}"
-          type: 'text'
-          createdAt: new Date()
-        expect(Messages.insert).toHaveBeenCalledWith message
-
-
-    describe 'unsuccessfully', ->
-      rejected = false
-
-      beforeEach ->
-        $httpBackend.expectPOST url, requestData
-          .respond 500, null
-
-        Friendship.sendMessage friend, text
-          .then null, ->
-            rejected = true
-        $httpBackend.flush 1
-
-      it 'should reject the promise', ->
-        expect(rejected).toBe true
+    it 'should save the message in the meteor server', ->
+      message =
+        creator:
+          id: "#{Auth.user.id}"
+          name: Auth.user.name
+          firstName: Auth.user.firstName
+          lastName: Auth.user.lastName
+          imageUrl: Auth.user.imageUrl
+        text: text
+        chatId: "#{Auth.user.id},#{friend.id}"
+        type: 'text'
+        createdAt: new Date()
+      expect(Messages.insert).toHaveBeenCalledWith message
 
 
   describe 'getting a friend chat id', ->

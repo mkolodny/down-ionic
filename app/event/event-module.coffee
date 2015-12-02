@@ -10,7 +10,7 @@ angular.module 'rallytap.event', [
     'ui.router'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'home.event',
+    $stateProvider.state 'event',
       url: '/event/:id'
       templateUrl: 'app/event/event.html'
       controller: 'EventCtrl as event'
