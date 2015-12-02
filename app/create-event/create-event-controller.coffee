@@ -76,7 +76,7 @@ class CreateEventCtrl
         delete @datetime
         delete @place
 
-        @$state.go 'tabs.home.events'
+        @$state.go 'events'
       , =>
         @ngToast.create 'Oops... an error occurred.'
       .finally =>

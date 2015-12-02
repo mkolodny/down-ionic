@@ -306,7 +306,7 @@ describe 'create event controller', ->
         expect($ionicLoading.hide).toHaveBeenCalled()
 
       it 'should go the the events feed', ->
-        expect($state.go).toHaveBeenCalledWith 'tabs.home.events'
+        expect($state.go).toHaveBeenCalledWith 'events'
 
 
     describe 'on error', ->

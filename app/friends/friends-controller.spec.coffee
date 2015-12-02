@@ -35,7 +35,7 @@ describe 'add friends controller', ->
       ctrl.addByUsername()
 
     it 'should go to the add by username view', ->
-      expect($state.go).toHaveBeenCalledWith 'tabs.friends.addByUsername'
+      expect($state.go).toHaveBeenCalledWith 'addByUsername'
 
 
   describe 'tapping to add by phone', ->
@@ -46,7 +46,7 @@ describe 'add friends controller', ->
       ctrl.addByPhone()
 
     it 'should go to the add by phone view', ->
-      expect($state.go).toHaveBeenCalledWith 'tabs.friends.addByPhone'
+      expect($state.go).toHaveBeenCalledWith 'addByPhone'
 
 
   describe 'tapping to add from address book', ->
@@ -57,7 +57,7 @@ describe 'add friends controller', ->
       ctrl.addFromAddressBook()
 
     it 'should go to the add from address book view', ->
-      expect($state.go).toHaveBeenCalledWith 'tabs.friends.addFromAddressBook'
+      expect($state.go).toHaveBeenCalledWith 'addFromAddressBook'
 
 
   describe 'tapping to add from facebook', ->
@@ -68,7 +68,7 @@ describe 'add friends controller', ->
       ctrl.addFromFacebook()
 
     it 'should go to the add from facebook view', ->
-      expect($state.go).toHaveBeenCalledWith 'tabs.friends.addFromFacebook'
+      expect($state.go).toHaveBeenCalledWith 'addFromFacebook'
 
 
   describe 'tapping to view my friends', ->
@@ -79,7 +79,7 @@ describe 'add friends controller', ->
       ctrl.showMyFriends()
 
     it 'should go to the my friends view', ->
-      expect($state.go).toHaveBeenCalledWith 'tabs.friends.myFriends'
+      expect($state.go).toHaveBeenCalledWith 'myFriends'
 
 
   describe 'tapping to view the people who added me', ->
@@ -90,5 +90,5 @@ describe 'add friends controller', ->
       ctrl.showAddedMe()
 
     it 'should go to the added me view', ->
-      expect($state.go).toHaveBeenCalledWith 'tabs.friends.addedMe'
+      expect($state.go).toHaveBeenCalledWith 'addedMe'
 
