@@ -22,13 +22,6 @@ angular.module 'rallytap.tabs', [
       views:
         chats:
           template: '<ion-nav-view></ion-nav-view>'
-    $stateProvider.state 'post',
-      abstract: true
-      url: '/post'
-      parent: 'tabs'
-      views:
-        post:
-          template: '<ion-nav-view></ion-nav-view>'
     $stateProvider.state 'saved',
       abstract: true
       url: '/saved'

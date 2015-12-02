@@ -1,8 +1,8 @@
 class CreateEventCtrl
-  @$inject: ['$cordovaDatePicker', '$filter', '$ionicLoading',
+  @$inject: ['$cordovaDatePicker', '$filter', '$ionicLoading', '$ionicHistory',
              '$ionicModal', '$rootScope', '$scope', '$state',
              'Auth', 'Event', 'ngToast', '$ionicActionSheet']
-  constructor: (@$cordovaDatePicker, @$filter, @$ionicLoading,
+  constructor: (@$cordovaDatePicker, @$filter, @$ionicLoading, @$ionicHistory,
                 @$ionicModal, @$rootScope, @$scope, @$state,
                 @Auth, @Event, @ngToast, @$ionicActionSheet) ->
     # Init the view.
