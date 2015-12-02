@@ -150,6 +150,32 @@ describe 'SavedEvent service', ->
           user: User.deserialize user
         expect(SavedEvent.deserialize response).toEqual expectedSavedEvent
 
+  ##resource.save
+  describe 'creating', ->
+
+    it 'should POST the user', ->
+      savedEvent =
+        id: 1
+        userId: 2
+        eventId: 3
+      postData = SavedEvent.serialize savedEvent
+      responseData = angular.extend postData
+
+      $httpBackend.expectPOST listUrl, postData
+        .respond 201, angular.toJson(responseData)
+
+      response = null
+      SavedEvent.save savedEvent
+        .$promise.then (_response_) ->
+          response = _response_
+      $httpBackend.flush 1
+
+      expectedSavedEventData = angular.extend
+        id: responseData.id
+        authtoken: responseData.authtoken
+      , savedEvent
+      expectedSavedEvent = new SavedEvent expectedSavedEventData
+      expect(response).toAngularEqual expectedSavedEvent
 
   ##resource.query
   describe 'querying', ->

@@ -29,7 +29,7 @@
         <div class="saved-event item-button-left" ng-if="item.savedEvent">
           <button class="button mark-interested"
                   ng-disabled="events.didUserSaveEvent(item.savedEvent)"
-                  ng-mousedown="events.saveEvent(item.savedEvent.event)"
+                  ng-mousedown="events.saveEvent(item)"
                   ontouchstart>
             <i class="icon"
                ng-class="{

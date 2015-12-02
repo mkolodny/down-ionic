@@ -44,6 +44,15 @@ SavedEvent = ['$resource', 'apiRoot', 'Event', 'User', \
     savedEvent
 
   resource = $resource "#{listUrl}/:id", null,
+    save:
+      method: 'post'
+      transformRequest: (data, headersGetter) ->
+        request = serializeSavedEvent data
+        angular.toJson request
+      transformResponse: (data, headersGetter) ->
+        data = angular.fromJson data
+        deserializeSavedEvent data
+
     query:
       method: 'get'
       isArray: true
