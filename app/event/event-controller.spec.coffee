@@ -108,7 +108,7 @@ describe 'event controller', ->
         eventId: "#{ctrl.event.id}"
       options =
         sort:
-          createdAt: -1
+          createdAt: 1
       expect(ctrl.Comments.find).toHaveBeenCalledWith selector, options
 
 
