@@ -67,6 +67,7 @@ describe 'events controller', ->
         spyOn scope, '$broadcast'
         ctrl.savedEventsLoaded = true
         ctrl.recommendedEventsLoaded = true
+        ctrl.commentsCountLoaded = true
 
         ctrl.handleLoadedData()
 
@@ -86,6 +87,7 @@ describe 'events controller', ->
     beforeEach ->
       ctrl.savedEventsLoaded = true
       ctrl.recommendedEventsLoaded = true
+      ctrl.commentsCountLoaded = true
 
       spyOn ctrl, 'getSavedEvents'
       spyOn ctrl, 'getRecommendedEvents'
@@ -95,6 +97,7 @@ describe 'events controller', ->
     it 'should clear the loaded flags', ->
       expect(ctrl.savedEventsLoaded).toBe undefined
       expect(ctrl.recommendedEventsLoaded).toBe undefined
+      expect(ctrl.commentsCountLoaded).toBe undefined
 
     it 'should get the events', ->
       expect(ctrl.getSavedEvents).toHaveBeenCalled()
@@ -114,19 +117,26 @@ describe 'events controller', ->
     recommendedEventsDivider = null
 
     beforeEach ->
+      ctrl.commentsCount =
+        '1': 1
+        '2': 1
       savedEvent =
         id: 1
+        eventId: 1
       savedEventItem =
         isDivider: false
         savedEvent: savedEvent
+        commentsCount: 1
 
       savedEventFromRecommendedEvent =
         id: 2
+        eventId: 2
         event:
           recommendedEvent: 1
       savedEventFromRecommendedEventItem =
         isDivider: false
         savedEvent: savedEventFromRecommendedEvent
+        commentsCount: 1
 
       recommendedEvent =
         id: 1
@@ -207,6 +217,7 @@ describe 'events controller', ->
 
       beforeEach ->
         spyOn ctrl, 'handleLoadedData'
+        spyOn ctrl, 'getCommentsCount'
         response = []
 
         deferred.resolve response
@@ -220,6 +231,9 @@ describe 'events controller', ->
 
       it 'should handle the loaded data', ->
         expect(ctrl.handleLoadedData).toHaveBeenCalled()
+
+      it 'should get the comments count', ->
+        expect(ctrl.getCommentsCount).toHaveBeenCalled()
 
 
     describe 'on error', ->
@@ -278,6 +292,62 @@ describe 'events controller', ->
 
       it 'should show an error', ->
         expect(ngToast.create).toHaveBeenCalledWith 'Oops.. an error occurred..'
+
+
+  ##getCommentsCount
+  describe 'getting the comments count', ->
+    event = null
+    deferred = null
+
+    beforeEach ->
+      event =
+        id: 1
+      savedEvent =
+        event: event
+        eventId: event.id
+      ctrl.savedEvents = [savedEvent]
+      deferred = $q.defer()
+      $meteor.call.and.returnValue deferred.promise
+
+      ctrl.getCommentsCount()
+
+    it 'should get the comments count', ->
+      expect($meteor.call).toHaveBeenCalledWith 'getCommentsCount', [event.id]
+
+    describe 'successfully', ->
+      count = null
+
+      beforeEach ->
+        count = 1
+        commentsCount = [
+          _id: "#{event.id}"
+          count: count
+        ]
+        spyOn ctrl, 'handleLoadedData'
+        deferred.resolve commentsCount
+        scope.$apply()
+
+      it 'should save the comments count on the controller as an object', ->
+        commentsCountObj = {}
+        commentsCountObj[event.id] = count
+        expect(ctrl.commentsCount).toEqual commentsCountObj
+
+      it 'should set the commentsCount loaded flag', ->
+        expect(ctrl.commentsCountLoaded).toBe true
+
+      it 'should handle the loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
+
+
+    describe 'on error', ->
+
+      beforeEach ->
+        spyOn ngToast, 'create'
+        deferred.reject()
+        scope.$apply()
+
+      it 'should throw an error', ->
+        expect(ngToast.create).toHaveBeenCalled()
 
 
   ##saveEvent

@@ -55,9 +55,9 @@
                ng-if="events.didUserSaveEvent(item.savedEvent)">
             <span class="section interested"
                   ng-click="events.viewInterested(item.savedEvent.event)"
-                  ng-if="item.savedEvent.totalNumInterested > 0">interested</span>
+                  ng-if="item.savedEvent.interestedFriends.length > 0">interested</span>
             <span class="section"
-                  ng-click="events.viewComments(item.savedEvent.event)">comment</span>
+                  ng-click="events.viewComments(item.savedEvent.event)">{{item.commentsCount}} comment</span>
             <div class="item item-avatar item-button-right"
                  ng-repeat="friend in item.savedEvent.interestedFriends">
               <img class="item-image" ng-src="{{friend.getImageUrl(72)}}">
