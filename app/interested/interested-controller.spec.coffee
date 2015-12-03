@@ -134,6 +134,9 @@ describe 'interested controller', ->
 
     it 'should build the items', ->
       expectedItems = [
+        isDivider: false
+        user: Auth.user
+      ,
         isDivider: true
         title: 'Friends'
       ,

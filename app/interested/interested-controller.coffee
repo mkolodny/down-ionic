@@ -17,6 +17,10 @@ class InterestedCtrl
   buildItems: ->
     items = []
 
+    items.push
+      isDivider: false
+      user: @Auth.user
+
     # Sort by friends or connections
     interestedFriends = []
     interestedConnections = []
