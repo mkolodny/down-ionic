@@ -474,3 +474,22 @@ describe 'events controller', ->
       expect($state.go).toHaveBeenCalledWith 'interested',
         id: event.id
         event: event
+
+
+  ##numConnectionsInterested
+  describe 'getting the number of connections who are interested', ->
+    event = null
+    numConnectionsInterested = null
+
+    beforeEach ->
+      event =
+        totalNumInterested: 4
+        interestedFriends: [
+          id: 1
+        ]
+
+      numConnectionsInterested = ctrl.numConnectionsInterested event
+
+    it 'should return the number', ->
+      num = event.totalNumInterested - event.interestedFriends.length - 1
+      expect(numConnectionsInterested).toBe num

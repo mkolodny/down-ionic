@@ -108,5 +108,7 @@ class EventsCtrl
       id: event.id
       event: event
 
+  numConnectionsInterested: (event) ->
+    event.totalNumInterested - event.interestedFriends.length - 1 # 1 is you
 
 module.exports = EventsCtrl
