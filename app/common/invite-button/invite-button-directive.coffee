@@ -57,7 +57,6 @@ inviteButtonDirective = ['$state', '$meteor', '$mixpanel', 'Auth', \
       $mixpanel.track 'Send Invite',
         'is friend': Auth.isFriend user.id
         'from screen': $state.current.name
-
   ]
 ]
 
