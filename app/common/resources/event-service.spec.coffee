@@ -222,6 +222,52 @@ describe 'event service', ->
         expect(rejected).toBe true
 
 
+  ##resource.interested
+  describe 'getting the users who are interested in an event', ->
+    eventId = null
+    url = null
+
+    beforeEach ->
+      eventId = 1
+      url = "#{listUrl}/#{eventId}/interested"
+
+    describe 'successfully', ->
+
+      it 'should GET the users', ->
+        user =
+          id: 1
+          email: 'aturing@gmail.com'
+          name: 'Alan Turing'
+          username: 'tdog'
+          imageUrl: 'https://facebook.com/profile-pic/tdog'
+          location:
+            lat: 40.7265834
+            long: -73.9821535
+        responseData = [User.serialize(user)]
+
+        $httpBackend.expectGET url
+          .respond 200, angular.toJson(responseData)
+        response = null
+        Event.interested(eventId).$promise.then (_response_) ->
+          response = _response_
+        $httpBackend.flush 1
+
+        expect(response).toAngularEqual [user]
+
+
+    describe 'on error', ->
+
+      it 'should reject the promise', ->
+        $httpBackend.expectGET url
+          .respond 500, null
+        rejected = null
+        Event.interested(eventId).$promise.then null, ->
+          rejected = true
+        $httpBackend.flush 1
+
+        expect(rejected).toBe true
+
+
   ##resource::getPercentRemaining
   describe 'getting the percent remaining for an event', ->
     currentDate = null

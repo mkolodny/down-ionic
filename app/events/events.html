@@ -83,9 +83,14 @@
             </div>
             <div class="section"
                  ng-click="events.viewComments(item.savedEvent.event)">
-              <span class="event-link"
-                    ng-click="events.viewComments(item.savedEvent.event)"
-                    >comment</span>
+              <ng-pluralize class="event-link"
+                            ng-click="events.viewComments(item.savedEvent.event)"
+                            count="item.commentsCount"
+                            when="{
+                              0: 'comment',
+                              1: '{} comment',
+                              'other': '{} comments'
+                            }" />
             </div>
           </div>
         </div>

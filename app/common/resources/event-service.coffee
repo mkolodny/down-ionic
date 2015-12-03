@@ -61,6 +61,20 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
 
     {$promise: deferred.promise}
 
+  resource.interested = (eventId) ->
+    deferred = $q.defer()
+
+    url = "#{listUrl}/#{eventId}/interested"
+    $http.get url
+      .success (data, status) ->
+        data = angular.fromJson data
+        users = (User.deserialize(user) for user in data)
+        deferred.resolve users
+      .error (data, status) ->
+        deferred.reject()
+
+    {$promise: deferred.promise}
+
   resource::getPercentRemaining = ->
     currentDate = new Date()
     twentyFourHrsAgo = angular.copy currentDate
