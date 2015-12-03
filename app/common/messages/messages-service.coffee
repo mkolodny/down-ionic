@@ -33,6 +33,7 @@ class Messages
         for chat in @chatIds
           delete newChatIdsMap[chat._id]
         for key, value of newChatIdsMap
+          @$meteor.subscribe 'messages', [key]
           @$rootScope.$broadcast 'messages.newChat', key
         @chatIds = newChatIds
     , true

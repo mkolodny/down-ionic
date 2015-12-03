@@ -140,6 +140,9 @@ describe 'Messages service', ->
       it 'should broadcast a new chat event', ->
         expect($rootScope.$broadcast).toHaveBeenCalledWith 'messages.newChat', newChat._id
   
+      it 'should subscribe to messages for that chat', ->
+        expect($meteor.subscribe).toHaveBeenCalledWith 'messages', [newChat._id]
+
 
   ##watchNewMessages
   describe 'watching for new messages', ->
