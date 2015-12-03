@@ -36,9 +36,15 @@ describe 'events controller', ->
     ngToast = $injector.get 'ngToast'
     RecommendedEvent = $injector.get 'RecommendedEvent'
 
+    # Mock the current user.
+    Auth.user = {id: 1}
+
     ctrl = $controller EventsCtrl,
       $scope: scope
   )
+
+  it 'should set the current user on the controller', ->
+    expect(ctrl.currentUser).toBe Auth.user
 
   ##$ionicView.loaded
   describe 'the first time that the view is loaded', ->
@@ -48,6 +54,9 @@ describe 'events controller', ->
 
       scope.$emit '$ionicView.loaded'
       scope.$apply()
+
+    it 'should set a loading flag', ->
+      expect(ctrl.isLoading).toBe true
 
     it 'should refresh the data', ->
       expect(ctrl.refresh).toHaveBeenCalled()
@@ -60,6 +69,7 @@ describe 'events controller', ->
     beforeEach ->
       items = []
       spyOn(ctrl, 'buildItems').and.returnValue items
+      ctrl.isLoading = true
 
     describe 'when all of the data has loaded', ->
 
@@ -71,8 +81,11 @@ describe 'events controller', ->
 
         ctrl.handleLoadedData()
 
-      it 'should stop the ion-refresher', ->
+      it 'should stop the refresher', ->
         expect(scope.$broadcast).toHaveBeenCalledWith 'scroll.refreshComplete'
+
+      it 'should clear the loading flag', ->
+        expect(ctrl.isLoading).toBe false
 
       it 'should build the items', ->
         expect(ctrl.buildItems).toHaveBeenCalled()
@@ -360,4 +373,3 @@ describe 'events controller', ->
 
     it 'should go to the create event view', ->
       expect($state.go).toHaveBeenCalledWith 'createEvent'
-

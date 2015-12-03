@@ -53,6 +53,9 @@ describe 'my events controller', ->
   it 'should init the items', ->
     expect(ctrl.items).toEqual []
 
+  it 'should set the current user on the controller', ->
+    expect(ctrl.currentUser).toBe Auth.user
+
   ##$ionicView.loaded
   describe 'when the view is loaded', ->
 
@@ -64,7 +67,7 @@ describe 'my events controller', ->
 
     it 'should refresh the data', ->
       expect(ctrl.refresh).toHaveBeenCalled()
-  
+
 
   ##handleLoadedData
   describe 'handling after new data loads', ->
@@ -237,5 +240,3 @@ describe 'my events controller', ->
 
       it 'should throw an error', ->
         expect(ngToast.create).toHaveBeenCalled()
-
-  

@@ -41,10 +41,9 @@ describe 'event item directive', ->
       event: event
       eventId: event.id
       userId: 4
-    scope.savedEvent = savedEvent
 
-    ctrl = $controller EventItemCtrl,
-      $scope: scope
+    ctrl = $controller EventItemCtrl
+    ctrl.savedEvent = savedEvent
   )
 
   ##saveEvent
@@ -91,17 +90,11 @@ describe 'event item directive', ->
 
   ##didUserSaveEvent
   describe 'checking if the currrent user saved the event', ->
-    savedEvent = null
-
-    beforeEach ->
-      savedEvent =
-        id: 1
-        event: 'some event'
-        user: 'a user'
-        interestedFriends: ['friend1', 'friend2']
-      ctrl.savedEvent = savedEvent
 
     describe 'when the user has saved the event', ->
+
+      beforeEach ->
+        savedEvent.interestedFriends = []
 
       it 'should return true', ->
         expect(ctrl.didUserSaveEvent savedEvent).toBe true
@@ -118,14 +111,9 @@ describe 'event item directive', ->
 
   ##viewComments
   describe 'viewing the comments', ->
-    event = null
 
     beforeEach ->
       spyOn $state, 'go'
-      event =
-        id: 1
-      ctrl.savedEvent =
-        event: event
 
       ctrl.viewComments()
 
@@ -137,14 +125,9 @@ describe 'event item directive', ->
 
   ##viewInterested
   describe 'viewing people who are interested', ->
-    event = null
 
     beforeEach ->
       spyOn $state, 'go'
-      event =
-        id: 1
-      ctrl.savedEvent =
-        event: event
 
       ctrl.viewInterested()
 

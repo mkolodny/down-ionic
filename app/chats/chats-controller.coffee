@@ -5,6 +5,8 @@ class ChatsCtrl
              '$state', 'Auth', 'Friendship', 'User']
   constructor: (@$ionicLoading, @$meteor, @$scope,
                 @$state, @Auth, @Friendship, @User) ->
+    @currentUser = @Auth.user
+
     # Init variables
     @users = {}
 

@@ -5,6 +5,7 @@ require '../mixpanel/mixpanel-module'
 require '../invite-button/invite-button-module'
 require '../auth/auth-module'
 EventItemCtrl = require './event-item-controller'
+EventItemDirective = require './event-item-directive'
 
 angular.module 'rallytap.eventItem', [
     'yaru22.angular-timeago'
@@ -17,11 +18,4 @@ angular.module 'rallytap.eventItem', [
     'ui.router'
   ]
   .controller 'eventItemCtrl', EventItemCtrl
-  .directive 'eventItem', ->
-    restrict: 'E'
-    scope:
-      savedEvent: '='
-      commentsCount: '='
-    bindToController: true
-    templateUrl: 'app/common/event-item/event-item.html'
-    controller: 'eventItemCtrl as eventItem'
+  .directive 'eventItem', EventItemDirective

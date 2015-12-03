@@ -5,14 +5,17 @@ class EventsCtrl
                 @ngToast, @User) ->
     @items = []
     @commentsCount = {}
+    @currentUser = @Auth.user
 
     @$scope.$on '$ionicView.loaded', =>
+      @isLoading = true
       @refresh()
 
   handleLoadedData: ->
     if @savedEventsLoaded and @recommendedEventsLoaded \
-       and @commentsCountLoaded
+        and @commentsCountLoaded
       @items = @buildItems()
+      @isLoading = false
       @$scope.$broadcast 'scroll.refreshComplete'
 
   refresh: ->
@@ -84,6 +87,5 @@ class EventsCtrl
 
   createEvent: ->
     @$state.go 'createEvent'
-
 
 module.exports = EventsCtrl

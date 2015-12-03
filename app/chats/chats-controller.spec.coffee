@@ -51,7 +51,6 @@ describe 'chats controller', ->
     earlier = new Date()
     later = new Date earlier.getTime()+1
 
-
     # Mock chats
     Auth.user =
       id: 2
@@ -77,7 +76,6 @@ describe 'chats controller', ->
 
     ctrl = $controller ChatsCtrl,
       $scope: scope
-      Auth: Auth
   )
 
   it 'should init the users object', ->
@@ -89,6 +87,9 @@ describe 'chats controller', ->
 
   it 'should subscribe to all the chats', ->
     expect($meteor.subscribe).toHaveBeenCalledWith 'allChats'
+
+  it 'should set the current user on the controller', ->
+    expect(ctrl.currentUser).toBe Auth.user
 
   describe 'when the allChats subscription is ready', ->
 
