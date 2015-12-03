@@ -2,10 +2,13 @@ require 'angular-ui-router'
 require 'ng-toast'
 require '../common/resources/resources-module'
 require '../common/auth/auth-module'
+require '../common/event-item/event-item-module'
 MyEventsCtrl = require './my-events-controller'
 
 angular.module 'rallytap.myEvents', [
+    'angular-meteor'
     'rallytap.auth'
+    'rallytap.eventItem'
     'rallytap.resources'
     'ui.router'
     'ngToast'
