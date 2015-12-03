@@ -14,7 +14,7 @@
     "angular-mixpanel": "git+https://github.com/kuhnza/angular-mixpanel.git",
     "angular-resource": "1.3.13",
     "angular-sanitize": "1.3.13",
-    "angular-timeago": "^0.2.4",
+    "angular-timeago": "git@github.com:mkolodny/angular-timeago.git#33d8ad1d84f55d2fabf6a1596b835aa69919642e",
     "angular-ui-router": "0.2.13",
     "angularjs-scroll-glue": "2.0.4",
     "asteroid": "git@github.com:mondora/asteroid.git#c97869a973161b47aec2edb9aac0c1ba3ba230fa",
