@@ -14,6 +14,7 @@ require './common/meteor/meteor'
 require './common/resources/resources-module'
 require './common/push-notifications/push-notifications-module'
 require './common/event-item/event-item-module'
+require './common/messages/messages-module'
 # Views
 require './tabs/tabs-module'
 require './login/login-module'
@@ -79,6 +80,7 @@ angular.module 'rallytap', [
     'rallytap.myEvents'
     'rallytap.interested'
     'rallytap.eventItem'
+    'rallytap.messages'
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]
@@ -115,7 +117,7 @@ angular.module 'rallytap', [
         $ionicPlatform, $ionicPopup, $ionicHistory, $mixpanel,
         $rootScope, $state, $timeout, $window, Auth, branchKey,
         localStorageService, LocalDB, ionicDeployChannel, PushNotifications,
-        skipIonicDeploy, User) ->
+        skipIonicDeploy, User, Messages) ->
     ###
     Put anything that touches Cordova in here!
     ###
@@ -182,6 +184,9 @@ angular.module 'rallytap', [
         if Auth.flags.hasRequestedLocationServices \
             or !ionic.Platform.isIOS()
           Auth.watchLocation()
+
+        # Subscribe to message and chat data
+        Messages.listen()
 
         $rootScope.finishedBootstrap = true
         Auth.redirectForAuthState()

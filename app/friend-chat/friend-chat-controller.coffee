@@ -1,15 +1,11 @@
 class FriendChatCtrl
   @$inject: ['$ionicScrollDelegate', '$meteor', '$mixpanel',
              '$scope', '$state', '$stateParams', 'Auth',
-             'Friendship', 'User']
+             'Friendship', 'User', 'Messages']
   constructor: (@$ionicScrollDelegate, @$meteor, @$mixpanel,
                 @$scope, @$state, @$stateParams, @Auth,
-                @Friendship, @User) ->
+                @Friendship, @User, @Messages) ->
     @friend = @$stateParams.friend
-
-    # Set Meteor collections on controller
-    @Messages = @$meteor.getCollectionByName 'messages'
-    @Chats = @$meteor.getCollectionByName 'chats'
 
     @$scope.$on '$ionicView.beforeEnter', =>
       @chatId = @Friendship.getChatId @friend.id
@@ -37,16 +33,17 @@ class FriendChatCtrl
     if newMessageId is undefined
       return
 
-    @$meteor.call 'readMessage', newMessageId
+    @Messages.readMessage newMessageId
     @scrollBottom()
 
   getMessages: =>
-    @Messages.find
-      chatId: @chatId
-    ,
-      sort:
-        createdAt: 1
-      transform: @transformMessage
+    @$meteor.getCollectionByName 'messages'
+      .find
+        chatId: @chatId
+      ,
+        sort:
+          createdAt: 1
+        transform: @transformMessage
 
   transformMessage: (message) =>
     message.creator = new @User message.creator

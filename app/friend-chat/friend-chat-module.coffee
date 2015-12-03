@@ -1,10 +1,12 @@
 require 'angular-elastic'
 require '../common/auth/auth-module'
+require '../common/messages/messages-module'
 FriendChatCtrl = require './friend-chat-controller'
 
 angular.module 'rallytap.friendChat', [
     'ionic'
     'rallytap.auth'
+    'rallytap.messages'
     'monospaced.elastic'
     'ui.router'
   ]

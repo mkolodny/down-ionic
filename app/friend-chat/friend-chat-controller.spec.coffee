@@ -3,6 +3,7 @@ require 'angular-mocks'
 require '../common/auth/auth-module'
 require '../common/mixpanel/mixpanel-module'
 require '../common/meteor/meteor-mocks'
+require '../common/messages/messages-module'
 FriendChatCtrl = require './friend-chat-controller'
 
 describe 'friend chat controller', ->
@@ -12,12 +13,11 @@ describe 'friend chat controller', ->
   $q = null
   $state = null
   Auth = null
-  chatsCollection = null
   ctrl = null
   friend = null
   Friendship = null
   Invitation = null
-  messagesCollection = null
+  Messages = null
   scope = null
   User = null
 
@@ -28,6 +28,8 @@ describe 'friend chat controller', ->
   beforeEach angular.mock.module('rallytap.resources')
 
   beforeEach angular.mock.module('rallytap.auth')
+
+  beforeEach angular.mock.module('rallytap.messages')
 
   beforeEach angular.mock.module('ionic')
 
@@ -41,6 +43,7 @@ describe 'friend chat controller', ->
     $stateParams = angular.copy $injector.get('$stateParams')
     Auth = $injector.get 'Auth'
     Friendship = $injector.get 'Friendship'
+    Messages = $injector.get 'Messages'
     scope = $injector.get '$rootScope'
     User = $injector.get 'User'
 
@@ -65,12 +68,6 @@ describe 'friend chat controller', ->
         long: -73.9821535
     $stateParams.friend = friend
 
-    messagesCollection = 'messagesCollection'
-    chatsCollection = 'chatsCollection'
-    $meteor.getCollectionByName.and.callFake (collectionName) ->
-      if collectionName is 'messages' then return messagesCollection
-      if collectionName is 'chats' then return chatsCollection
-
     ctrl = $controller FriendChatCtrl,
       $scope: scope
       $stateParams: $stateParams
@@ -79,14 +76,6 @@ describe 'friend chat controller', ->
 
   it 'should set the friend on the controller', ->
     expect(ctrl.friend).toBe friend
-
-  it 'should set the messages collection on the controller', ->
-    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'messages'
-    expect(ctrl.Messages).toBe messagesCollection
-
-  it 'should set the chats collection on the controller', ->
-    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
-    expect(ctrl.Chats).toBe chatsCollection
 
   ##$ionicView.beforeEnter
   describe 'once the view loads', ->
@@ -189,11 +178,12 @@ describe 'friend chat controller', ->
       ctrl.messages.push message2
 
       spyOn ctrl, 'scrollBottom'
+      spyOn Messages, 'readMessage'
 
       ctrl.handleNewMessage newMessageId
 
     it 'should mark the message as read', ->
-      expect($meteor.call).toHaveBeenCalledWith 'readMessage', newMessageId
+      expect(Messages.readMessage).toHaveBeenCalledWith newMessageId
 
     it 'should scroll to the bottom', ->
       expect(ctrl.scrollBottom).toHaveBeenCalled()
@@ -203,12 +193,15 @@ describe 'friend chat controller', ->
   describe 'getting messages', ->
     cursor = null
     messages = null
+    messagesCollection = null
 
     beforeEach ->
+      messagesCollection =
+        find: jasmine.createSpy('Messages.find').and.returnValue cursor
+      $meteor.getCollectionByName.and.callFake (collectionName) ->
+        if collectionName is 'messages' then return messagesCollection
       ctrl.chatId = '1,2'
       cursor = 'messagesCursor'
-      ctrl.Messages =
-        find: jasmine.createSpy('Messages.find').and.returnValue cursor
       messages = ctrl.getMessages()
 
     it 'should query, sort and transform messages', ->
@@ -218,7 +211,7 @@ describe 'friend chat controller', ->
         sort:
           createdAt: 1
         transform: ctrl.transformMessage
-      expect(ctrl.Messages.find).toHaveBeenCalledWith selector, options
+      expect(messagesCollection.find).toHaveBeenCalledWith selector, options
 
     it 'should return a messages reactive cursor', ->
       expect(messages).toBe cursor

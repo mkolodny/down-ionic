@@ -61,6 +61,9 @@ describe 'interested controller', ->
   it 'should set the event on the controller', ->
     expect(ctrl.event).toBe event
 
+  it 'should set the current user on the controller', ->
+    expect(ctrl.currentUser).toBe Auth.user
+
   ##$ionicView.beforeEnter
   describe 'before the view enters', ->
 
@@ -134,6 +137,9 @@ describe 'interested controller', ->
 
     it 'should build the items', ->
       expectedItems = [
+        isDivider: false
+        user: Auth.user
+      ,
         isDivider: true
         title: 'Friends'
       ,
