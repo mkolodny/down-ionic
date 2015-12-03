@@ -107,7 +107,8 @@ describe 'invite button directive', ->
           firstName: Auth.user.firstName
           lastName: Auth.user.lastName
           imageUrl: Auth.user.imageUrl
-        expect($meteor.call).toHaveBeenCalledWith 'sendEventInvite', creator, "#{friend.id}", event
+        expect($meteor.call).toHaveBeenCalledWith('sendEventInvite', creator,
+            "#{friend.id}", event)
 
       it 'should show a loading spinner', ->
         spinner = element.find 'ion-spinner'

@@ -19,7 +19,7 @@ inviteButtonDirective = ['$state', '$meteor', '$mixpanel', 'Auth', \
         <ion-spinner icon="bubbles"></ion-spinner>
       </i>
     </a>
-    <button class="button button-clear invite sent-invite"
+    <button class="button button-clear invite sent"
             ng-if="hasBeenInvited(user, event)"
             disabled>
       Message sent

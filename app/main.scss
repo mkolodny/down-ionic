@@ -63,6 +63,7 @@ $font-family-sans-serif: 'Open Sans', 'Helvetica Neue', 'Roboto', 'Segoe UI', sa
 @import "./create-event/create-event";
 @import "./team/team";
 @import "./chats/chats";
+@import "./interested/interested";
 @import "./common/event-item/event-item";
 
 /*
@@ -627,5 +628,30 @@ ion-nav-back-button {
   .spinner {
     stroke: #666666;
     fill: #666666;
+  }
+}
+
+// Invite
+.invite {
+  margin-top: 4px;
+  background-color: #fff;
+  font-weight: 500;
+  font-size: 14px;
+  color: #999;
+  border-color: #999;
+  min-height: 0;
+  height: 28px !important;
+  line-height: 26px;
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  background-color: $positive;
+  border-color: $positive;
+  color: #fff;
+
+  &.sent {
+    background-color: transparent;
+    border: none;
+    color: #000;
   }
 }
