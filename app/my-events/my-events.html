@@ -5,7 +5,13 @@
                    on-refresh="myEvents.refresh()"
                    spinner="bubbles">
     </ion-refresher>
-    <ion-list>
+    <!-- No saved events placeholder -->
+    <div class="placeholder"
+         ng-if="myEvents.items.length === 0">
+      <div>No interests :(</div>
+    </div>
+
+    <ion-list ng-if="myEvents.items.length > 0">
       <ion-item ng-repeat="item in myEvents.items">
         <event-item saved-event="item.savedEvent"
                     comments-count="item.commentsCount"/>

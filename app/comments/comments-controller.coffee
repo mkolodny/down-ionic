@@ -6,6 +6,8 @@ class CommentsCtrl
 
     @$scope.$on '$ionicView.beforeEnter', =>
       @$scope.$meteorSubscribe 'comments', "#{@event.id}"
+        .then =>
+          @commentsLoaded = true
       @comments = @$scope.$meteorCollection @getComments, false
 
   getComments: =>

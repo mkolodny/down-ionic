@@ -8,7 +8,13 @@
     </button>
   </ion-nav-buttons>
   <ion-content>
-    <ion-list>
+    <!-- No comments placeholder -->
+    <div class="placeholder"
+         ng-if="comments.comments.length === 0 && comments.commentsLoaded === true">
+      <div>There are no comments yet. Why not be the first?</div>
+    </div>
+
+    <ion-list ng-if="comments.comments.length > 0">
       <ion-item ng-repeat="comment in comments.comments">
           {{comment.text}}
       </ion-item>
