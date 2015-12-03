@@ -36,9 +36,15 @@ describe 'events controller', ->
     ngToast = $injector.get 'ngToast'
     RecommendedEvent = $injector.get 'RecommendedEvent'
 
+    # Mock the current user.
+    Auth.user = {id: 1}
+
     ctrl = $controller EventsCtrl,
       $scope: scope
   )
+
+  it 'should set the current user on the controller', ->
+    expect(ctrl.currentUser).toBe Auth.user
 
   ##$ionicView.loaded
   describe 'the first time that the view is loaded', ->
@@ -49,7 +55,7 @@ describe 'events controller', ->
       scope.$emit '$ionicView.loaded'
       scope.$apply()
 
-    fit 'should set a loading flag', ->
+    it 'should set a loading flag', ->
       expect(ctrl.isLoading).toBe true
 
     it 'should refresh the data', ->
@@ -75,10 +81,10 @@ describe 'events controller', ->
 
         ctrl.handleLoadedData()
 
-      it 'should clear the loading flag', ->
+      it 'should stop the refresher', ->
         expect(scope.$broadcast).toHaveBeenCalledWith 'scroll.refreshComplete'
 
-      fit 'should clear the loading flag', ->
+      it 'should clear the loading flag', ->
         expect(ctrl.isLoading).toBe false
 
       it 'should build the items', ->

@@ -1,4 +1,7 @@
 <ion-view id="friends" view-title="Friends" hide-back-button="true">
+  <ion-nav-buttons side="left">
+    <span class="points-nav">{{friends.currentUser.points | number:0}}</span>
+  </ion-nav-buttons>
   <ion-content>
     <ion-list>
       <ion-item class="item-avatar"

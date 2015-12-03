@@ -61,7 +61,7 @@ describe 'invite button directive', ->
     User = $injector.get 'User'
     ngToast = $injector.get 'ngToast'
 
-    Messages = 
+    Messages =
       findOne: jasmine.createSpy 'Messages.findOne'
     $meteor.getCollectionByName.and.returnValue Messages
 
@@ -107,7 +107,7 @@ describe 'invite button directive', ->
           firstName: Auth.user.firstName
           lastName: Auth.user.lastName
           imageUrl: Auth.user.imageUrl
-        expect($meteor.call).toHaveBeenCalledWith 'sendEventInvite', creator, "#{friend.id}", event 
+        expect($meteor.call).toHaveBeenCalledWith 'sendEventInvite', creator, "#{friend.id}", event
 
       it 'should show a loading spinner', ->
         spinner = element.find 'ion-spinner'
@@ -174,6 +174,3 @@ describe 'invite button directive', ->
       expect($mixpanel.track).toHaveBeenCalledWith 'Send Invite',
         'is friend': true
         'from screen': $state.current.name
-
-
-    

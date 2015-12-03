@@ -5,27 +5,38 @@ require 'angular-mocks'
 require 'angular-sanitize'
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js'
+require '../common/auth/auth-module'
 FriendsCtrl = require './friends-controller'
 
 describe 'add friends controller', ->
   $ionicHistory = null
+  $state = null
+  Auth = null
   ctrl = null
   scope = null
-  $state = null
 
   beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('ui.router')
 
+  beforeEach angular.mock.module('rallytap.auth')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $ionicHistory = $injector.get '$ionicHistory'
     $state = $injector.get '$state'
+    Auth = $injector.get 'Auth'
     scope = $injector.get '$rootScope'
+
+    # Mock the current user.
+    Auth.user = {id: 1}
 
     ctrl = $controller FriendsCtrl,
       $scope: scope
   )
+
+  it 'should set the current user on the controller', ->
+    expect(ctrl.currentUser).toBe Auth.user
 
   describe 'tapping to add by username', ->
 

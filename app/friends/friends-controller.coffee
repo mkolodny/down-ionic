@@ -1,6 +1,7 @@
 class FriendsCtrl
-  @$inject: ['$ionicHistory', '$state']
-  constructor: (@$ionicHistory, @$state) ->
+  @$inject: ['$ionicHistory', '$state', 'Auth']
+  constructor: (@$ionicHistory, @$state, @Auth) ->
+    @currentUser = @Auth.user
 
   showMyFriends: ->
     @$state.go 'myFriends'

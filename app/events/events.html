@@ -4,6 +4,9 @@
   <ion-nav-title>
     <span id="logo">Rallytap</span>
   </ion-nav-title>
+  <ion-nav-buttons side="left">
+    <span class="points-nav">{{events.currentUser.points | number:0}}</span>
+  </ion-nav-buttons>
   <ion-content>
     <div class="spinner-container" ng-if="events.isLoading">
       <ion-spinner icon="bubbles"></ion-spinner>

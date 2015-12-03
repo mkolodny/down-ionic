@@ -3,6 +3,7 @@ class MyEventsCtrl
   constructor: (@$scope, @$stateParams, @$meteor, @Auth, @ngToast, @User) ->
     @items = []
     @commentsCount = {}
+    @currentUser = @Auth.user
 
     @$scope.$on '$ionicView.loaded', =>
       @refresh()

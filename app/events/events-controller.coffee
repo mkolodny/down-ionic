@@ -5,6 +5,7 @@ class EventsCtrl
                 @ngToast, @User) ->
     @items = []
     @commentsCount = {}
+    @currentUser = @Auth.user
 
     @$scope.$on '$ionicView.loaded', =>
       @isLoading = true
