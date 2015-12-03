@@ -5,13 +5,6 @@ require './angular-meteor.js'
 
 # Define Local Mongo Collections
 #   In controllers use $meteor.getCollectionByName 'messages'
-Chats = new Mongo.Collection 'chats'
-Messages = new Mongo.Collection 'messages'
-Comments = new Mongo.Collection 'comments'
-
-# Subscribe to all chats
-Meteor.subscribe 'allChats', ->
-  Tracker.autorun ->
-    allChats = Chats.find().fetch()
-    chatIds = (chat._id for chat in allChats)
-    Meteor.subscribe 'messages', chatIds
+new Mongo.Collection 'chats'
+new Mongo.Collection 'messages'
+new Mongo.Collection 'comments'

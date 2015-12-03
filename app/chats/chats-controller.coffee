@@ -118,7 +118,6 @@ class ChatsCtrl
   wasRead: (message) =>
     # Get Chat object for message
     chat = @Chats.findOne {_id: message?.chatId}
-
     # Default to read to stop flicker
     if chat is undefined then return true
 

@@ -1,3 +1,6 @@
+require '../common/messages/messages-module'
+TabsCtrl = require './tabs-controller'
+
 angular.module 'rallytap.tabs', [
     'ui.router'
   ]
@@ -6,6 +9,7 @@ angular.module 'rallytap.tabs', [
       url: '/tabs'
       abstract: true
       templateUrl: 'app/tabs/tabs.html'
+      controller: 'TabsCtrl as tabs'
 
     # Abstract tab states
     $stateProvider.state 'home',
@@ -36,6 +40,8 @@ angular.module 'rallytap.tabs', [
       views:
         friends:
           template: '<ion-nav-view></ion-nav-view>'
+  .controller 'TabsCtrl', TabsCtrl
+  
 
     # Default tab
     #$urlRouterProvider.otherwise '/tabs/home'
