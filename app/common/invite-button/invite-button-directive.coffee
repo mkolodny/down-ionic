@@ -1,4 +1,5 @@
-inviteButtonDirective = ['$state', '$meteor', '$mixpanel', 'Auth', 'Friendship', 'ngToast', \
+inviteButtonDirective = ['$state', '$meteor', '$mixpanel', 'Auth', \
+                         'Friendship', 'ngToast', \
                          ($state, $meteor, $mixpanel, Auth, Friendship, ngToast) ->
   restrict: 'E'
   scope:

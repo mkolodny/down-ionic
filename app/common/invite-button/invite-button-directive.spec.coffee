@@ -152,10 +152,13 @@ describe 'invite button directive', ->
       isolateScope = element.isolateScope()
       scope.$apply()
 
-    it 'should show a disabled invite button', ->
-      anchor = element.find 'a'
-      expect(anchor.length).toBe 1
-      expect(anchor).toHaveProp 'disabled'
+    it 'should hide the invite button', ->
+      inviteButton = element.find 'anchor'
+      expect(inviteButton.length).toBe 0
+
+    it 'should show an invited button', ->
+      invitedButton = element.find 'button'
+      expect(invitedButton.length).toBe 1
 
 
   ##$scope.trackInvite
