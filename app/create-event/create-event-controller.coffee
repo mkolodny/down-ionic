@@ -76,6 +76,8 @@ class CreateEventCtrl
         delete @datetime
         delete @place
 
+        @$ionicHistory.clearCache()
+      .then =>
         @$state.go 'events'
       , =>
         @ngToast.create 'Oops... an error occurred.'

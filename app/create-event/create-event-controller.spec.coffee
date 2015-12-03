@@ -14,6 +14,7 @@ describe 'create event controller', ->
   $cordovaDatePicker = null
   $filter = null
   $ionicActionSheet = null
+  $ionicHistory = null
   $ionicLoading = null
   $ionicModal = null
   $q = null
@@ -41,6 +42,7 @@ describe 'create event controller', ->
     $cordovaDatePicker = $injector.get '$cordovaDatePicker'
     $filter = $injector.get '$filter'
     $ionicActionSheet = $injector.get '$ionicActionSheet'
+    $ionicHistory = $injector.get '$ionicHistory'
     $ionicLoading = $injector.get '$ionicLoading'
     $ionicModal = $injector.get '$ionicModal'
     $q = $injector.get '$q'
@@ -278,10 +280,7 @@ describe 'create event controller', ->
         title: 'bars?!?'
       spyOn(ctrl, 'getNewEvent').and.returnValue event
       ctrl.title = event.title
-
       spyOn $ionicLoading, 'show'
-      spyOn $ionicLoading, 'hide'
-      spyOn $state, 'go'
 
       ctrl.createEvent()
 
@@ -291,9 +290,14 @@ describe 'create event controller', ->
     it 'should show a loading spinner', ->
       expect($ionicLoading.show).toHaveBeenCalled()
 
-    describe 'sucessfully', ->
+    fdescribe 'successfully', ->
+      deferredCacheClear = null
 
       beforeEach ->
+        deferredCacheClear = $q.defer()
+        spyOn($ionicHistory, 'clearCache').and.returnValue \
+            deferredCacheClear.promise
+
         deferred.resolve()
         scope.$apply()
 
@@ -302,11 +306,23 @@ describe 'create event controller', ->
         expect(ctrl.datetime).toBe undefined
         expect(ctrl.place).toBe undefined
 
-      it 'should hide a loading spinner', ->
-        expect($ionicLoading.hide).toHaveBeenCalled()
+      it 'should clear the cache', ->
+        expect($ionicHistory.clearCache).toHaveBeenCalled()
 
-      it 'should go the the events feed', ->
-        expect($state.go).toHaveBeenCalledWith 'events'
+      describe 'when the cache is cleared', ->
+
+        beforeEach ->
+          spyOn $ionicLoading, 'hide'
+          spyOn $state, 'go'
+
+          deferredCacheClear.resolve()
+          scope.$apply()
+
+        it 'should hide a loading spinner', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
+
+        it 'should go the the events feed', ->
+          expect($state.go).toHaveBeenCalledWith 'events'
 
 
     describe 'on error', ->
