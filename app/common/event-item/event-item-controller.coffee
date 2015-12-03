@@ -3,6 +3,10 @@ class EventItemCtrl
   constructor: (@$state, @Auth, @SavedEvent, @ngToast) ->
 
   saveEvent: ->
+    # For latency compensation
+    @savedEvent.interestedFriends = []
+    @savedEvent.totalNumInterested++
+
     newSavedEvent =
       userId: @Auth.user.id
       eventId: @savedEvent.eventId
@@ -10,6 +14,10 @@ class EventItemCtrl
       .$promise.then (newSavedEvent) =>
         @savedEvent.interestedFriends = newSavedEvent.interestedFriends
       , =>
+        # Revert latency compensation
+        delete @savedEvent.interestedFriends
+        @savedEvent.totalNumInterested--
+  
         @ngToast.create 'Oops.. an error occurred..'
 
   didUserSaveEvent: ->

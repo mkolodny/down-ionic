@@ -41,6 +41,7 @@ describe 'event item directive', ->
       event: event
       eventId: event.id
       userId: 4
+      totalNumInterested: 1
 
     ctrl = $controller EventItemCtrl
     ctrl.savedEvent = savedEvent
@@ -49,17 +50,25 @@ describe 'event item directive', ->
   ##saveEvent
   describe 'saving an event', ->
     deferred = null
+    preSaveNumInterested = null
 
     beforeEach ->
       deferred = $q.defer()
       spyOn(SavedEvent, 'save').and.returnValue {$promise: deferred.promise}
 
+      preSaveNumInterested = ctrl.savedEvent.totalNumInterested
       ctrl.saveEvent()
 
     it 'should create a new SavedEvent object', ->
       expect(SavedEvent.save).toHaveBeenCalledWith
         userId: Auth.user.id
         eventId: event.id
+
+    it 'should mark the current user as interested', ->
+      expect(ctrl.didUserSaveEvent()).toBe true
+
+    it 'should increase the total number interested by 1', ->
+      expect(ctrl.savedEvent.totalNumInterested).toBe preSaveNumInterested + 1
 
     describe 'when the save succeeds', ->
       interestedFriends = null
@@ -86,6 +95,12 @@ describe 'event item directive', ->
 
       it 'should show an error', ->
         expect(ngToast.create).toHaveBeenCalled()
+
+      it 'should show the currrent user as not interested', ->
+        expect(ctrl.didUserSaveEvent()).toBe false
+
+      it 'should show the original interested number', ->
+        expect(ctrl.savedEvent.totalNumInterested).toBe preSaveNumInterested
 
 
   ##didUserSaveEvent
