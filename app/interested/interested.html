@@ -27,7 +27,7 @@
           <img class="item-image" ng-src="{{item.user.getImageUrl()}}">
           <h2>{{item.user.name}}</h2>
           <p>{{item.user.username}}</p>
-          <invite-button ng-if="item.user.id !== interested.Auth.user.id"
+          <invite-button ng-if="item.user.id !== interested.currentUser.id"
                          user="item.user"
                          event="interested.event">
         </div>
