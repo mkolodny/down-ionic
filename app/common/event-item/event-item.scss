@@ -1,9 +1,10 @@
 .saved-event {
-  padding-left: 43px;
-  padding-right: 5px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-
+  .event {
+    padding-left: 43px;
+    padding-right: 5px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
   h2 {
     font-size: 20px;
     font-weight: 400;
@@ -13,7 +14,7 @@
     border: none;
     padding: 8px;
     position: absolute;
-    top: 10px;
+    top: 13px;
     left: 12px;
     color: #999;
 
@@ -33,7 +34,7 @@
   }
   .total-num-interested {
     position: absolute;
-    top: 43px;
+    top: 46px;
     left: 18px;
     font-size: 18px;
     font-weight: 700;
@@ -53,9 +54,7 @@
     margin-top: 3px;
   }
   .extra-details {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #eee;
+    margin-top: 1px;
   }
   .event-link {
     display: inline-block;
@@ -63,15 +62,6 @@
     font-weight: 700;
     font-size: 14px;
     color: #999;
-  }
-  .interested {
-    color: $brand-color;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: -5px;
-  }
-  .interested-friends {
-    margin-bottom: 7px;
   }
   .item-avatar {
     padding-left: 50px;
@@ -102,10 +92,40 @@
     min-height: 0;
     height: 28px !important;
     line-height: 26px;
+    position: absolute;
+    top: 10px;
+    right: 16px;
   }
   .invited {
-    background-color: $brand-color;
-    border-color: $brand-color;
+    background-color: $positive;
+    border-color: $positive;
     color: #fff;
+  }
+  .sent-invite {
+    background-color: transparent;
+    border: none;
+    color: #000;
+  }
+  .interested-friends {
+    background-color: #eef;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 3px;
+  }
+  .num-interested-friends {
+    color: $brand-color;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: -5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+  }
+  .interested-friend {
+    margin-top: 7px;
+    background-color: transparent;
+
+    &.first {
+      margin-top: 2px;
+    }
   }
 }

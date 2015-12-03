@@ -6,7 +6,7 @@ inviteButtonDirective = ['$state', '$meteor', '$mixpanel', 'Auth', 'Friendship',
     event: '='
   template: """
     <a ng-mousedown="inviteUser(user, event)"
-       ng-disabled="hasBeenInvited(user, event)"
+       ng-if="!hasBeenInvited(user, event)"
        class="button invite"
        ng-class="{
         'invited': hasBeenInvited(user, event)
@@ -18,13 +18,18 @@ inviteButtonDirective = ['$state', '$meteor', '$mixpanel', 'Auth', 'Friendship',
         <ion-spinner icon="bubbles"></ion-spinner>
       </i>
     </a>
+    <button class="button button-clear invite sent-invite"
+            ng-if="hasBeenInvited(user, event)"
+            disabled>
+      Message sent
+    </button>
     """
   controller: ['$scope', ($scope) ->
     Messages = $meteor.getCollectionByName 'messages'
 
     $scope.hasBeenInvited = (user, event) ->
       chatId = Friendship.getChatId user.id
-      selector = 
+      selector =
         chatId: chatId
         type: 'invite_action'
         'meta.event.id': event.id
