@@ -70,9 +70,12 @@ describe 'comments controller', ->
   ##$ionicView.beforeEnter
   describe 'before the view enters', ->
     comments = null
+    deferred = null
 
     beforeEach ->
-      scope.$meteorSubscribe = jasmine.createSpy 'scope.$meteorSubscribe'
+      deferred = $q.defer()
+      scope.$meteorSubscribe = jasmine.createSpy('scope.$meteorSubscribe') \
+        .and.returnValue deferred.promise
 
       comments = []
       scope.$meteorCollection = jasmine.createSpy('scope.$meteorCollection') \
@@ -86,6 +89,15 @@ describe 'comments controller', ->
 
     it 'should bind the comments to the controller', ->
       expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.getComments, false
+
+    describe 'when comment subscription is ready', ->
+
+      beforeEach ->
+        deferred.resolve()
+        scope.$apply()
+
+      it 'should set a comment loaded flag', ->
+        expect(ctrl.commentsLoaded).toBe true
 
 
   ##getComments
