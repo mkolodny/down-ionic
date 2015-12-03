@@ -53,17 +53,39 @@
           </div>
           <div class="extra-details"
                ng-if="events.didUserSaveEvent(item.savedEvent)">
-            <span class="section interested"
-                  ng-if="item.savedEvent.interestedFriends.length > 0">interested</span>
-            <span class="section"
-                  ng-click="events.viewComments(item.savedEvent.event)">comment</span>
-            <div class="item item-avatar item-button-right"
-                 ng-repeat="friend in item.savedEvent.interestedFriends">
-              <img class="item-image" ng-src="{{friend.getImageUrl(72)}}">
-              <h3>{{friend.name}}</h3>
-              <invite-button user="friend"
-                             event="item.savedEvent.event">
-              </invite-button>
+            <div ng-if="item.savedEvent.interestedFriends.length > 0">
+              <div class="section interested">
+                {{item.savedEvent.interestedFriends.length}} <ng-pluralize
+                count="item.savedEvent.interestedFriends.length"
+                when="{
+                  1: 'friend is interested:',
+                  'other': 'friends are interested:'
+                }" />
+              </div>
+              <div class="interested-friends">
+                <div class="item item-avatar item-button-right"
+                     ng-repeat="friend in item.savedEvent.interestedFriends">
+                  <img class="item-image" ng-src="{{friend.getImageUrl(72)}}">
+                  <h3>{{friend.name}}</h3>
+                  <invite-button user="friend" event="item.savedEvent.event" />
+                </div>
+              </div>
+            </div>
+            <div ng-if="events.numConnectionsInterested(item.savedEvent.event) > 0">
+              <span class="event-link"
+                    ng-click="events.viewInterested(item.savedEvent.event)"
+                    >{{events.numConnectionsInterested(item.savedEvent.event)}} <ng-pluralize
+              count="events.numConnectionsInterested(item.savedEvent.event)"
+              when="{
+                1: 'connection is interested',
+                'other': 'connections are interested'
+              }" /></span>
+            </div>
+            <div class="section"
+                 ng-click="events.viewComments(item.savedEvent.event)">
+              <span class="event-link"
+                    ng-click="events.viewComments(item.savedEvent.event)"
+                    >comment</span>
             </div>
           </div>
         </div>
