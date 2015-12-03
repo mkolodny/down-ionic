@@ -11,7 +11,7 @@ class EventsCtrl
 
   handleLoadedData: ->
     if @savedEventsLoaded and @recommendedEventsLoaded \
-       and @commentsCountLoaded
+        and @commentsCountLoaded
       @items = @buildItems()
       @$scope.$broadcast 'scroll.refreshComplete'
 

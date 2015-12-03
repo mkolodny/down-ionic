@@ -1,0 +1,111 @@
+.saved-event {
+  padding-left: 43px;
+  padding-right: 5px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+
+  h2 {
+    font-size: 20px;
+    font-weight: 400;
+  }
+  .mark-interested {
+    background: none;
+    border: none;
+    padding: 8px;
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    color: #999;
+
+    &[disabled],
+    &.disabled {
+      opacity: 1;
+      color: $brand-color;
+    }
+    &.activated {
+      box-shadow: none;
+    }
+  }
+  .calendar-star-selected,
+  .calendar-star-default {
+    padding-top: 23px;
+    width: 23px;
+  }
+  .total-num-interested {
+    position: absolute;
+    top: 43px;
+    left: 18px;
+    font-size: 18px;
+    font-weight: 700;
+    width: 26px;
+    text-align: center;
+    color: #999;
+
+    &.selected {
+      color: $brand-color;
+    }
+  }
+  .date-posted {
+    color: #999;
+    font-size: 14px;
+    white-space: normal;
+    line-height: 18px;
+    margin-top: 3px;
+  }
+  .extra-details {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+  }
+  .event-link {
+    display: inline-block;
+    margin-right: 7px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #999;
+  }
+  .interested {
+    color: $brand-color;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: -5px;
+  }
+  .interested-friends {
+    margin-bottom: 7px;
+  }
+  .item-avatar {
+    padding-left: 50px;
+    padding-right: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+    min-height: 43px;
+    margin-left: -11px;
+    margin-right: -17px;
+  }
+  .item-image {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  h3 {
+    font-size: 14px;
+    margin-top: 3px;
+    font-weight: 400;
+    padding-right: 100px;
+  }
+  .invite {
+    margin-top: 4px;
+    background-color: #fff;
+    font-weight: 500;
+    font-size: 14px;
+    color: #999;
+    border-color: #999;
+    min-height: 0;
+    height: 28px !important;
+    line-height: 26px;
+  }
+  .invited {
+    background-color: $brand-color;
+    border-color: $brand-color;
+    color: #fff;
+  }
+}
