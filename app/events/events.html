@@ -5,6 +5,9 @@
     <span id="logo">Rallytap</span>
   </ion-nav-title>
   <ion-content>
+    <div class="spinner-container" ng-if="events.isLoading">
+      <ion-spinner icon="bubbles"></ion-spinner>
+    </div>
     <ion-refresher pulling-text="Pull to refresh..."
                    on-refresh="events.refresh()"
                    spinner="bubbles">

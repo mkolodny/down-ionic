@@ -7,12 +7,14 @@ class EventsCtrl
     @commentsCount = {}
 
     @$scope.$on '$ionicView.loaded', =>
+      @isLoading = true
       @refresh()
 
   handleLoadedData: ->
     if @savedEventsLoaded and @recommendedEventsLoaded \
         and @commentsCountLoaded
       @items = @buildItems()
+      @isLoading = false
       @$scope.$broadcast 'scroll.refreshComplete'
 
   refresh: ->

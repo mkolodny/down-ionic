@@ -4,7 +4,7 @@
                    on-refresh="addFromFacebook.refresh()"
                    ng-if="!addFromFacebook.isLoading">
     </ion-refresher>
-    <div id="spinner-container" ng-if="addFromFacebook.isLoading">
+    <div class="spinner-container" ng-if="addFromFacebook.isLoading">
       <ion-spinner icon="bubbles"></ion-spinner>
     </div>
     <div id="load-error"

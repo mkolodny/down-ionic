@@ -61,7 +61,6 @@ $font-family-sans-serif: 'Open Sans', 'Helvetica Neue', 'Roboto', 'Segoe UI', sa
 @import "./friends/friends";
 @import "./added-me/added-me";
 @import "./create-event/create-event";
-@import "./tutorial/tutorial";
 @import "./team/team";
 @import "./common/event-item/event-item";
 
@@ -391,15 +390,6 @@ ion-nav-back-button {
   width: 45px;
 }
 
-// Spinner
-.scroll-refresher,
-#spinner-container {
-  .spinner {
-    stroke: #666666;
-    fill: #666666;
-  }
-}
-
 // Permission denied
 .permission-denied {
   text-align: center;
@@ -622,5 +612,18 @@ ion-nav-back-button {
   & > i {
     font-size: 18px;
     margin-right: 2px;
+  }
+}
+
+// Spinner
+.scroll-refresher,
+#spinner-container,
+.spinner-container {
+  text-align: center;
+  margin-top: 20px;
+
+  .spinner {
+    stroke: #666666;
+    fill: #666666;
   }
 }

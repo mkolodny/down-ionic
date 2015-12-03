@@ -1,6 +1,6 @@
 <ion-view id="added-me" view-title="Added Me">
   <ion-content>
-    <div id="spinner-container" ng-if="addedMe.isLoading">
+    <div class="spinner-container" ng-if="addedMe.isLoading">
       <ion-spinner icon="bubbles"></ion-spinner>
     </div>
     <ion-refresher pulling-text="Pull to refresh..." on-refresh="addedMe.refresh()"

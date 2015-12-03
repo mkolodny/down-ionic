@@ -49,6 +49,9 @@ describe 'events controller', ->
       scope.$emit '$ionicView.loaded'
       scope.$apply()
 
+    fit 'should set a loading flag', ->
+      expect(ctrl.isLoading).toBe true
+
     it 'should refresh the data', ->
       expect(ctrl.refresh).toHaveBeenCalled()
 
@@ -60,6 +63,7 @@ describe 'events controller', ->
     beforeEach ->
       items = []
       spyOn(ctrl, 'buildItems').and.returnValue items
+      ctrl.isLoading = true
 
     describe 'when all of the data has loaded', ->
 
@@ -71,8 +75,11 @@ describe 'events controller', ->
 
         ctrl.handleLoadedData()
 
-      it 'should stop the ion-refresher', ->
+      it 'should clear the loading flag', ->
         expect(scope.$broadcast).toHaveBeenCalledWith 'scroll.refreshComplete'
+
+      fit 'should clear the loading flag', ->
+        expect(ctrl.isLoading).toBe false
 
       it 'should build the items', ->
         expect(ctrl.buildItems).toHaveBeenCalled()
