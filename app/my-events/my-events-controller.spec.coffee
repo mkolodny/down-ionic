@@ -3,6 +3,7 @@ require 'angular-mocks'
 require 'angular-ui-router'
 require 'ng-toast'
 require '../common/auth/auth-module'
+require '../common/meteor/meteor-mocks'
 MyEventsCtrl = require './my-events-controller'
 
 describe 'my events controller', ->
@@ -14,6 +15,9 @@ describe 'my events controller', ->
   event = null
   scope = null
   ngToast = null
+  $meteor = null
+
+  beforeEach angular.mock.module('angular-meteor')
 
   beforeEach angular.mock.module('ui.router')
 
@@ -31,6 +35,7 @@ describe 'my events controller', ->
     Auth = $injector.get 'Auth'
     scope = $injector.get '$rootScope'
     ngToast = $injector.get 'ngToast'
+    $meteor = $injector.get '$meteor'
 
     # Mock the current user.
     Auth.user =
@@ -52,13 +57,80 @@ describe 'my events controller', ->
   describe 'when the view is loaded', ->
 
     beforeEach ->
-      spyOn ctrl, 'getSavedEvents'
+      spyOn ctrl, 'refresh'
 
       scope.$emit '$ionicView.loaded'
       scope.$apply()
 
-    it 'should get the saved events', ->
+    it 'should refresh the data', ->
+      expect(ctrl.refresh).toHaveBeenCalled()
+  
+
+  ##handleLoadedData
+  describe 'handling after new data loads', ->
+    items = null
+
+    beforeEach ->
+      items = []
+      spyOn(ctrl, 'buildItems').and.returnValue items
+
+    describe 'when all of the data has loaded', ->
+
+      beforeEach ->
+        spyOn scope, '$broadcast'
+        ctrl.savedEventsLoaded = true
+        ctrl.commentsCountLoaded = true
+
+        ctrl.handleLoadedData()
+
+      it 'should stop the ion-refresher', ->
+        expect(scope.$broadcast).toHaveBeenCalledWith 'scroll.refreshComplete'
+
+      it 'should build the items', ->
+        expect(ctrl.buildItems).toHaveBeenCalled()
+
+      it 'should set the items on the controller', ->
+        expect(ctrl.items).toBe items
+
+
+  ##refresh
+  describe 'pull to refresh', ->
+
+    beforeEach ->
+      ctrl.savedEventsLoaded = true
+      ctrl.commentsCountLoaded = true
+
+      spyOn ctrl, 'getSavedEvents'
+
+      ctrl.refresh()
+
+    it 'should clear the loaded flags', ->
+      expect(ctrl.savedEventsLoaded).toBe undefined
+      expect(ctrl.commentsCountLoaded).toBe undefined
+
+    it 'should get the events', ->
       expect(ctrl.getSavedEvents).toHaveBeenCalled()
+
+
+  ##buildItems
+  describe 'building the items', ->
+    savedEvent = null
+
+    beforeEach ->
+      savedEvent =
+        id: 1
+        eventId: 2
+        userId: 1
+      ctrl.commentsCount =
+        '2': 1
+      ctrl.savedEvents = [savedEvent]
+
+    it 'should build the items', ->
+      expectedItems = [
+        savedEvent: savedEvent
+        commentsCount: 1
+      ]
+      expect(ctrl.buildItems()).toEqual expectedItems
 
 
   ##getSavedEvents
@@ -77,12 +149,11 @@ describe 'my events controller', ->
       expect(Auth.getSavedEvents).toHaveBeenCalled()
 
     describe 'successfully', ->
-      items = null
       savedEvents = null
 
       beforeEach ->
-        items = []
-        spyOn(ctrl, 'buildItems').and.returnValue items
+        spyOn ctrl, 'handleLoadedData'
+        spyOn ctrl, 'getCommentsCount'
         savedEvents = 'savedEvents'
 
         deferred.resolve savedEvents
@@ -91,14 +162,14 @@ describe 'my events controller', ->
       it 'should set the saved events on the controller', ->
         expect(ctrl.savedEvents).toBe savedEvents
 
-      it 'should build the items', ->
-        expect(ctrl.buildItems).toHaveBeenCalled()
+      it 'should set the saved events loaded flag', ->
+        expect(ctrl.savedEventsLoaded).toBe true
 
-      it 'should set the items on the controller', ->
-        expect(ctrl.items).toBe items
+      it 'should handle the loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
-      it 'should stop the ion-refresher', ->
-        expect(scope.$broadcast).toHaveBeenCalledWith 'scroll.refreshComplete'
+      it 'should get the comment count', ->
+        expect(ctrl.getCommentsCount).toHaveBeenCalled()
 
 
     describe 'on error', ->
@@ -111,24 +182,60 @@ describe 'my events controller', ->
       it 'should throw an error', ->
         expect(ngToast.create).toHaveBeenCalled()
 
-      it 'should stop the ion-refresher', ->
-        expect(scope.$broadcast).toHaveBeenCalledWith 'scroll.refreshComplete'
 
-
-  ##buildItems
-  describe 'building the items', ->
-    savedEvent = null
+  ##getCommentsCount
+  describe 'getting the comments count', ->
+    event = null
+    deferred = null
 
     beforeEach ->
-      savedEvent =
+      event =
         id: 1
-        eventId: 2
-        userId: 1
-
+      savedEvent =
+        event: event
+        eventId: event.id
       ctrl.savedEvents = [savedEvent]
+      deferred = $q.defer()
+      $meteor.call.and.returnValue deferred.promise
 
-    it 'should build the items', ->
-      expectedItems = [
-        savedEvent: savedEvent
-      ]
-      expect(ctrl.buildItems()).toEqual expectedItems
+      ctrl.getCommentsCount()
+
+    it 'should get the comments count', ->
+      expect($meteor.call).toHaveBeenCalledWith 'getCommentsCount', [event.id]
+
+    describe 'successfully', ->
+      count = null
+
+      beforeEach ->
+        count = 1
+        commentsCount = [
+          _id: "#{event.id}"
+          count: count
+        ]
+        spyOn ctrl, 'handleLoadedData'
+        deferred.resolve commentsCount
+        scope.$apply()
+
+      it 'should save the comments count on the controller as an object', ->
+        commentsCountObj = {}
+        commentsCountObj[event.id] = count
+        expect(ctrl.commentsCount).toEqual commentsCountObj
+
+      it 'should set the commentsCount loaded flag', ->
+        expect(ctrl.commentsCountLoaded).toBe true
+
+      it 'should handle the loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
+
+
+    describe 'on error', ->
+
+      beforeEach ->
+        spyOn ngToast, 'create'
+        deferred.reject()
+        scope.$apply()
+
+      it 'should throw an error', ->
+        expect(ngToast.create).toHaveBeenCalled()
+
+  

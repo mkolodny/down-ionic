@@ -2,44 +2,13 @@
           view-title="I'm interested in...">
   <ion-content>
     <ion-refresher pulling-text="Pull to refresh..."
-                   on-refresh="myEvents.getSavedEvents()"
+                   on-refresh="myEvents.refresh()"
                    spinner="bubbles">
     </ion-refresher>
     <ion-list>
       <ion-item ng-repeat="item in myEvents.items">
-        <div class="saved-event item-button-left" ng-if="item.savedEvent">
-          <button class="button mark-interested" disabled>
-            <i class="icon calendar-star-selected"></i>
-          </button>
-          <div class="total-num-interested selected">
-            {{item.savedEvent.totalNumInterested}}76
-          </div>
-          <h2>
-             {{item.savedEvent.event.title}}<span
-             ng-if="item.savedEvent.event.place"
-             > at {{item.savedEvent.event.place.name}}</span><span
-             ng-if="item.savedEvent.event.datetime"
-             > &mdash; {{item.savedEvent.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
-          </h2>
-          <div class="date-posted">
-             posted 7 minutes ago
-          </div>
-          <div class="extra-details">
-            <span class="section interested"
-                  ng-if="item.savedEvent.numInterestedFriends > 0">interested</span>
-            <span class="section">comment</span>
-            <div class="item item-avatar item-button-right"
-                 ng-repeat="friend in item.savedEvent.interestedFriends">
-              <img class="item-image" ng-src="{{friend.getImageUrl(72)}}">
-              <h3>{{friend.name}}</h3>
-              <button class="button invite"
-                      ng-class="{invited: myEvents.wasInvited(friend, item.savedEvent.event)}"
-                      ng-disabled="myEvents.wasInvited(friend, item.savedEvent.event)"
-                      ng-mousedown="myEvents.invite(friend, item.savedEvent.event)"
-                      >Down?</button>
-            </div>
-          </div>
-        </div>
+        <event-item saved-event="item.savedEvent"
+                    comments-count="item.commentsCount"/>
       </ion-item>
     </ion-list>
   </ion-content>

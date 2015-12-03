@@ -1,8 +1,6 @@
 class EventItemCtrl
-  @$inject: ['$scope', '$state', 'Auth', 'SavedEvent',
-             'ngToast']
-  constructor: (@$scope, @$state, @Auth, @SavedEvent,
-                @ngToast) ->
+  @$inject: ['$state', 'Auth', 'SavedEvent', 'ngToast']
+  constructor: (@$state, @Auth, @SavedEvent, @ngToast) ->
 
   saveEvent: ->
     newSavedEvent =
@@ -26,6 +24,5 @@ class EventItemCtrl
     @$state.go 'interested',
       id: @savedEvent.event.id
       event: @savedEvent.event
-
 
 module.exports = EventItemCtrl

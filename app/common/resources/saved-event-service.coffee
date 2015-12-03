@@ -34,6 +34,9 @@ SavedEvent = ['$resource', 'apiRoot', 'Event', 'User', \
       savedEvent.user = User.deserialize response.user
       savedEvent.userId = savedEvent.user.id
 
+    if angular.isString response.created_at
+      savedEvent.createdAt = new Date response.created_at
+
     # Optional fields
     if angular.isArray response.interested_friends
       savedEvent.interestedFriends = (User.deserialize(friend) \

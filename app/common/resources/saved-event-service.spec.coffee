@@ -107,6 +107,7 @@ describe 'SavedEvent service', ->
         user: user.id
         interested_friends: [friend1, friend2]
         total_num_interested: totalNumInterested
+        created_at: new Date().toISOString()
 
       expectedSavedEvent =
         id: response.id
@@ -118,6 +119,7 @@ describe 'SavedEvent service', ->
         ,
           User.deserialize friend2
         ]
+        createdAt: new Date response.created_at
 
     describe 'with the minimum amount of data', ->
 

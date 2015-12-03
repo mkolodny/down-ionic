@@ -82,33 +82,7 @@ class EventsCtrl
       , =>
         @ngToast.create 'Oops.. an error occurred..'
 
-  saveEvent: (item) ->
-    newSavedEvent =
-      userId: @Auth.user.id
-      eventId: item.savedEvent.eventId
-    @SavedEvent.save newSavedEvent
-      .$promise.then (newSavedEvent) =>
-        item.savedEvent.interestedFriends = newSavedEvent.interestedFriends
-      , ->
-        item.saveError = true
-
-  didUserSaveEvent: (savedEvent) ->
-    angular.isArray savedEvent.interestedFriends
-
   createEvent: ->
     @$state.go 'createEvent'
-
-  viewComments: (event) ->
-    @$state.go 'comments',
-      id: event.id
-      event: event
-
-  viewInterested: (event) ->
-    @$state.go 'interested',
-      id: event.id
-      event: event
-
-  numConnectionsInterested: (event) ->
-    event.totalNumInterested - event.interestedFriends.length - 1 # 1 is you
 
 module.exports = EventsCtrl

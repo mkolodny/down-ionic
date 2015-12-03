@@ -21,7 +21,7 @@
      > &mdash; {{eventItem.savedEvent.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
   </h2>
   <div class="date-posted">
-     posted 7 minutes ago
+     posted <time-ago from-time='{{eventItem.savedEvent.createdAt}}'></time-ago>
   </div>
   <div class="extra-details"
        ng-if="eventItem.didUserSaveEvent()">
@@ -42,16 +42,6 @@
           <invite-button user="friend" event="eventItem.savedEvent.event" />
         </div>
       </div>
-    </div>
-    <div ng-if="eventItem.numConnectionsInterested(eventItem.savedEvent.event) > 0">
-      <span class="event-link"
-            ng-click="eventItem.viewInterested(eventItem.savedEvent.event)"
-            >{{eventItem.numConnectionsInterested(eventItem.savedEvent.event)}} <ng-pluralize
-      count="eventItem.numConnectionsInterested(eventItem.savedEvent.event)"
-      when="{
-        1: 'connection is interested',
-        'other': 'connections are interested'
-      }" /></span>
     </div>
     <div class="section"
          ng-click="eventItem.viewComments(eventItem.savedEvent.event)">
