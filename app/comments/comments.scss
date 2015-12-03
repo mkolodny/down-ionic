@@ -1,3 +1,25 @@
 #comments {
-
+  img {
+    width: 36px;
+    height: 36px;
+    top: 17px;
+  }
+  .item-avatar {
+    padding-left: 58px;
+  }
+  h2 {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  p {
+    color: #000;
+    white-space: normal;
+  }
+  time-ago {
+    font-weight: 400;    
+    color: #999;
+    font-size: 12px;
+    margin-left: 3px;
+  }
 }

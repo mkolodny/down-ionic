@@ -1,6 +1,6 @@
 class CommentsCtrl
-  @$inject: ['$meteor', '$scope', '$stateParams', 'Auth']
-  constructor: (@$meteor, @$scope, @$stateParams, @Auth) ->
+  @$inject: ['$meteor', '$scope', '$stateParams', 'Auth', 'User']
+  constructor: (@$meteor, @$scope, @$stateParams, @Auth, @User) ->
     @event = @$stateParams.event
     @Comments = @$meteor.getCollectionByName 'comments'
 
@@ -16,6 +16,7 @@ class CommentsCtrl
     options =
       sort:
         createdAt: 1
+      transform: @transformComment
     @Comments.find selector, options
 
   postComment: ->
@@ -31,5 +32,9 @@ class CommentsCtrl
       text: @newComment
 
     @newComment = null
+
+  transformComment: (comment) =>
+    comment.creator = new @User comment.creator
+    comment
 
 module.exports = CommentsCtrl

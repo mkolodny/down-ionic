@@ -15,8 +15,12 @@
     </div>
 
     <ion-list ng-if="comments.comments.length > 0">
-      <ion-item ng-repeat="comment in comments.comments">
-          {{comment.text}}
+      <ion-item class="item-avatar" ng-repeat="comment in comments.comments">
+        <!-- TODO: make the creator a resource -->
+        <img ng-src="{{comment.creator.getImageUrl(72)}}">
+        <h2>{{comment.creator.name}} <time-ago
+            from-time='{{comment.createdAt}}'></time-ago></h2>
+        <p>{{comment.text}}</p>
       </ion-item>
     </ion-list>
   </ion-content>

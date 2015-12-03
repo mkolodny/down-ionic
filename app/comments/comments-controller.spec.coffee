@@ -15,6 +15,7 @@ describe 'comments controller', ->
   ctrl = null
   event = null
   scope = null
+  User = null
 
   beforeEach angular.mock.module('ui.router')
 
@@ -32,9 +33,10 @@ describe 'comments controller', ->
     $meteor = $injector.get '$meteor'
     Auth = $injector.get 'Auth'
     scope = $injector.get '$rootScope'
+    User = $injector.get 'User'
 
     # Mock the current user.
-    Auth.user = 
+    Auth.user =
       id: 1
       name: 'Andrew Linfoot'
       firstName: 'Andrew'
@@ -77,7 +79,11 @@ describe 'comments controller', ->
       scope.$meteorSubscribe = jasmine.createSpy('scope.$meteorSubscribe') \
         .and.returnValue deferred.promise
 
-      comments = []
+      comments = [
+        _id: '1'
+        creator:
+          id: 1
+      ]
       scope.$meteorCollection = jasmine.createSpy('scope.$meteorCollection') \
         .and.returnValue comments
 
@@ -85,7 +91,8 @@ describe 'comments controller', ->
       scope.$apply()
 
     it 'should subscribe to the event comments', ->
-      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'comments', "#{ctrl.event.id}"
+      expect(scope.$meteorSubscribe).toHaveBeenCalledWith('comments',
+          "#{ctrl.event.id}")
 
     it 'should bind the comments to the controller', ->
       expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.getComments, false
@@ -121,6 +128,7 @@ describe 'comments controller', ->
       options =
         sort:
           createdAt: 1
+        transform: ctrl.transformComment
       expect(ctrl.Comments.find).toHaveBeenCalledWith selector, options
 
 
@@ -156,4 +164,21 @@ describe 'comments controller', ->
         text: commentText
 
     it 'should clear the new comment field', ->
-      expect(ctrl.newComment).toBeNull()  
+      expect(ctrl.newComment).toBeNull()
+
+
+  ##transformComment
+  describe 'transforming a comment', ->
+    comment = null
+    transformedComment = null
+
+    beforeEach ->
+      comment =
+        _id: '1'
+        creator:
+          id: '1'
+
+      transformedComment = ctrl.transformComment comment
+
+    it 'should return the comment with the creator as a user', ->
+      expect(transformedComment.creator).toEqual jasmine.any(User)

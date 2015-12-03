@@ -1,4 +1,5 @@
 require 'angular-ui-router'
+require 'angular-timeago'
 require '../common/resources/resources-module'
 require '../common/auth/auth-module'
 CommentsCtrl = require './comments-controller'
@@ -8,6 +9,7 @@ angular.module 'rallytap.comments', [
     'rallytap.auth'
     'rallytap.resources'
     'ui.router'
+    'yaru22.angular-timeago'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'comments',
