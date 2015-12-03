@@ -182,9 +182,7 @@ class Auth
     isIOS = ionic.Platform.isIOS()
     isAndroid = ionic.Platform.isAndroid()
 
-    if @flags.hasViewedTutorial isnt true
-      @$state.go 'tutorial'
-    else if not @phone?
+    if not @phone?
       @$state.go 'login'
     else if not @user?.id
       @$state.go 'verifyPhone'

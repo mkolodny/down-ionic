@@ -768,21 +768,12 @@ describe 'Auth service', ->
         expect(Auth.isFriend user.id).toBe false
 
 
+  ##redirectForAuthState
   describe 'redirecting for auth state', ->
-
-    describe 'when you haven\'t viewed the tutorial yet', ->
-
-      beforeEach ->
-        Auth.redirectForAuthState()
-
-      it 'should send the user to the tutorial view', ->
-        expect($state.go).toHaveBeenCalledWith 'tutorial'
-
 
     describe 'no phone number entered', ->
 
       beforeEach ->
-        Auth.flags.hasViewedTutorial = true
         Auth.phone = undefined
         Auth.redirectForAuthState()
 
@@ -793,7 +784,6 @@ describe 'Auth service', ->
     describe 'no authenticated user', ->
 
       beforeEach ->
-        Auth.flags.hasViewedTutorial = true
         Auth.phone = '+19252852230'
         Auth.user = {}
         Auth.redirectForAuthState()
@@ -805,7 +795,6 @@ describe 'Auth service', ->
     describe 'the user doesn\'t have an image url', ->
 
       beforeEach ->
-        Auth.flags.hasViewedTutorial = true
         Auth.phone = '+19252852230'
         Auth.user =
           id: 1
@@ -818,7 +807,6 @@ describe 'Auth service', ->
     describe 'the user doesn\'t have a username', ->
 
       beforeEach ->
-        Auth.flags.hasViewedTutorial = true
         Auth.phone = '+19252852230'
         Auth.user =
           id: 1
@@ -833,7 +821,6 @@ describe 'Auth service', ->
     describe 'when using an iOS device', ->
 
       beforeEach ->
-        Auth.flags.hasViewedTutorial = true
         spyOn(ionic.Platform, 'isIOS').and.returnValue true
 
       describe 'we haven\'t requested location services', ->
@@ -894,7 +881,6 @@ describe 'Auth service', ->
     describe 'we haven\'t shown the find friends view', ->
 
       beforeEach ->
-        Auth.flags.hasViewedTutorial = true
         spyOn(ionic.Platform, 'isIOS').and.returnValue true
         spyOn(ionic.Platform, 'isAndroid').and.returnValue true
 
@@ -920,7 +906,6 @@ describe 'Auth service', ->
     describe 'user has already completed sign up', ->
 
       beforeEach ->
-        Auth.flags.hasViewedTutorial = true
         Auth.phone = '+19252852230'
         Auth.user =
           id: 1
