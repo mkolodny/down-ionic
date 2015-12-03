@@ -1,5 +1,6 @@
 require 'angular-chart.js'
 require 'angular-elastic'
+require 'angular-timeago'
 require '../common/auth/auth-module'
 require '../common/resources/resources-module'
 ChatsCtrl = require './chats-controller'
@@ -11,6 +12,7 @@ angular.module 'rallytap.chats', [
     'rallytap.resources'
     'monospaced.elastic'
     'ui.router'
+    'yaru22.angular-timeago'
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'list',

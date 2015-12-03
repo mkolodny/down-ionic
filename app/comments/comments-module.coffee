@@ -1,5 +1,5 @@
-require 'angular-ui-router'
 require 'angular-timeago'
+require 'angular-ui-router'
 require '../common/resources/resources-module'
 require '../common/auth/auth-module'
 CommentsCtrl = require './comments-controller'
