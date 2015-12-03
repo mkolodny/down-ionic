@@ -1,4 +1,4 @@
-<ion-view id="friendChat" view-title="{{friendChat.friend.name}}">
+<ion-view id="friend-chat" view-title="{{friendChat.friend.name}}">
   <ion-nav-buttons side="left">
     <button class="button button-icon icon"
             ng-click="$ionicGoBack()"
@@ -16,14 +16,12 @@
           <!-- Invite action messages -->
           <div class="text invite-action"
                ng-if="friendChat.isInviteAction(message)"
-               >Are you down to <span
-               class="invite"
+               >Are you down for <span
                ng-class="{'was-joined': friendChat.wasJoined(message) && !friendChat.isLocked(message)}"
                ng-click="friendChat.wasJoined(message) && !friendChat.isLocked(message) ? friendChat.viewEvent(message.meta.event) : null"
-               ><span>{{message.meta.event.title}}</span><span
+               ><span>"{{message.meta.event.title}}</span><span
                ng-if="message.meta.event.place"
-               > at {{message.meta.event.place.name}}</span><span ng-if="message.meta.event.datetime"> &mdash; {{message.meta.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span></span>?
-              </div>
+               > at {{message.meta.event.place.name}}</span><span ng-if="message.meta.event.datetime"> &mdash; {{message.meta.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>"</span>?</div>
         </div>
       </ion-item>
     </ion-list>
