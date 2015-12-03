@@ -13,6 +13,7 @@ require './common/env/env-module'
 require './common/meteor/meteor'
 require './common/resources/resources-module'
 require './common/push-notifications/push-notifications-module'
+require './common/event-item/event-item-module'
 # Views
 require './tabs/tabs-module'
 require './login/login-module'
@@ -79,6 +80,7 @@ angular.module 'rallytap', [
     'rallytap.comments'
     'rallytap.myEvents'
     'rallytap.interested'
+    'rallytap.eventItem'
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]

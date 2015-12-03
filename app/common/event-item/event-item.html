@@ -1,0 +1,42 @@
+<div class="saved-event item-button-left">
+  <button class="button mark-interested"
+          ng-disabled="eventItem.didUserSaveEvent()"
+          ng-mousedown="eventItem.saveEvent()"
+          ontouchstart>
+    <i class="icon"
+       ng-class="{
+         'calendar-star-selected': eventItem.didUserSaveEvent(),
+         'calendar-star-default': !eventItem.didUserSaveEvent()
+       }"></i>
+  </button>
+  <div class="total-num-interested"
+       ng-class="{selected: eventItem.didUserSaveEvent()}">
+    {{eventItem.savedEvent.totalNumInterested}}
+  </div>
+  <h2>
+     {{eventItem.savedEvent.event.title}}<span
+     ng-if="eventItem.savedEvent.event.place"
+     > at {{eventItem.savedEvent.event.place.name}}</span><span
+     ng-if="eventItem.savedEvent.event.datetime"
+     > &mdash; {{eventItem.savedEvent.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
+  </h2>
+  <div class="date-posted">
+     posted 7 minutes ago
+  </div>
+  <div class="extra-details"
+       ng-if="eventItem.didUserSaveEvent()">
+    <span class="section interested"
+          ng-click="eventItem.viewInterested()"
+          ng-if="eventItem.savedEvent.interestedFriends.length > 0">interested</span>
+    <span class="section"
+          ng-click="eventItem.viewComments()">{{eventItem.commentsCount}} comment</span>
+    <div class="item item-avatar item-button-right"
+         ng-repeat="friend in eventItem.savedEvent.interestedFriends">
+      <img class="item-image" ng-src="{{friend.getImageUrl(72)}}">
+      <h3>{{friend.name}}</h3>
+      <invite-button user="friend"
+                     event="eventItem.savedEvent.event">
+      </invite-button>
+    </div>
+  </div>
+</div>

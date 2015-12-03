@@ -1,12 +1,12 @@
 require 'ng-toast'
 require '../common/resources/resources-module'
-require '../common/invite-button/invite-button-module'
+require '../common/event-item/event-item-module'
 EventsCtrl = require './events-controller'
 
 angular.module 'rallytap.events', [
     'angular-meteor'
     'rallytap.resources'
-    'rallytap.inviteButton'
+    'rallytap.eventItem'
     'ui.router'
     'ngToast'
   ]
