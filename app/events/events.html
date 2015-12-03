@@ -26,74 +26,9 @@
         </div>
 
         <!-- Event -->
-        <div class="saved-event item-button-left" ng-if="item.savedEvent">
-          <button class="button mark-interested"
-                  ng-disabled="events.didUserSaveEvent(item.savedEvent)"
-                  ng-mousedown="events.saveEvent(item)"
-                  ontouchstart>
-            <i class="icon"
-               ng-class="{
-                 'calendar-star-selected': events.didUserSaveEvent(item.savedEvent),
-                 'calendar-star-default': !events.didUserSaveEvent(item.savedEvent)
-               }"></i>
-          </button>
-          <div class="total-num-interested"
-               ng-class="{selected: events.didUserSaveEvent(item.savedEvent)}">
-            {{item.savedEvent.totalNumInterested}}
-          </div>
-          <h2>
-             {{item.savedEvent.event.title}}<span
-             ng-if="item.savedEvent.event.place"
-             > at {{item.savedEvent.event.place.name}}</span><span
-             ng-if="item.savedEvent.event.datetime"
-             > &mdash; {{item.savedEvent.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
-          </h2>
-          <div class="date-posted">
-             posted 7 minutes ago
-          </div>
-          <div class="extra-details"
-               ng-if="events.didUserSaveEvent(item.savedEvent)">
-            <div ng-if="item.savedEvent.interestedFriends.length > 0">
-              <div class="section interested">
-                {{item.savedEvent.interestedFriends.length}} <ng-pluralize
-                count="item.savedEvent.interestedFriends.length"
-                when="{
-                  1: 'friend is interested:',
-                  'other': 'friends are interested:'
-                }" />
-              </div>
-              <div class="interested-friends">
-                <div class="item item-avatar item-button-right"
-                     ng-repeat="friend in item.savedEvent.interestedFriends">
-                  <img class="item-image" ng-src="{{friend.getImageUrl(72)}}">
-                  <h3>{{friend.name}}</h3>
-                  <invite-button user="friend" event="item.savedEvent.event" />
-                </div>
-              </div>
-            </div>
-            <div ng-if="events.numConnectionsInterested(item.savedEvent.event) > 0">
-              <span class="event-link"
-                    ng-click="events.viewInterested(item.savedEvent.event)"
-                    >{{events.numConnectionsInterested(item.savedEvent.event)}} <ng-pluralize
-              count="events.numConnectionsInterested(item.savedEvent.event)"
-              when="{
-                1: 'connection is interested',
-                'other': 'connections are interested'
-              }" /></span>
-            </div>
-            <div class="section"
-                 ng-click="events.viewComments(item.savedEvent.event)">
-              <ng-pluralize class="event-link"
-                            ng-click="events.viewComments(item.savedEvent.event)"
-                            count="item.commentsCount"
-                            when="{
-                              0: 'comment',
-                              1: '{} comment',
-                              'other': '{} comments'
-                            }" />
-            </div>
-          </div>
-        </div>
+        <event-item ng-if="item.savedEvent"
+                    saved-event="item.savedEvent"
+                    comments-count="item.commentsCount"/>
       </ion-item>
     </ion-list>
   </ion-content>
