@@ -1,6 +1,8 @@
 class InviteButtonCtrl
-  @$inject: ['$ionicPopup', '$meteor', '$mixpanel', '$state', 'Auth', 'Friendship', 'ngToast']
-  constructor: (@$ionicPopup, @$meteor, @$mixpanel, @$state, @Auth, @Friendship, @ngToast) ->
+  @$inject: ['$ionicPopup', '$meteor', '$mixpanel', '$state', 'Auth',
+             'Friendship', 'ngToast']
+  constructor: (@$ionicPopup, @$meteor, @$mixpanel, @$state, @Auth,
+                @Friendship, @ngToast) ->
     # Bound to controller via directive
     #  @user
     #  @event

@@ -615,13 +615,16 @@ ion-nav-back-button {
 
 // Icon
 .calendar-star-default {
-  background-image: url('../images/calendar-star-999.svg');
+  background-image: url('../images/calendar-star-999.png');
+  background-size: contain;
 }
 .calendar-star-selected {
-  background-image: url('../images/calendar-star-6a38ab.svg');
+  background-image: url('../images/calendar-star-6a38ab.png');
+  background-size: contain;
 }
 .calendar-star-tab {
-  background-image: url('../images/calendar-star-ccc.svg');
+  background-image: url('../images/calendar-star-ccc.png');
+  background-size: contain;
 }
 
 // Action Sheet
