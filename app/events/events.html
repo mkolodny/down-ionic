@@ -10,7 +10,8 @@
   <ion-content>
     <ion-refresher pulling-text="Pull to refresh..."
                    on-refresh="events.refresh()"
-                   spinner="bubbles">
+                   spinner="bubbles"
+                   ng-if="!events.isLoading">
     </ion-refresher>
     <div class="spinner-container" ng-if="events.isLoading">
       <ion-spinner icon="bubbles"></ion-spinner>
