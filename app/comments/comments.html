@@ -18,7 +18,7 @@
       <ion-item class="item-avatar" ng-repeat="comment in comments.comments">
         <img ng-src="{{comment.creator.getImageUrl(72)}}">
         <h2>{{comment.creator.name}} <time-ago
-            from-time='{{comment.createdAt}}'></time-ago></h2>
+            from-time='{{comment.createdAt.getTime()}}'></time-ago></h2>
         <p>{{comment.text}}</p>
       </ion-item>
     </ion-list>
