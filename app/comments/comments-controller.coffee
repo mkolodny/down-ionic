@@ -1,6 +1,6 @@
 class CommentsCtrl
-  @$inject: ['$meteor', '$scope', '$stateParams', 'Auth', 'User']
-  constructor: (@$meteor, @$scope, @$stateParams, @Auth, @User) ->
+  @$inject: ['$meteor', '$mixpanel', '$scope', '$stateParams', 'Auth', 'User']
+  constructor: (@$meteor, @$mixpanel, @$scope, @$stateParams, @Auth, @User) ->
     @event = @$stateParams.event
     @Comments = @$meteor.getCollectionByName 'comments'
 
@@ -20,6 +20,9 @@ class CommentsCtrl
     @Comments.find selector, options
 
   postComment: ->
+    @$mixpanel.track 'Post Comment',
+      'comments count': @comments.length
+
     @Comments.insert
       creator:
         id: "#{@Auth.user.id}"

@@ -3,6 +3,7 @@ require 'angular-mocks'
 require 'angular-ui-router'
 require '../common/auth/auth-module'
 require '../common/meteor/meteor-mocks'
+require '../common/mixpanel/mixpanel-module'
 CommentsCtrl = require './comments-controller'
 
 describe 'comments controller', ->
@@ -10,6 +11,7 @@ describe 'comments controller', ->
   $state = null
   $stateParams = null
   $meteor = null
+  $mixpanel = null
   Auth = null
   commentsCollection = null
   ctrl = null
@@ -25,12 +27,15 @@ describe 'comments controller', ->
 
   beforeEach angular.mock.module('angular-meteor')
 
+  beforeEach angular.mock.module('analytics.mixpanel')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     $stateParams = angular.copy $injector.get('$stateParams')
     $meteor = $injector.get '$meteor'
+    $mixpanel = $injector.get '$mixpanel'
     Auth = $injector.get 'Auth'
     scope = $injector.get '$rootScope'
     User = $injector.get 'User'
@@ -141,10 +146,13 @@ describe 'comments controller', ->
       date = new Date 1438014089235
       jasmine.clock().mockDate date
 
+      spyOn $mixpanel, 'track'
+
       ctrl.Comments =
         insert: jasmine.createSpy 'Comments.insert'
       commentText = 'Some comment text'
       ctrl.newComment = commentText
+      ctrl.comments = []
 
       ctrl.postComment()
 
@@ -165,6 +173,10 @@ describe 'comments controller', ->
 
     it 'should clear the new comment field', ->
       expect(ctrl.newComment).toBeNull()
+
+    it 'should track in mixpanel', ->
+      expect($mixpanel.track).toHaveBeenCalledWith 'Post Comment',
+        'comments count': ctrl.comments.length
 
 
   ##transformComment

@@ -1,8 +1,8 @@
 class EventsCtrl
   @$inject: ['$meteor', '$scope', '$state', 'Auth', 'SavedEvent',
-             'RecommendedEvent', 'ngToast', 'User', 'Event']
+             'RecommendedEvent', 'ngToast', 'User', 'Event', '$mixpanel']
   constructor: (@$meteor, @$scope, @$state, @Auth, @SavedEvent, @RecommendedEvent,
-                @ngToast, @User, @Event) ->
+                @ngToast, @User, @Event, @$mixpanel) ->
     @items = []
     @commentsCount = {}
     @currentUser = @Auth.user
@@ -93,7 +93,12 @@ class EventsCtrl
     event.recommendedEvent = recommendedEvent.id
     delete event.id
     recommendedEvent.wasSaved = true
-    @Event.save(event).$promise.then null, =>
+    @Event.save(event).$promise.then =>
+      @$mixpanel.track 'Create Event',
+        'from recommended': true
+        place: angular.isDefined recommendedEvent.place
+        time: angular.isDefined recommendedEvent.datetime
+    , =>
       delete recommendedEvent.wasSaved
       @ngToast.create 'Oops.. an error occurred..'
 

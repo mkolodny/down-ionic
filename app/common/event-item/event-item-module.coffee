@@ -4,10 +4,12 @@ require 'ng-toast'
 require '../mixpanel/mixpanel-module'
 require '../invite-button/invite-button-module'
 require '../auth/auth-module'
+require '../mixpanel/mixpanel-module'
 EventItemCtrl = require './event-item-controller'
 EventItemDirective = require './event-item-directive'
 
 angular.module 'rallytap.eventItem', [
+    'analytics.mixpanel'
     'yaru22.angular-timeago'
     'angular-meteor'
     'analytics.mixpanel'

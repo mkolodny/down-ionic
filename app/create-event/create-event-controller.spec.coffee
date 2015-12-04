@@ -7,6 +7,7 @@ require 'angular-ui-router'
 require '../ionic/ionic-angular.js' # for ionic module
 require 'ng-cordova'
 require 'ng-toast'
+require '../common/mixpanel/mixpanel-module'
 require '../common/resources/resources-module'
 CreateEventCtrl = require './create-event-controller'
 
@@ -17,6 +18,7 @@ describe 'create event controller', ->
   $ionicHistory = null
   $ionicLoading = null
   $ionicModal = null
+  $mixpanel = null
   $q = null
   $state = null
   $window = null
@@ -37,6 +39,8 @@ describe 'create event controller', ->
 
   beforeEach angular.mock.module('ngToast')
 
+  beforeEach angular.mock.module('analytics.mixpanel')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $cordovaDatePicker = $injector.get '$cordovaDatePicker'
@@ -45,6 +49,7 @@ describe 'create event controller', ->
     $ionicHistory = $injector.get '$ionicHistory'
     $ionicLoading = $injector.get '$ionicLoading'
     $ionicModal = $injector.get '$ionicModal'
+    $mixpanel = $injector.get '$mixpanel'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     $window = $injector.get '$window'
@@ -298,8 +303,16 @@ describe 'create event controller', ->
         spyOn($ionicHistory, 'clearCache').and.returnValue \
             deferredCacheClear.promise
 
+        spyOn $mixpanel, 'track'
+
         deferred.resolve()
         scope.$apply()
+
+      it 'should track in mixpanel', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Create Event',
+          'from recommended': false
+          time: angular.isDefined ctrl.datetime
+          place: angular.isDefined ctrl.place
 
       it 'should clear the form', ->
         expect(ctrl.title).toBe undefined

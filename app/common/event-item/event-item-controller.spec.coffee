@@ -1,14 +1,18 @@
 require 'angular'
 require 'angular-mocks'
 require 'angular-ui-router'
+require 'angular-timeago'
 require 'ng-toast'
 require '../meteor/meteor-mocks'
+require '../mixpanel/mixpanel-module'
 EventItemCtrl = require './event-item-controller'
 
 describe 'event item directive', ->
+  $filter = null
   $ionicPopup = null
   $q = null
   $state = null
+  $mixpanel = null
   Auth = null
   ctrl = null
   event = null
@@ -27,15 +31,25 @@ describe 'event item directive', ->
 
   beforeEach angular.mock.module('ionic')
 
+  beforeEach angular.mock.module('analytics.mixpanel')
+
+  beforeEach angular.mock.module('yaru22.angular-timeago')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $filter = $injector.get '$filter'
     $ionicPopup = $injector.get '$ionicPopup'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
+    $mixpanel = $injector.get '$mixpanel'
     Auth = $injector.get 'Auth'
     SavedEvent = $injector.get 'SavedEvent'
     scope = $injector.get '$rootScope'
     ngToast = $injector.get 'ngToast'
+
+    jasmine.clock().install()
+    date = new Date 1438014089235
+    jasmine.clock().mockDate date
 
     Auth.user =
         id: 1
@@ -47,13 +61,17 @@ describe 'event item directive', ->
       eventId: event.id
       userId: 4
       totalNumInterested: 1
+      createdAt: new Date(date - 10000)
 
     ctrl = $controller EventItemCtrl
     ctrl.savedEvent = savedEvent
   )
 
+  afterEach ->
+    jasmine.clock().uninstall()
+
   ##saveEvent
-  fdescribe 'saving an event', ->
+  describe 'saving an event', ->
     $event = null
     deferred = null
     preSaveNumInterested = null
@@ -90,8 +108,17 @@ describe 'event item directive', ->
           newSavedEvent = angular.extend {}, savedEvent,
             interestedFriends: interestedFriends
 
+          spyOn $mixpanel, 'track'
+
           deferred.resolve newSavedEvent
           scope.$apply()
+
+        it 'should track it in mixpanel', ->
+          expect($mixpanel.track).toHaveBeenCalledWith 'Save Event',
+            'total num interested': preSaveNumInterested
+            'time since posted': $filter('timeAgo')(savedEvent.createdAt)
+            time: angular.isDefined savedEvent.event.datetime
+            place: angular.isDefined savedEvent.event.place
 
         it 'should set the interested friends on the item', ->
           expect(ctrl.savedEvent.interestedFriends).toBe interestedFriends
@@ -181,7 +208,7 @@ describe 'event item directive', ->
 
 
   ##showSavedEventPopup
-  fdescribe 'showing the saved event popup', ->
+  describe 'showing the saved event popup', ->
     popupOptions = null
     $event = null
 
