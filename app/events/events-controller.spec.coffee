@@ -3,12 +3,14 @@ require 'angular-mocks'
 require 'angular-ui-router'
 require 'ng-toast'
 require '../common/meteor/meteor-mocks'
+require '../common/mixpanel/mixpanel-module'
 EventsCtrl = require './events-controller'
 
 describe 'events controller', ->
   $q = null
   $state = null
   $meteor = null
+  $mixpanel = null
   Auth = null
   commentsCollection = null
   ctrl = null
@@ -26,11 +28,14 @@ describe 'events controller', ->
 
   beforeEach angular.mock.module('ngToast')
 
+  beforeEach angular.mock.module('analytics.mixpanel')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     $meteor = $injector.get '$meteor'
+    $mixpanel = $injector.get '$mixpanel'
     Auth = $injector.get 'Auth'
     Event = $injector.get 'Event'
     SavedEvent = $injector.get 'SavedEvent'
@@ -400,6 +405,8 @@ describe 'events controller', ->
       delete expectedEvent.id
       expectedEvent.recommendedEvent = recommendedEvent.id
 
+      spyOn $mixpanel, 'track'
+
       ctrl.saveRecommendedEvent recommendedEvent
 
     it 'should create an event from the recommended event', ->
@@ -407,6 +414,18 @@ describe 'events controller', ->
 
     it 'should set a was saved flag', ->
       expect(recommendedEvent.wasSaved).toBe true
+
+    describe 'on success', ->
+
+      beforeEach ->
+        deferred.resolve()
+        scope.$apply()
+
+      it 'should track Create Event in mixpanel', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Create Event',
+          time: true
+          place: true
+          'from recommended': true
 
     describe 'on error', ->
 

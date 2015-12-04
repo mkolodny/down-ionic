@@ -1,9 +1,11 @@
 require 'ng-cordova'
 require 'ng-toast'
 require '../common/resources/resources-module'
+require '../common/mixpanel/mixpanel-module'
 CreateEventCtrl = require './create-event-controller'
 
 angular.module 'rallytap.createEvent', [
+    'analytics.mixpanel'
     'rallytap.resources'
     'ngCordova'
     'ui.router'

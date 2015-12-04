@@ -1,10 +1,10 @@
 class CreateEventCtrl
   @$inject: ['$cordovaDatePicker', '$filter', '$ionicLoading', '$ionicHistory',
              '$ionicModal', '$rootScope', '$scope', '$state',
-             'Auth', 'Event', 'ngToast', '$ionicActionSheet']
+             'Auth', 'Event', 'ngToast', '$ionicActionSheet', '$mixpanel']
   constructor: (@$cordovaDatePicker, @$filter, @$ionicLoading, @$ionicHistory,
                 @$ionicModal, @$rootScope, @$scope, @$state,
-                @Auth, @Event, @ngToast, @$ionicActionSheet) ->
+                @Auth, @Event, @ngToast, @$ionicActionSheet, @$mixpanel) ->
     # Init the view.
     @currentUser = @Auth.user
 
@@ -71,6 +71,11 @@ class CreateEventCtrl
     newEvent = @getNewEvent()
     @Event.save newEvent
       .$promise.then (event) =>
+        @$mixpanel.track 'Create Event',
+          'from recommended': false
+          time: angular.isDefined @datetime
+          place: angular.isDefined @place
+          
         # Clear form
         delete @title
         delete @datetime
