@@ -24,7 +24,10 @@
     </div>
     <ion-list>
       <ion-item ng-repeat="item in events.items"
-                ng-class="{'item-divider': item.isDivider}">
+                ng-class="{
+                  'item-divider': item.isDivider,
+                  'recommended-divider': (item.title === 'Recommended')
+                }">
         <!-- Divider -->
         <div ng-if="item.isDivider">
           <span class="divider-title">{{item.title}}</span>
@@ -37,8 +40,7 @@
                     comments-count="item.commentsCount"></event-item>
 
         <!-- Recommended Event -->
-        <div class="saved-event"
-             ng-if="item.recommendedEvent">
+        <div class="saved-event" ng-if="item.recommendedEvent">
           <div class="event item-button-left">
             <button class="button mark-interested"
                     ng-disabled="item.recommendedEvent.wasSaved"

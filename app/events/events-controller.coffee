@@ -29,6 +29,11 @@ class EventsCtrl
   buildItems: ->
     items = []
 
+    if @savedEvents.length > 0
+      items.push
+        isDivider: true
+        title: 'Friends'
+
     recommendedEventsMap = {}
     for savedEvent in @savedEvents
       items.push
