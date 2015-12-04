@@ -116,7 +116,7 @@ describe 'event item directive', ->
         it 'should track it in mixpanel', ->
           expect($mixpanel.track).toHaveBeenCalledWith 'Save Event',
             'total num interested': preSaveNumInterested
-            'time since posted': $filter('timeAgo')(savedEvent.createdAt)
+            'time since posted': $filter('timeAgo')(savedEvent.createdAt.getTime())
             time: angular.isDefined savedEvent.event.datetime
             place: angular.isDefined savedEvent.event.place
 

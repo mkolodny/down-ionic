@@ -22,7 +22,7 @@
        > &mdash; {{eventItem.savedEvent.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
     </h2>
     <div class="date-posted">
-       posted <time-ago from-time='{{eventItem.savedEvent.createdAt}}'></time-ago>
+       posted <time-ago from-time='{{eventItem.savedEvent.createdAt.getTime()}}'></time-ago>
     </div>
     <div class="extra-details"
          ng-if="eventItem.didUserSaveEvent()">

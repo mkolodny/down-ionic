@@ -20,7 +20,7 @@ class EventItemCtrl
         @savedEvent.interestedFriends = newSavedEvent.interestedFriends
         @$mixpanel.track 'Save Event',
           'total num interested': @savedEvent.totalNumInterested - 1
-          'time since posted': @$filter('timeAgo')(@savedEvent.createdAt)
+          'time since posted': @$filter('timeAgo')(@savedEvent.createdAt.getTime())
           time: angular.isDefined @savedEvent.event.datetime
           place: angular.isDefined @savedEvent.event.place
       , =>
