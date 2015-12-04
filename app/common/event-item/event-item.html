@@ -2,8 +2,8 @@
   <div class="event item-button-left">
     <button class="button mark-interested"
             ng-disabled="eventItem.didUserSaveEvent()"
-            ng-mousedown="eventItem.saveEvent(); $event.stopPropagation()"
-            ontouchstart>
+            ng-click="eventItem.saveEvent(); $event.stopPropagation()"
+            on-tap>
       <i class="icon"
          ng-class="{
            'calendar-star-selected': eventItem.didUserSaveEvent(),
@@ -15,11 +15,11 @@
       {{eventItem.savedEvent.totalNumInterested}}
     </div>
     <h2>
-       {{eventItem.savedEvent.event.title}}<span
-       ng-if="eventItem.savedEvent.event.place"
-       > at {{eventItem.savedEvent.event.place.name}}</span><span
-       ng-if="eventItem.savedEvent.event.datetime"
-       > &mdash; {{eventItem.savedEvent.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
+       {{::eventItem.savedEvent.event.title}}<span
+       ng-if="::eventItem.savedEvent.event.place"
+       > at {{::eventItem.savedEvent.event.place.name}}</span><span
+       ng-if="::eventItem.savedEvent.event.datetime"
+       > &mdash; {{::eventItem.savedEvent.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
     </h2>
     <div class="date-posted">
        posted <time-ago from-time='{{eventItem.savedEvent.createdAt.getTime()}}'></time-ago>
@@ -55,8 +55,8 @@
     <div class="item item-avatar item-button-right interested-friend"
          ng-class="{first: $first}"
          ng-repeat="friend in eventItem.savedEvent.interestedFriends">
-      <img class="item-image" ng-src="{{friend.getImageUrl(72)}}">
-      <h3>{{friend.name}}</h3>
+      <img class="item-image" ng-src="{{::friend.getImageUrl(72)}}">
+      <h3>{{::friend.name}}</h3>
       <invite-button user="friend" event="eventItem.savedEvent.event" />
     </div>
   </div>

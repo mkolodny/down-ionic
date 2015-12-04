@@ -22,7 +22,7 @@ class ChatsCtrl
         allChats = @Chats.find().fetch()
         chatIds = (chat._id for chat in allChats)
         @getChatUsers chatIds
-        @getChatMessages chatIds
+        @$meteor.subscribe 'messages', chatIds
       .then =>
         @messagesLoaded = true
         # messages subscription is ready
@@ -55,20 +55,8 @@ class ChatsCtrl
     items
 
   watchNewChats: ->
-    # When a new chat is added, subscribe to chat
-    # messages and the the user for the chat
-    @chats = @$scope.$meteorCollection @Chats
-    @$scope.$watch =>
-      (chat._id for chat in @chats)
-    , (oldValue, newValue) =>
-      if oldValue isnt newValue
-        @getChatMessages newValue
-        @getChatUsers newValue
-    , true
-
-  getChatMessages: (chatIds) ->
-    # TODO: only subscribe to new chats
-    @$meteor.subscribe 'messages', chatIds
+    @$scope.$on 'messages.newChat', (event, chatId) =>
+      @getChatUsers [chatId]
 
   getChatUsers: (chatIds) ->
     # TODO: Only grab users once
@@ -81,16 +69,8 @@ class ChatsCtrl
         @handleLoadedData()
 
   watchNewMessages: =>
-    options =
-      sort:
-        createdAt: -1
-    @newestMessage = @$scope.$meteorObject @Messages, {}, false, options
-    @$scope.$watch =>
-      @newestMessage._id
-    , (oldValue, newValue) =>
-      if oldValue isnt newValue
-        @handleLoadedData()
-    , true
+    @$scope.$on 'messages.newMessage', =>
+      @handleLoadedData()
 
   getNewestMessage: (chatId) =>
     selector =

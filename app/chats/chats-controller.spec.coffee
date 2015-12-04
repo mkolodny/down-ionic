@@ -85,11 +85,11 @@ describe 'chats controller', ->
     expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
     expect(ctrl.Chats).toBe chatsCollection
 
-  it 'should subscribe to all the chats', ->
-    expect($meteor.subscribe).toHaveBeenCalledWith 'allChats'
-
   it 'should set the current user on the controller', ->
     expect(ctrl.currentUser).toBe Auth.user
+
+  it 'should subscribe to all the chats', ->
+    expect($meteor.subscribe).toHaveBeenCalledWith 'allChats'
 
   describe 'when the allChats subscription is ready', ->
 
@@ -98,7 +98,6 @@ describe 'chats controller', ->
       spyOn ctrl, 'watchNewMessages'
       spyOn ctrl, 'watchNewChats'
       spyOn ctrl, 'getChatUsers'
-      spyOn ctrl, 'getChatMessages'
 
       allChatsDeferred.resolve()
       scope.$apply()
@@ -107,7 +106,7 @@ describe 'chats controller', ->
       expect(ctrl.allChatsLoaded).toBe true
 
     it 'should subscribe to messages for all of the chats', ->
-      expect(ctrl.getChatMessages).toHaveBeenCalledWith chatIds
+      expect($meteor.subscribe).toHaveBeenCalledWith 'messages', chatIds
 
     it 'should get the users for each chat', ->
       expect(ctrl.getChatUsers).toHaveBeenCalledWith chatIds
@@ -196,41 +195,19 @@ describe 'chats controller', ->
   describe 'watching for new chats', ->
 
     beforeEach ->
-      scope.$meteorCollection = jasmine.createSpy('scope.$meteorCollection') \
-        .and.returnValue []
-      spyOn ctrl, 'getChatMessages'
-      spyOn ctrl, 'getChatUsers'
-
       ctrl.watchNewChats()
 
-    it 'should bind the chats to the controller', ->
-      expect(scope.$meteorCollection).toHaveBeenCalledWith ctrl.Chats
-      expect(ctrl.chats).toEqual []
-
     describe 'when a new chat comes in', ->
+      chatId = null
 
       beforeEach ->
-        ctrl.chats = [chat23]
+        spyOn ctrl, 'getChatUsers'
+        chatId = 'asdfas'
+        scope.$broadcast 'messages.newChat', chatId
         scope.$apply()
-        ctrl.chats = [chat23, chat24]
-        scope.$apply()
-
-      it 'should subscribe to the chat messages', ->
-        expect(ctrl.getChatMessages).toHaveBeenCalled()
 
       it 'should get the chat users', ->
-        expect(ctrl.getChatUsers).toHaveBeenCalled()
-
-
-  #getChatMessages
-  describe 'getting the messages for chats', ->
-
-    beforeEach ->
-      $meteor.subscribe.calls.reset()
-      ctrl.getChatMessages chatIds
-
-    it 'should subscribe to the chat messages', ->
-      expect($meteor.subscribe).toHaveBeenCalledWith 'messages', chatIds
+        expect(ctrl.getChatUsers).toHaveBeenCalledWith [chatId]
 
 
   ##getChatUsers
@@ -280,33 +257,17 @@ describe 'chats controller', ->
     newestMessage = null
 
     beforeEach ->
-      newestMessage =
-        _id: 'asdflkjn;anoi'
-      scope.$meteorObject = jasmine.createSpy('scope.$meteorObject') \
-        .and.returnValue newestMessage
-
+      spyOn ctrl, 'handleLoadedData'
       ctrl.watchNewMessages()
 
-    it 'should bind the newest message to the controller', ->
-      options =
-        sort:
-          createdAt: -1
-      expect(scope.$meteorObject).toHaveBeenCalledWith ctrl.Messages, {}, false, options
-      expect(ctrl.newestMessage).toEqual newestMessage
-
-    describe 'when a new message comes in', ->
+    describe 'when a new message is posted', ->
 
       beforeEach ->
-        spyOn ctrl, 'handleLoadedData'
-        ctrl.newestMessage =
-          _id: 'alkjsdfn'
-        scope.$apply()
-        ctrl.newestMessage =
-          _id: 'aksdjfierfq'
+        scope.$broadcast 'messages.newMessage'
         scope.$apply()
 
-      it 'should re-build the items', ->
-        expect(ctrl.handleLoadedData).toHaveBeenCalled()
+      it 'should handle the loaded data', ->
+        expect(ctrl.handleLoadedData).toHaveBeenCalled() 
 
 
   ##getNewestMessage
