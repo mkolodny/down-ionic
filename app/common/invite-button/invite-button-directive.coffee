@@ -7,7 +7,7 @@ inviteButtonDirective = ['$state', '$meteor', '$mixpanel', 'Auth', \
     event: '='
   template: """
     <a ng-mousedown="inviteUser(user, event)"
-       ng-if="!hasBeenInvited(user, event)"
+       ng-if="!hasBeenInvited(user, event) && !event.isExpired()"
        class="button invite"
        ng-class="{
         'invited': hasBeenInvited(user, event)
@@ -20,9 +20,14 @@ inviteButtonDirective = ['$state', '$meteor', '$mixpanel', 'Auth', \
       </i>
     </a>
     <button class="button button-clear invite sent"
-            ng-if="hasBeenInvited(user, event)"
+            ng-if="hasBeenInvited(user, event) && !event.isExpired()"
             disabled>
       Message sent
+    </button>
+    <button class="button button-clear invite sent"
+            ng-if="event.isExpired()"
+            disabled>
+      Post expired
     </button>
     """
   controller: ['$scope', ($scope) ->

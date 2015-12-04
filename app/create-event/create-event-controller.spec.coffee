@@ -290,7 +290,7 @@ describe 'create event controller', ->
     it 'should show a loading spinner', ->
       expect($ionicLoading.show).toHaveBeenCalled()
 
-    fdescribe 'successfully', ->
+    describe 'successfully', ->
       deferredCacheClear = null
 
       beforeEach ->

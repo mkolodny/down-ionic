@@ -105,6 +105,16 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
 
     "#{@title}#{placeString}#{dateString}"
 
+  resource::isExpired = ->
+    twelveHours = 1000 * 60 * 60 * 12
+    now = new Date()
+    if angular.isDefined @datetime
+      expiresAt = new Date @datetime.getTime() + twelveHours
+      now > expiresAt
+    else
+      expiresAt = new Date @createdAt.getTime() + twelveHours
+      now > expiresAt
+
   resource
 ]
 
