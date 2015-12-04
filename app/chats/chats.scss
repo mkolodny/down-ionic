@@ -3,6 +3,15 @@
     &.last {
       border-bottom-width: 1px;
     }
+    &.updated {
+      h2,
+      .latest-message {
+        font-weight: 600;		
+      }
+      .latest-message {
+        color: #111;
+      }
+    }
   }
   .avatar-pie {
     position: absolute;
@@ -23,7 +32,7 @@
     right: 11px;
     top: 20px;
   }
-  p,
+  .latest-message,
   time-ago {
     color: #777;
   }
