@@ -24,8 +24,7 @@
                 }">
         <div ng-if="item.friend"
              ng-click="chats.viewChat(item)">
-          <img class="item-image"
-               ng-src="{{item.friend.getImageUrl()}}">
+          <img class="item-image" ng-src="{{item.friend.getImageUrl()}}">
 <!--           <canvas class="chart chart-pie avatar-pie"
                   data="[
                     (100 - item.chat.percentRemaining),
@@ -40,7 +39,8 @@
                     showTooltips: false
                   }"
                   ></canvas> -->
-          <h2>{{item.friend.name}}</h2>
+          <h2>{{item.friend.name}} <time-ago
+              from-time='{{item.newestMessage.createdAt}}'></time-ago></h2>
           <p class="latest-message">
             <span ng-if="item.newestMessage.text">
               {{item.newestMessage.text}}

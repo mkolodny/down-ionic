@@ -6,11 +6,13 @@ class MyEventsCtrl
     @currentUser = @Auth.user
 
     @$scope.$on '$ionicView.loaded', =>
+      @isLoading = true
       @refresh()
 
   handleLoadedData: ->
     if @savedEventsLoaded and @commentsCountLoaded
       @items = @buildItems()
+      @isLoading = false
       @$scope.$broadcast 'scroll.refreshComplete'
 
   refresh: ->

@@ -1,120 +1,30 @@
 #chats {
-  h2 {
-    color: $brand-color;
-    font-size: 18px;
-    padding-right: 10px;
-  }
-  .list,
   .item {
-    width: 100%;
-  }
-  .moving {
-    .item {
-      position: absolute;
-      transition: top 0.5s ease-in-out, right 1s linear;
-    }
-  }
-  .item-divider {
-    text-align: center;
-    padding-left: 0;
-    padding-right: 0 !important;
-    padding-bottom: 0;
-    min-height: 26px;
-
-    img,
-    h2,
-    p,
-    .updated-at,
-    i {
-      display: none;
-    }
-  }
-  .divider-title {
-    background-color: #fff;
-    padding-right: 7px;
-    padding-left: 7px;
-  }
-  .divider-line {
-    border-top: 1px solid #eee;
-    margin-top: -11px;
-  }
-  .item {
-    padding-right: 8px;
-
-    &.updated {
-      h2,
-      p,
-      .updated-at {
-        font-weight: 600;
-      }
-      p,
-      .updated-at {
-        color: #111;
-      }
-    }
-    &.activated {
-      .white {
-        display: none;
-      }
-      .gray {
-        display: block !important;
-      }
-    }
     &.last {
       border-bottom-width: 1px;
-    }
-    & + .item-divider {
-      margin-top: -7px;
-      min-height: 16px;
     }
   }
   .avatar-pie {
     position: absolute;
     top: 10px;
     left: 10px;
-
-    &.gray {
-      display: none;
-    }
-  }
-  .updated-at,
-  .latest-message {
-    padding-right: 45px;
-  }
-  .updated-at {
-    font-size: 14px;
-    float: right;
-    padding-top: 2px;
   }
   h2 {
+    color: $brand-color;
+    font-size: 18px;
+    padding-right: 10px;
     font-weight: 400;
     margin-bottom: 2px;
   }
+  time-ago {
+    font-size: 13px;
+    margin-left: 3px;
+    position: absolute;
+    right: 11px;
+    top: 20px;
+  }
   p,
-  .updated-at {
+  time-ago {
     color: #777;
-  }
-  .fa-circle-thin,
-  .fa-circle {
-    font-size: 40px;
-  }
-  .fa-circle-thin,
-  .fa-hand-o-up {
-    color: #999;
-  }
-  .fa-circle {
-    color: $brand-color;
-    display: none;
-  }
-  .fa-hand-o-up {
-    font-size: 19px;
-    right: -25px;
-  }
-  #add-friends {
-    .item-avatar {
-      h2 {
-        padding-top: 7px;
-      }
-    }
   }
 }
