@@ -130,6 +130,7 @@ describe 'events controller', ->
   describe 'building the items', ->
     savedEvent = null
     savedEventItem = null
+    savedEventsDivider = null
     savedEventFromRecommendedEvent = null
     savedEventFromRecommendedEventItem = null
     recommendedEvent = null
@@ -140,6 +141,9 @@ describe 'events controller', ->
       ctrl.commentsCount =
         '1': 1
         '2': 1
+      savedEventsDivider =
+        isDivider: true
+        title: 'Friends'
       savedEvent =
         id: 1
         eventId: 1
@@ -173,6 +177,8 @@ describe 'events controller', ->
         ctrl.savedEvents = [savedEvent]
         ctrl.recommendedEvents = [recommendedEvent]
         expectedItems = [
+          savedEventsDivider
+        ,
           savedEventItem
         ,
           recommendedEventsDivider
@@ -188,6 +194,8 @@ describe 'events controller', ->
         ctrl.savedEvents = [savedEvent, savedEventFromRecommendedEvent]
         ctrl.recommendedEvents = [recommendedEvent]
         expectedItems = [
+          savedEventsDivider
+        ,
           savedEventItem
         ,
           savedEventFromRecommendedEventItem
@@ -214,6 +222,8 @@ describe 'events controller', ->
         ctrl.savedEvents = [savedEvent]
         ctrl.recommendedEvents = []
         expectedItems = [
+          savedEventsDivider
+        ,
           savedEventItem
         ]
         expect(ctrl.buildItems()).toEqual expectedItems
