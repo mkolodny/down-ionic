@@ -8,9 +8,13 @@
                    on-refresh="myEvents.refresh()"
                    spinner="bubbles">
     </ion-refresher>
+    <div class="spinner-container" ng-if="myEvents.isLoading">
+      <ion-spinner icon="bubbles"></ion-spinner>
+    </div>
+
     <!-- No saved events placeholder -->
     <div class="placeholder"
-         ng-if="myEvents.items.length === 0">
+         ng-if="myEvents.items.length === 0 && !myEvents.isLoading">
       <p>You aren't interested in doing anything... yet!</p>
       <p>Tap the <i id="example-calendar-star" class="calendar-star-selected"></i> next to a post to say you're interested.</p>
     </div>
