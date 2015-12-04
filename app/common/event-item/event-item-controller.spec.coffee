@@ -210,7 +210,6 @@ describe 'event item directive', ->
   ##showSavedEventPopup
   describe 'showing the saved event popup', ->
     popupOptions = null
-    $event = null
 
     beforeEach ->
       spyOn($ionicPopup, 'show').and.callFake (options) ->

@@ -381,6 +381,7 @@ describe 'events controller', ->
     it 'should go to the create event view', ->
       expect($state.go).toHaveBeenCalledWith 'createEvent'
 
+
   ##saveRecommendedEvent
   describe 'saving a recommended event', ->
     recommendedEvent = null
@@ -439,6 +440,3 @@ describe 'events controller', ->
 
       it 'should show an error', ->
         expect(ngToast.create).toHaveBeenCalled()
-
-
-

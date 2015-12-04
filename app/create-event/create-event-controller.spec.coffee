@@ -286,6 +286,7 @@ describe 'create event controller', ->
       spyOn(ctrl, 'getNewEvent').and.returnValue event
       ctrl.title = event.title
       spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
 
       ctrl.createEvent()
 
@@ -325,7 +326,6 @@ describe 'create event controller', ->
       describe 'when the cache is cleared', ->
 
         beforeEach ->
-          spyOn $ionicLoading, 'hide'
           spyOn $state, 'go'
 
           deferredCacheClear.resolve()

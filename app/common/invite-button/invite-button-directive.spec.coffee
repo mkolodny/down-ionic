@@ -10,6 +10,7 @@ require './invite-button-module'
 
 describe 'invite button directive', ->
   $compile = null
+  $ionicPopup = null
   $q = null
   $state = null
   $meteor = null
@@ -36,6 +37,8 @@ describe 'invite button directive', ->
 
   beforeEach angular.mock.module('angular-meteor')
 
+  beforeEach angular.mock.module('ionic')
+
   beforeEach angular.mock.module(($provide) ->
     # Mock a logged in user.
     Auth =
@@ -52,6 +55,7 @@ describe 'invite button directive', ->
 
   beforeEach inject(($injector) ->
     $compile = $injector.get '$compile'
+    $ionicPopup = $injector.get '$ionicPopup'
     scope = $injector.get '$rootScope'
     $state = $injector.get '$state'
     $meteor = $injector.get '$meteor'
@@ -67,9 +71,11 @@ describe 'invite button directive', ->
 
     friend =
       id: 2
+      name: 'Billy Bob'
     scope.friend = friend
     event =
       id: 1
+      title: 'Hoe down'
     scope.event = event
     element = angular.element """
       <invite-button user="friend" event="event">
@@ -92,56 +98,81 @@ describe 'invite button directive', ->
 
     describe 'inviting a user', ->
       deferred = null
+      anchor = null
 
       beforeEach ->
         deferred = $q.defer()
         $meteor.call.and.returnValue deferred.promise
 
         anchor = element.find 'a'
-        anchor.triggerHandler 'mousedown'
 
-      it 'should call the send invite meteor method', ->
-        creator =
-          id: "#{Auth.user.id}"
-          name: Auth.user.name
-          firstName: Auth.user.firstName
-          lastName: Auth.user.lastName
-          imageUrl: Auth.user.imageUrl
-        expect($meteor.call).toHaveBeenCalledWith('sendEventInvite', creator,
-            "#{friend.id}", event)
-
-      it 'should show a loading spinner', ->
-        spinner = element.find 'ion-spinner'
-        expect(spinner.length).toEqual 1
-
-      describe 'when the method returns successfully', ->
+      describe 'when this isn\'t the user\'s first time', ->
 
         beforeEach ->
-          spyOn isolateScope, 'trackInvite'
-          deferred.resolve()
-          scope.$apply()
+          Auth.flags =
+            hasSentInvite: true
 
-        it 'should hide the loading spinner', ->
+          anchor.triggerHandler 'mousedown'
+
+        it 'should call the send invite meteor method', ->
+          creator =
+            id: "#{Auth.user.id}"
+            name: Auth.user.name
+            firstName: Auth.user.firstName
+            lastName: Auth.user.lastName
+            imageUrl: Auth.user.imageUrl
+          expect($meteor.call).toHaveBeenCalledWith('sendEventInvite', creator,
+              "#{friend.id}", event)
+
+        it 'should show a loading spinner', ->
           spinner = element.find 'ion-spinner'
-          expect(spinner.length).toEqual 0
+          expect(spinner.length).toEqual 1
 
-        it 'should track sending an invite in mixpanel', ->
-          expect(isolateScope.trackInvite).toHaveBeenCalled()
+        describe 'when the method returns successfully', ->
+
+          beforeEach ->
+            spyOn isolateScope, 'trackInvite'
+            deferred.resolve()
+            scope.$apply()
+
+          it 'should hide the loading spinner', ->
+            spinner = element.find 'ion-spinner'
+            expect(spinner.length).toEqual 0
+
+          it 'should track sending an invite in mixpanel', ->
+            expect(isolateScope.trackInvite).toHaveBeenCalled()
 
 
-      describe 'when there is an error', ->
+        describe 'when there is an error', ->
+
+          beforeEach ->
+            spyOn ngToast, 'create'
+            deferred.reject()
+            scope.$apply()
+
+          it 'should hide the loading spinner', ->
+            spinner = element.find 'ion-spinner'
+            expect(spinner.length).toEqual 0
+
+          it 'should show an error toast', ->
+            expect(ngToast.create).toHaveBeenCalledWith 'Oops, an error occurred.'
+
+
+      describe 'when this is the user\'s first time', ->
 
         beforeEach ->
-          spyOn ngToast, 'create'
-          deferred.reject()
-          scope.$apply()
+          Auth.flags =
+            hasSentInvite: false
+          Auth.setFlag = jasmine.createSpy 'Auth.setFlag'
+          spyOn isolateScope, 'showSentInvitePopup'
 
-        it 'should hide the loading spinner', ->
-          spinner = element.find 'ion-spinner'
-          expect(spinner.length).toEqual 0
+          anchor.triggerHandler 'mousedown'
 
-        it 'should show an error toast', ->
-          expect(ngToast.create).toHaveBeenCalledWith 'Oops, an error occurred.'
+        it 'should set a flag', ->
+          expect(Auth.setFlag).toHaveBeenCalledWith 'hasSentInvite', true
+
+        it 'should show a popup', ->
+          expect(isolateScope.showSentInvitePopup).toHaveBeenCalled()
 
 
   describe 'when the user has been invited', ->
@@ -178,3 +209,27 @@ describe 'invite button directive', ->
       expect($mixpanel.track).toHaveBeenCalledWith 'Send Invite',
         'is friend': true
         'from screen': $state.current.name
+
+
+  ##$scope.showSentInvitePopup
+  describe 'showing the sent invite popup', ->
+    popupOptions = null
+
+    beforeEach ->
+      spyOn($ionicPopup, 'show').and.callFake (options) ->
+        popupOptions = options
+
+      $compile(element) scope
+      isolateScope = element.isolateScope()
+      isolateScope.showSentInvitePopup()
+
+    it 'should show an ionic popup', ->
+      expect($ionicPopup.show).toHaveBeenCalledWith
+        title: 'Send Message?'
+        subTitle: "Tapping \"Down?\" sends #{friend.name} a message asking if they\'re down for \"#{event.title}\""
+        buttons: [
+          text: 'Cancel'
+        ,
+          text: '<b>Send</b>'
+          onTap: jasmine.any Function
+        ]
