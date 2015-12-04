@@ -83,11 +83,11 @@ In package.json, the com.phonegap.plugins.facebookconnect variables go from:
 
 Staging:
         "APP_ID": "864552050271610",
-        "APP_NAME": "DownDev"
+        "APP_NAME": "RallytapDev"
 
 Prod:
         "APP_ID": "1466791860252976",
-        "APP_NAME": "Down"
+        "APP_NAME": "Rallytap"
 
 ## iOS Allow HTTP
 
