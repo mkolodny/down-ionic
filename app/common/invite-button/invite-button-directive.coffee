@@ -1,86 +1,10 @@
-inviteButtonDirective = ['$ionicPopup', '$meteor', '$mixpanel', '$state', 'Auth', \
-                         'Friendship', 'ngToast', \
-                         ($ionicPopup, $meteor, $mixpanel, $state, Auth,
-                          Friendship, ngToast) ->
+inviteButtonDirective = ->
   restrict: 'E'
   scope:
     user: '='
     event: '='
-  template: """
-    <a ng-mousedown="inviteUser(user, event); $event.stopPropagation()"
-       ng-if="!hasBeenInvited(user, event) && !event.isExpired()"
-       class="button invite"
-       ng-class="{
-        'invited': hasBeenInvited(user, event)
-       }">
-      <span ng-if="!isLoading">
-        Down?
-      </span>
-      <i class="icon" ng-if="isLoading">
-        <ion-spinner icon="bubbles"></ion-spinner>
-      </i>
-    </a>
-    <button class="button button-clear invite sent"
-            ng-if="hasBeenInvited(user, event) && !event.isExpired()"
-            disabled>
-      Message sent
-    </button>
-    <button class="button button-clear invite sent"
-            ng-if="event.isExpired()"
-            disabled>
-      Post expired
-    </button>
-    """
-  controller: ['$scope', ($scope) ->
-    Messages = $meteor.getCollectionByName 'messages'
-
-    $scope.hasBeenInvited = (user, event) ->
-      chatId = Friendship.getChatId user.id
-      selector =
-        chatId: chatId
-        type: 'invite_action'
-        'meta.event.id': event.id
-      angular.isDefined Messages.findOne(selector)
-
-    $scope.inviteUser = (user, event) ->
-      if not Auth.flags.hasSentInvite
-        Auth.setFlag 'hasSentInvite', true
-        $scope.showSentInvitePopup()
-        return
-
-      $scope.isLoading = true
-
-      creator =
-        id: "#{Auth.user.id}"
-        name: Auth.user.name
-        firstName: Auth.user.firstName
-        lastName: Auth.user.lastName
-        imageUrl: Auth.user.imageUrl
-      $meteor.call 'sendEventInvite', creator, "#{user.id}", event
-        .then ->
-          $scope.trackInvite user
-        , ->
-          ngToast.create 'Oops, an error occurred.'
-        .finally ->
-          $scope.isLoading = false
-
-    $scope.trackInvite = (user) ->
-      $mixpanel.track 'Send Invite',
-        'is friend': Auth.isFriend user.id
-        'from screen': $state.current.name
-
-    $scope.showSentInvitePopup = ->
-      $ionicPopup.show
-        title: 'Send Message?'
-        subTitle: "Tapping \"Down?\" sends #{$scope.user.name} a message asking if they\'re down for \"#{$scope.event.title}\""
-        buttons: [
-          text: 'Cancel'
-        ,
-          text: '<b>Send</b>'
-          onTap: (e) =>
-            @inviteUser $scope.user, $scope.event
-        ]
-  ]
-]
+  bindToController: true
+  templateUrl: 'app/common/invite-button/invite-button.html'
+  controller: 'inviteButtonCtrl as inviteButton'
 
 module.exports = inviteButtonDirective
