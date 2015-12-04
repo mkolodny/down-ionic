@@ -21,9 +21,8 @@
     padding-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-  }
-  #create-event-prompt {
     font-size: 20px;
+    -webkit-appearance: none; // remove the inset on ios
   }
   .item-divider {
     text-align: center;
