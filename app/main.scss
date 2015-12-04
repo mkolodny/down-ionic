@@ -660,6 +660,9 @@ ion-nav-back-button {
   border-color: $positive;
   color: #fff;
 
+  &:hover {
+    color: #fff;
+  }
   &.sent {
     background-color: transparent;
     border: none;
