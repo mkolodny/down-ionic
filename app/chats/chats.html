@@ -40,7 +40,7 @@
                    }"
                    ></canvas>
             <h2>{{::item.friend.name}} <time-ago
-              from-time='{{::item.newestMessage.createdAt.getTime()}}'></time-ago></h2>
+              from-time='{{item.newestMessage.createdAt.getTime()}}'></time-ago></h2>
           <p class="latest-message">
             <span ng-if="item.newestMessage.text">{{item.newestMessage.text}}</span>
           </p>
