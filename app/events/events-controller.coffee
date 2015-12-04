@@ -89,13 +89,12 @@ class EventsCtrl
     @$state.go 'createEvent'
 
   saveRecommendedEvent: (recommendedEvent) ->
-    event = angular.extend {}, recommendedEvent
+    event = angular.copy recommendedEvent
     event.recommendedEvent = recommendedEvent.id
     delete event.id
     recommendedEvent.wasSaved = true
     @Event.save(event).$promise.then null, =>
       delete recommendedEvent.wasSaved
       @ngToast.create 'Oops.. an error occurred..'
-
 
 module.exports = EventsCtrl

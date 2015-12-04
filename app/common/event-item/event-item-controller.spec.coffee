@@ -53,7 +53,7 @@ describe 'event item directive', ->
   )
 
   ##saveEvent
-  fdescribe 'saving an event', ->
+  describe 'saving an event', ->
     $event = null
     deferred = null
     preSaveNumInterested = null
@@ -181,9 +181,8 @@ describe 'event item directive', ->
 
 
   ##showSavedEventPopup
-  fdescribe 'showing the saved event popup', ->
+  describe 'showing the saved event popup', ->
     popupOptions = null
-    $event = null
 
     beforeEach ->
       spyOn($ionicPopup, 'show').and.callFake (options) ->
