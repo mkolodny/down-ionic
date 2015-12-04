@@ -32,6 +32,9 @@ $button-positive-text: #fff;
 // Fonts
 $font-family-sans-serif: 'Open Sans', 'Helvetica Neue', 'Roboto', 'Segoe UI', sans-serif;
 
+// Font awesone path
+$fa-font-path: '../fonts';
+
 // The path for our ionicons font files, relative to the built CSS in www/css
 //$ionicons-font-path: "../lib/ionic/fonts" !default;
 
@@ -612,13 +615,13 @@ ion-nav-back-button {
 
 // Icon
 .calendar-star-default {
-  background-image: url('/images/calendar-star-999.svg');
+  background-image: url('../images/calendar-star-999.svg');
 }
 .calendar-star-selected {
-  background-image: url('/images/calendar-star-6a38ab.svg');
+  background-image: url('../images/calendar-star-6a38ab.svg');
 }
 .calendar-star-tab {
-  background-image: url('/images/calendar-star-ccc.svg');
+  background-image: url('../images/calendar-star-ccc.svg');
 }
 
 // Action Sheet
