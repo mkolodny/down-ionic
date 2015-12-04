@@ -42,6 +42,7 @@ class EventItemCtrl
         text: '<b>Interested</b>'
         onTap: (e) =>
           @saveEvent()
+          return
       ]
 
   didUserSaveEvent: ->

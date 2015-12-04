@@ -63,7 +63,9 @@ class InviteButtonCtrl
         text: 'Cancel'
       ,
         text: '<b>Send</b>'
-        onTap: @inviteUser
+        onTap: (e) =>
+          @inviteUser()
+          return
       ]
 
 module.exports = InviteButtonCtrl
