@@ -383,3 +383,73 @@ describe 'event service', ->
       it 'should return the message', ->
         expect(eventMessage).toBe event.title
 
+
+  ##resource::isExpired
+  describe 'checking if the event is expired', ->
+    event = null
+    now = null
+    expired = null
+
+    beforeEach ->
+      jasmine.clock().install()
+      now = new Date 1438014089235
+      jasmine.clock().mockDate now
+
+      twelveHours = 1000 * 60 * 60 * 12
+      expired = new Date now.getTime() - 2 * twelveHours
+
+      event =
+        id: 1
+        title: 'bars?!?!!?'
+        creator: 2
+        canceled: false
+        datetime: new Date()
+        createdAt: new Date()
+        updatedAt: new Date()
+        place:
+          name: 'B Bar & Grill'
+          lat: 40.7270718
+          long: -73.9919324
+      event = new Event event
+
+    afterEach ->
+      jasmine.clock().uninstall()
+
+    describe 'when it has a datetime', ->
+
+      describe 'when expired', ->
+
+        beforeEach ->
+          event.datetime = expired
+
+        it 'should return true', ->
+          expect(event.isExpired()).toBe true
+
+      describe 'when not expired', ->
+
+        beforeEach ->
+          event.datetime = now
+
+        it 'should return false', ->
+          expect(event.isExpired()).toBe false
+
+    describe 'when it doesn\'t have a datetime', ->
+
+      beforeEach ->
+        delete event.datetime
+
+      describe 'when expired', ->
+
+        beforeEach ->
+          event.createdAt = expired
+
+        it 'should return true', ->
+          expect(event.isExpired()).toBe true
+
+      describe 'when not expired', ->
+
+        beforeEach ->
+          event.createdAt = now
+
+        it 'should return false', ->
+          expect(event.isExpired()).toBe false
