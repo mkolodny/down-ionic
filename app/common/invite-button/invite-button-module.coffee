@@ -1,7 +1,8 @@
 require 'angular-elastic'
 require 'ng-toast'
 require '../mixpanel/mixpanel-module'
-inviteButton = require './invite-button-directive'
+InviteButtonCtrl = require './invite-button-controller'
+InviteButtonDirective = require './invite-button-directive'
 
 angular.module 'rallytap.inviteButton', [
     'angular-meteor'
@@ -9,4 +10,5 @@ angular.module 'rallytap.inviteButton', [
     'ngToast'
     'ui.router'
   ]
-  .directive 'inviteButton', inviteButton
+  .controller 'inviteButtonCtrl', InviteButtonCtrl
+  .directive 'inviteButton', InviteButtonDirective

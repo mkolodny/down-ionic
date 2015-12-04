@@ -1,0 +1,28 @@
+<a ng-mousedown="inviteButton.inviteUser(); $event.stopPropagation()"
+   ng-if="!inviteButton.hasBeenInvited() && !inviteButton.event.isExpired()"
+   class="button invite"
+   ng-class="{
+    'invited': inviteButton.hasBeenInvited()
+   }">
+  <span ng-if="!inviteButton.isLoading">
+    Down?
+  </span>
+  <i class="icon" ng-if="inviteButton.isLoading">
+    <ion-spinner icon="bubbles"></ion-spinner>
+  </i>
+</a>
+<button class="button button-clear invite sent"
+        ng-if="inviteButton.hasSentInvite() &&!inviteButton.event.isExpired()"
+        disabled>
+  Message sent
+</button>
+<button class="button button-clear invite sent"
+        ng-if="inviteButton.hasBeenInvited() &&!inviteButton.event.isExpired()"
+        disabled>
+  Chatting
+</button>
+<button class="button button-clear invite sent"
+        ng-if="inviteButton.event.isExpired()"
+        disabled>
+  Post expired
+</button>
