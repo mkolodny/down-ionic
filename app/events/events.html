@@ -19,7 +19,8 @@
     <div id="create-event-container">
       <i class="fa fa-calendar-plus-o" ng-click="events.createEvent()"></i>
       <input id="create-event-prompt"
-             ng-mousedown="events.createEvent()"
+             ng-click="events.createEvent()"
+             on-tap
              readonly
              placeholder="What sounds fun?">
     </div>
@@ -45,8 +46,8 @@
           <div class="event item-button-left">
             <button class="button mark-interested"
                     ng-disabled="item.recommendedEvent.wasSaved"
-                    ng-mousedown="events.saveRecommendedEvent(item.recommendedEvent)"
-                    ontouchstart>
+                    ng-click="events.saveRecommendedEvent(item.recommendedEvent)"
+                    on-tap>
               <i class="icon"
                  ng-class="{
                    'calendar-star-selected': item.recommendedEvent.wasSaved,

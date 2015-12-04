@@ -2,8 +2,8 @@
   <div class="event item-button-left">
     <button class="button mark-interested"
             ng-disabled="eventItem.didUserSaveEvent()"
-            ng-mousedown="eventItem.saveEvent(); $event.stopPropagation()"
-            ontouchstart>
+            ng-click="eventItem.saveEvent(); $event.stopPropagation()"
+            on-tap>
       <i class="icon"
          ng-class="{
            'calendar-star-selected': eventItem.didUserSaveEvent(),

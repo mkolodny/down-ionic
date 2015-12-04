@@ -1,4 +1,5 @@
-<a ng-mousedown="inviteButton.inviteUser(); $event.stopPropagation()"
+<a ng-click="inviteButton.inviteUser(); $event.stopPropagation()"
+   on-tap
    ng-if="!inviteButton.hasBeenInvited() && !inviteButton.hasSentInvite() && !inviteButton.event.isExpired()"
    class="button invite"
    ng-class="{
