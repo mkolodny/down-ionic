@@ -77,6 +77,7 @@ describe 'event service', ->
             lat: 40.7270718
             long: -73.9919324
           friendsOnly: true
+          recommendedEvent: 1
           createdAt: new Date()
           updatedAt: new Date()
 
@@ -92,6 +93,7 @@ describe 'event service', ->
               type: 'Point'
               coordinates: [event.place.lat, event.place.long]
           friends_only: event.friendsOnly
+          recommended_event: event.recommendedEvent
         expect(Event.serialize event).toEqual expectedEvent
 
 
@@ -136,6 +138,7 @@ describe 'event service', ->
           friends_only: false
           created_at: new Date().toISOString()
           updated_at: new Date().toISOString()
+          recommended_event: 1
 
       it 'should return the deserialized event', ->
         expectedEvent =
@@ -150,6 +153,7 @@ describe 'event service', ->
           friendsOnly: response.friends_only
           createdAt: new Date response.created_at
           updatedAt: new Date response.updated_at
+          recommendedEvent: response.recommended_event
         expect(Event.deserialize response).toAngularEqual expectedEvent
 
 

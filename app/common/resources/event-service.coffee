@@ -10,6 +10,7 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
       title: event.title
     optionalFields =
       id: 'id'
+      recommended_event: 'recommendedEvent'
     for serializedField, deserializedField of optionalFields
       if angular.isDefined event[deserializedField]
         request[serializedField] = event[deserializedField]
@@ -32,6 +33,8 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
       friendsOnly: event.friends_only
       createdAt: new Date event.created_at
       updatedAt: new Date event.updated_at
+    if angular.isDefined event.recommended_event
+      response.recommendedEvent = event.recommended_event
     if angular.isString event.datetime
       response.datetime = new Date event.datetime
     if angular.isObject event.place
