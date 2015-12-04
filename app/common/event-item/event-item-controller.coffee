@@ -1,6 +1,8 @@
 class EventItemCtrl
-  @$inject: ['$filter', '$mixpanel', '$ionicPopup', '$state', 'Auth', 'SavedEvent', 'ngToast']
-  constructor: (@$filter, @$mixpanel, @$ionicPopup, @$state, @Auth, @SavedEvent, @ngToast) ->
+  @$inject: ['$filter', '$mixpanel', '$ionicPopup', '$state', 'Auth',
+             'SavedEvent', 'ngToast']
+  constructor: (@$filter, @$mixpanel, @$ionicPopup, @$state, @Auth,
+                @SavedEvent, @ngToast) ->
 
   saveEvent: ->
     if not @Auth.flags.hasSavedEvent
