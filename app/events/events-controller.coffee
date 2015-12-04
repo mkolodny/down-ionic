@@ -1,8 +1,8 @@
 class EventsCtrl
   @$inject: ['$meteor', '$scope', '$state', 'Auth', 'SavedEvent',
-             'RecommendedEvent', 'ngToast', 'User']
+             'RecommendedEvent', 'ngToast', 'User', 'Event']
   constructor: (@$meteor, @$scope, @$state, @Auth, @SavedEvent, @RecommendedEvent,
-                @ngToast, @User) ->
+                @ngToast, @User, @Event) ->
     @items = []
     @commentsCount = {}
     @currentUser = @Auth.user
@@ -87,5 +87,15 @@ class EventsCtrl
 
   createEvent: ->
     @$state.go 'createEvent'
+
+  saveRecommendedEvent: (recommendedEvent) ->
+    event = angular.extend {}, recommendedEvent
+    event.recommendedEvent = recommendedEvent.id
+    delete event.id
+    recommendedEvent.wasSaved = true
+    @Event.save(event).$promise.then null, =>
+      delete recommendedEvent.wasSaved
+      @ngToast.create 'Oops.. an error occurred..'
+
 
 module.exports = EventsCtrl

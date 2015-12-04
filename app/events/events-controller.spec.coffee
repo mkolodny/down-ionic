@@ -12,6 +12,7 @@ describe 'events controller', ->
   Auth = null
   commentsCollection = null
   ctrl = null
+  Event = null
   SavedEvent = null
   scope = null
   ngToast = null
@@ -31,6 +32,7 @@ describe 'events controller', ->
     $state = $injector.get '$state'
     $meteor = $injector.get '$meteor'
     Auth = $injector.get 'Auth'
+    Event = $injector.get 'Event'
     SavedEvent = $injector.get 'SavedEvent'
     scope = $injector.get '$rootScope'
     ngToast = $injector.get 'ngToast'
@@ -373,3 +375,51 @@ describe 'events controller', ->
 
     it 'should go to the create event view', ->
       expect($state.go).toHaveBeenCalledWith 'createEvent'
+
+  ##saveRecommendedEvent
+  describe 'saving a recommended event', ->
+    recommendedEvent = null
+    deferred = null
+    expectedEvent = null
+
+    beforeEach ->
+      recommendedEvent =
+        id: 1
+        title: 'Going up on a Tuesday'
+        datetime: new Date()
+        place:
+          name: 'Bar bar'
+          lat: 40.6785872
+          long: -74.0419964
+
+      deferred = $q.defer()
+      spyOn(Event, 'save').and.returnValue {$promise: deferred.promise}
+
+      expectedEvent = angular.extend {}, recommendedEvent
+      delete expectedEvent.id
+      expectedEvent.recommendedEvent = recommendedEvent.id
+
+      ctrl.saveRecommendedEvent recommendedEvent
+
+    it 'should create an event from the recommended event', ->
+      expect(Event.save).toHaveBeenCalledWith expectedEvent
+
+    it 'should set a was saved flag', ->
+      expect(recommendedEvent.wasSaved).toBe true
+
+    describe 'on error', ->
+
+      beforeEach ->
+        spyOn ngToast, 'create'
+
+        deferred.reject()
+        scope.$apply()
+
+      it 'should remove the was saved flag', ->
+        expect(recommendedEvent.wasSaved).toBe undefined
+
+      it 'should show an error', ->
+        expect(ngToast.create).toHaveBeenCalled()
+
+
+
