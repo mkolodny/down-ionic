@@ -15,19 +15,20 @@ class ChatsCtrl
     @Chats = @$meteor.getCollectionByName 'chats'
 
     # Subscribe to all chats
-    @$meteor.subscribe('allChats').then =>
-      @allChatsLoaded = true
+    @$meteor.subscribe 'allChats'
+      .then =>
+        @allChatsLoaded = true
 
-      allChats = @Chats.find().fetch()
-      chatIds = (chat._id for chat in allChats)
-      @getChatUsers chatIds
-      @getChatMessages chatIds
-    .then =>
-      @messagesLoaded = true
-      # messages subscription is ready
-      @handleLoadedData()
-      @watchNewMessages()
-      @watchNewChats()
+        allChats = @Chats.find().fetch()
+        chatIds = (chat._id for chat in allChats)
+        @getChatUsers chatIds
+        @getChatMessages chatIds
+      .then =>
+        @messagesLoaded = true
+        # messages subscription is ready
+        @handleLoadedData()
+        @watchNewMessages()
+        @watchNewChats()
 
   handleLoadedData: ->
     if @allChatsLoaded and @messagesLoaded and @chatUsersLoaded
