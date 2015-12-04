@@ -562,15 +562,24 @@ ion-nav-back-button {
 // Popup
 .popup {
   border-radius: 8px !important;
+
+  .calendar-star-default {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    vertical-align: top;
+    margin-right: 2px;
+    margin-left: 2px;
+  }
 }
 .popup-head {
   padding: 15px 20px;
 }
 .popup-title {
-  font-size: 20px;
+  font-size: 18px;
 }
 .popup-sub-title {
-  font-size: 15px;
+  font-size: 13px;
   margin-top: 10px;
 
   p:last-child {
@@ -588,7 +597,7 @@ ion-nav-back-button {
     border-radius: 0 !important;
     background-color: inherit;
     color: $link-color !important;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 45px;
 
     &:first-child {
