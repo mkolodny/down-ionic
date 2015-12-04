@@ -6,6 +6,7 @@ require '../meteor/meteor-mocks'
 EventItemCtrl = require './event-item-controller'
 
 describe 'event item directive', ->
+  $ionicPopup = null
   $q = null
   $state = null
   Auth = null
@@ -24,8 +25,11 @@ describe 'event item directive', ->
 
   beforeEach angular.mock.module('ngToast')
 
+  beforeEach angular.mock.module('ionic')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $ionicPopup = $injector.get '$ionicPopup'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     Auth = $injector.get 'Auth'
@@ -37,6 +41,7 @@ describe 'event item directive', ->
         id: 1
     event =
       id: 1
+      title: 'ballllinnn'
     savedEvent =
       event: event
       eventId: event.id
@@ -48,7 +53,8 @@ describe 'event item directive', ->
   )
 
   ##saveEvent
-  describe 'saving an event', ->
+  fdescribe 'saving an event', ->
+    $event = null
     deferred = null
     preSaveNumInterested = null
 
@@ -57,50 +63,72 @@ describe 'event item directive', ->
       spyOn(SavedEvent, 'save').and.returnValue {$promise: deferred.promise}
 
       preSaveNumInterested = ctrl.savedEvent.totalNumInterested
-      ctrl.saveEvent()
 
-    it 'should create a new SavedEvent object', ->
-      expect(SavedEvent.save).toHaveBeenCalledWith
-        userId: Auth.user.id
-        eventId: event.id
-
-    it 'should mark the current user as interested', ->
-      expect(ctrl.didUserSaveEvent()).toBe true
-
-    it 'should increase the total number interested by 1', ->
-      expect(ctrl.savedEvent.totalNumInterested).toBe preSaveNumInterested + 1
-
-    describe 'when the save succeeds', ->
-      interestedFriends = null
+    describe 'when this isn\'t the user\'s first time', ->
 
       beforeEach ->
-        interestedFriends = ['friend1', 'friend2']
-        newSavedEvent = angular.extend {}, savedEvent,
-          interestedFriends: interestedFriends
+        Auth.flags.hasSavedEvent = true
 
-        deferred.resolve newSavedEvent
-        scope.$apply()
+        ctrl.saveEvent()
 
-      it 'should set the interested friends on the item', ->
-        expect(ctrl.savedEvent.interestedFriends).toBe interestedFriends
+      it 'should create a new SavedEvent object', ->
+        expect(SavedEvent.save).toHaveBeenCalledWith
+          userId: Auth.user.id
+          eventId: event.id
+
+      it 'should mark the current user as interested', ->
+        expect(ctrl.didUserSaveEvent()).toBe true
+
+      it 'should increase the total number interested by 1', ->
+        expect(ctrl.savedEvent.totalNumInterested).toBe preSaveNumInterested + 1
+
+      describe 'when the save succeeds', ->
+        interestedFriends = null
+
+        beforeEach ->
+          interestedFriends = ['friend1', 'friend2']
+          newSavedEvent = angular.extend {}, savedEvent,
+            interestedFriends: interestedFriends
+
+          deferred.resolve newSavedEvent
+          scope.$apply()
+
+        it 'should set the interested friends on the item', ->
+          expect(ctrl.savedEvent.interestedFriends).toBe interestedFriends
 
 
-    describe 'on error', ->
+      describe 'on error', ->
+
+        beforeEach ->
+          spyOn ngToast, 'create'
+
+          deferred.reject()
+          scope.$apply()
+
+        it 'should show an error', ->
+          expect(ngToast.create).toHaveBeenCalled()
+
+        it 'should show the currrent user as not interested', ->
+          expect(ctrl.didUserSaveEvent()).toBe false
+
+        it 'should show the original interested number', ->
+          expect(ctrl.savedEvent.totalNumInterested).toBe preSaveNumInterested
+
+
+    describe 'when this is the user\'s first time', ->
 
       beforeEach ->
-        spyOn ngToast, 'create'
+        Auth.flags.hasSavedEvent = false
+        spyOn Auth, 'setFlag'
+        spyOn ctrl, 'showSavedEventPopup'
 
-        deferred.reject()
-        scope.$apply()
+        ctrl.saveEvent()
 
-      it 'should show an error', ->
-        expect(ngToast.create).toHaveBeenCalled()
+      it 'should set a flag', ->
+        expect(Auth.setFlag).toHaveBeenCalledWith 'hasSavedEvent', true
 
-      it 'should show the currrent user as not interested', ->
-        expect(ctrl.didUserSaveEvent()).toBe false
-
-      it 'should show the original interested number', ->
-        expect(ctrl.savedEvent.totalNumInterested).toBe preSaveNumInterested
+      it 'should show a popup', ->
+        expect(ctrl.showSavedEventPopup).toHaveBeenCalled()
 
 
   ##didUserSaveEvent
@@ -150,3 +178,26 @@ describe 'event item directive', ->
       expect($state.go).toHaveBeenCalledWith 'interested',
         id: event.id
         event: event
+
+
+  ##showSavedEventPopup
+  fdescribe 'showing the saved event popup', ->
+    popupOptions = null
+    $event = null
+
+    beforeEach ->
+      spyOn($ionicPopup, 'show').and.callFake (options) ->
+        popupOptions = options
+
+      ctrl.showSavedEventPopup()
+
+    it 'should show an ionic popup', ->
+      expect($ionicPopup.show).toHaveBeenCalledWith
+        title: 'Interested?'
+        subTitle: "Tapping <i class=\"calendar-star-default\"></i> indicates that you\'re interested in \"#{event.title}\""
+        buttons: [
+          text: 'Cancel'
+        ,
+          text: '<b>Interested</b>'
+          onTap: jasmine.any Function
+        ]
