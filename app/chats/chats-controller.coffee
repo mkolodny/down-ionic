@@ -6,9 +6,9 @@ class ChatsCtrl
   constructor: (@$ionicLoading, @$meteor, @$scope,
                 @$state, @Auth, @Friendship, @User) ->
     @currentUser = @Auth.user
-
     # Init variables
     @users = {}
+    @items = []
 
     # Set Meteor collections on controller
     @Messages = @$meteor.getCollectionByName 'messages'
