@@ -118,6 +118,52 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
       expiresAt = new Date @createdAt.getTime() + twelveHours
       now > expiresAt
 
+  resource.titleHeightCache = {}
+  # http://www.rgraph.net/blog/2013/january/measuring-text-height-with-html5-canvas.html
+  resource::getTitleHeight = ->
+    text = @getEventMessage()
+
+    # This global variable is used to cache repeated 
+    #   calls with the same arguments
+    if resource.titleHeightCache[text]
+      return resource.titleHeightCache[text]
+    
+    font = 'Open Sans'
+    size = '20px'
+    marginBottom = 1
+
+    padding =
+      ionItemPaddingLeft: 16
+      ionItemPaddingRight: 16
+      eventPaddingRight: 5
+      eventPaddingLeft: 43
+    totalPadding = 0
+    for key, value of padding
+      totalPadding += value
+    width = document.body.clientWidth - totalPadding
+
+    div = document.createElement 'DIV'
+    div.innerHTML = text
+    div.style.position = 'absolute'
+    div.style.top = '-9999px'
+    div.style.left = '-9999px'
+    div.style.fontFamily = font
+    div.style.fontWeight = 'normal'
+    div.style.fontSize = size
+    div.style.lineHeight = '24px'
+    div.style.width = "#{width}px"
+
+    document.body.appendChild div
+    height = div.offsetHeight
+    height += marginBottom
+    document.body.removeChild div
+
+    # Add the sizes to the cache as adding DOM elements
+    #   is costly and can cause slow downs
+    resource.titleHeightCache[text] = height
+
+    height
+
   resource
 ]
 

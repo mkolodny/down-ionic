@@ -45,7 +45,7 @@ SavedEvent = ['$resource', 'apiRoot', 'Event', 'User', \
     if angular.isDefined response.total_num_interested
       savedEvent.totalNumInterested = response.total_num_interested
 
-    savedEvent
+    new resource savedEvent
 
   resource = $resource "#{listUrl}/:id", null,
     save:
@@ -68,6 +68,27 @@ SavedEvent = ['$resource', 'apiRoot', 'Event', 'User', \
 
   resource.serialize = serializeSavedEvent
   resource.deserialize = deserializeSavedEvent
+
+  resource::getCellHeight = ->
+    ionItem = 33 # 16 top, 16 bottom, 1 borderbottom
+    event = 8 # 4 top, 4 bottom
+    datePosted = 18
+    eventLinks = 23
+    interestedFriends =
+      padding: 20
+      title: 26
+      firstFriend: 40
+      otherFriends: 45
+    title = @event.getTitleHeight()
+
+    total = title + datePosted + ionItem + event
+    if angular.isDefined @interestedFriends
+      total += eventLinks
+      if @interestedFriends.length > 0
+        total += interestedFriends.padding + interestedFriends.title + interestedFriends.firstFriend
+        total += (@interestedFriends.length - 1) * interestedFriends.otherFriends
+
+    total
 
   resource
 ]

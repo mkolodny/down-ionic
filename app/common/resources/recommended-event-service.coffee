@@ -1,4 +1,4 @@
-RecommendedEvent = ['$resource', 'apiRoot', ($resource, apiRoot) ->
+RecommendedEvent = ['$resource', 'apiRoot', 'Event', ($resource, apiRoot, Event) ->
   listUrl = "#{apiRoot}/recommended-events"
 
   # serializeRecommendedEvent = (recommendedEvent) ->
@@ -30,6 +30,17 @@ RecommendedEvent = ['$resource', 'apiRoot', ($resource, apiRoot) ->
 
   # resource.serialize = serializeRecommendedEvent
   resource.deserialize = deserializeRecommendedEvent
+
+  resource::getCellHeight = ->
+    ionItem = 33 # 16 top, 16 bottom, 1 borderbottom
+    event = 8 # 4 top, 4 bottom
+
+    # serialize it as an event for get title height method
+    title = new Event(this).getTitleHeight()
+
+    total = title + ionItem + event
+
+    total
 
   resource
 ]

@@ -107,4 +107,12 @@ class EventsCtrl
       delete recommendedEvent.wasSaved
       @ngToast.create 'Oops.. an error occurred..'
 
+  getItemHeight: (item) ->
+    if item.isDivider
+      26
+    else if item.savedEvent
+      item.savedEvent.getCellHeight()
+    else if item.recommendedEvent
+      item.recommendedEvent.getCellHeight()
+
 module.exports = EventsCtrl

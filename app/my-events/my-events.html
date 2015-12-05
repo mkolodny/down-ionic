@@ -20,8 +20,11 @@
     </div>
 
     <ion-list ng-if="myEvents.items.length > 0">
-      <ion-item ng-repeat="item in myEvents.items">
-        <event-item saved-event="item.savedEvent"
+      <ion-item collection-repeat="item in myEvents.items"
+                item-width="100%"
+                item-height="item.savedEvent.getCellHeight()">
+        <event-item ng-if="item.savedEvent"
+                    saved-event="item.savedEvent"
                     comments-count="item.commentsCount"/>
       </ion-item>
     </ion-list>
