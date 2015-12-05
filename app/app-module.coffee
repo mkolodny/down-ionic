@@ -105,6 +105,9 @@ angular.module 'rallytap', [
     $ionicConfigProvider.backButton.text ''
       .previousTitleText false
 
+    # Always show tabs on the bottom.
+    $ionicConfigProvider.tabs.position 'bottom'
+
     # Init mixpanel
     $mixpanelProvider.apiKey mixpanelToken
 
@@ -174,10 +177,10 @@ angular.module 'rallytap', [
           # Track App Opens
           $mixpanel.track 'Open App'
 
-          # Update the user's friend list in case a user 
+          # Update the user's friend list in case a user
           #   they added by phone number signed up.
           Auth.getFriends()
-          
+
           # Update the user for an accurate point count
           Auth.getMe().then (user) ->
             Auth.setUser user
@@ -207,7 +210,7 @@ angular.module 'rallytap', [
           if not hasUpdate
             # No update
             bootstrap()
-            return 
+            return
 
           $ionicLoading.show
             template: '''
