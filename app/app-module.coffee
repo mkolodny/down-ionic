@@ -15,6 +15,7 @@ require './common/resources/resources-module'
 require './common/push-notifications/push-notifications-module'
 require './common/event-item/event-item-module'
 require './common/messages/messages-module'
+require './common/place-autocomplete/place-autocomplete-module'
 # Views
 require './tabs/tabs-module'
 require './login/login-module'
@@ -81,6 +82,7 @@ angular.module 'rallytap', [
     'rallytap.interested'
     'rallytap.eventItem'
     'rallytap.messages'
+    'rallytap.placeAutocomplete'
     'LocalStorageModule'
     'ngIOS9UIWebViewPatch'
   ]
