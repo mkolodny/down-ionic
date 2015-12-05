@@ -5,6 +5,7 @@ require '../mixpanel/mixpanel-module'
 require '../invite-button/invite-button-module'
 require '../auth/auth-module'
 require '../mixpanel/mixpanel-module'
+require '../view-place/view-place-module'
 EventItemCtrl = require './event-item-controller'
 EventItemDirective = require './event-item-directive'
 
@@ -16,6 +17,7 @@ angular.module 'rallytap.eventItem', [
     'rallytap.auth'
     'rallytap.resources'
     'rallytap.inviteButton'
+    'rallytap.viewPlace'
     'ngToast'
     'ui.router'
   ]

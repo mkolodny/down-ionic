@@ -17,7 +17,10 @@
     <h2>
        {{eventItem.savedEvent.event.title}}<span
        ng-if="eventItem.savedEvent.event.place"
-       > at {{eventItem.savedEvent.event.place.name}}</span><span
+       view-place
+       place="eventItem.savedEvent.event.place"
+       > at <span
+       class="place">{{eventItem.savedEvent.event.place.name}}</span></span><span
        ng-if="eventItem.savedEvent.event.datetime"
        > &mdash; {{eventItem.savedEvent.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
     </h2>
