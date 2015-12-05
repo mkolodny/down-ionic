@@ -123,12 +123,11 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
   resource::getTitleHeight = ->
     text = @getEventMessage()
 
-    # This global variable is used to cache repeated 
+    # This global variable is used to cache repeated
     #   calls with the same arguments
     if resource.titleHeightCache[text]
       return resource.titleHeightCache[text]
-    
-    font = 'Open Sans'
+
     size = '20px'
     marginBottom = 1
 
@@ -147,7 +146,6 @@ Event = ['$http', '$filter', '$meteor', '$q', '$resource',  \
     div.style.position = 'absolute'
     div.style.top = '-9999px'
     div.style.left = '-9999px'
-    div.style.fontFamily = font
     div.style.fontWeight = 'normal'
     div.style.fontSize = size
     div.style.lineHeight = '24px'
