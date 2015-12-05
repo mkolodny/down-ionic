@@ -81,6 +81,9 @@ describe 'chats controller', ->
   it 'should init the users object', ->
     expect(ctrl.users).toEqual {}
 
+  it 'should init the items array', ->
+    expect(ctrl.items).toEqual []
+
   it 'should set the Chats collection on the controller', ->
     expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
     expect(ctrl.Chats).toBe chatsCollection
