@@ -41,7 +41,7 @@
     border-top: 1px solid #eee;
     margin-top: -11px;
   }
-  .recommended-divider {
+  .recommended-divider:not(:first) {
     margin-top: -14px;
   }
   .ionic-refresher-content {
