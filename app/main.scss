@@ -92,14 +92,19 @@ body {
 }
 
 // Tabs
-.tab-item-active {
-  color: $brand-color;
-}
 .tab-item {
   opacity: 1;
   
   .icon {
+    color: #ccc;
     font-size: 34px;
+  }
+}
+.tab-item-active {
+  border-top-color: $brand-color !important;
+
+  .icon {
+    color: $brand-color;
   }
 }
 .tab-nav {
