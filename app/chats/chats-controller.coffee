@@ -30,6 +30,9 @@ class ChatsCtrl
         @watchNewMessages()
         @watchNewChats()
 
+    @$scope.$on '$ionicView.beforeEnter', =>
+      @handleLoadedData()
+
   handleLoadedData: ->
     if @allChatsLoaded and @messagesLoaded and @chatUsersLoaded
       @items = @buildItems()
