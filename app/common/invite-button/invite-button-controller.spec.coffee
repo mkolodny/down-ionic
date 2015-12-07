@@ -242,7 +242,7 @@ describe 'invite button directive', ->
 
       ctrl.showSentInvitePopup()
 
-    it 'should show an ionic popup', ->
+    fit 'should show an ionic popup', ->
       expect($ionicPopup.show).toHaveBeenCalledWith
         title: 'Send Message?'
         subTitle: "Tapping \"Down?\" sends #{user.name} a message asking if they\'re down for \"#{event.title}\""
@@ -250,5 +250,5 @@ describe 'invite button directive', ->
           text: 'Cancel'
         ,
           text: '<b>Send</b>'
-          onTap: ctrl.inviteUser
+          onTap: jasmine.any Function
         ]
