@@ -10,6 +10,7 @@ EventItemCtrl = require './event-item-controller'
 describe 'event item directive', ->
   $filter = null
   $ionicPopup = null
+  $ionicScrollDelegate = null
   $q = null
   $state = null
   $mixpanel = null
@@ -39,6 +40,7 @@ describe 'event item directive', ->
     $controller = $injector.get '$controller'
     $filter = $injector.get '$filter'
     $ionicPopup = $injector.get '$ionicPopup'
+    $ionicScrollDelegate = $injector.get '$ionicScrollDelegate'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     $mixpanel = $injector.get '$mixpanel'
@@ -109,6 +111,7 @@ describe 'event item directive', ->
             interestedFriends: interestedFriends
 
           spyOn $mixpanel, 'track'
+          spyOn $ionicScrollDelegate, 'resize'
 
           deferred.resolve newSavedEvent
           scope.$apply()
@@ -122,6 +125,9 @@ describe 'event item directive', ->
 
         it 'should set the interested friends on the item', ->
           expect(ctrl.savedEvent.interestedFriends).toBe interestedFriends
+
+        it 'should resize the scroll view', ->
+          expect($ionicScrollDelegate.resize).toHaveBeenCalled()
 
 
       describe 'on error', ->
