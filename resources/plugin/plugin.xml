@@ -9,15 +9,14 @@
     <engine name="cordova" version=">=3.4.0"/>
   </engines>
 
-  <asset src="www/ionic.min.js" target="resources/ionic.js" />
-  <asset src="www/jquery-1.11.3.min.js" target="resources/jquery.js" />
-  <asset src="www/angular.min.js" target="resources/angular.js"/>
-  <asset src="www/angular-animate.min.js" target="resources/angular-animate.js"/>
-  <asset src="www/angular-sanitize.min.js" target="resources/angular-sanitize.js"/>
-  <asset src="www/angular-ui-router.min.js" target="resources/angular-ui-router.js"/>
-  <asset src="www/ionic-angular.min.js" target="resources/ionic-angular.js" />
-  <asset src="www/meteor.min.js" target="resources/meteor.js"/>
-  <asset src="www/pouchdb-5.0.0.min.js" target="resources/pouchdb.js" />
+  <js-module name="ionic" src="www/ionic.min.js" />
+  <js-module name="jQuery" src="www/jquery-1.11.3.min.js" />
+  <js-module name="angular" src="www/angular.min.js" />
+  <js-module name="angular-animate" src="www/angular-animate.min.js" />
+  <js-module name="angular-sanitize" src="www/angular-sanitize.min.js" />
+  <js-module name="angular-ui-router" src="www/angular-ui-router.min.js" />
+  <js-module name="ionic-angular" src="www/ionic-angular.min.js" />
+  <js-module name="meteor" src="www/meteor.min.js" />
 
   <platform name="ios">
 

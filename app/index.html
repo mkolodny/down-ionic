@@ -6,12 +6,35 @@
     <meta name="format-detection" content="telephone=no">
     <title>Rallytap.</title>
     <link href="https://fonts.googleapis.com/css?family=Carter+One|Open+Sans:400,700" rel="stylesheet">
+
+    <!-- Set Meteor Config Variable -->
+    <!-- @if BUILD_ENV='prod' -->
+    <script type="text/javascript">
+    window.__meteor_runtime_config__ = {
+        DDP_DEFAULT_CONNECTION_URL: window.MeteorUrl || 'https://down-meteor.herokuapp.com'
+    };
+    </script>
+    <!-- @endif -->
+    <!-- @if BUILD_ENV='staging' -->
+    <script type="text/javascript">
+    window.__meteor_runtime_config__ = {
+        DDP_DEFAULT_CONNECTION_URL: window.MeteorUrl || 'https://down-meteor-staging.herokuapp.com'
+    };
+    </script>
+    <!-- @endif -->
+    <!-- @if BUILD_ENV='local' -->
+    <script type="text/javascript">
+    window.__meteor_runtime_config__ = {
+        DDP_DEFAULT_CONNECTION_URL: window.MeteorUrl || 'http://localhost:3500'
+    };
+    </script>
+    <!-- @endif -->
+
     <!-- cordova script (bootstrapped by ionic.io) -->
     <!-- <script src="cordova.js"></script> -->
-    
+
     <script src="app/bundle.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
-
     <link href="app/main.css" rel="stylesheet">
 </head>
 <body>

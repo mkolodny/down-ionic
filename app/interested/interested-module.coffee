@@ -1,4 +1,3 @@
-require 'angular-ui-router'
 require 'ng-toast'
 require '../common/resources/resources-module'
 require '../common/auth/auth-module'

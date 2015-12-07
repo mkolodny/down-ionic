@@ -1,5 +1,4 @@
 require 'angular-timeago'
-require 'angular-ui-router'
 require '../common/resources/resources-module'
 require '../common/auth/auth-module'
 require '../common/mixpanel/mixpanel-module'

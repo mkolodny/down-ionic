@@ -1,9 +1,8 @@
+require './ionic/ionic.io.angular.js'
 require 'angular-local-storage'
 require 'ng-toast'
-require 'ng-cordova'
 # Lib
 require './ionic/angular-ios9-uiwebview.patch.js'
-require './ionic/ionic.io.min.js'
 require './vendor/mixpanel/mixpanel-jslib-snippet'
 # Common
 require './common/local-db/local-db-module'
@@ -196,36 +195,37 @@ angular.module 'rallytap', [
         $rootScope.finishedBootstrap = true
         Auth.redirectForAuthState()
 
-    $ionicPlatform.ready ->
-      # Skip Downloading Updates During Development
-      if skipIonicDeploy
-        console.log 'Skipping Ionic Deploy'
-        bootstrap()
-        return
+    # Note : checking ionic.onReady in bootstrap.coffee
+    
+    # Skip Downloading Updates During Development
+    if skipIonicDeploy
+      console.log 'Skipping Ionic Deploy'
+      bootstrap()
+      return
 
-      # Check For Updates
-      $ionicDeploy.setChannel ionicDeployChannel
-      $ionicDeploy.check()
-        .then (hasUpdate) ->
-          if not hasUpdate
-            # No update
-            bootstrap()
-            return
-
-          $ionicLoading.show
-            template: '''
-              <div class="loading-text">Loading...</div>
-              <ion-spinner icon="bubbles"></ion-spinner>
-              '''
-
-          # Download update
-          $ionicDeploy.update()
-            .finally ->
-              $ionicLoading.hide()
-              bootstrap()
-        , ->
-          # Error checking for update
+    # Check For Updates
+    $ionicDeploy.setChannel ionicDeployChannel
+    $ionicDeploy.check()
+      .then (hasUpdate) ->
+        if not hasUpdate
+          # No update
           bootstrap()
+          return
+
+        $ionicLoading.show
+          template: '''
+            <div class="loading-text">Loading...</div>
+            <ion-spinner icon="bubbles"></ion-spinner>
+            '''
+
+        # Download update
+        $ionicDeploy.update()
+          .finally ->
+            $ionicLoading.hide()
+            bootstrap()
+      , ->
+        # Error checking for update
+        bootstrap()
 
   .constant '$ionicLoadingConfig',
     template: '''

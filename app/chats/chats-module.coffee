@@ -1,4 +1,3 @@
-require 'angular-chart.js'
 require 'angular-elastic'
 require 'angular-timeago'
 require '../common/auth/auth-module'

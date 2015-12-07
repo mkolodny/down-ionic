@@ -1,4 +1,3 @@
-require 'angular-ui-router'
 require '../common/auth/auth-module'
 TeamCtrl = require './team-controller'
 
