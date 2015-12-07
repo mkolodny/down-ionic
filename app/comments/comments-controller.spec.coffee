@@ -194,27 +194,3 @@ describe 'comments controller', ->
 
     it 'should return the comment with the creator as a user', ->
       expect(transformedComment.creator).toEqual jasmine.any(User)
- 
-
-  ##getPlaceholderText
-  describe 'getting the comment input placeholder text', ->
-
-    describe 'when the event is expired', ->
-
-      beforeEach ->
-        ctrl.event =
-          isExpired: ->
-            true
-
-      it 'should return the text', ->
-        expect(ctrl.getPlaceholderText()).toBe 'Post expired, comments closed.'
-
-    describe 'when the event is not expired', ->
-
-      beforeEach ->
-        ctrl.event =
-          isExpired: ->
-            false
-
-      it 'should return the text', ->
-        expect(ctrl.getPlaceholderText()).toBe 'Add a comment..'

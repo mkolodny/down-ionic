@@ -40,11 +40,5 @@ class CommentsCtrl
     comment.creator = new @User comment.creator
     comment
 
-  getPlaceholderText: ->
-    if @event.isExpired()
-      'Post expired, comments closed.'
-    else
-      'Add a comment..'
-
 
 module.exports = CommentsCtrl

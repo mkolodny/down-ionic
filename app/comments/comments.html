@@ -24,14 +24,13 @@
   </ion-content>
   <ion-footer-bar class="bar-light new-message-bar" keyboard-attach>
     <textarea class="new-message"
-              ng-disabled="comments.event.isExpired()"
               ng-model="comments.newComment"
-              placeholder="{{comments.getPlaceholderText()}}"
+              placeholder="Add a comment.."
               msd-elastic
               rows="1"
               ></textarea>
     <button class="button button-clear send-message"
-            ng-disabled="!comments.newComment || comments.event.isExpired()"
+            ng-disabled="!comments.newComment"
             ng-click="comments.postComment()"
             ontouchstart
             >Post</button>
