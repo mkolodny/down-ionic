@@ -101,6 +101,17 @@
     padding-bottom: 5px;
     border-bottom: 1px solid #ccc;
   }
+  .loading-friends {
+    svg {
+      stroke: $brand-color;
+      fill: $brand-color;
+      width: 30px;
+      height: 30px;
+      margin-top: 12px;
+      position: relative;
+      top: 1px;
+    }
+  }
   .interested-friend {
     margin-top: 7px;
     background-color: transparent;

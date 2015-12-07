@@ -45,6 +45,12 @@
       </div>
     </div>
   </div>
+  <div class="loading interested-friends" ng-if="eventItem.isLoadingInterested">
+    <div class="num-interested-friends">
+      friends interested
+    </div>
+    <ion-spinner class="loading-friends" icon="bubbles"></ion-spinner>
+  </div>
   <div class="interested-friends"
        ng-if="eventItem.savedEvent.interestedFriends.length > 0">
     <div class="num-interested-friends">
