@@ -78,7 +78,7 @@ SavedEvent = ['$resource', 'apiRoot', 'Event', 'User', \
       padding: 20
       title: 26
       firstFriend: 40
-      otherFriends: 45
+      otherFriends: 51
     title = @event.getTitleHeight()
 
     total = title + datePosted + ionItem + event
