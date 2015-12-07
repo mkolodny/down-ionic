@@ -242,7 +242,7 @@ describe 'invite button directive', ->
 
       ctrl.showSentInvitePopup()
 
-    fit 'should show an ionic popup', ->
+    it 'should show an ionic popup', ->
       expect($ionicPopup.show).toHaveBeenCalledWith
         title: 'Send Message?'
         subTitle: "Tapping \"Down?\" sends #{user.name} a message asking if they\'re down for \"#{event.title}\""
