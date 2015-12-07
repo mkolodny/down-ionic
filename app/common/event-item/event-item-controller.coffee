@@ -1,8 +1,8 @@
 class EventItemCtrl
-  @$inject: ['$filter', '$mixpanel', '$ionicPopup', '$state', 'Auth',
-             'SavedEvent', 'ngToast']
-  constructor: (@$filter, @$mixpanel, @$ionicPopup, @$state, @Auth,
-                @SavedEvent, @ngToast) ->
+  @$inject: ['$filter', '$ionicPopup', '$ionicScrollDelegate', '$mixpanel',
+             '$state', 'Auth', 'SavedEvent', 'ngToast']
+  constructor: (@$filter, @$ionicPopup, @$ionicScrollDelegate, @$mixpanel,
+                @$state, @Auth, @SavedEvent, @ngToast) ->
 
   saveEvent: ->
     if not @Auth.flags.hasSavedEvent
@@ -20,9 +20,10 @@ class EventItemCtrl
     @SavedEvent.save newSavedEvent
       .$promise.then (newSavedEvent) =>
         @savedEvent.interestedFriends = newSavedEvent.interestedFriends
+        @$ionicScrollDelegate.resize()
         @$mixpanel.track 'Save Event',
           'total num interested': @savedEvent.totalNumInterested - 1
-          'time since posted': @$filter('timeAgo')(@savedEvent.createdAt.getTime())
+          'time since posted': @$filter('timeAgo') @savedEvent.createdAt.getTime()
           time: angular.isDefined @savedEvent.event.datetime
           place: angular.isDefined @savedEvent.event.place
       , =>
