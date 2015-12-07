@@ -1,6 +1,6 @@
 <a ng-click="inviteButton.inviteUser(); $event.stopPropagation()"
    on-tap
-   ng-if="!inviteButton.hasBeenInvited() && !inviteButton.hasSentInvite() && !inviteButton.event.isExpired()"
+   ng-if="!inviteButton.hasBeenInvited() && !inviteButton.hasSentInvite()"
    class="button invite"
    ng-class="{
      'invited': inviteButton.hasBeenInvited()
@@ -13,12 +13,12 @@
   </span>
 </a>
 <button class="button button-clear invite sent"
-        ng-if="inviteButton.hasSentInvite() && !inviteButton.event.isExpired()"
+        ng-if="inviteButton.hasSentInvite()"
         disabled>
   Message sent
 </button>
 <button class="button button-clear invite sent"
-        ng-if="inviteButton.hasBeenInvited() && !inviteButton.event.isExpired()"
+        ng-if="inviteButton.hasBeenInvited()"
         disabled>
   Chatting
 </button>
