@@ -53,7 +53,7 @@ describe 'SavedEvent service', ->
     describe 'with the max amount of data', ->
 
       it 'should serialize the saved event', ->
-        expectedSavedEvent = 
+        expectedSavedEvent =
           id: savedEvent.id
           user: savedEvent.userId
           event: savedEvent.eventId
@@ -109,7 +109,7 @@ describe 'SavedEvent service', ->
         total_num_interested: totalNumInterested
         created_at: new Date().toISOString()
 
-      expectedSavedEvent =
+      expectedSavedEvent = new SavedEvent
         id: response.id
         eventId: event.id
         userId: user.id
@@ -147,7 +147,7 @@ describe 'SavedEvent service', ->
         response.user = user
 
       it 'should deserialize the saved event', ->
-        expectedSavedEvent = angular.extend {}, expectedSavedEvent,
+        expectedSavedEvent = new SavedEvent angular.extend {}, expectedSavedEvent,
           event: Event.deserialize event
           user: User.deserialize user
         expect(SavedEvent.deserialize response).toEqual expectedSavedEvent
