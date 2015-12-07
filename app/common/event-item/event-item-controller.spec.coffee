@@ -107,7 +107,7 @@ describe 'event item directive', ->
         expect($ionicScrollDelegate.resize).toHaveBeenCalled()
 
       it 'should set a loading flag', ->
-        expect(ctrl.isLoadingInterested).toBe true
+        expect(ctrl.savedEvent.isLoadingInterested).toBe true
 
       describe 'when the save succeeds', ->
         interestedFriends = null
@@ -136,7 +136,7 @@ describe 'event item directive', ->
           expect($ionicScrollDelegate.resize).toHaveBeenCalled()
 
         it 'should clear a loading flag', ->
-          expect(ctrl.isLoadingInterested).toBe false
+          expect(ctrl.savedEvent.isLoadingInterested).toBe false
 
 
       describe 'on error', ->
@@ -157,7 +157,7 @@ describe 'event item directive', ->
           expect(ctrl.savedEvent.totalNumInterested).toBe preSaveNumInterested
 
         it 'should clear a loading flag', ->
-          expect(ctrl.isLoadingInterested).toBe false
+          expect(ctrl.savedEvent.isLoadingInterested).toBe false
 
 
     describe 'when this is the user\'s first time', ->

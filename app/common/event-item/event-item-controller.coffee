@@ -14,7 +14,7 @@ class EventItemCtrl
     @savedEvent.interestedFriends = []
     @savedEvent.totalNumInterested++
     @$ionicScrollDelegate.resize()
-    @isLoadingInterested = true
+    @savedEvent.isLoadingInterested = true
 
     newSavedEvent =
       userId: @Auth.user.id
@@ -35,7 +35,7 @@ class EventItemCtrl
 
         @ngToast.create 'Oops.. an error occurred..'
       .finally =>
-        @isLoadingInterested = false
+        @savedEvent.isLoadingInterested = false
 
   showSavedEventPopup: ->
     @$ionicPopup.show
