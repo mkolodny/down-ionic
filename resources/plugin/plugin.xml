@@ -9,8 +9,10 @@
     <engine name="cordova" version=">=3.4.0"/>
   </engines>
 
-  <js-module name="ionic" src="www/ionic.min.js"><runs/></js-module>
   <js-module name="jQuery" src="www/jquery-1.11.3.min.js"><runs/></js-module>
+  <js-module name="intlTelInput" src="www/intlTelInput.min.js"><runs/></js-module>
+
+  <js-module name="ionic" src="www/ionic.min.js"><runs/></js-module>
   <js-module name="angular" src="www/angular.min.js"><runs/></js-module>
   <js-module name="angular-animate" src="www/angular-animate.min.js"><runs/></js-module>
   <js-module name="angular-sanitize" src="www/angular-sanitize.min.js"><runs/></js-module>

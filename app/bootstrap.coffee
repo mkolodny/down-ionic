@@ -34,14 +34,17 @@ window.Ionic.io().onReady ->
   # Inject scripts that didn't get loaded 
   #   by the rallytap resources plugin
 
-  # ionic
-  if window.ionic is undefined
-    scripts = [ 'https://d3r38ef3fjjz7g.cloudfront.net/vendor/ionic.min.js' ]
-    injectScripts scripts
   # jquery
   #   note: jquery must be loaded before angular - needed for intl-phone
   if window.jQuery is undefined
-    scripts = [ 'https://code.jquery.com/jquery-1.11.3.min.js' ]
+    scripts = [ 
+      'https://code.jquery.com/jquery-1.11.3.min.js'
+      'https://d3r38ef3fjjz7g.cloudfront.net/vendor/intlTelInput.min.js'
+    ]
+    injectScripts scripts
+  # ionic
+  if window.ionic is undefined
+    scripts = [ 'https://d3r38ef3fjjz7g.cloudfront.net/vendor/ionic.min.js' ]
     injectScripts scripts
   # angular
   if window.angular is undefined
