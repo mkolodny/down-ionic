@@ -220,20 +220,30 @@ angular.module 'rallytap', [
                   $ionicDeploy.extract()
         else
           # Update before bootstrapping
-          $ionicLoading.show
-            template: '''
-              <div class="loading-text">Loading...</div>
-              <ion-spinner icon="bubbles"></ion-spinner>
-              '''
+          $ionicDeploy.check()
+            .then (hasUpdate) ->
+              if not hasUpdate
+                # No update
+                Auth.setFlag 'hasCompletedFirstUpdate', true
+                bootstrap()
+                return
 
-          # Download update
-          $ionicDeploy.update()
-            .then ->
-              Auth.setFlag 'hasCompletedFirstUpdate', true
-            .finally ->
-              $ionicLoading.hide()
+              $ionicLoading.show
+                template: '''
+                  <div class="loading-text">Loading...</div>
+                  <ion-spinner icon="bubbles"></ion-spinner>
+                  '''
+
+              # Download update
+              $ionicDeploy.update()
+                .then ->
+                  Auth.setFlag 'hasCompletedFirstUpdate', true
+                .finally ->
+                  $ionicLoading.hide()
+                  bootstrap()
+            , ->
+              # Error checking for update
               bootstrap()
-
 
   .constant '$ionicLoadingConfig',
     template: '''
