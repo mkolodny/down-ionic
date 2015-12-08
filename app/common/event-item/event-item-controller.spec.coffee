@@ -81,6 +81,7 @@ describe 'event item directive', ->
     beforeEach ->
       deferred = $q.defer()
       spyOn(SavedEvent, 'save').and.returnValue {$promise: deferred.promise}
+      spyOn $ionicScrollDelegate, 'resize'
 
       preSaveNumInterested = ctrl.savedEvent.totalNumInterested
 
@@ -102,6 +103,12 @@ describe 'event item directive', ->
       it 'should increase the total number interested by 1', ->
         expect(ctrl.savedEvent.totalNumInterested).toBe preSaveNumInterested + 1
 
+      it 'should resize the scroll view', ->
+        expect($ionicScrollDelegate.resize).toHaveBeenCalled()
+
+      it 'should set a loading flag', ->
+        expect(ctrl.savedEvent.isLoadingInterested).toBe true
+
       describe 'when the save succeeds', ->
         interestedFriends = null
 
@@ -111,7 +118,6 @@ describe 'event item directive', ->
             interestedFriends: interestedFriends
 
           spyOn $mixpanel, 'track'
-          spyOn $ionicScrollDelegate, 'resize'
 
           deferred.resolve newSavedEvent
           scope.$apply()
@@ -128,6 +134,9 @@ describe 'event item directive', ->
 
         it 'should resize the scroll view', ->
           expect($ionicScrollDelegate.resize).toHaveBeenCalled()
+
+        it 'should clear a loading flag', ->
+          expect(ctrl.savedEvent.isLoadingInterested).toBe false
 
 
       describe 'on error', ->
@@ -146,6 +155,9 @@ describe 'event item directive', ->
 
         it 'should show the original interested number', ->
           expect(ctrl.savedEvent.totalNumInterested).toBe preSaveNumInterested
+
+        it 'should clear a loading flag', ->
+          expect(ctrl.savedEvent.isLoadingInterested).toBe false
 
 
     describe 'when this is the user\'s first time', ->

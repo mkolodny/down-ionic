@@ -13,6 +13,8 @@ class EventItemCtrl
     # For latency compensation
     @savedEvent.interestedFriends = []
     @savedEvent.totalNumInterested++
+    @$ionicScrollDelegate.resize()
+    @savedEvent.isLoadingInterested = true
 
     newSavedEvent =
       userId: @Auth.user.id
@@ -32,6 +34,8 @@ class EventItemCtrl
         @savedEvent.totalNumInterested--
 
         @ngToast.create 'Oops.. an error occurred..'
+      .finally =>
+        @savedEvent.isLoadingInterested = false
 
   showSavedEventPopup: ->
     @$ionicPopup.show

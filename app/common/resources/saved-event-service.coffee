@@ -84,6 +84,8 @@ SavedEvent = ['$resource', 'apiRoot', 'Event', 'User', \
     total = title + datePosted + ionItem + event
     if angular.isDefined @interestedFriends
       total += eventLinks
+      if @isLoadingInterested
+        total += interestedFriends.padding + interestedFriends.title + interestedFriends.firstFriend
       if @interestedFriends.length > 0
         total += interestedFriends.padding + interestedFriends.title + interestedFriends.firstFriend
         total += (@interestedFriends.length - 1) * interestedFriends.otherFriends

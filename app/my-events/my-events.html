@@ -1,7 +1,10 @@
 <ion-view id="my-events"
           view-title="I'm interested in...">
   <ion-nav-buttons side="left">
-    <span class="points-nav">{{myEvents.currentUser.points | number:0}}</span>
+    <span class="points-nav"
+          ng-click="myEvents.Points.showPopup()"
+          ontouchstart
+          >{{myEvents.currentUser.points | number:0}}</span>
   </ion-nav-buttons>
   <ion-content>
     <ion-refresher pulling-text="Pull to refresh..."

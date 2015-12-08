@@ -1,6 +1,8 @@
 class MyEventsCtrl
-  @$inject: ['$scope', '$stateParams', '$meteor', 'Auth', 'ngToast', 'User']
-  constructor: (@$scope, @$stateParams, @$meteor, @Auth, @ngToast, @User) ->
+  @$inject: ['$scope', '$stateParams', '$meteor', 'Auth', 'ngToast', 'Points',
+             'User']
+  constructor: (@$scope, @$stateParams, @$meteor, @Auth, @ngToast, @Points,
+                @User) ->
     @items = []
     @commentsCount = {}
     @currentUser = @Auth.user

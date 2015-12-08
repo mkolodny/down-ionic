@@ -4,6 +4,7 @@ require 'angular-ui-router'
 require 'ng-toast'
 require '../common/meteor/meteor-mocks'
 require '../common/mixpanel/mixpanel-module'
+require '../common/points/points-module'
 EventsCtrl = require './events-controller'
 
 describe 'events controller', ->
@@ -15,12 +16,15 @@ describe 'events controller', ->
   commentsCollection = null
   ctrl = null
   Event = null
+  Points = null
   SavedEvent = null
   scope = null
   ngToast = null
   RecommendedEvent = null
 
   beforeEach angular.mock.module('ui.router')
+
+  beforeEach angular.mock.module('rallytap.points')
 
   beforeEach angular.mock.module('rallytap.resources')
 
@@ -38,6 +42,7 @@ describe 'events controller', ->
     $mixpanel = $injector.get '$mixpanel'
     Auth = $injector.get 'Auth'
     Event = $injector.get 'Event'
+    Points = $injector.get 'Points'
     SavedEvent = $injector.get 'SavedEvent'
     scope = $injector.get '$rootScope'
     ngToast = $injector.get 'ngToast'
@@ -52,6 +57,9 @@ describe 'events controller', ->
 
   it 'should set the current user on the controller', ->
     expect(ctrl.currentUser).toBe Auth.user
+
+  it 'should set the points service on the controller', ->
+    expect(ctrl.Points).toBe Points
 
   ##$ionicView.loaded
   describe 'the first time that the view is loaded', ->

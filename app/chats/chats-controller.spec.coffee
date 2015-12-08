@@ -3,10 +3,12 @@ require 'angular-mocks'
 require 'angular-ui-router'
 require '../common/auth/auth-module'
 require '../common/meteor/meteor-mocks'
+require '../common/points/points-module'
 require './chats-module'
 ChatsCtrl = require './chats-controller'
 
 describe 'chats controller', ->
+  $httpBackend = null
   $meteor = null
   $q = null
   $state = null
@@ -23,6 +25,7 @@ describe 'chats controller', ->
   messagesCollection = null
   messagesDeferred = null
   later = null
+  Points = null
   scope = null
   User = null
 
@@ -34,10 +37,13 @@ describe 'chats controller', ->
 
   beforeEach angular.mock.module('rallytap.chats')
 
+  beforeEach angular.mock.module('rallytap.points')
+
   beforeEach angular.mock.module('ionic')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $httpBackend = $injector.get '$httpBackend'
     $meteor = $injector.get '$meteor'
     $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
@@ -45,6 +51,7 @@ describe 'chats controller', ->
     Auth = $injector.get 'Auth'
     Event = $injector.get 'Event'
     Friendship = $injector.get 'Friendship'
+    Points = $injector.get 'Points'
     scope = $rootScope.$new()
     User = $injector.get 'User'
 
@@ -74,6 +81,11 @@ describe 'chats controller', ->
       if subscriptionName is 'allChats' then return allChatsDeferred.promise
       if subscriptionName is 'messages' then return messagesDeferred.promise
 
+    # For some reason, we're making requests to this URL.
+    # TODO: Figure out why, and remove this.
+    $httpBackend.expectGET 'app/chats/chats.html'
+      .respond 200
+
     ctrl = $controller ChatsCtrl,
       $scope: scope
   )
@@ -93,6 +105,9 @@ describe 'chats controller', ->
 
   it 'should subscribe to all the chats', ->
     expect($meteor.subscribe).toHaveBeenCalledWith 'allChats'
+
+  it 'should set the points service on the controller', ->
+    expect(ctrl.Points).toBe Points
 
   describe 'when the allChats subscription is ready', ->
 
@@ -283,7 +298,7 @@ describe 'chats controller', ->
         scope.$apply()
 
       it 'should handle the loaded data', ->
-        expect(ctrl.handleLoadedData).toHaveBeenCalled() 
+        expect(ctrl.handleLoadedData).toHaveBeenCalled()
 
 
   ##getNewestMessage
