@@ -5,7 +5,6 @@ require './points-module'
 
 describe 'Points service', ->
   $ionicPopup = null
-  $rootScope = null
   Auth = null
   Points = null
   User = null
@@ -20,7 +19,6 @@ describe 'Points service', ->
 
   beforeEach inject(($injector) ->
     $ionicPopup = $injector.get '$ionicPopup'
-    $rootScope = $injector.get '$rootScope'
     Auth = $injector.get 'Auth'
     Points = $injector.get 'Points'
     User = $injector.get 'User'
@@ -33,17 +31,11 @@ describe 'Points service', ->
       imageUrl: 'http://imgur.com/baller'
   )
 
-  it 'should set the hidePopup function on the controller', ->
-    expect($rootScope.close).toBe Points.hidePopup
-
   ##showPopup
   describe 'showing the points explainer popup', ->
-    popup = null
 
     beforeEach ->
-      spyOn($ionicPopup, 'show').and.callFake (options) ->
-        popup = 'popup'
-        popup
+      spyOn $ionicPopup, 'show'
 
       Points.showPopup()
 
@@ -52,7 +44,6 @@ describe 'Points service', ->
       expect($ionicPopup.show).toHaveBeenCalledWith
         template: """
           <div class=\"points-popup\">
-            <i class="fa fa-close points-close" ng-click="close()"></i>
             <img class=\"points-img\" src=\"#{imageUrl}\">
             <h1 class=\"points-name\">#{Auth.user.name}</h1>
             <h2 class=\"points-points\">#{Auth.user.points} points</h2>
@@ -60,20 +51,6 @@ describe 'Points service', ->
           </div>
           """
         cssClass: 'popup-no-head'
-        scope: $rootScope
-
-    it 'should set the popup on the service', ->
-      expect(Points.popup).toBe popup
-
-
-  ##hidePopup
-  describe 'hiding the points popup', ->
-
-    beforeEach ->
-      Points.popup =
-        close: jasmine.createSpy 'Points.popup.close'
-
-      Points.hidePopup()
-
-    it 'should close the popup', ->
-      expect(Points.popup.close).toHaveBeenCalled()
+        buttons: [
+          text: 'OK'
+        ]

@@ -2,32 +2,25 @@
   color: $brand-color;
   text-align: center;
 
-  .points-name,
-  .points-points {
-    color: $brand-color;
-  }
-  .points-close {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 10px;
-  }
   .points-img {
     border-radius: 50%;
     width: 50px;
     height: 50px;
     margin-top: 10px;
+    background-color: #ccc;
   }
   .points-name {
     margin-top: 0;
     margin-bottom: 0;
     font-size: 18px;
+    color: $brand-color;
   }
   .points-points {
     margin-top: 2px;
     margin-bottom: 18px;
     font-size: 18px;
     font-weight: 700;
+    color: $brand-color;
   }
   .points-calendar {
     display: inline-block;
@@ -38,6 +31,6 @@
   .points-explainer {
     padding-left: 20px;
     padding-right: 20px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
 }

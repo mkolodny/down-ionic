@@ -623,6 +623,9 @@ ion-nav-back-button {
   .popup-head {
     display: none;
   }
+  button {
+    color: $brand-color !important;
+  }
 }
 
 // Icon
