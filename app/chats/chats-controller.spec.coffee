@@ -376,41 +376,22 @@ describe 'chats controller', ->
       jasmine.clock().install()
       date = new Date 1438014089235
       jasmine.clock().mockDate date
+      now = new Date().getTime()
 
-    describe 'when the chat has less than 12 hours left', ->
+      sixHours = 1000 * 60 * 60 * 6
+      chat =
+        _id: 'asdfasdf'
+        expiresAt: new Date(now + sixHours)
+        createdAt: new Date(now - sixHours)
 
-      beforeEach ->
-        sixHours = 1000 * 60 * 60 * 6
-        chat =
-          _id: 'asdfasdf'
-          expiresAt: new Date(new Date().getTime() + sixHours)
+      result = ctrl.transformChat angular.copy(chat)
 
-        result = ctrl.transformChat angular.copy(chat)
+    afterEach ->
+      jasmine.clock().uninstall()
 
-      afterEach ->
-        jasmine.clock().uninstall()
-
-      it 'should set the percent remaining', ->
-        chat.percentRemaining = 50
-        expect(result).toEqual chat
-
-
-    describe 'when the chat has more than 12 hours left', ->
-
-      beforeEach ->
-        fourteenHours = 1000 * 60 * 60 * 14
-        chat =
-          _id: 'asdfasdf'
-          expiresAt: new Date(new Date().getTime() + fourteenHours)
-
-        result = ctrl.transformChat angular.copy(chat)
-
-      afterEach ->
-        jasmine.clock().uninstall()
-
-      it 'should set the percent remaining', ->
-        chat.percentRemaining = 100
-        expect(result).toEqual chat
+    it 'should set the percent remaining', ->
+      chat.percentRemaining = 50
+      expect(result).toEqual chat
 
 
   ##wasRead

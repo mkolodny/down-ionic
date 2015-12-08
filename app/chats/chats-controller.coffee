@@ -100,10 +100,8 @@ class ChatsCtrl
   transformChat: (chat) =>
     now = new Date().getTime()
     timeRemaining = chat.expiresAt?.getTime() - now
-    twelveHours = 1000 * 60 * 60 * 12
-    chat.percentRemaining = Math.round (timeRemaining / twelveHours) * 100
-    if chat.percentRemaining > 100
-      chat.percentRemaining = 100
+    totalTime = chat.expiresAt?.getTime() - chat.createdAt?.getTime()
+    chat.percentRemaining = Math.round (timeRemaining / totalTime) * 100
     chat
 
   wasRead: (message) =>
