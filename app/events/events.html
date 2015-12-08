@@ -5,7 +5,10 @@
     <span id="logo">Rallytap</span>
   </ion-nav-title>
   <ion-nav-buttons side="left">
-    <span class="points-nav">{{events.currentUser.points | number:0}}</span>
+    <span class="points-nav"
+          ng-click="events.Points.showPopup()"
+          ontouchstart
+          >{{events.currentUser.points | number:0}}</span>
   </ion-nav-buttons>
   <ion-content>
     <ion-refresher pulling-text="Pull to refresh..."

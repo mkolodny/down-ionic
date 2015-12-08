@@ -6,6 +6,7 @@ require 'angular-sanitize'
 require 'angular-ui-router'
 require '../ionic/ionic-angular.js'
 require '../common/auth/auth-module'
+require '../common/points/points-module'
 FriendsCtrl = require './friends-controller'
 
 describe 'add friends controller', ->
@@ -13,6 +14,7 @@ describe 'add friends controller', ->
   $state = null
   Auth = null
   ctrl = null
+  Points = null
   scope = null
 
   beforeEach angular.mock.module('ionic')
@@ -21,11 +23,14 @@ describe 'add friends controller', ->
 
   beforeEach angular.mock.module('rallytap.auth')
 
+  beforeEach angular.mock.module('rallytap.points')
+
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
     $ionicHistory = $injector.get '$ionicHistory'
     $state = $injector.get '$state'
     Auth = $injector.get 'Auth'
+    Points = $injector.get 'Points'
     scope = $injector.get '$rootScope'
 
     # Mock the current user.
@@ -37,6 +42,9 @@ describe 'add friends controller', ->
 
   it 'should set the current user on the controller', ->
     expect(ctrl.currentUser).toBe Auth.user
+
+  it 'should set the points service on the controller', ->
+    expect(ctrl.Points).toBe Points
 
   describe 'tapping to add by username', ->
 

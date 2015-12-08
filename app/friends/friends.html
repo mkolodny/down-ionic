@@ -1,6 +1,9 @@
 <ion-view id="friends" view-title="Friends" hide-back-button="true">
   <ion-nav-buttons side="left">
-    <span class="points-nav">{{friends.currentUser.points | number:0}}</span>
+    <span class="points-nav"
+          ng-click="friends.Points.showPopup()"
+          ontouchstart
+          >{{friends.currentUser.points | number:0}}</span>
   </ion-nav-buttons>
   <ion-content>
     <ion-list>

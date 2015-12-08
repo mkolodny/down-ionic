@@ -2,10 +2,11 @@ haversine = require 'haversine'
 
 class ChatsCtrl
   @$inject: ['$ionicLoading', '$meteor', '$scope',
-             '$state', 'Auth', 'Friendship', 'User']
+             '$state', 'Auth', 'Friendship', 'Points', 'User']
   constructor: (@$ionicLoading, @$meteor, @$scope,
-                @$state, @Auth, @Friendship, @User) ->
+                @$state, @Auth, @Friendship, @Points, @User) ->
     @currentUser = @Auth.user
+
     # Init variables
     @users = {}
     @items = []
@@ -64,7 +65,7 @@ class ChatsCtrl
   getChatUsers: (chatIds) ->
     # TODO: Only grab users once
     userIds = (@Friendship.parseChatId(chatId) for chatId in chatIds).join ','
-    
+
     # Don't try to get users if there are no chats
     # if userIds.length is 0 then return
 
