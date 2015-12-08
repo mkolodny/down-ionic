@@ -1,7 +1,7 @@
 (function (factory) {
   'use strict';
   // Browser globals
-  factory(angular, Chart);
+  factory(window.angular, window.Chart);
 }(function (angular, Chart) {
   'use strict';
 
@@ -27,13 +27,13 @@
   angular.module('chart.js', [])
     .provider('ChartJs', ChartJsProvider)
     .factory('ChartJsFactory', ['ChartJs', '$timeout', ChartJsFactory])
-    .directive('chartBase', function (ChartJsFactory) { return new ChartJsFactory(); })
-    .directive('chartLine', function (ChartJsFactory) { return new ChartJsFactory('Line'); })
-    .directive('chartBar', function (ChartJsFactory) { return new ChartJsFactory('Bar'); })
-    .directive('chartRadar', function (ChartJsFactory) { return new ChartJsFactory('Radar'); })
-    .directive('chartDoughnut', function (ChartJsFactory) { return new ChartJsFactory('Doughnut'); })
-    .directive('chartPie', function (ChartJsFactory) { return new ChartJsFactory('Pie'); })
-    .directive('chartPolarArea', function (ChartJsFactory) { return new ChartJsFactory('PolarArea'); });
+    .directive('chartBase', ['ChartJsFactory', function (ChartJsFactory) { return new ChartJsFactory(); }])
+    .directive('chartLine', ['ChartJsFactory', function (ChartJsFactory) { return new ChartJsFactory('Line'); }])
+    .directive('chartBar', ['ChartJsFactory', function (ChartJsFactory) { return new ChartJsFactory('Bar'); }])
+    .directive('chartRadar', ['ChartJsFactory', function (ChartJsFactory) { return new ChartJsFactory('Radar'); }])
+    .directive('chartDoughnut', ['ChartJsFactory', function (ChartJsFactory) { return new ChartJsFactory('Doughnut'); }])
+    .directive('chartPie', ['ChartJsFactory', function (ChartJsFactory) { return new ChartJsFactory('Pie'); }])
+    .directive('chartPolarArea', ['ChartJsFactory', function (ChartJsFactory) { return new ChartJsFactory('PolarArea'); }]);
 
   /**
    * Wrapper for chart.js
@@ -207,6 +207,16 @@
     function convertColour (colour) {
       if (typeof colour === 'object' && colour !== null) return colour;
       if (typeof colour === 'string' && colour[0] === '#') return getColour(hexToRgb(colour.substr(1)));
+      if (typeof colour === 'string' && colour.substr(0, 3) === 'rgb') {
+        return {
+          fillColor: colour,
+          strokeColor: colour,
+          pointColor: colour,
+          pointStrokeColor: colour,
+          pointHighlightFill: colour,
+          pointHighlightStroke: colour,
+        };
+      }
       return getRandomColour();
     }
 
