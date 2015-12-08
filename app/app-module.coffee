@@ -127,105 +127,118 @@ angular.module 'rallytap', [
     Put anything that touches Cordova in here!
     ###
     bootstrap = ->
+      # Hide the accessory bar by default (remove this to show the accessory bar
+      # above the keyboard for form inputs)
+      $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
+
+      # Fix this problem:
+      #   http://stackoverflow.com/questions/29846816/space-made-for-two-keyboards-in-ionic-on-ios
+      $window.cordova?.plugins.Keyboard?.disableScroll true
+
+      # Make the status bar white.
+      if angular.isDefined $window.StatusBar
+        $cordovaStatusbar.overlaysWebView true
+        $cordovaStatusbar.style 1
+
+      # Start a Branch session.
+      if angular.isDefined $window.branch
+        $window.branch.init branchKey, (err, data) ->
+
+      # Start listening for notifications.
+      if angular.isDefined $window.device
+        PushNotifications.listen()
+
+      # Prevent hardware back button from returning
+      #   to login views on Android
+      #   TODO : update states
+      $ionicPlatform.registerBackButtonAction (event) ->
+        currentState = $state.current.name
+        # States where going back is disabled, therefore the
+        #   hardware back button should exit the app
+        disabledStates = [
+          'login'
+          'facebookSync'
+          'setUsername'
+          'findFriends'
+          'events'
+        ]
+        if currentState in disabledStates
+          ionic.Platform.exitApp()
+        else
+          $ionicHistory.goBack()
+      , 100 # override action priority 100 (Return to previous view)
+
+      $ionicPlatform.on 'resume', ->
+        # Track App Opens
+        $mixpanel.track 'Open App'
+
+        # Update the user's friend list in case a user
+        #   they added by phone number signed up.
+        Auth.getFriends()
+
+        # Update the user for an accurate point count
+        Auth.getMe().then (user) ->
+          Auth.setUser user
+
+      # Update the user's location while they use the app.
+      if Auth.flags.hasRequestedLocationServices \
+          or !ionic.Platform.isIOS()
+        Auth.watchLocation()
+
+      # Subscribe to message and chat data
+      Messages.listen()
+
+      $rootScope.finishedBootstrap = true
+      Auth.redirectForAuthState()
+
+    $ionicPlatform.ready ->      
       # Init the localDB
       LocalDB.init().then ->
-        # Resume session from localStorage
+        # Resume session from local storage
         Auth.resumeSession()
       .then ->
-        # Hide the accessory bar by default (remove this to show the accessory bar
-        # above the keyboard for form inputs)
-        $window.cordova?.plugins.Keyboard?.hideKeyboardAccessoryBar true
-
-        # Fix this problem:
-        #   http://stackoverflow.com/questions/29846816/space-made-for-two-keyboards-in-ionic-on-ios
-        $window.cordova?.plugins.Keyboard?.disableScroll true
-
-        # Make the status bar white.
-        if angular.isDefined $window.StatusBar
-          $cordovaStatusbar.overlaysWebView true
-          $cordovaStatusbar.style 1
-
-        # Start a Branch session.
-        if angular.isDefined $window.branch
-          $window.branch.init branchKey, (err, data) ->
-
-        # Start listening for notifications.
-        if angular.isDefined $window.device
-          PushNotifications.listen()
-
-        # Prevent hardware back button from returning
-        #   to login views on Android
-        #   TODO : update states
-        $ionicPlatform.registerBackButtonAction (event) ->
-          currentState = $state.current.name
-          # States where going back is disabled, therefore the
-          #   hardware back button should exit the app
-          disabledStates = [
-            'login'
-            'facebookSync'
-            'setUsername'
-            'findFriends'
-            'events'
-          ]
-          if currentState in disabledStates
-            ionic.Platform.exitApp()
-          else
-            $ionicHistory.goBack()
-        , 100 # override action priority 100 (Return to previous view)
-
-        $ionicPlatform.on 'resume', ->
-          # Track App Opens
-          $mixpanel.track 'Open App'
-
-          # Update the user's friend list in case a user
-          #   they added by phone number signed up.
-          Auth.getFriends()
-
-          # Update the user for an accurate point count
-          Auth.getMe().then (user) ->
-            Auth.setUser user
-
-        # Update the user's location while they use the app.
-        if Auth.flags.hasRequestedLocationServices \
-            or !ionic.Platform.isIOS()
-          Auth.watchLocation()
-
-        # Subscribe to message and chat data
-        Messages.listen()
-
-        $rootScope.finishedBootstrap = true
-        Auth.redirectForAuthState()
-
-    $ionicPlatform.ready ->
-      # Skip Downloading Updates During Development
-      if skipIonicDeploy
-        console.log 'Skipping Ionic Deploy'
-        bootstrap()
-        return
-
-      # Check For Updates
-      $ionicDeploy.setChannel ionicDeployChannel
-      $ionicDeploy.check()
-        .then (hasUpdate) ->
-          if not hasUpdate
-            # No update
-            bootstrap()
-            return
-
-          $ionicLoading.show
-            template: '''
-              <div class="loading-text">Loading...</div>
-              <ion-spinner icon="bubbles"></ion-spinner>
-              '''
-
-          # Download update
-          $ionicDeploy.update()
-            .finally ->
-              $ionicLoading.hide()
-              bootstrap()
-        , ->
-          # Error checking for update
+        # Skip Downloading Updates During Development
+        if skipIonicDeploy
+          console.log 'Skipping Ionic Deploy'
           bootstrap()
+          return
+
+        # Check For Updates
+        $ionicDeploy.setChannel ionicDeployChannel
+        if angular.isDefined Auth.flags.hasCompletedFirstUpdate
+          # Download in the background
+          bootstrap()
+          $ionicDeploy.check()
+            .then (hasUpdate) ->
+              if hasUpdate
+                $ionicDeploy.download()
+                  .then ->
+                    $ionicDeploy.extract()
+        else
+          # Update before bootstrapping
+          $ionicDeploy.check()
+            .then (hasUpdate) ->
+              if not hasUpdate
+                # No update
+                Auth.setFlag 'hasCompletedFirstUpdate', true
+                bootstrap()
+                return
+
+              $ionicLoading.show
+                template: '''
+                  <div class="loading-text">Loading...</div>
+                  <ion-spinner icon="bubbles"></ion-spinner>
+                  '''
+
+              # Download update
+              $ionicDeploy.update()
+                .finally ->
+                  $ionicLoading.hide()
+                  Auth.setFlag 'hasCompletedFirstUpdate', true
+                  bootstrap()
+            , ->
+              # Error checking for update
+              bootstrap()
 
   .constant '$ionicLoadingConfig',
     template: '''
