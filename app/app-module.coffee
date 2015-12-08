@@ -205,40 +205,35 @@ angular.module 'rallytap', [
 
         # Check For Updates
         $ionicDeploy.setChannel ionicDeployChannel
-        if angular.isDefined Auth.flags.hasCompletedFirstUpdate
+        if Auth.flags.hasCompletedFirstUpdate
           # Download in the background
           bootstrap()
           $ionicDeploy.check()
             .then (hasUpdate) ->
-              if hasUpdate
-                $ionicDeploy.download()
-                  .then ->
-                    $ionicDeploy.extract()
+              # No updates
+              if not hasUpdate then return
+
+              # Download in background and extract so that the
+              #  update will be applied on next app launch
+              $ionicDeploy.download()
+                .then ->
+                  $ionicDeploy.extract()
         else
           # Update before bootstrapping
-          $ionicDeploy.check()
-            .then (hasUpdate) ->
-              if not hasUpdate
-                # No update
-                Auth.setFlag 'hasCompletedFirstUpdate', true
-                bootstrap()
-                return
+          $ionicLoading.show
+            template: '''
+              <div class="loading-text">Loading...</div>
+              <ion-spinner icon="bubbles"></ion-spinner>
+              '''
 
-              $ionicLoading.show
-                template: '''
-                  <div class="loading-text">Loading...</div>
-                  <ion-spinner icon="bubbles"></ion-spinner>
-                  '''
-
-              # Download update
-              $ionicDeploy.update()
-                .finally ->
-                  $ionicLoading.hide()
-                  Auth.setFlag 'hasCompletedFirstUpdate', true
-                  bootstrap()
-            , ->
-              # Error checking for update
+          # Download update
+          $ionicDeploy.update()
+            .then ->
+              Auth.setFlag 'hasCompletedFirstUpdate', true
+            .finally ->
+              $ionicLoading.hide()
               bootstrap()
+
 
   .constant '$ionicLoadingConfig',
     template: '''
