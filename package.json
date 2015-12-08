@@ -116,7 +116,9 @@
       "locator": "./resources/plugin",
       "id": "down.resources"
     },
-    "cordova-sqlite-storage"
+    "cordova-sqlite-storage",
+    "cordova-sms-plugin",
+    "cordova-plugin-network-information"
   ],
   "cordovaPlatforms": [
     "android",
