@@ -16,6 +16,8 @@
   <js-module name="angular-sanitize" src="www/angular-sanitize.min.js" />
   <js-module name="angular-ui-router" src="www/angular-ui-router.min.js" />
   <js-module name="ionic-angular" src="www/ionic-angular.min.js" />
+  <js-module name="ng-cordova" src="www/ng-cordova.min.js" />
+  <js-module name="angular-chart" src="www/angular-chart.min.js" />
   <js-module name="meteor" src="www/meteor.min.js" />
 
   <platform name="ios">
