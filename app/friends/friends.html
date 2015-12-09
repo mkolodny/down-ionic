@@ -19,6 +19,12 @@
         <h2>Added Me</h2>
         <i class="fa fa-chevron-right"></i>
       </ion-item>
+      <ion-item class="item-avatar"
+                ng-if="friends.hasSharePlugin()"
+                ng-click="friends.shareApp()">
+        <img ng-src="images/Add_By_Phone.png" alt="Invite friends">
+        <h2>Invite friends to Rallytap!</h2>
+      </ion-item>
       <ion-item class="item-divider">
         Add Friends
       </ion-item>
