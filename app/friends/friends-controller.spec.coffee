@@ -4,14 +4,20 @@ require 'angular-animate'
 require 'angular-mocks'
 require 'angular-sanitize'
 require 'angular-ui-router'
+require 'ng-cordova'
 require '../ionic/ionic-angular.js'
 require '../common/auth/auth-module'
 require '../common/points/points-module'
+require '../common/mixpanel/mixpanel-module'
 FriendsCtrl = require './friends-controller'
 
 describe 'add friends controller', ->
+  $cordovaSocialSharing = null
   $ionicHistory = null
   $state = null
+  $mixpanel = null
+  $q = null
+  $window = null
   Auth = null
   ctrl = null
   Points = null
@@ -25,10 +31,18 @@ describe 'add friends controller', ->
 
   beforeEach angular.mock.module('rallytap.points')
 
+  beforeEach angular.mock.module('ngCordova')
+
+  beforeEach angular.mock.module('analytics.mixpanel')
+
   beforeEach inject(($injector) ->
+    $cordovaSocialSharing = $injector.get '$cordovaSocialSharing'
     $controller = $injector.get '$controller'
     $ionicHistory = $injector.get '$ionicHistory'
     $state = $injector.get '$state'
+    $mixpanel = $injector.get '$mixpanel'
+    $q = $injector.get '$q'
+    $window = $injector.get '$window'
     Auth = $injector.get 'Auth'
     Points = $injector.get 'Points'
     scope = $injector.get '$rootScope'
@@ -110,4 +124,72 @@ describe 'add friends controller', ->
 
     it 'should go to the added me view', ->
       expect($state.go).toHaveBeenCalledWith 'addedMe'
+
+  ##hasSharePlugin
+  describe 'checking if the social sharing plugin is installed', ->
+
+    describe 'when installed', ->
+
+      beforeEach ->
+        $window.plugins =
+          socialsharing: {}
+
+      it 'should return true', ->
+        expect(ctrl.hasSharePlugin()).toBe true
+
+
+    describe 'when not installed', ->
+
+      beforeEach ->
+        $window.plugins =
+          socialsharing: undefined
+
+      it 'should return false', ->
+        expect(ctrl.hasSharePlugin()).toBe false
+
+
+  ##shareApp
+  describe 'inviting friends to rallytap', ->
+    deferred = null
+
+    beforeEach ->
+      spyOn $mixpanel, 'track'
+
+      deferred = $q.defer()
+      $cordovaSocialSharing.share = jasmine.createSpy('$cordovaSocialSharing.share') \
+        .and.returnValue deferred.promise
+
+      ctrl.shareApp()
+
+    it 'should open the share dialog', ->
+      inviteMessage = jasmine.any String
+      inviteLink = jasmine.any String
+      expect($cordovaSocialSharing.share).toHaveBeenCalledWith inviteMessage, inviteMessage, null, inviteLink
+
+    describe 'when successful', ->
+
+      # Note - details about confirmed shares  
+      # https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin#notes-about-the-successcallback-you-can-just-ignore-the-callbacks-if-you-like
+
+      describe 'when a confirmed share', ->
+
+        beforeEach ->
+          deferred.resolve true
+          scope.$apply()
+
+        it 'should track in mixpanel', ->
+          expect($mixpanel.track).toHaveBeenCalledWith 'Share App',
+            'confirmed share': true
+
+
+      describe 'when not a confirmed share', ->
+
+        beforeEach ->
+          deferred.resolve false
+          scope.$apply()
+
+        it 'should track in mixpanel', ->
+          expect($mixpanel.track).toHaveBeenCalledWith 'Share App',
+            'confirmed share': false
+
 

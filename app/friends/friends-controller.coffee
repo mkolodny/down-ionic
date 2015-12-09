@@ -1,6 +1,8 @@
 class FriendsCtrl
-  @$inject: ['$ionicHistory', '$state', 'Auth', 'Points']
-  constructor: (@$ionicHistory, @$state, @Auth, @Points) ->
+  @$inject: ['$cordovaSocialSharing', '$ionicHistory', '$state', \
+             '$mixpanel', '$window', 'Auth', 'Points']
+  constructor: (@$cordovaSocialSharing, @$ionicHistory, @$state, 
+                @$mixpanel, @$window, @Auth, @Points) ->
     @currentUser = @Auth.user
 
   showMyFriends: ->
@@ -20,5 +22,17 @@ class FriendsCtrl
 
   addByPhone: ->
     @$state.go 'addByPhone'
+
+  hasSharePlugin: ->
+    angular.isDefined @$window.plugins?.socialsharing
+
+  shareApp: ->
+    inviteMessage = 'Hey! Have you tried Rallytap?'
+    inviteLink = 'http://rallytap.com'
+    @$cordovaSocialSharing.share inviteMessage, inviteMessage, null, inviteLink
+      .then (confirmedShare) =>
+        @$mixpanel.track 'Share App',
+          'confirmed share': confirmedShare
+
 
 module.exports = FriendsCtrl
