@@ -168,28 +168,10 @@ describe 'add friends controller', ->
 
     describe 'when successful', ->
 
-      # Note - details about confirmed shares  
-      # https://github.com/EddyVerbruggen/SocialSharing-PhoneGap-Plugin#notes-about-the-successcallback-you-can-just-ignore-the-callbacks-if-you-like
+      beforeEach ->
+        deferred.resolve()
+        scope.$apply()
 
-      describe 'when a confirmed share', ->
-
-        beforeEach ->
-          deferred.resolve true
-          scope.$apply()
-
-        it 'should track in mixpanel', ->
-          expect($mixpanel.track).toHaveBeenCalledWith 'Share App',
-            'confirmed share': true
-
-
-      describe 'when not a confirmed share', ->
-
-        beforeEach ->
-          deferred.resolve false
-          scope.$apply()
-
-        it 'should track in mixpanel', ->
-          expect($mixpanel.track).toHaveBeenCalledWith 'Share App',
-            'confirmed share': false
-
+      it 'should track in mixpanel', ->
+        expect($mixpanel.track).toHaveBeenCalledWith 'Share App'
 

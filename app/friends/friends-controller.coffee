@@ -28,11 +28,10 @@ class FriendsCtrl
 
   shareApp: ->
     inviteMessage = 'Hey! Have you tried Rallytap?'
-    inviteLink = 'http://rallytap.com'
+    inviteLink = 'https://rallytap.com'
     @$cordovaSocialSharing.share inviteMessage, inviteMessage, null, inviteLink
-      .then (confirmedShare) =>
-        @$mixpanel.track 'Share App',
-          'confirmed share': confirmedShare
+      .then =>
+        @$mixpanel.track 'Share App'
 
 
 module.exports = FriendsCtrl
