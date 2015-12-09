@@ -314,6 +314,7 @@ describe 'create event controller', ->
           'from recommended': false
           'has time': false
           'has place': false
+          'friends only': false
 
       it 'should clear the form', ->
         expect(ctrl.title).toBe undefined
