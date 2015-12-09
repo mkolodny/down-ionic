@@ -26,8 +26,8 @@ class EventItemCtrl
         @$mixpanel.track 'Save Event',
           'total num interested': @savedEvent.totalNumInterested - 1
           'time since posted': @$filter('timeAgo') @savedEvent.createdAt.getTime()
-          time: angular.isDefined @savedEvent.event.datetime
-          place: angular.isDefined @savedEvent.event.place
+          'has time': angular.isDefined @savedEvent.event.datetime
+          'has place': angular.isDefined @savedEvent.event.place
       , =>
         # Revert latency compensation
         delete @savedEvent.interestedFriends

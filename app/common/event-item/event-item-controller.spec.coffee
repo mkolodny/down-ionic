@@ -126,8 +126,8 @@ describe 'event item directive', ->
           expect($mixpanel.track).toHaveBeenCalledWith 'Save Event',
             'total num interested': preSaveNumInterested
             'time since posted': $filter('timeAgo')(savedEvent.createdAt.getTime())
-            time: angular.isDefined savedEvent.event.datetime
-            place: angular.isDefined savedEvent.event.place
+            'has time': angular.isDefined savedEvent.event.datetime
+            'has place': angular.isDefined savedEvent.event.place
 
         it 'should set the interested friends on the item', ->
           expect(ctrl.savedEvent.interestedFriends).toBe interestedFriends

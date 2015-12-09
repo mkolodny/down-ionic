@@ -73,9 +73,9 @@ class CreateEventCtrl
       .$promise.then (event) =>
         @$mixpanel.track 'Create Event',
           'from recommended': false
-          time: angular.isDefined @datetime
-          place: angular.isDefined @place
-          
+          'has place': angular.isDefined newEvent.place
+          'has time': angular.isDefined newEvent.datetime
+
         # Clear form
         delete @title
         delete @datetime

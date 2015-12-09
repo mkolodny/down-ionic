@@ -433,9 +433,9 @@ describe 'events controller', ->
 
       it 'should track Create Event in mixpanel', ->
         expect($mixpanel.track).toHaveBeenCalledWith 'Create Event',
-          time: true
-          place: true
           'from recommended': true
+          'has place': true
+          'has time': true
 
     describe 'on error', ->
 

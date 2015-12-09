@@ -101,8 +101,8 @@ class EventsCtrl
     @Event.save(event).$promise.then =>
       @$mixpanel.track 'Create Event',
         'from recommended': true
-        place: angular.isDefined recommendedEvent.place
-        time: angular.isDefined recommendedEvent.datetime
+        'has place': angular.isDefined recommendedEvent.place
+        'has time': angular.isDefined recommendedEvent.datetime
     , =>
       delete recommendedEvent.wasSaved
       @ngToast.create 'Oops.. an error occurred..'

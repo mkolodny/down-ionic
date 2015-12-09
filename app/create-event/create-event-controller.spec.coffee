@@ -312,8 +312,8 @@ describe 'create event controller', ->
       it 'should track in mixpanel', ->
         expect($mixpanel.track).toHaveBeenCalledWith 'Create Event',
           'from recommended': false
-          time: angular.isDefined ctrl.datetime
-          place: angular.isDefined ctrl.place
+          'has time': false
+          'has place': false
 
       it 'should clear the form', ->
         expect(ctrl.title).toBe undefined
