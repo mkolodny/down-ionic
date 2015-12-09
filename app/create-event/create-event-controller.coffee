@@ -75,6 +75,7 @@ class CreateEventCtrl
           'from recommended': false
           'has place': angular.isDefined newEvent.place
           'has time': angular.isDefined newEvent.datetime
+          'friends only': newEvent.friendsOnly || false
 
         # Clear form
         delete @title
