@@ -1,0 +1,36 @@
+.points-popup {
+  color: $brand-color;
+  text-align: center;
+
+  .points-img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin-top: 10px;
+    background-color: #ccc;
+  }
+  .points-name {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 18px;
+    color: $brand-color;
+  }
+  .points-points {
+    margin-top: 2px;
+    margin-bottom: 18px;
+    font-size: 18px;
+    font-weight: 700;
+    color: $brand-color;
+  }
+  .points-calendar {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    vertical-align: top;
+  }
+  .points-explainer {
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 10px;
+  }
+}

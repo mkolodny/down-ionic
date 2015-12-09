@@ -3,7 +3,10 @@
           hide-back-button="true"
           can-swipe-back="false">
   <ion-nav-buttons side="left">
-    <span class="points-nav">{{chats.currentUser.points | number:0}}</span>
+    <span class="points-nav"
+          ng-click="chats.Points.showPopup()"
+          ontouchstart
+          >{{chats.currentUser.points | number:0}}</span>
   </ion-nav-buttons>
   <ion-content id="chats-content">
     <!-- No chats placeholder -->

@@ -1,6 +1,8 @@
+require '../common/points/points-module'
 FriendsCtrl = require './friends-controller'
 
 angular.module 'rallytap.friends', [
+    'rallytap.points'
     'ui.router'
   ]
   .config ($stateProvider) ->

@@ -4,6 +4,7 @@ require 'angular-ui-router'
 require 'ng-toast'
 require '../common/auth/auth-module'
 require '../common/meteor/meteor-mocks'
+require '../common/points/points-module'
 MyEventsCtrl = require './my-events-controller'
 
 describe 'my events controller', ->
@@ -15,6 +16,7 @@ describe 'my events controller', ->
   event = null
   scope = null
   ngToast = null
+  Points = null
   $meteor = null
 
   beforeEach angular.mock.module('angular-meteor')
@@ -22,6 +24,8 @@ describe 'my events controller', ->
   beforeEach angular.mock.module('ui.router')
 
   beforeEach angular.mock.module('rallytap.auth')
+
+  beforeEach angular.mock.module('rallytap.points')
 
   beforeEach angular.mock.module('rallytap.resources')
 
@@ -35,6 +39,7 @@ describe 'my events controller', ->
     Auth = $injector.get 'Auth'
     scope = $injector.get '$rootScope'
     ngToast = $injector.get 'ngToast'
+    Points = $injector.get 'Points'
     $meteor = $injector.get '$meteor'
 
     # Mock the current user.
@@ -55,6 +60,9 @@ describe 'my events controller', ->
 
   it 'should set the current user on the controller', ->
     expect(ctrl.currentUser).toBe Auth.user
+
+  it 'should set the points service on the controller', ->
+    expect(ctrl.Points).toBe Points
 
   ##$ionicView.loaded
   describe 'when the view is loaded', ->

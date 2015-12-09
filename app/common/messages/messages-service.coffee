@@ -11,7 +11,7 @@ class Messages
 
       # Subscribe to messages for chats
       allChats = @Chats.find().fetch()
-      chatIds = (chat._id for chat in allChats)      
+      chatIds = (chat._id for chat in allChats)
       @$meteor.subscribe 'messages', chatIds
     .then =>
       @watchNewMessages()
@@ -68,8 +68,5 @@ class Messages
     @$meteor.call 'readMessage', messageId
       .then =>
         @unreadCount = @getUnreadCount()
-
-
-
 
 module.exports = Messages
