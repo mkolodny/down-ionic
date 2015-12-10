@@ -1,14 +1,18 @@
 class CommentsCtrl
-  @$inject: ['$meteor', '$mixpanel', '$scope', '$stateParams', 'Auth', 'User']
-  constructor: (@$meteor, @$mixpanel, @$scope, @$stateParams, @Auth, @User) ->
+  @$inject: ['$meteor', '$mixpanel', '$scope', '$stateParams', '$rootScope', 'Auth', 'User']
+  constructor: (@$meteor, @$mixpanel, @$scope, @$stateParams, @$rootScope, @Auth, @User) ->
     @event = @$stateParams.event
     @Comments = @$meteor.getCollectionByName 'comments'
 
     @$scope.$on '$ionicView.beforeEnter', =>
+      @$rootScope.hideTabBar = true
       @$scope.$meteorSubscribe 'comments', "#{@event.id}"
         .then =>
           @commentsLoaded = true
       @comments = @$scope.$meteorCollection @getComments, false
+
+    @$scope.$on '$ionicView.beforeLeave', =>
+      @$rootScope.hideTabBar = false
 
   getComments: =>
     selector =

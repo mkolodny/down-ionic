@@ -95,6 +95,9 @@ describe 'comments controller', ->
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
 
+    it 'should hide the tab bar', ->
+      expect(scope.hideTabBar).toBe true
+
     it 'should subscribe to the event comments', ->
       expect(scope.$meteorSubscribe).toHaveBeenCalledWith('comments',
           "#{ctrl.event.id}")
@@ -110,6 +113,17 @@ describe 'comments controller', ->
 
       it 'should set a comment loaded flag', ->
         expect(ctrl.commentsLoaded).toBe true
+
+
+  ##$ionicView.beforeLeave
+  describe 'when view leaves', ->
+
+    beforeEach ->
+      scope.$broadcast '$ionicView.beforeLeave'
+      scope.$apply()
+
+    it 'should show the tab bar', ->
+      expect(scope.hideTabBar).toBe false
 
 
   ##getComments

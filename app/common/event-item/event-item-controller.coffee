@@ -54,12 +54,14 @@ class EventItemCtrl
     angular.isArray @savedEvent.interestedFriends
 
   viewComments: ->
-    @$state.go 'comments',
+    stateName = "#{@$state.current.parent}.comments"
+    @$state.go stateName,
       id: @savedEvent.event.id
       event: @savedEvent.event
 
   viewInterested: ->
-    @$state.go 'interested',
+    stateName = "#{@$state.current.parent}.interested"
+    @$state.go stateName,
       id: @savedEvent.event.id
       event: @savedEvent.event
 

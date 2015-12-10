@@ -14,7 +14,7 @@ angular.module 'rallytap.comments', [
     'yaru22.angular-timeago'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'comments',
+    state =
       url: '/comments/:id'
       templateUrl: 'app/comments/comments.html'
       controller: 'CommentsCtrl as comments'
@@ -31,4 +31,13 @@ angular.module 'rallytap.comments', [
           createdAt: new Date()
         ###
         event: null
+
+    # Create states for each tab that can 
+    #   transition to the comments view
+    homeState = angular.extend {parent: 'home'}, state
+    $stateProvider.state 'home.comments', homeState
+
+    savedState = angular.extend {parent: 'saved'}, state
+    $stateProvider.state 'saved.comments', savedState
+      
   .controller 'CommentsCtrl', CommentsCtrl

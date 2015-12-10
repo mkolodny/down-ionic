@@ -12,7 +12,7 @@ angular.module 'rallytap.interested', [
     'ngToast'
   ]
   .config ($stateProvider) ->
-    $stateProvider.state 'interested',
+    state = 
       url: '/interested/:id'
       templateUrl: 'app/interested/interested.html'
       controller: 'InterestedCtrl as interested'
@@ -29,4 +29,13 @@ angular.module 'rallytap.interested', [
           createdAt: new Date()
         ###
         event: null
+
+    # Create states for each state that can 
+    #   transition to the interested view
+    homeState = angular.extend {parent: 'home'}, state
+    $stateProvider.state 'home.interested', homeState
+
+    savedState = angular.extend {parent: 'saved'}, state
+    $stateProvider.state 'saved.interested', savedState
+
   .controller 'InterestedCtrl', InterestedCtrl

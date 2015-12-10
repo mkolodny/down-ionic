@@ -206,7 +206,8 @@ describe 'event item directive', ->
       ctrl.viewComments()
 
     it 'should go to the comments view', ->
-      expect($state.go).toHaveBeenCalledWith 'comments',
+      stateName = "#{$state.parent}.comments"
+      expect($state.go).toHaveBeenCalledWith stateName,
         id: event.id
         event: event
 
@@ -220,7 +221,8 @@ describe 'event item directive', ->
       ctrl.viewInterested()
 
     it 'should go to the interested view', ->
-      expect($state.go).toHaveBeenCalledWith 'interested',
+      stateName = "#{$state.parent}.interested"
+      expect($state.go).toHaveBeenCalledWith stateName,
         id: event.id
         event: event
 

@@ -1,12 +1,5 @@
 <ion-view id="interested"
           view-title="Interested">
-  <ion-nav-buttons side="left">
-    <button class="button button-icon icon"
-            ng-click="$ionicGoBack()"
-            ontouchstart>
-      <i class="fa fa-chevron-left fa-lg"></i>
-    </button>
-  </ion-nav-buttons>
   <ion-content>
     <ion-list class="list-avatar">
       <ion-item collection-repeat="item in interested.items track by item.user.id"

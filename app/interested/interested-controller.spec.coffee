@@ -76,6 +76,20 @@ describe 'interested controller', ->
     it 'should get the interested users', ->
       expect(ctrl.getInterested).toHaveBeenCalled()
 
+    it 'should hide the tab bar', ->
+      expect(scope.hideTabBar).toBe true
+
+
+  ##$ionicView.beforeLeave
+  describe 'when view leaves', ->
+
+    beforeEach ->
+      scope.$broadcast '$ionicView.beforeLeave'
+      scope.$apply()
+
+    it 'should show the tab bar', ->
+      expect(scope.hideTabBar).toBe false
+
 
   ##getInterested
   describe 'getting the interested users', ->
