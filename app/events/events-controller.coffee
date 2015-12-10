@@ -117,7 +117,7 @@ class EventsCtrl
       item.recommendedEvent.getCellHeight()
 
   viewEvent: (savedEvent) ->
-    @$state.go 'event',
+    @$state.go 'home.event',
       savedEvent: savedEvent
       commentsCount: @commentsCount[savedEvent.eventId]
 

@@ -1,11 +1,4 @@
 <ion-view id="friend-chat" view-title="{{friendChat.friend.name}}">
-  <ion-nav-buttons side="left">
-    <button class="button button-icon icon"
-            ng-click="$ionicGoBack()"
-            ontouchstart>
-      <i class="fa fa-chevron-left fa-lg"></i>
-    </button>
-  </ion-nav-buttons>
   <ion-content delegate-handle="friendChat">
     <ion-list>
       <ion-item class="message-item" ng-repeat="message in friendChat.messages">

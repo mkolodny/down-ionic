@@ -30,12 +30,12 @@
     <div class="extra-details"
          ng-if="eventItem.didUserSaveEvent()">
       <div class="event-link">
-        <span ng-click="eventItem.viewInterested(eventItem.savedEvent.event)"
+        <span ng-click="eventItem.viewInterested(eventItem.savedEvent.event); $event.stopPropagation();"
               >{{eventItem.savedEvent.totalNumInterested}} interested</span>
       </div>
       <div class="event-link">
         <ng-pluralize class="event-link"
-                      ng-click="eventItem.viewComments(eventItem.savedEvent.event)"
+                      ng-click="eventItem.viewComments(eventItem.savedEvent.event); $event.stopPropagation();"
                       count="eventItem.commentsCount"
                       when="{
                         0: 'comment',

@@ -12,6 +12,7 @@ angular.module 'rallytap.friendChat', [
   ]
   .config ($stateProvider) ->
     $stateProvider.state 'friendChat',
+      parent: 'chats'
       url: '/friend/:id'
       templateUrl: 'app/friend-chat/friend-chat.html'
       controller: 'FriendChatCtrl as friendChat'

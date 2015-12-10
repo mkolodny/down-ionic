@@ -1,8 +1,8 @@
 class MyEventsCtrl
   @$inject: ['$scope', '$stateParams', '$meteor', 'Auth', 'ngToast', 'Points',
-             'User']
+             'User', '$state']
   constructor: (@$scope, @$stateParams, @$meteor, @Auth, @ngToast, @Points,
-                @User) ->
+                @User, @$state) ->
     @items = []
     @commentsCount = {}
     @currentUser = @Auth.user
@@ -54,7 +54,10 @@ class MyEventsCtrl
       , =>
         @ngToast.create 'Oops.. an error occurred..'
 
-
+  viewEvent: (savedEvent) ->
+    @$state.go 'saved.event',
+      savedEvent: savedEvent
+      commentsCount: @commentsCount[savedEvent.eventId]
 
 
 module.exports = MyEventsCtrl

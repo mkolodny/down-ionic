@@ -255,3 +255,25 @@ describe 'my events controller', ->
 
       it 'should throw an error', ->
         expect(ngToast.create).toHaveBeenCalled()
+  
+
+  ##viewEvent
+  describe 'viewing an event', ->
+    savedEvent = null
+    commentsCount = null
+
+    beforeEach ->
+      savedEvent =
+        id: 1
+        eventId: 2
+      commentsCount = 16
+      ctrl.commentsCount = {}
+      ctrl.commentsCount[savedEvent.eventId] = commentsCount
+      spyOn $state, 'go'
+
+      ctrl.viewEvent savedEvent
+
+    it 'should go to the event view', ->
+      expect($state.go).toHaveBeenCalledWith 'saved.event',
+        savedEvent: savedEvent
+        commentsCount: commentsCount
