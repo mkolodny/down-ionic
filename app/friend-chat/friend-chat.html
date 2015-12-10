@@ -12,7 +12,11 @@
         <div class="text-message"
              ng-class="{mine: friendChat.isMyMessage(message)}">
           <!-- Text message -->
-          <div class="text" ng-if="friendChat.isTextMessage(message)">{{message.text}}</div>
+          <div class="text text-action"
+               ng-if="friendChat.isTextMessage(message)"
+               ng-bind-html="message.text | linky">
+          </div>
+
           <!-- Invite action messages -->
           <div class="text invite-action"
                ng-if="friendChat.isInviteAction(message)"
