@@ -23,7 +23,7 @@
       <i class="fa fa-calendar-plus-o" ng-click="events.createEvent()"></i>
       <input id="create-event-prompt"
              ng-click="events.createEvent()"
-             on-tap
+             ontouchstart
              readonly
              placeholder="What sounds fun?">
     </div>
@@ -54,7 +54,7 @@
             <button class="button mark-interested"
                     ng-disabled="item.recommendedEvent.wasSaved"
                     ng-click="events.saveRecommendedEvent(item.recommendedEvent)"
-                    on-tap>
+                    ontouchstart>
               <i class="icon"
                  ng-class="{
                    'calendar-star-selected': item.recommendedEvent.wasSaved,
