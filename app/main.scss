@@ -21,6 +21,7 @@ $new-event-margin-left: 5px;
 
 // Colors
 $positive: #ed6700;
+$link-color: #369;
 
 // Buttons
 $button-positive-bg: $positive;
@@ -558,7 +559,7 @@ ion-nav-back-button {
   text-decoration: none;
   font-weight: 700 !important;
   font-size: 16px;
-  color: $link-color !important;
+  color: $positive !important;
 
   &:disabled {
     color: #999 !important;
@@ -607,7 +608,7 @@ ion-nav-back-button {
     border-top: 1px solid #bababa;
     border-radius: 0 !important;
     background-color: inherit;
-    color: $link-color !important;
+    color: $positive !important;
     font-size: 16px;
     line-height: 45px;
 
@@ -700,4 +701,10 @@ ion-nav-back-button {
       margin-top: 3px;
     }
   }
+}
+
+// Links
+a {
+  color: $link-color;
+  text-decoration: none;
 }

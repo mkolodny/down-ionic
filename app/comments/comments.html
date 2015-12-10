@@ -18,7 +18,7 @@
       <ion-item class="item-avatar" ng-repeat="comment in comments.comments">
         <img ng-src="{{comment.creator.getImageUrl(72)}}">
         <h2>{{comment.creator.name}} <span class="comment-time">{{comment.createdAt.getTime() | timeAgo}}</span></h2>
-        <p>{{comment.text}}</p>
+        <p ng-bind-html="comment.text | linky"></p>
       </ion-item>
     </ion-list>
   </ion-content>
