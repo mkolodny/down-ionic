@@ -1,7 +1,7 @@
 class EventsCtrl
-  @$inject: ['$meteor', '$scope', '$state', 'Auth', 'Points', 'SavedEvent',
+  @$inject: ['$meteor', '$scope', '$state', '$rootScope', 'Auth', 'Points', 'SavedEvent',
              'RecommendedEvent', 'ngToast', 'User', 'Event', '$mixpanel']
-  constructor: (@$meteor, @$scope, @$state, @Auth, @Points,
+  constructor: (@$meteor, @$scope, @$state, @$rootScope, @Auth, @Points,
                 @SavedEvent, @RecommendedEvent, @ngToast, @User,
                 @Event, @$mixpanel) ->
     @items = []
@@ -11,6 +11,9 @@ class EventsCtrl
     @$scope.$on '$ionicView.loaded', =>
       @isLoading = true
       @refresh()
+
+    @$scope.$on '$ionicView.beforeEnter', =>
+      @$rootScope.hideTabBar = false
 
   handleLoadedData: ->
     if @savedEventsLoaded and @recommendedEventsLoaded \

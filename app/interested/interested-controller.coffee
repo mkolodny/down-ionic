@@ -8,10 +8,6 @@ class InterestedCtrl
       @getInterested()
       @$rootScope.hideTabBar = true
 
-    @$scope.$on '$ionicView.beforeLeave', =>
-      @$rootScope.hideTabBar = false
-
-
   getInterested: ->
     @Event.interested(@event.id).$promise
       .then (users) =>

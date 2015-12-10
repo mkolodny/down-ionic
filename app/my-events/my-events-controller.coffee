@@ -1,8 +1,8 @@
 class MyEventsCtrl
   @$inject: ['$scope', '$stateParams', '$meteor', 'Auth', 'ngToast', 'Points',
-             'User', '$state']
+             'User', '$state', '$rootScope']
   constructor: (@$scope, @$stateParams, @$meteor, @Auth, @ngToast, @Points,
-                @User, @$state) ->
+                @User, @$state, @$rootScope) ->
     @items = []
     @commentsCount = {}
     @currentUser = @Auth.user
@@ -10,6 +10,9 @@ class MyEventsCtrl
     @$scope.$on '$ionicView.loaded', =>
       @isLoading = true
       @refresh()
+
+    @$scope.$on '$ionicView.beforeEnter', =>
+      @$rootScope.hideTabBar = false
 
   handleLoadedData: ->
     if @savedEventsLoaded and @commentsCountLoaded

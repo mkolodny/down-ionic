@@ -79,6 +79,15 @@ describe 'my events controller', ->
     it 'should refresh the data', ->
       expect(ctrl.refresh).toHaveBeenCalled()
 
+  ##$ionicView.beforeEnter
+  describe 'before entering the view', ->
+
+    beforeEach ->
+      scope.$broadcast '$ionicView.beforeEnter'
+      scope.$apply()
+
+    it 'should show the tab bar', ->
+      expect(scope.hideTabBar).toBe false
 
   ##handleLoadedData
   describe 'handling after new data loads', ->

@@ -11,9 +11,6 @@ class CommentsCtrl
           @commentsLoaded = true
       @comments = @$scope.$meteorCollection @getComments, false
 
-    @$scope.$on '$ionicView.beforeLeave', =>
-      @$rootScope.hideTabBar = false
-
   getComments: =>
     selector =
       eventId: "#{@event.id}"

@@ -50,13 +50,3 @@ describe 'event controller', ->
       expect($rootScope.hideTabBar).toBe true
 
 
-  ##$ionicView.beforeLeave
-  describe 'when view leaves', ->
-
-    beforeEach ->
-      $rootScope.$broadcast '$ionicView.beforeLeave'
-      $rootScope.$apply()
-
-    it 'should show the tab bar', ->
-      expect($rootScope.hideTabBar).toBe false
-

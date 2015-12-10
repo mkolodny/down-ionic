@@ -6,8 +6,6 @@ class Event
     @$scope.$on '$ionicView.beforeEnter', =>
       @$rootScope.hideTabBar = true
 
-    @$scope.$on '$ionicView.beforeLeave', =>
-      @$rootScope.hideTabBar = false
 
 
 module.exports = Event

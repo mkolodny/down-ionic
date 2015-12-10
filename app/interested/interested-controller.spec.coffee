@@ -80,17 +80,6 @@ describe 'interested controller', ->
       expect(scope.hideTabBar).toBe true
 
 
-  ##$ionicView.beforeLeave
-  describe 'when view leaves', ->
-
-    beforeEach ->
-      scope.$broadcast '$ionicView.beforeLeave'
-      scope.$apply()
-
-    it 'should show the tab bar', ->
-      expect(scope.hideTabBar).toBe false
-
-
   ##getInterested
   describe 'getting the interested users', ->
     deferred = null

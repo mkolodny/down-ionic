@@ -115,17 +115,6 @@ describe 'comments controller', ->
         expect(ctrl.commentsLoaded).toBe true
 
 
-  ##$ionicView.beforeLeave
-  describe 'when view leaves', ->
-
-    beforeEach ->
-      scope.$broadcast '$ionicView.beforeLeave'
-      scope.$apply()
-
-    it 'should show the tab bar', ->
-      expect(scope.hideTabBar).toBe false
-
-
   ##getComments
   describe 'getting the comments for the event', ->
     cursor = null
