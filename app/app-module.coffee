@@ -42,6 +42,7 @@ require './events/events-module'
 require './comments/comments-module'
 require './my-events/my-events-module'
 require './interested/interested-module'
+require './event/event-module'
 
 angular.module 'rallytap', [
     'analytics.mixpanel'
@@ -77,6 +78,7 @@ angular.module 'rallytap', [
     'rallytap.localDB'
     'rallytap.team'
     'rallytap.events'
+    'rallytap.event'
     'rallytap.comments'
     'rallytap.myEvents'
     'rallytap.interested'
@@ -191,7 +193,7 @@ angular.module 'rallytap', [
       $rootScope.finishedBootstrap = true
       Auth.redirectForAuthState()
 
-    $ionicPlatform.ready ->      
+    $ionicPlatform.ready ->
       # Init the localDB
       LocalDB.init().then ->
         # Resume session from local storage

@@ -156,7 +156,7 @@ describe 'MyFriends controller', ->
       expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
 
     it 'should go to the add friends view', ->
-      expect($state.go).toHaveBeenCalledWith 'tabs.friends.addFriends'
+      expect($state.go).toHaveBeenCalledWith 'addFriends'
 
 
   ##isPhone
