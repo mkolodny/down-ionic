@@ -3,7 +3,7 @@ require 'angular-mocks'
 require 'angular-ui-router'
 EventCtrl = require './event-controller'
 
-describe 'event controller', ->
+fdescribe 'event controller', ->
   commentsCount = null
   ctrl = null
   savedEvent = null

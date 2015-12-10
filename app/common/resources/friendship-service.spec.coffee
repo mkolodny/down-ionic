@@ -1,3 +1,5 @@
+haversine = require 'haversine'
+
 require 'angular'
 require 'angular-mocks'
 require '../meteor/meteor-mocks'
@@ -20,6 +22,18 @@ describe 'friendship service', ->
         id: 1
         friends: {}
       setUser: jasmine.createSpy 'Auth.setUser'
+      isNearby: (user) ->
+        if user.location is undefined or \
+           @user.location is undefined
+          return false
+
+        start =
+          latitude: @user.location.lat
+          longitude: @user.location.long
+        end =
+          latitude: user.location.lat
+          longitude: user.location.long
+        haversine(start, end, {unit: 'mile'}) <= 5
     $provide.value 'Auth', Auth
     return
   )
@@ -208,3 +222,205 @@ describe 'friendship service', ->
 
     it 'should return the friend id', ->
       expect(result).toBe "#{friendId}"
+
+
+  ##buildFriendItems
+  describe 'building the friend items', ->
+    friendItems = null
+    nearbyFriends = null
+
+    beforeEach ->
+      # Mock the logged in user.
+      Auth.user =
+        id: 1
+        email: 'aturing@gmail.com'
+        name: 'Alan Turing'
+        username: 'tdog'
+        imageUrl: 'https://facebook.com/profile-pics/tdog'
+        location:
+          lat: 40.7265834
+          long: -73.9821535
+
+      # Mock the user's friends.
+      Auth.user.friends =
+        2:
+          id: 2
+          email: 'ltorvalds@gmail.com'
+          name: 'Linus Torvalds'
+          username: 'valding'
+          imageUrl: 'https://facebook.com/profile-pics/valding'
+          location:
+            lat: 40.7265834 # just under 5 mi away
+            long: -73.9821535
+        3:
+          id: 3
+          email: 'jclarke@gmail.com'
+          name: 'Joan Clarke'
+          username: 'jnasty'
+          imageUrl: 'https://facebook.com/profile-pics/jnasty'
+          location:
+            lat: 40.7265834 # just under 5 mi away
+            long: -73.9821535
+        4:
+          id: 4
+          email: 'gvrossum@gmail.com'
+          name: 'Guido van Rossum'
+          username: 'vrawesome'
+          imageUrl: 'https://facebook.com/profile-pics/vrawesome'
+          location:
+            lat: 40.79893 # just over 5 mi away
+            long: -73.9821535
+        5:
+          id: 5
+          name: '+19252852230'
+      Auth.user.facebookFriends =
+        4: Auth.user.friends[4]
+      contacts =
+        2: Auth.user.friends[2]
+        3: Auth.user.friends[3]
+      nearbyFriends = (friend for id, friend of Auth.user.friends \
+          when Auth.isNearby friend)
+      nearbyFriends.sort (a, b) ->
+        if a.name.toLowerCase() < b.name.toLowerCase()
+          return -1
+        else
+          return 1
+
+    describe 'without a search query', ->
+
+      # describe 'when the user has contacts', ->
+
+      #   beforeEach ->
+      #     ctrl.contacts = contacts
+      #     ctrl.buildItems()
+
+      #   it 'should set the items on the controller', ->
+      #     items = [
+      #       isDivider: true
+      #       title: 'Nearby Friends'
+      #     ]
+      #     for friend in ctrl.nearbyFriends
+      #       items.push
+      #         isDivider: false
+      #         friend: friend
+      #     alphabeticalItems = [
+      #       isDivider: true
+      #       title: Auth.user.friends[4].name[0]
+      #     ,
+      #       isDivider: false
+      #       friend: Auth.user.friends[4]
+      #     ,
+      #       isDivider: true
+      #       title: Auth.user.friends[3].name[0]
+      #     ,
+      #       isDivider: false
+      #       friend: Auth.user.friends[3]
+      #     ,
+      #       isDivider: true
+      #       title: Auth.user.friends[2].name[0]
+      #     ,
+      #       isDivider: false
+      #       friend: Auth.user.friends[2]
+      #     ]
+      #     for item in alphabeticalItems
+      #       items.push item
+      #     items.push
+      #       isDivider: true
+      #       title: 'Facebook Friends'
+      #     facebookFriendsItems = [
+      #       isDivider: false
+      #       friend: Auth.user.facebookFriends[4]
+      #     ]
+      #     for item in facebookFriendsItems
+      #       items.push item
+      #     items.push
+      #       isDivider: true
+      #       title: 'Contacts'
+      #     contactsItems = [
+      #       isDivider: false
+      #       friend: contacts[3]
+      #     ,
+      #       isDivider: false
+      #       friend: contacts[2]
+      #     ]
+      #     for item in contactsItems
+      #       items.push item
+      #     expect(ctrl.items).toEqual items
+
+      #   it 'should save a sorted array of nearby friends', ->
+      #     expect(ctrl.nearbyFriends).toEqual [ # Alphabetical
+      #       Auth.user.friends[3]
+      #       Auth.user.friends[2]
+      #     ]
+
+      #   it 'should save nearby friend ids', ->
+      #     nearbyFriendIds = {}
+      #     nearbyFriendIds[2] = true
+      #     nearbyFriendIds[3] = true
+      #     expect(ctrl.nearbyFriendIds).toEqual nearbyFriendIds
+
+
+      describe 'when not returning contacts', ->
+
+        beforeEach ->
+          friendItems = Friendship.buildFriendItems()
+
+        it 'should set the items on the controller', ->
+          items = [
+            isDivider: true
+            title: 'Nearby Friends'
+          ]
+          for friend in nearbyFriends
+            items.push
+              isDivider: false
+              friend: friend
+          alphabeticalItems = [
+            isDivider: true
+            title: Auth.user.friends[4].name[0]
+          ,
+            isDivider: false
+            friend: Auth.user.friends[4]
+          ,
+            isDivider: true
+            title: Auth.user.friends[3].name[0]
+          ,
+            isDivider: false
+            friend: Auth.user.friends[3]
+          ,
+            isDivider: true
+            title: Auth.user.friends[2].name[0]
+          ,
+            isDivider: false
+            friend: Auth.user.friends[2]
+          ]
+          for item in alphabeticalItems
+            items.push item
+          items.push
+            isDivider: true
+            title: 'Facebook Friends'
+          facebookFriendsItems = [
+            isDivider: false
+            friend: Auth.user.facebookFriends[4]
+          ]
+          for item in facebookFriendsItems
+            items.push item
+          expect(friendItems).toEqual items
+
+
+    describe 'with a search query', ->
+
+      beforeEach ->
+        options =
+          query: 'U'
+
+        friendItems = Friendship.buildFriendItems options
+
+      it 'should build the items array', ->
+        items = [
+          isDivider: false
+          friend: Auth.user.friends[4]
+        ,
+          isDivider: false
+          friend: Auth.user.friends[2]
+        ]
+        expect(friendItems).toEqual items
