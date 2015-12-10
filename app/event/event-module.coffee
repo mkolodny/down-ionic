@@ -1,6 +1,13 @@
+require '../common/resources/resources-module'
+require '../common/auth/auth-module'
+require '../common/local-db/local-db-module'
 EventCtrl = require './event-controller'
 
 angular.module 'rallytap.event', [
+    'ionic'
+    'rallytap.auth'
+    'rallytap.resources'
+    'rallytap.localDB'
     'ui.router'
   ]
   .config ($stateProvider) ->

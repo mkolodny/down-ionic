@@ -97,7 +97,7 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
         else
           return 1
 
-      items = ({isDivider: false, friend: friend} \
+      items = ({isDivider: false, user: friend} \
           for friend in friends)
     else
       # Build the list of alphabetically sorted nearby friends.
@@ -132,7 +132,7 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
 
         alphabeticalItems.push
           isDivider: false
-          friend: friend
+          user: friend
 
       # Build the list of facebook friends.
       facebookFriends = (friend for id, friend of Auth.user.facebookFriends)
@@ -141,7 +141,7 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
           return -1
         else
           return 1
-      facebookFriendsItems = ({isDivider: false, friend: friend} \
+      facebookFriendsItems = ({isDivider: false, user: friend} \
           for friend in facebookFriends)
 
       # Build the list of contacts.
@@ -162,7 +162,7 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
       for friend in nearbyFriends
         items.push
           isDivider: false
-          friend: friend
+          user: friend
       for item in alphabeticalItems
         items.push item
       if facebookFriendsItems.length > 0

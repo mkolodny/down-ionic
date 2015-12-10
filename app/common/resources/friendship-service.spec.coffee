@@ -373,25 +373,25 @@ describe 'friendship service', ->
           for friend in nearbyFriends
             items.push
               isDivider: false
-              friend: friend
+              user: friend
           alphabeticalItems = [
             isDivider: true
             title: Auth.user.friends[4].name[0]
           ,
             isDivider: false
-            friend: Auth.user.friends[4]
+            user: Auth.user.friends[4]
           ,
             isDivider: true
             title: Auth.user.friends[3].name[0]
           ,
             isDivider: false
-            friend: Auth.user.friends[3]
+            user: Auth.user.friends[3]
           ,
             isDivider: true
             title: Auth.user.friends[2].name[0]
           ,
             isDivider: false
-            friend: Auth.user.friends[2]
+            user: Auth.user.friends[2]
           ]
           for item in alphabeticalItems
             items.push item
@@ -400,7 +400,7 @@ describe 'friendship service', ->
             title: 'Facebook Friends'
           facebookFriendsItems = [
             isDivider: false
-            friend: Auth.user.facebookFriends[4]
+            user: Auth.user.facebookFriends[4]
           ]
           for item in facebookFriendsItems
             items.push item
@@ -418,9 +418,9 @@ describe 'friendship service', ->
       it 'should build the items array', ->
         items = [
           isDivider: false
-          friend: Auth.user.friends[4]
+          user: Auth.user.friends[4]
         ,
           isDivider: false
-          friend: Auth.user.friends[2]
+          user: Auth.user.friends[2]
         ]
         expect(friendItems).toEqual items

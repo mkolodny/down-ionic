@@ -383,3 +383,63 @@ describe 'user service', ->
       it 'should return the default size', ->
         expected = "#{user.imageUrl}?width=#{size}&height=#{size}"
         expect(imageUrl).toBe expected
+
+
+  ##resource::getInitials
+  describe 'getting a contact\'s initials', ->
+
+    describe 'when they have multiple words in their name', ->
+      user = null
+
+      beforeEach ->
+        user =
+          id: 1
+          email: 'aturing@gmail.com'
+          name: 'Alan Danger Turing'
+          username: 'tdog'
+          image_url: 'https://facebook.com/profile-pic/tdog'
+          location:
+            type: 'Point'
+            coordinates: [40.7265834, -73.9821535]
+        user = new User user
+
+      it 'should return the first letter of their first and last name', ->
+        expect(user.getInitials()).toBe 'AT'
+
+
+    describe 'when they have one word in their name', ->
+      user = null
+
+      beforeEach ->
+        user =
+          id: 1
+          email: 'aturing@gmail.com'
+          name: 'Pele'
+          username: 'tdog'
+          image_url: 'https://facebook.com/profile-pic/tdog'
+          location:
+            type: 'Point'
+            coordinates: [40.7265834, -73.9821535]
+        user = new User user
+
+      it 'should return the first two letters of their name', ->
+        expect(user.getInitials()).toBe 'PE'
+
+
+    describe 'when they have one letter in their name', ->
+      user = null
+
+      beforeEach ->
+        user =
+          id: 1
+          email: 'aturing@gmail.com'
+          name: 'P'
+          username: 'tdog'
+          image_url: 'https://facebook.com/profile-pic/tdog'
+          location:
+            type: 'Point'
+            coordinates: [40.7265834, -73.9821535]
+        user = new User user
+
+      it 'should return the first letter of their name', ->
+        expect(user.getInitials()).toBe 'P'

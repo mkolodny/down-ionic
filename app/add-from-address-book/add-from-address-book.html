@@ -34,7 +34,7 @@
         <!-- Contact -->
         <div ng-if="!item.isDivider && !item.user.username">
           <span class="contact-image item-image"
-                >{{addFromAddressBook.getInitials(item.user.name)}}</span>
+                >{{item.user.getInitials()}}</span>
           <h2>{{item.user.name}}</h2>
           <p>Add by SMS</p>
           <friendship-button user="item.user">
