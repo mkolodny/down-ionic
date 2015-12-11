@@ -43,12 +43,12 @@
           <!-- Event -->
           <invite-button ng-if="item.user.id && event.savedEvent && !event.recommendedEvent"
                          user="item.user"
-                         event="event.savedEvent.event">
+                         event="event.savedEvent.event"></invite-button>
 
           <!-- Recommended Event -->
           <invite-button ng-if="item.user.id && event.recommendedEvent && !event.savedEvent"
                          user="item.user"
-                         recommended-event="event.recommendedEvent">
+                         recommended-event="event.recommendedEvent"></invite-button>
         </ion-item>
       </ion-list>
     </div>
