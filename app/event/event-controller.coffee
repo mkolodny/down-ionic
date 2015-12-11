@@ -65,7 +65,6 @@ class Event
                     {{item.user.getInitials()}}
               </span>
               <h2>{{item.user.name}}</h2>
-              <p>{{item.user.username}}</p>
               <invite-button ng-if="item.user.id"
                              user="item.user"
                              recommended-event="event.recommendedEvent"

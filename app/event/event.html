@@ -36,7 +36,6 @@
                 {{item.user.getInitials()}}
           </span>
           <h2>{{item.user.name}}</h2>
-          <p>{{item.user.username}}</p>
           <!-- Event -->
           <invite-button ng-if="item.user.id && event.savedEvent && !event.recommendedEvent"
                          user="item.user"
