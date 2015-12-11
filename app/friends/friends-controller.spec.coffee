@@ -60,50 +60,8 @@ describe 'add friends controller', ->
   it 'should set the points service on the controller', ->
     expect(ctrl.Points).toBe Points
 
-  describe 'tapping to add by username', ->
 
-    beforeEach ->
-      spyOn $state, 'go'
-
-      ctrl.addByUsername()
-
-    it 'should go to the add by username view', ->
-      expect($state.go).toHaveBeenCalledWith 'addByUsername'
-
-
-  describe 'tapping to add by phone', ->
-
-    beforeEach ->
-      spyOn $state, 'go'
-
-      ctrl.addByPhone()
-
-    it 'should go to the add by phone view', ->
-      expect($state.go).toHaveBeenCalledWith 'addByPhone'
-
-
-  describe 'tapping to add from address book', ->
-
-    beforeEach ->
-      spyOn $state, 'go'
-
-      ctrl.addFromAddressBook()
-
-    it 'should go to the add from address book view', ->
-      expect($state.go).toHaveBeenCalledWith 'addFromAddressBook'
-
-
-  describe 'tapping to add from facebook', ->
-
-    beforeEach ->
-      spyOn $state, 'go'
-
-      ctrl.addFromFacebook()
-
-    it 'should go to the add from facebook view', ->
-      expect($state.go).toHaveBeenCalledWith 'addFromFacebook'
-
-
+  ##showMyFriends
   describe 'tapping to view my friends', ->
 
     beforeEach ->
@@ -115,6 +73,7 @@ describe 'add friends controller', ->
       expect($state.go).toHaveBeenCalledWith 'myFriends'
 
 
+  ##showAddedMe
   describe 'tapping to view the people who added me', ->
 
     beforeEach ->
@@ -124,6 +83,18 @@ describe 'add friends controller', ->
 
     it 'should go to the added me view', ->
       expect($state.go).toHaveBeenCalledWith 'addedMe'
+
+
+  ##showAddFriends
+  describe 'tapping to view the add friends view', ->
+
+    beforeEach ->
+      spyOn $state, 'go'
+
+      ctrl.showAddFriends()
+
+    it 'should go to the add friends view', ->
+      expect($state.go).toHaveBeenCalledWith 'addFriends'
 
   ##hasSharePlugin
   describe 'checking if the social sharing plugin is installed', ->

@@ -11,17 +11,8 @@ class FriendsCtrl
   showAddedMe: ->
     @$state.go 'addedMe'
 
-  addByUsername: ->
-    @$state.go 'addByUsername'
-
-  addFromAddressBook: ->
-    @$state.go 'addFromAddressBook'
-
-  addFromFacebook: ->
-    @$state.go 'addFromFacebook'
-
-  addByPhone: ->
-    @$state.go 'addByPhone'
+  showAddFriends: ->
+    @$state.go 'addFriends'
 
   hasSharePlugin: ->
     angular.isDefined @$window.plugins?.socialsharing
