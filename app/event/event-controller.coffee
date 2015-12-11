@@ -10,7 +10,7 @@ class Event
 
     # Init variables
     @contacts = {}
-    
+
     @$scope.$on '$ionicView.loaded', =>
       @setupSearchModal()
 
@@ -33,49 +33,50 @@ class Event
     modalTemplate = """
       <ion-modal-view id="search">
         <ion-header-bar>
-          <button class="button button-icon icon" 
+          <button class="button button-icon icon"
                   ng-click="event.hideSearchModal()">
             <i class="fa fa-close"></i>
           </button>
-          <h1 class="title">Invite Friends</h1>
+          <h1 class="title">See Who's Down</h1>
         </ion-header-bar>
         <ion-content scroll="false">
           <div class="search-bar">
             <i class="fa fa-search"></i>
-            <input id="enter-place" 
+            <input id="enter-place"
                    ng-model="searchQuery"
                    placeholder="Search"
                    autofocus>
           </div>
-          <ion-item>
-            <h2>Invite your favorite people</h2>
-            <p>We'll send them a text if they're not on Rallytap.</p>
-          </ion-item>
-          <ion-item ng-repeat="item in event.items | filter:searchQuery | limitTo:10"
-                class="item-avatar item-icon-right"
-                item-height="79px"
-                item-width="100%">
-            <!-- User -->
-            <div>
-              <img class="item-image" 
-                   ng-if="item.user.imageUrl"
-                   ng-src="{{item.user.getImageUrl()}}">
-              <span class="contact-image item-image"
-                    ng-if="!item.user.imageUrl">
-                    {{item.user.getInitials()}}
-              </span>
-              <h2>{{item.user.name}}</h2>
-              <invite-button ng-if="item.user.id"
-                             user="item.user"
-                             recommended-event="event.recommendedEvent"
-                             event="event.savedEvent.event">
+          <div id="see-whos-down">
+            <div id="section-header" ng-if="!searchQuery">
+              <p>We'll send them a text with your message and a link to reply if they're not on Rallytap.</p>
             </div>
-          </ion-item>
+            <ion-item ng-repeat="item in event.items | filter:searchQuery"
+                  class="item-avatar item-icon-right friend"
+                  item-height="52px"
+                  item-width="100%">
+              <!-- User -->
+              <div>
+                <img class="item-image"
+                     ng-if="item.user.imageUrl"
+                     ng-src="{{item.user.getImageUrl()}}">
+                <span class="contact-image item-image"
+                      ng-if="!item.user.imageUrl">
+                      {{item.user.getInitials()}}
+                </span>
+                <h2>{{item.user.name}}</h2>
+                <invite-button ng-if="item.user.id"
+                               user="item.user"
+                               recommended-event="event.recommendedEvent"
+                               event="event.savedEvent.event">
+              </div>
+            </ion-item>
+          </div>
         </ion-content>
       </ion-modal-view>
     """
     @searchModal = @$ionicModal.fromTemplate modalTemplate, modalOptions
-    
+
     # Clean up the search modal
     @$scope.$on '$destroy', =>
       @searchModal.remove()
@@ -106,7 +107,7 @@ class Event
       pushItem user
 
     items
-    
+
   showSearchModal: ->
     @searchModal.show()
 

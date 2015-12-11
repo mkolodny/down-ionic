@@ -50,21 +50,21 @@
   <!-- Interested Friends -->
   <div class="loading interested-friends"
        ng-if="eventItem.savedEvent.isLoadingInterested">
-    <div class="num-interested-friends">
+    <h3>
       friends interested
-    </div>
+    </h3>
     <ion-spinner class="loading-friends" icon="bubbles"></ion-spinner>
   </div>
   <div class="interested-friends"
        ng-if="eventItem.savedEvent.interestedFriends.length > 0">
-    <div class="num-interested-friends">
+    <h3>
       {{eventItem.savedEvent.interestedFriends.length}} <ng-pluralize
       count="eventItem.savedEvent.interestedFriends.length"
       when="{
         1: 'friend is interested',
         'other': 'friends are interested'
       }" />
-    </div>
+    </h3>
     <div id="learn-down" class="popover" ng-if="eventItem.showLearnInvitePopover">
       <div>
         Your friends are interested, too!

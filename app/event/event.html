@@ -13,19 +13,24 @@
                 recommended-event="event.recommendedEvent"></event-item>
 
     <!-- Invite friends -->
-    <ion-list class="list-avatar">
-      <!-- Section Heading -->
-      <ion-item class="item-icon-right">
-        <h2>Invite Friends</h2>
-        <p>We'll send them a text if they're not on Rallytap.</p>
-        <i class="icon fa fa-search" ng-click="event.showSearchModal()"></i>
-      </ion-item>
-      <ion-item collection-repeat="item in event.items"
-                class="item-avatar item-icon-right"
-                item-height="79px"
-                item-width="100%">
-        <!-- User -->
-        <div>
+    <div id="see-whos-down">
+      <div id="section-header">
+        <h3>See who's down</h3>
+        <p>We'll send them a text with your message and a link to reply if they're not on Rallytap.</p>
+      </div>
+      <div class="search-bar">
+        <i class="fa fa-search"></i>
+        <input ng-model="name"
+               placeholder="Search"
+               ng-click="event.showSearchModal()"
+               ontouchstart>
+      </div>
+      <ion-list class="list-avatar">
+        <ion-item collection-repeat="item in event.items"
+                  class="item-avatar item-icon-right friend"
+                  item-height="52px"
+                  item-width="100%">
+          <!-- User -->
           <img class="item-image" 
                ng-if="item.user.imageUrl"
                ng-src="{{item.user.getImageUrl()}}">
@@ -43,8 +48,8 @@
           <invite-button ng-if="item.user.id && event.recommendedEvent && !event.savedEvent"
                          user="item.user"
                          recommended-event="event.recommendedEvent">
-        </div>
-      </ion-item>
-    </ion-list>
+        </ion-item>
+      </ion-list>
+    </div>
   </ion-content>
 </ion-view>
