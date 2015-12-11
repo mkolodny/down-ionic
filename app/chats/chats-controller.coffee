@@ -54,7 +54,7 @@ class ChatsCtrl
 
     # Sort by newestMessage.createdAt
     items.sort (a, b) ->
-      a.newestMessage.createdAt > b.newestMessage.createdAt
+      a.newestMessage.createdAt < b.newestMessage.createdAt
 
     items
 
