@@ -14,9 +14,9 @@
           <div class="text invite-action"
                ng-if="friendChat.isInviteAction(message)"
                >Are you down for <span
-               ><span>"{{message.meta.event.title}}</span><span
-               ng-if="message.meta.event.place"
-               > at {{message.meta.event.place.name}}</span><span ng-if="message.meta.event.datetime"> &mdash; {{message.meta.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>"</span>?</div>
+               ><span>"{{message.eventData.title}}</span><span
+               ng-if="message.eventData.place"
+               > at {{message.eventData.place.name}}</span><span ng-if="message.eventData.datetime"> &mdash; {{message.eventData.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>"</span>?</div>
         </div>
       </ion-item>
     </ion-list>

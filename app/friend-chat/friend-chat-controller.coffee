@@ -52,6 +52,15 @@ class FriendChatCtrl
 
   transformMessage: (message) =>
     message.creator = new @User message.creator
+
+    if message.type is 'invite_action'
+      # Normalize data for event and recommended
+      #   event to simplify HTML
+      if angular.isDefined message.meta.event
+        message.eventData = message.meta.event
+      else
+        message.eventData = message.meta.recommendedEvent
+
     message
 
   isInviteAction: (message) ->

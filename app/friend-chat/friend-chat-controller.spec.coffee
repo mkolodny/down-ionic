@@ -247,6 +247,35 @@ describe 'friend chat controller', ->
       messageCopy.creator = new User messageCopy.creator
       expect(transformedMessage).toEqual messageCopy
   
+    describe 'when the message is an invite_action', ->
+      eventData = null
+
+      beforeEach ->
+        message.type = 'invite_action'
+        eventData = 
+          id: 1
+          name: 'The Best Event Ever!'
+
+      describe 'when it\'s for an event', ->
+
+        beforeEach ->
+          message.meta =
+            event: eventData
+          transformedMessage = ctrl.transformMessage message
+
+        it 'should set the event data on message', ->
+          expect(transformedMessage.eventData).toEqual eventData
+
+      describe 'when it\'s for a recommended event', ->
+
+        beforeEach ->
+          message.meta =
+            recommendedEvent: eventData
+          transformedMessage = ctrl.transformMessage message
+
+        it 'should set the event data on message', ->
+          expect(transformedMessage.eventData).toEqual eventData
+
 
   ##isInviteAction
   describe 'checking whether a message is an invite action message', ->
