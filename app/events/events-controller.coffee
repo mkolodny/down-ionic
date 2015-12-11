@@ -1,12 +1,16 @@
 class EventsCtrl
-  @$inject: ['$meteor', '$scope', '$state', '$rootScope', 'Auth', 'Points', 'SavedEvent',
-             'RecommendedEvent', 'ngToast', 'User', 'Event', '$mixpanel']
-  constructor: (@$meteor, @$scope, @$state, @$rootScope, @Auth, @Points,
-                @SavedEvent, @RecommendedEvent, @ngToast, @User,
-                @Event, @$mixpanel) ->
+  @$inject: ['$meteor', '$mixpanel', '$scope', '$state', '$rootScope',
+              'Auth', 'Event', 'ngToast', 'Points', 'RecommendedEvent',
+              'SavedEvent', 'User']
+  constructor: (@$meteor, @$mixpanel, @$scope, @$state, @$rootScope,
+                @Auth, @Event, @ngToast, @Points, @RecommendedEvent,
+                @SavedEvent, @User) ->
     @items = []
     @commentsCount = {}
     @currentUser = @Auth.user
+
+    # Set this function on the root scope so that it can be called from index.html.
+    @$rootScope.setHasLearnedSaveEvent = @setHasLearnedSaveEvent
 
     @$scope.$on '$ionicView.loaded', =>
       @isLoading = true
@@ -21,6 +25,7 @@ class EventsCtrl
       @items = @buildItems()
       @isLoading = false
       @$scope.$broadcast 'scroll.refreshComplete'
+      @optionallyShowWalkthrough()
 
   refresh: ->
     delete @savedEventsLoaded
@@ -110,5 +115,22 @@ class EventsCtrl
       savedEvent: item.savedEvent
       recommendedEvent: item.recommendedEvent
       commentsCount: item.commentsCount
+
+  optionallyShowWalkthrough: ->
+    if not @Auth.flags.hasLearnedSaveEvent
+      @$rootScope.showLearnSaveEventPopover = true
+    else if not @Auth.flags.hasLearnedFeed and @savedEvents.length > 0
+      @showLearnFeedPopover = true
+
+  setHasLearnedFeed: ->
+    @Auth.setFlag 'hasLearnedFeed', true
+    @showLearnFeedPopover = false
+
+  # We need the => to call functions from this controller's scope because this
+  # function is called from the root scope.
+  setHasLearnedSaveEvent: =>
+    @Auth.setFlag 'hasLearnedSaveEvent', true
+    @$rootScope.showLearnSaveEventPopover = false
+    @optionallyShowWalkthrough()
 
 module.exports = EventsCtrl

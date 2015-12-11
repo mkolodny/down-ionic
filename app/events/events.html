@@ -27,6 +27,15 @@
              readonly
              placeholder="What sounds fun?">
     </div>
+    <div id="learn-friends" class="popover" ng-if="events.showLearnFeedPopover">
+      Here's what your nearby friends are interested in doing.
+      <button class="button button-clear"
+              ng-click="events.setHasLearnedFeed()"
+              ontouchstart>
+        Got it.
+      </button>
+      <div class="popover-arrow"></div>
+    </div>
     <ion-list>
       <ion-item collection-repeat="item in events.items"
                 item-width="100%"

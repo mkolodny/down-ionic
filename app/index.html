@@ -22,5 +22,16 @@
     </ion-nav-back-button>
   </ion-nav-bar>
   <ion-nav-view></ion-nav-view>
+  <div class="popover-backdrop active" ng-if="showLearnSaveEventPopover">
+    <div id="learn-save-event" class="popover">
+      Tap to indicate that you're interested.
+      <button class="button button-clear"
+              ng-click="setHasLearnedSaveEvent()"
+              ontouchstart>
+        Got it.
+      </button>
+      <div class="popover-arrow"></div>
+    </div>
+  </div>
 </body>
 </html>
