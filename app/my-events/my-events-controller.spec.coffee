@@ -285,6 +285,6 @@ describe 'my events controller', ->
       ctrl.viewEvent item
 
     it 'should go to the event view', ->
-      expect($state.go).toHaveBeenCalledWith 'home.event',
+      expect($state.go).toHaveBeenCalledWith 'saved.event',
         savedEvent: item.savedEvent
         commentsCount: item.commentsCount

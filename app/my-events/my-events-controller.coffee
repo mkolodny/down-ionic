@@ -58,7 +58,7 @@ class MyEventsCtrl
         @ngToast.create 'Oops.. an error occurred..'
 
   viewEvent: (item) ->
-    @$state.go 'home.event',
+    @$state.go 'saved.event',
       savedEvent: item.savedEvent
       commentsCount: item.commentsCount
 
