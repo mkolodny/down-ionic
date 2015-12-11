@@ -20,37 +20,16 @@
         <i class="fa fa-chevron-right"></i>
       </ion-item>
       <ion-item class="item-avatar"
+                ng-click="friends.showAddFriends()">
+        <img ng-src="images/Add_Friends.png" alt="Add Friends">
+        <h2>Add Friends</h2>
+        <i class="fa fa-chevron-right"></i>
+      </ion-item>
+      <ion-item class="item-avatar"
                 ng-if="friends.hasSharePlugin()"
                 ng-click="friends.shareApp()">
         <img ng-src="images/Invite_Friends.png" alt="Invite Friends">
         <h2>Invite friends to Rallytap!</h2>
-      </ion-item>
-      <ion-item class="item-divider">
-        Add Friends
-      </ion-item>
-      <ion-item class="item-avatar"
-                ng-click="friends.addByUsername()">
-        <img ng-src="images/Add_By_Username.png">
-        <h2>Add by username</h2>
-        <i class="fa fa-chevron-right"></i>
-      </ion-item>
-      <ion-item class="item-avatar"
-                ng-click="friends.addFromAddressBook()">
-        <img ng-src="images/Add_From_Address_Book.png">
-        <h2>Add from address book</h2>
-        <i class="fa fa-chevron-right"></i>
-      </ion-item>
-      <ion-item class="item-avatar"
-                ng-click="friends.addFromFacebook()">
-        <img ng-src="images/Add_From_Facebook.png">
-        <h2>Add from Facebook</h2>
-        <i class="fa fa-chevron-right"></i>
-      </ion-item>
-      <ion-item class="item-avatar"
-                ng-click="friends.addByPhone()">
-        <img ng-src="images/Add_By_Phone.png" alt="Facebook">
-        <h2>Add by phone number</h2>
-        <i class="fa fa-chevron-right"></i>
       </ion-item>
     </ion-list>
   </ion-content>

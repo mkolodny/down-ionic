@@ -8,18 +8,14 @@ require '../ionic/ionic-angular.js'
 AddFriendsCtrl = require './add-friends-controller'
 
 describe 'add friends controller', ->
-  $ionicHistory = null
   $state = null
   ctrl = null
   scope = null
-
-  beforeEach angular.mock.module('ionic')
 
   beforeEach angular.mock.module('ui.router')
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
-    $ionicHistory = $injector.get '$ionicHistory'
     $state = $injector.get '$state'
     scope = $injector.get '$rootScope'
 
@@ -69,19 +65,3 @@ describe 'add friends controller', ->
 
     it 'should go to the add by phone view', ->
       expect($state.go).toHaveBeenCalledWith 'addByPhone'
-
-
-  describe 'going back', ->
-
-    beforeEach ->
-      spyOn $ionicHistory, 'nextViewOptions'
-      spyOn $ionicHistory, 'goBack'
-
-      ctrl.goBack()
-
-    it 'should disable animating transitions', ->
-      options = {disableAnimate: true}
-      expect($ionicHistory.nextViewOptions).toHaveBeenCalledWith options
-
-    it 'should go to the previous view', ->
-      expect($ionicHistory.goBack).toHaveBeenCalled()

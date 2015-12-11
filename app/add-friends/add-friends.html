@@ -1,26 +1,21 @@
-<ion-view id="add-friends" view-title="Add Friends" hide-back-button="true">
-  <ion-nav-buttons side="left">
-    <button class="button back-button buttons button-clear header-item"
-            ng-click="addFriends.goBack()" ontouchstart
-            ><i class="fa fa-chevron-left fa-lg"></i></button>
-  </ion-nav-buttons>
+<ion-view id="add-friends" view-title="Add Friends">
   <ion-content>
     <ion-list>
       <ion-item class="item-avatar"
                 ng-click="addFriends.addByUsername()">
-        <img ng-src="images/Add_By_Username.png" alt="Username">
+        <img ng-src="images/Add_By_Username.png">
         <h2>Add by username</h2>
         <i class="fa fa-chevron-right"></i>
       </ion-item>
       <ion-item class="item-avatar"
                 ng-click="addFriends.addFromAddressBook()">
-        <img ng-src="images/Add_From_Address_Book.png" alt="Address Book">
+        <img ng-src="images/Add_From_Address_Book.png">
         <h2>Add from address book</h2>
         <i class="fa fa-chevron-right"></i>
       </ion-item>
       <ion-item class="item-avatar"
                 ng-click="addFriends.addFromFacebook()">
-        <img ng-src="images/Add_From_Facebook.png" alt="Facebook">
+        <img ng-src="images/Add_From_Facebook.png">
         <h2>Add from Facebook</h2>
         <i class="fa fa-chevron-right"></i>
       </ion-item>

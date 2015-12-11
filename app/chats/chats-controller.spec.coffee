@@ -10,6 +10,7 @@ ChatsCtrl = require './chats-controller'
 describe 'chats controller', ->
   $httpBackend = null
   $meteor = null
+  $ionicLoading = null
   $q = null
   $state = null
   allChatsDeferred = null
@@ -46,6 +47,7 @@ describe 'chats controller', ->
     $httpBackend = $injector.get '$httpBackend'
     $meteor = $injector.get '$meteor'
     $rootScope = $injector.get '$rootScope'
+    $ionicLoading = $injector.get '$ionicLoading'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     Auth = $injector.get 'Auth'
@@ -75,11 +77,6 @@ describe 'chats controller', ->
       if collectionName is 'messages' then return messagesCollection
       if collectionName is 'chats' then return chatsCollection
 
-    allChatsDeferred = $q.defer()
-    messagesDeferred = $q.defer()
-    $meteor.subscribe.and.callFake (subscriptionName)->
-      if subscriptionName is 'allChats' then return allChatsDeferred.promise
-      if subscriptionName is 'messages' then return messagesDeferred.promise
 
     # For some reason, we're making requests to this URL.
     # TODO: Figure out why, and remove this.
@@ -96,56 +93,78 @@ describe 'chats controller', ->
   it 'should init the items array', ->
     expect(ctrl.items).toEqual []
 
-  it 'should set the Chats collection on the controller', ->
-    expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
-    expect(ctrl.Chats).toBe chatsCollection
-
-  it 'should set the current user on the controller', ->
-    expect(ctrl.currentUser).toBe Auth.user
-
-  it 'should subscribe to all the chats', ->
-    expect($meteor.subscribe).toHaveBeenCalledWith 'allChats'
-
-  it 'should set the points service on the controller', ->
-    expect(ctrl.Points).toBe Points
-
-  describe 'when the allChats subscription is ready', ->
+  ##$ionicView.loaded
+  describe 'when the view loads', ->
 
     beforeEach ->
-      spyOn ctrl, 'handleLoadedData'
-      spyOn ctrl, 'watchNewMessages'
-      spyOn ctrl, 'watchNewChats'
-      spyOn ctrl, 'getChatUsers'
+      allChatsDeferred = $q.defer()
+      messagesDeferred = $q.defer()
+      scope.$meteorSubscribe = jasmine.createSpy('scope.$meteorSubscribe') \
+        .and.callFake (subscriptionName)->
+          if subscriptionName is 'allChats' then return allChatsDeferred.promise
+          if subscriptionName is 'messages' then return messagesDeferred.promise
+      spyOn $ionicLoading, 'show'
+      spyOn $ionicLoading, 'hide'
 
-      allChatsDeferred.resolve()
+      scope.$broadcast '$ionicView.loaded'
       scope.$apply()
 
-    it 'should set the all chats loaded flag', ->
-      expect(ctrl.allChatsLoaded).toBe true
+    it 'should show a loading indicator', ->
+      expect($ionicLoading.show).toHaveBeenCalled()
 
-    it 'should subscribe to messages for all of the chats', ->
-      expect($meteor.subscribe).toHaveBeenCalledWith 'messages', chatIds
+    it 'should set the Chats collection on the controller', ->
+      expect($meteor.getCollectionByName).toHaveBeenCalledWith 'chats'
+      expect(ctrl.Chats).toBe chatsCollection
 
-    it 'should get the users for each chat', ->
-      expect(ctrl.getChatUsers).toHaveBeenCalledWith chatIds
+    it 'should set the current user on the controller', ->
+      expect(ctrl.currentUser).toBe Auth.user
 
-    describe 'when messages subscription is ready', ->
+    it 'should subscribe to all the chats', ->
+      expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'allChats'
+
+    it 'should set the points service on the controller', ->
+      expect(ctrl.Points).toBe Points
+
+    describe 'when the allChats subscription is ready', ->
 
       beforeEach ->
-        messagesDeferred.resolve()
+        spyOn ctrl, 'handleLoadedData'
+        spyOn ctrl, 'watchNewMessages'
+        spyOn ctrl, 'watchNewChats'
+        spyOn ctrl, 'getChatUsers'
+
+        allChatsDeferred.resolve()
         scope.$apply()
 
-      it 'should set the messages loaded flag', ->
-        expect(ctrl.messagesLoaded).toBe true
+      it 'should set the all chats loaded flag', ->
+        expect(ctrl.allChatsLoaded).toBe true
 
-      it 'should watch for new messages', ->
-        expect(ctrl.watchNewMessages).toHaveBeenCalled()
+      it 'should subscribe to messages for all of the chats', ->
+        expect(scope.$meteorSubscribe).toHaveBeenCalledWith 'messages', chatIds
 
-      it 'should watch for new chats', ->
-        expect(ctrl.watchNewChats).toHaveBeenCalled()
+      it 'should get the users for each chat', ->
+        expect(ctrl.getChatUsers).toHaveBeenCalledWith chatIds
 
-      it 'should handleLoadedData', ->
-        expect(ctrl.handleLoadedData).toHaveBeenCalled()
+      describe 'when messages subscription is ready', ->
+
+        beforeEach ->
+          messagesDeferred.resolve()
+          scope.$apply()
+
+        it 'should set the messages loaded flag', ->
+          expect(ctrl.messagesLoaded).toBe true
+
+        it 'should watch for new messages', ->
+          expect(ctrl.watchNewMessages).toHaveBeenCalled()
+
+        it 'should watch for new chats', ->
+          expect(ctrl.watchNewChats).toHaveBeenCalled()
+
+        it 'should handleLoadedData', ->
+          expect(ctrl.handleLoadedData).toHaveBeenCalled()
+
+        it 'should hide a loading indicator', ->
+          expect($ionicLoading.hide).toHaveBeenCalled()
 
 
   ##$ionicView.beforeEnter
@@ -178,6 +197,9 @@ describe 'chats controller', ->
       it 'should build the items and set them on the controller', ->
         expect(ctrl.items).toEqual []
 
+      it 'should set the items loaded flag', ->
+        expect(ctrl.itemsLoaded).toBe true
+
 
   ##buildItems
   describe 'building the items', ->
@@ -202,6 +224,16 @@ describe 'chats controller', ->
       spyOn(ctrl, 'getNewestMessage').and.callFake (chatId) ->
         if chatId is '2,3' then return newerMessage
         if chatId is '2,4' then return olderMessage
+
+      chat23 =
+        _id: '2,3'
+      chat24 =
+        _id: '2,4'
+      chats = [chat23, chat24]
+      chatIds = [chat23._id, chat24._id]
+      fetch = jasmine.createSpy('find.fetch').and.returnValue chats
+      ctrl.Chats =
+        find: jasmine.createSpy('Chats.find').and.returnValue {fetch: fetch}
 
       items = ctrl.buildItems()
 
