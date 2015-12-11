@@ -23,7 +23,7 @@
       <i class="fa fa-calendar-plus-o" ng-click="events.createEvent()"></i>
       <input id="create-event-prompt"
              ng-click="events.createEvent()"
-             on-tap
+             ontouchstart
              readonly
              placeholder="What sounds fun?">
     </div>
@@ -52,7 +52,6 @@
         <!-- Recommended Event -->
         <event-item ng-if="item.recommendedEvent"
                     recommended-event="item.recommendedEvent"></event-item>
-
       </ion-item>
     </ion-list>
   </ion-content>
