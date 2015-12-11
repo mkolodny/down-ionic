@@ -31,7 +31,8 @@
       <ion-item collection-repeat="item in events.items"
                 item-width="100%"
                 item-height="events.getItemHeight(item)"
-                ng-click="events.viewEvent(item.savedEvent)"
+                ng-click="events.viewEvent(item)"
+                ng-disabled="item.isDivider"
                 ontouchstart
                 ng-class="{
                   'item-divider': item.isDivider,

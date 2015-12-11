@@ -57,10 +57,10 @@ class MyEventsCtrl
       , =>
         @ngToast.create 'Oops.. an error occurred..'
 
-  viewEvent: (savedEvent) ->
-    @$state.go 'saved.event',
-      savedEvent: savedEvent
-      commentsCount: @commentsCount[savedEvent.eventId]
+  viewEvent: (item) ->
+    @$state.go 'home.event',
+      savedEvent: item.savedEvent
+      commentsCount: item.commentsCount
 
 
 module.exports = MyEventsCtrl

@@ -105,9 +105,10 @@ class EventsCtrl
     else if item.recommendedEvent
       item.recommendedEvent.getCellHeight()
 
-  viewEvent: (savedEvent) ->
+  viewEvent: (item) ->
     @$state.go 'home.event',
-      savedEvent: savedEvent
-      commentsCount: @commentsCount[savedEvent.eventId]
+      savedEvent: item.savedEvent
+      recommendedEvent: item.recommendedEvent
+      commentsCount: item.commentsCount
 
 module.exports = EventsCtrl

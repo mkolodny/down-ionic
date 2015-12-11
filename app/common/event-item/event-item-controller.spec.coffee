@@ -90,10 +90,11 @@ describe 'event item directive', ->
     describe 'when there is a recommended event', ->
 
       beforeEach ->
+        delete ctrl.savedEvent
         ctrl.recommendedEvent = recommendedEvent
 
       it 'should return the event', ->
-        expect(ctrl.getEvent()).toEqual ctrl.recommendedEvent
+        expect(ctrl.getEvent()).toEqual recommendedEvent
 
 
   ##save

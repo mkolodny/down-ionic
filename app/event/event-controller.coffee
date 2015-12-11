@@ -2,9 +2,11 @@ class Event
   @$inject: ['$ionicModal', '$stateParams', '$rootScope', '$scope', 'Auth', 'LocalDB']
   constructor: (@$ionicModal, @$stateParams, @$rootScope, @$scope, @Auth, @LocalDB) ->
     # State params
-    @savedEvent = @$stateParams.savedEvent
-    @commentsCount = @$stateParams.commentsCount
-    @searchQuery = ''
+    #   if not set, ui.router defaults to null
+    #   default to undefined instead
+    @savedEvent = @$stateParams.savedEvent or undefined
+    @commentsCount = @$stateParams.commentsCount or undefined
+    @recommendedEvent = @$stateParams.recommendedEvent or undefined
 
     # Init variables
     @contacts = {}
@@ -62,6 +64,7 @@ class Event
               <p>{{item.user.username}}</p>
               <invite-button ng-if="item.user.id"
                              user="item.user"
+                             recommended-event="event.recommendedEvent"
                              event="event.savedEvent.event">
             </div>
           </ion-item>

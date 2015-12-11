@@ -1,7 +1,10 @@
 <ion-view id="event" view-title="Rallytap">
   <ion-content>
+    <!-- Event item -->
     <event-item saved-event="event.savedEvent"
+                recommended-event="event.recommendedEvent"
                 comments-count="event.commentsCount"></event-item>
+    <!-- Invite friends -->
     <ion-list class="list-avatar">
       <!-- Section Heading -->
       <ion-item>
@@ -24,6 +27,7 @@
           <p>{{item.user.username}}</p>
           <invite-button ng-if="item.user.id"
                          user="item.user"
+                         recommended-event="event.recommendedEvent"
                          event="event.savedEvent.event">
         </div>
       </ion-item>

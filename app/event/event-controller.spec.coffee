@@ -17,6 +17,7 @@ describe 'event controller', ->
   LocalDB = null
   savedEvent = null
   scope = null
+  recommendedEvent = null
 
   beforeEach angular.mock.module('ui.router')
 
@@ -45,8 +46,11 @@ describe 'event controller', ->
       event:
         id: 2
     commentsCount = 16
+    recommendedEvent =
+      id: 1
     $stateParams.savedEvent = savedEvent
     $stateParams.commentsCount = commentsCount
+    $stateParams.recommendedEvent = recommendedEvent
 
     ctrl = $controller EventCtrl,
       $stateParams: $stateParams
@@ -59,11 +63,11 @@ describe 'event controller', ->
   it 'should set the comments count on the controller', ->
     expect(ctrl.commentsCount).toBe commentsCount
 
+  it 'should set the recommended event on the controller', ->
+    expect(ctrl.recommendedEvent).toBe recommendedEvent
+
   it 'shoud init the contacts object on the controller', ->
     expect(ctrl.contacts).toEqual {}
-
-  it 'should init the search query', ->
-    expect(ctrl.searchQuery).toEqual ''
 
   ##$ionicView.load
   describe 'the first time the view loads', ->

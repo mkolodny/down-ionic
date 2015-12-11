@@ -22,6 +22,12 @@ angular.module 'rallytap.event', [
           ...
         ###
         savedEvent: null
+        ###
+        recommendedEvent =
+          id: 1
+          ...
+        ###
+        recommendedEvent: null
         commentsCount: null
 
     # Create states for each state that can 

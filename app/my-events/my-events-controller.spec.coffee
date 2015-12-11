@@ -268,6 +268,7 @@ describe 'my events controller', ->
 
   ##viewEvent
   describe 'viewing an event', ->
+    item = null
     savedEvent = null
     commentsCount = null
 
@@ -276,13 +277,14 @@ describe 'my events controller', ->
         id: 1
         eventId: 2
       commentsCount = 16
-      ctrl.commentsCount = {}
-      ctrl.commentsCount[savedEvent.eventId] = commentsCount
-      spyOn $state, 'go'
-
-      ctrl.viewEvent savedEvent
-
-    it 'should go to the event view', ->
-      expect($state.go).toHaveBeenCalledWith 'saved.event',
+      item =
         savedEvent: savedEvent
         commentsCount: commentsCount
+      spyOn $state, 'go'
+
+      ctrl.viewEvent item
+
+    it 'should go to the event view', ->
+      expect($state.go).toHaveBeenCalledWith 'home.event',
+        savedEvent: item.savedEvent
+        commentsCount: item.commentsCount
