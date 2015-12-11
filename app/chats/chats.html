@@ -10,7 +10,7 @@
   </ion-nav-buttons>
   <ion-content id="chats-content">
     <!-- No chats placeholder -->
-    <div class="placeholder" ng-if="chats.items.length === 0">
+    <div class="placeholder" ng-if="chats.itemsLoaded && chats.items.length === 0">
       <p>You don't have any chats right now.</p>
       <p>Tap the "Down?" button next to a friend who's also interested in a post to start a chat with them.</p>
     </div>

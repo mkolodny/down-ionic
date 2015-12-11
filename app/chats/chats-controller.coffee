@@ -5,31 +5,35 @@ class ChatsCtrl
              '$state', 'Auth', 'Friendship', 'Points', 'User']
   constructor: (@$ionicLoading, @$meteor, @$scope,
                 @$state, @Auth, @Friendship, @Points, @User) ->
-    @currentUser = @Auth.user
-
     # Init variables
     @users = {}
     @items = []
 
-    # Set Meteor collections on controller
-    @Messages = @$meteor.getCollectionByName 'messages'
-    @Chats = @$meteor.getCollectionByName 'chats'
+    @$scope.$on '$ionicView.loaded', =>
+      @currentUser = @Auth.user
 
-    # Subscribe to all chats
-    @$meteor.subscribe 'allChats'
-      .then =>
-        @allChatsLoaded = true
+      # Set Meteor collections on controller
+      @Messages = @$meteor.getCollectionByName 'messages'
+      @Chats = @$meteor.getCollectionByName 'chats'
 
-        allChats = @Chats.find().fetch()
-        chatIds = (chat._id for chat in allChats)
-        @getChatUsers chatIds
-        @$meteor.subscribe 'messages', chatIds
-      .then =>
-        @messagesLoaded = true
-        # messages subscription is ready
-        @handleLoadedData()
-        @watchNewMessages()
-        @watchNewChats()
+      @$ionicLoading.show()
+
+      # Subscribe to all chats
+      @$scope.$meteorSubscribe 'allChats'
+        .then =>
+          @allChatsLoaded = true
+
+          allChats = @Chats.find().fetch()
+          chatIds = (chat._id for chat in allChats)
+          @getChatUsers chatIds
+          @$scope.$meteorSubscribe 'messages', chatIds
+        .then =>
+          @messagesLoaded = true
+          # messages subscription is ready
+          @$ionicLoading.hide()
+          @handleLoadedData()
+          @watchNewMessages()
+          @watchNewChats()
 
     @$scope.$on '$ionicView.beforeEnter', =>
       @handleLoadedData()
@@ -37,6 +41,7 @@ class ChatsCtrl
   handleLoadedData: ->
     if @allChatsLoaded and @messagesLoaded and @chatUsersLoaded
       @items = @buildItems()
+      @itemsLoaded = true
 
   buildItems: ->
     items = []
@@ -67,7 +72,8 @@ class ChatsCtrl
     userIds = (@Friendship.parseChatId(chatId) for chatId in chatIds).join ','
 
     # Don't try to get users if there are no chats
-    # if userIds.length is 0 then return
+    if userIds.length is 0
+      @chatUsersLoaded = true
 
     @User.query {ids: userIds}
       .$promise.then (users) =>
