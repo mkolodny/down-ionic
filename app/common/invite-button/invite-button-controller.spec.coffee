@@ -72,6 +72,7 @@ describe 'invite button directive', ->
     user =
       id: 2
       name: 'Billy Bob'
+      firstName: 'Billy'
     event =
       id: 1
       title: 'Hoe down'
@@ -130,7 +131,7 @@ describe 'invite button directive', ->
 
       beforeEach ->
         ctrl.recommendedEvent = event
-        selector = 
+        selector =
           $or: [
             chatId: chatId
             type: 'invite_action'
@@ -225,13 +226,13 @@ describe 'invite button directive', ->
             chatId: chatId
             type: 'invite_action'
             'meta.recommendedEvent.id': event.id
-            'creator.id': 
+            'creator.id':
               $ne: "#{Auth.user.id}"
           ,
             chatId: chatId
             type: 'invite_action'
             'meta.event.recommendedEvent': event.id
-            'creator.id': 
+            'creator.id':
               $ne: "#{Auth.user.id}"
           ]
 
@@ -257,7 +258,7 @@ describe 'invite button directive', ->
           expect(response).toBe false
 
         it 'should query for invite action messages', ->
-          expect(ctrl.Messages.findOne).toHaveBeenCalledWith selector      
+          expect(ctrl.Messages.findOne).toHaveBeenCalledWith selector
 
 
   ##inviteUser
@@ -342,7 +343,7 @@ describe 'invite button directive', ->
 
 
       describe 'when there is a recommended event', ->
-        
+
         beforeEach ->
           ctrl.recommendedEvent = event
           ctrl.inviteUser()
@@ -415,7 +416,7 @@ describe 'invite button directive', ->
     it 'should show an ionic popup', ->
       expect($ionicPopup.show).toHaveBeenCalledWith
         title: 'Send Message?'
-        subTitle: "Tapping \"Down?\" sends #{user.name} a message asking if they\'re down for \"#{event.title}\""
+        subTitle: "Tapping \"Down?\" sends #{user.firstName} the message \"Are you down for \"#{event.title}\"?\""
         buttons: [
           text: 'Cancel'
         ,
