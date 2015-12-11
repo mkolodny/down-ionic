@@ -35,7 +35,7 @@ class ChatsCtrl
           @watchNewMessages()
           @watchNewChats()
 
-    @$scope.$on '$ionicView.beforeEnter', =>
+    @$scope.$on '$ionicView.enter', =>
       @handleLoadedData()
 
   handleLoadedData: ->

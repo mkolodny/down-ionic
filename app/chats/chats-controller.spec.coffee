@@ -167,13 +167,13 @@ describe 'chats controller', ->
           expect($ionicLoading.hide).toHaveBeenCalled()
 
 
-  ##$ionicView.beforeEnter
+  ##$ionicView.enter
   describe 'before the view enters', ->
 
     beforeEach ->
       spyOn ctrl, 'handleLoadedData'
 
-      scope.$broadcast '$ionicView.beforeEnter'
+      scope.$broadcast '$ionicView.enter'
       scope.$apply()
 
     it 'should handle the loaded data', ->
