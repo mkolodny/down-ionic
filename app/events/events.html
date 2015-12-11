@@ -40,7 +40,8 @@
       <ion-item collection-repeat="item in events.items"
                 item-width="100%"
                 item-height="events.getItemHeight(item)"
-                ng-click="events.viewEvent(item.savedEvent)"
+                ng-click="events.viewEvent(item)"
+                ng-disabled="item.isDivider"
                 ontouchstart
                 ng-class="{
                   'item-divider': item.isDivider,
@@ -56,29 +57,10 @@
         <event-item ng-if="item.savedEvent"
                     saved-event="item.savedEvent"
                     comments-count="item.commentsCount"></event-item>
-
+                    
         <!-- Recommended Event -->
-        <div class="saved-event" ng-if="item.recommendedEvent">
-          <div class="event item-button-left">
-            <button class="button mark-interested"
-                    ng-disabled="item.recommendedEvent.wasSaved"
-                    ng-click="events.saveRecommendedEvent(item.recommendedEvent)"
-                    ontouchstart>
-              <i class="icon"
-                 ng-class="{
-                   'calendar-star-selected': item.recommendedEvent.wasSaved,
-                   'calendar-star-default': !item.recommendedEvent.wasSaved
-                 }"></i>
-            </button>
-            <h2>
-               {{item.recommendedEvent.title}}<span
-               ng-if="item.recommendedEvent.place"
-               > at {{item.recommendedEvent.place.name}}</span><span
-               ng-if="item.recommendedEvent.datetime"
-               > &mdash; {{item.recommendedEvent.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
-            </h2>
-          </div>
-        </div>
+        <event-item ng-if="item.recommendedEvent"
+                    recommended-event="item.recommendedEvent"></event-item>
       </ion-item>
     </ion-list>
   </ion-content>

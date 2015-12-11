@@ -1,13 +1,15 @@
 class FriendChatCtrl
   @$inject: ['$ionicScrollDelegate', '$meteor', '$mixpanel',
              '$scope', '$state', '$stateParams', 'Auth',
-             'Friendship', 'User', 'Messages']
+             'Friendship', 'User', 'Messages', '$rootScope']
   constructor: (@$ionicScrollDelegate, @$meteor, @$mixpanel,
                 @$scope, @$state, @$stateParams, @Auth,
-                @Friendship, @User, @Messages) ->
+                @Friendship, @User, @Messages, @$rootScope) ->
     @friend = @$stateParams.friend
 
     @$scope.$on '$ionicView.beforeEnter', =>
+      @$rootScope.hideTabBar = true
+
       @chatId = @Friendship.getChatId @friend.id
 
       # Bind reactive variables
@@ -15,6 +17,9 @@ class FriendChatCtrl
 
       # Watch for changes in newest message
       @watchNewestMessage()
+
+    @$scope.$on '$ionicView.beforeLeave', =>
+      @$rootScope.hideTabBar = false
 
     @$scope.$on '$ionicView.leave', =>
       # Remove angular-meteor bindings.
@@ -47,6 +52,15 @@ class FriendChatCtrl
 
   transformMessage: (message) =>
     message.creator = new @User message.creator
+
+    if message.type is 'invite_action'
+      # Normalize data for event and recommended
+      #   event to simplify HTML
+      if angular.isDefined message.meta.event
+        message.eventData = message.meta.event
+      else
+        message.eventData = message.meta.recommendedEvent
+
     message
 
   isInviteAction: (message) ->
@@ -67,5 +81,10 @@ class FriendChatCtrl
   scrollBottom: ->
     @$ionicScrollDelegate.$getByHandle 'friendChat'
       .scrollBottom true
+
+  # viewEvent: (savedEvent) ->
+  #   @$state.go 'friendChat.event',
+  #     savedEvent: savedEvent
+  #     commentsCount: @commentsCount[savedEvent.eventId]
 
 module.exports = FriendChatCtrl

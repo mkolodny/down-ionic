@@ -1,15 +1,33 @@
 class EventItemCtrl
   @$inject: ['$filter', '$ionicPopup', '$ionicScrollDelegate', '$mixpanel',
-             '$state', 'Auth', 'SavedEvent', 'ngToast']
+             '$state', 'Auth', 'SavedEvent', 'ngToast', 'Event']
   constructor: (@$filter, @$ionicPopup, @$ionicScrollDelegate, @$mixpanel,
-                @$state, @Auth, @SavedEvent, @ngToast) ->
+                @$state, @Auth, @SavedEvent, @ngToast, @Event) ->
+    # Bound to controller via directive
+    #  @savedEvent
+    #  @recommendedEvent
+    #  @commentsCount
 
-  saveEvent: ->
+  # Don't bind normalized event data to
+  #   controller for collection-repeat
+  getEvent: ->
+    if angular.isDefined @savedEvent
+      @savedEvent.event
+    else
+      @recommendedEvent
+
+  save: ->
     if not @Auth.flags.hasSavedEvent
       @showSavedEventPopup()
       @Auth.setFlag 'hasSavedEvent', true
       return
 
+    if angular.isDefined @savedEvent
+      @saveEvent()
+    else
+      @saveRecommendedEvent()
+
+  saveEvent: ->
     # For latency compensation
     @savedEvent.interestedFriends = []
     @savedEvent.totalNumInterested++
@@ -38,21 +56,41 @@ class EventItemCtrl
       .finally =>
         @savedEvent.isLoadingInterested = false
 
+  saveRecommendedEvent: ->
+    event = angular.copy @recommendedEvent
+    event.recommendedEvent = @recommendedEvent.id
+    delete event.id
+    @recommendedEvent.wasSaved = true
+    @Event.save(event).$promise.then =>
+      @$mixpanel.track 'Create Event',
+        'from recommended': true
+        'has place': angular.isDefined @recommendedEvent.place
+        'has time': angular.isDefined @recommendedEvent.datetime
+    , =>
+      delete @recommendedEvent.wasSaved
+      @ngToast.create 'Oops.. an error occurred..'
+
   showSavedEventPopup: ->
     @$ionicPopup.show
       title: 'Interested?'
-      subTitle: "Tapping <i class=\"calendar-star-default\"></i> indicates that you\'re interested in \"#{@savedEvent.event.title}\""
+      subTitle: "
+        Tapping <i class=\"calendar-star-default\"></i> indicates that
+        you\'re interested in \"#{@getEvent().title}\"
+      "
       buttons: [
         text: 'Cancel'
       ,
         text: '<b>Interested</b>'
         onTap: (e) =>
-          @saveEvent()
+          @save()
           return
       ]
 
   didUserSaveEvent: ->
-    angular.isArray @savedEvent.interestedFriends
+    if angular.isDefined @savedEvent
+      angular.isArray @savedEvent.interestedFriends
+    else
+      angular.isDefined @recommendedEvent.wasSaved
 
   optionallyShowWalkthrough: ->
     if not @Auth.flags.hasLearnedInvite
@@ -63,12 +101,14 @@ class EventItemCtrl
     @showLearnInvitePopover = false
 
   viewComments: ->
-    @$state.go 'comments',
+    stateName = "#{@$state.current.parent}.comments"
+    @$state.go stateName,
       id: @savedEvent.event.id
       event: @savedEvent.event
 
   viewInterested: ->
-    @$state.go 'interested',
+    stateName = "#{@$state.current.parent}.interested"
+    @$state.go stateName,
       id: @savedEvent.event.id
       event: @savedEvent.event
 

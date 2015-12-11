@@ -79,6 +79,15 @@ describe 'my events controller', ->
     it 'should refresh the data', ->
       expect(ctrl.refresh).toHaveBeenCalled()
 
+  ##$ionicView.beforeEnter
+  describe 'before entering the view', ->
+
+    beforeEach ->
+      scope.$broadcast '$ionicView.beforeEnter'
+      scope.$apply()
+
+    it 'should show the tab bar', ->
+      expect(scope.hideTabBar).toBe false
 
   ##handleLoadedData
   describe 'handling after new data loads', ->
@@ -255,3 +264,27 @@ describe 'my events controller', ->
 
       it 'should throw an error', ->
         expect(ngToast.create).toHaveBeenCalled()
+  
+
+  ##viewEvent
+  describe 'viewing an event', ->
+    item = null
+    savedEvent = null
+    commentsCount = null
+
+    beforeEach ->
+      savedEvent =
+        id: 1
+        eventId: 2
+      commentsCount = 16
+      item =
+        savedEvent: savedEvent
+        commentsCount: commentsCount
+      spyOn $state, 'go'
+
+      ctrl.viewEvent item
+
+    it 'should go to the event view', ->
+      expect($state.go).toHaveBeenCalledWith 'saved.event',
+        savedEvent: item.savedEvent
+        commentsCount: item.commentsCount

@@ -1,10 +1,10 @@
 class EventsCtrl
-  @$inject: ['$meteor', '$rootScope', '$scope', '$state', 'Auth', 'Points',
-             'SavedEvent', 'RecommendedEvent', 'ngToast', 'User', 'Event',
-             '$mixpanel']
-  constructor: (@$meteor, @$rootScope, @$scope, @$state, @Auth, @Points,
-                @SavedEvent, @RecommendedEvent, @ngToast, @User,
-                @Event, @$mixpanel) ->
+  @$inject: ['$meteor', '$mixpanel', '$scope', '$state', '$rootScope',
+              'Auth', 'Event', 'ngToast', 'Points', 'RecommendedEvent',
+              'SavedEvent', 'User']
+  constructor: (@$meteor, @$mixpanel, @$scope, @$state, @$rootScope,
+                @Auth, @Event, @ngToast, @Points, @RecommendedEvent,
+                @SavedEvent, @User) ->
     @items = []
     @commentsCount = {}
     @currentUser = @Auth.user
@@ -15,6 +15,9 @@ class EventsCtrl
     @$scope.$on '$ionicView.loaded', =>
       @isLoading = true
       @refresh()
+
+    @$scope.$on '$ionicView.beforeEnter', =>
+      @$rootScope.hideTabBar = false
 
   handleLoadedData: ->
     if @savedEventsLoaded and @recommendedEventsLoaded \
@@ -99,21 +102,6 @@ class EventsCtrl
   createEvent: ->
     @$state.go 'createEvent'
 
-  saveRecommendedEvent: (recommendedEvent) ->
-    event = angular.copy recommendedEvent
-    event.recommendedEvent = recommendedEvent.id
-    delete event.id
-    recommendedEvent.wasSaved = true
-    @Event.save event
-      .$promise.then =>
-        @$mixpanel.track 'Create Event',
-          'from recommended': true
-          'has place': angular.isDefined recommendedEvent.place
-          'has time': angular.isDefined recommendedEvent.datetime
-      , =>
-        delete recommendedEvent.wasSaved
-        @ngToast.create 'Oops.. an error occurred..'
-
   getItemHeight: (item) ->
     if item.isDivider
       26
@@ -122,10 +110,11 @@ class EventsCtrl
     else if item.recommendedEvent
       item.recommendedEvent.getCellHeight()
 
-  viewEvent: (savedEvent) ->
-    @$state.go 'event',
-      savedEvent: savedEvent
-      commentsCount: @commentsCount[savedEvent.eventId]
+  viewEvent: (item) ->
+    @$state.go 'home.event',
+      savedEvent: item.savedEvent
+      recommendedEvent: item.recommendedEvent
+      commentsCount: item.commentsCount
 
   optionallyShowWalkthrough: ->
     if not @Auth.flags.hasLearnedSaveEvent

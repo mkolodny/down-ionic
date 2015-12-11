@@ -11,6 +11,7 @@ describe 'friend chat controller', ->
   $meteor = null
   $mixpanel = null
   $q = null
+  $rootScope = null
   $state = null
   Auth = null
   ctrl = null
@@ -45,6 +46,7 @@ describe 'friend chat controller', ->
     Friendship = $injector.get 'Friendship'
     Messages = $injector.get 'Messages'
     scope = $injector.get '$rootScope'
+    $rootScope = scope
     User = $injector.get 'User'
 
     Auth.user =
@@ -101,6 +103,9 @@ describe 'friend chat controller', ->
       scope.$emit '$ionicView.beforeEnter'
       scope.$apply()
 
+    it 'should hide the tab bar', ->
+      expect($rootScope.hideTabBar).toBe true
+
     it 'should get the chat id', ->
       expect(Friendship.getChatId).toHaveBeenCalledWith ctrl.friend.id
 
@@ -114,6 +119,16 @@ describe 'friend chat controller', ->
       expect($meteor.collection).toHaveBeenCalledWith ctrl.getMessages, false
       expect(ctrl.messages).toBe messages
 
+
+  ##$ionicView.beforeLeave
+  describe 'before leaving the view', ->
+
+    beforeEach ->
+      $rootScope.$broadcast '$ionicView.beforeLeave'
+      $rootScope.$apply()
+
+    it 'should show the tab bar', ->
+      expect($rootScope.hideTabBar).toBe false
 
   ##$ionicView.leave
   describe 'when leaving the view', ->
@@ -232,6 +247,35 @@ describe 'friend chat controller', ->
       messageCopy.creator = new User messageCopy.creator
       expect(transformedMessage).toEqual messageCopy
   
+    describe 'when the message is an invite_action', ->
+      eventData = null
+
+      beforeEach ->
+        message.type = 'invite_action'
+        eventData = 
+          id: 1
+          name: 'The Best Event Ever!'
+
+      describe 'when it\'s for an event', ->
+
+        beforeEach ->
+          message.meta =
+            event: eventData
+          transformedMessage = ctrl.transformMessage message
+
+        it 'should set the event data on message', ->
+          expect(transformedMessage.eventData).toEqual eventData
+
+      describe 'when it\'s for a recommended event', ->
+
+        beforeEach ->
+          message.meta =
+            recommendedEvent: eventData
+          transformedMessage = ctrl.transformMessage message
+
+        it 'should set the event data on message', ->
+          expect(transformedMessage.eventData).toEqual eventData
+
 
   ##isInviteAction
   describe 'checking whether a message is an invite action message', ->
@@ -370,3 +414,25 @@ describe 'friend chat controller', ->
 
       it 'should scroll to the bottom', ->
         expect(scrollHandle.scrollBottom).toHaveBeenCalledWith true
+
+
+  ##viewEvent
+  # describe 'viewing an event', ->
+  #   savedEvent = null
+  #   commentsCount = null
+
+  #   beforeEach ->
+  #     savedEvent =
+  #       id: 1
+  #       eventId: 2
+  #     commentsCount = 16
+  #     ctrl.commentsCount = {}
+  #     ctrl.commentsCount[savedEvent.eventId] = commentsCount
+  #     spyOn $state, 'go'
+
+  #     ctrl.viewEvent savedEvent
+
+  #   it 'should go to the event view', ->
+  #     expect($state.go).toHaveBeenCalledWith 'friendChat.event',
+  #       savedEvent: savedEvent
+  #       commentsCount: commentsCount

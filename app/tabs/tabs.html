@@ -1,4 +1,7 @@
-<ion-tabs class="tabs-light tabs-icon-only">
+<ion-tabs class="tabs-light tabs-icon-only"
+          ng-class="{
+            'tabs-item-hide': hideTabBar
+          }">
   <ion-tab ui-sref="home"
            icon-on="fa fa-home" 
            icon-off="fa fa-home">

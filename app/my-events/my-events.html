@@ -25,7 +25,9 @@
     <ion-list ng-if="myEvents.items.length > 0">
       <ion-item collection-repeat="item in myEvents.items"
                 item-width="100%"
-                item-height="item.savedEvent.getCellHeight()">
+                item-height="item.savedEvent.getCellHeight()"
+                ng-click="myEvents.viewEvent(item)"
+                ontouchstart>
         <event-item ng-if="item.savedEvent"
                     saved-event="item.savedEvent"
                     comments-count="item.commentsCount"/>

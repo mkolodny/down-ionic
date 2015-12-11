@@ -215,23 +215,3 @@ describe 'add from address book controller', ->
 
       it 'should show a load error', ->
         expect(ctrl.getContactsError).toBe true
-
-
-  describe 'getting a contact\'s initials', ->
-
-    describe 'when they have multiple words in their name', ->
-
-      it 'should return the first letter of their first and last name', ->
-        expect(ctrl.getInitials 'Alan Danger Turing').toBe 'AT'
-
-
-    describe 'when they have one word in their name', ->
-
-      it 'should return the first two letters of their name', ->
-        expect(ctrl.getInitials 'Pele').toBe 'PE'
-
-
-    describe 'when they have one letter in their name', ->
-
-      it 'should return the first letter of their name', ->
-        expect(ctrl.getInitials 'p').toBe 'P'

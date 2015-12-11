@@ -76,6 +76,9 @@ describe 'interested controller', ->
     it 'should get the interested users', ->
       expect(ctrl.getInterested).toHaveBeenCalled()
 
+    it 'should hide the tab bar', ->
+      expect(scope.hideTabBar).toBe true
+
 
   ##getInterested
   describe 'getting the interested users', ->

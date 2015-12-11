@@ -64,6 +64,122 @@ Friendship = ['$http', '$meteor', '$q', '$resource', 'apiRoot', 'Auth', \
     else
       ids[0]
 
+  ##
+  # options:
+  # {
+  #   query: String
+  #   contacts: Bool - Not implemented yet
+  #   facebookFriends: Bool - Not implemented yet
+  #   phoneNames: Bool - Not implemented yet
+  # }
+  ##
+  resource.buildFriendItems = (options = {}) ->
+    items = []
+    if options.query
+      # Only show unique users.
+      friendsDict = {}
+      for id, friend of Auth.user.friends
+
+        # Filter out friends who have phone numbers as names
+        firstLetter = friend.name[0]
+        if firstLetter is '+' then continue
+
+        friendsDict[id] = friend
+      for id, friend of Auth.user.facebookFriends
+        friendsDict[id] = friend
+      # for id, contact of contacts
+      #   friendsDict[id] = contact
+      friends = (friend for id, friend of friendsDict \
+          when friend.name.toLowerCase().indexOf(options.query.toLowerCase()) isnt -1)
+      friends.sort (a, b) ->
+        if a.name.toLowerCase() < b.name.toLowerCase()
+          return -1
+        else
+          return 1
+
+      items = ({isDivider: false, user: friend} \
+          for friend in friends)
+    else
+      # Build the list of alphabetically sorted nearby friends.
+      nearbyFriends = (friend for id, friend of Auth.user.friends \
+          when Auth.isNearby friend)
+      nearbyFriends.sort (a, b) ->
+        if a.name.toLowerCase() < b.name.toLowerCase()
+          return -1
+        else
+          return 1
+
+      # Build the list of alphabetically sorted items.
+      friends = (friend for id, friend of Auth.user.friends)
+      friends.sort (a, b) ->
+        if a.name.toLowerCase() < b.name.toLowerCase()
+          return -1
+        else
+          return 1
+      alphabeticalItems = []
+      currentLetter = null
+      for friend in friends
+        firstLetter = friend.name[0]
+
+        # Filter out friends who have phone numbers as names
+        if firstLetter is '+' then continue
+
+        if firstLetter != currentLetter
+          alphabeticalItems.push
+            isDivider: true
+            title: friend.name[0]
+          currentLetter = friend.name[0]
+
+        alphabeticalItems.push
+          isDivider: false
+          user: friend
+
+      # Build the list of facebook friends.
+      facebookFriends = (friend for id, friend of Auth.user.facebookFriends)
+      facebookFriends.sort (a, b) ->
+        if a.name.toLowerCase() < b.name.toLowerCase()
+          return -1
+        else
+          return 1
+      facebookFriendsItems = ({isDivider: false, user: friend} \
+          for friend in facebookFriends)
+
+      # Build the list of contacts.
+      # contacts = (contact for id, contact of contacts)
+      # contacts.sort (a, b) ->
+      #   if a.name.toLowerCase() < b.name.toLowerCase()
+      #     return -1
+      #   else
+      #     return 1
+      # contactsItems = ({isDivider: false, friend: friend} \
+      #     for friend in contacts)
+
+      # Build the list of items to show in the collection.
+      if nearbyFriends.length > 0
+        items.push
+          isDivider: true
+          title: 'Nearby Friends'
+      for friend in nearbyFriends
+        items.push
+          isDivider: false
+          user: friend
+      for item in alphabeticalItems
+        items.push item
+      if facebookFriendsItems.length > 0
+        items.push
+          isDivider: true
+          title: 'Facebook Friends'
+      for item in facebookFriendsItems
+        items.push item
+      # if contactsItems.length > 0
+      #   items.push
+      #     isDivider: true
+      #     title: 'Contacts'
+      # for item in contactsItems
+      #   items.push item
+
+    items
+
   resource
 ]
 

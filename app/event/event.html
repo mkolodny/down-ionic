@@ -1,6 +1,50 @@
-<ion-view id="event" view-title="Rallytap">
+<ion-view id="event">
+  <ion-nav-title>
+    <span id="logo">Rallytap</span>
+  </ion-nav-title>
   <ion-content>
-    <event-item saved-event="event.savedEvent"
-                comments-count="event.commentsCount" />
+    <!-- Event item -->
+    <event-item ng-if="event.savedEvent && !event.recommendedEvent"
+                saved-event="event.savedEvent"
+                comments-count="event.commentsCount"></event-item>
+
+    <!-- Recommended Event item -->
+    <event-item ng-if="event.recommendedEvent && !event.savedEvent"
+                recommended-event="event.recommendedEvent"></event-item>
+
+    <!-- Invite friends -->
+    <ion-list class="list-avatar">
+      <!-- Section Heading -->
+      <ion-item class="item-icon-right">
+        <h2>Invite Friends</h2>
+        <p>We'll send them a text if they're not on Rallytap.</p>
+        <i class="icon fa fa-search" ng-click="event.showSearchModal()"></i>
+      </ion-item>
+      <ion-item collection-repeat="item in event.items"
+                class="item-avatar item-icon-right"
+                item-height="79px"
+                item-width="100%">
+        <!-- User -->
+        <div>
+          <img class="item-image" 
+               ng-if="item.user.imageUrl"
+               ng-src="{{item.user.getImageUrl()}}">
+          <span class="contact-image item-image"
+                ng-if="!item.user.imageUrl">
+                {{item.user.getInitials()}}
+          </span>
+          <h2>{{item.user.name}}</h2>
+          <!-- Event -->
+          <invite-button ng-if="item.user.id && event.savedEvent && !event.recommendedEvent"
+                         user="item.user"
+                         event="event.savedEvent.event">
+
+          <!-- Recommended Event -->
+          <invite-button ng-if="item.user.id && event.recommendedEvent && !event.savedEvent"
+                         user="item.user"
+                         recommended-event="event.recommendedEvent">
+        </div>
+      </ion-item>
+    </ion-list>
   </ion-content>
 </ion-view>

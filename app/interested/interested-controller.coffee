@@ -1,11 +1,12 @@
 class InterestedCtrl
-  @$inject: ['$scope', '$stateParams', 'Auth', 'Event', 'ngToast']
-  constructor: (@$scope, @$stateParams, @Auth, @Event, @ngToast) ->
+  @$inject: ['$rootScope', '$scope', '$stateParams', 'Auth', 'Event', 'ngToast']
+  constructor: (@$rootScope, @$scope, @$stateParams, @Auth, @Event, @ngToast) ->
     @event = @$stateParams.event
     @currentUser = @Auth.user
 
     @$scope.$on '$ionicView.beforeEnter', =>
       @getInterested()
+      @$rootScope.hideTabBar = true
 
   getInterested: ->
     @Event.interested(@event.id).$promise

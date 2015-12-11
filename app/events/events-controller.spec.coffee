@@ -82,6 +82,17 @@ describe 'events controller', ->
       expect(ctrl.refresh).toHaveBeenCalled()
 
 
+  ##$ionicView.beforeEnter
+  describe 'before entering the view', ->
+
+    beforeEach ->
+      scope.$broadcast '$ionicView.beforeEnter'
+      scope.$apply()
+
+    it 'should show the tab bar', ->
+      expect(scope.hideTabBar).toBe false
+
+
   ##handleLoadedData
   describe 'handling after new data loads', ->
     items = null
@@ -409,68 +420,9 @@ describe 'events controller', ->
       expect($state.go).toHaveBeenCalledWith 'createEvent'
 
 
-  ##saveRecommendedEvent
-  describe 'saving a recommended event', ->
-    recommendedEvent = null
-    deferred = null
-    expectedEvent = null
-
-    beforeEach ->
-      recommendedEvent =
-        id: 1
-        title: 'Going up on a Tuesday'
-        datetime: new Date()
-        place:
-          name: 'Bar bar'
-          lat: 40.6785872
-          long: -74.0419964
-
-      deferred = $q.defer()
-      spyOn(Event, 'save').and.returnValue {$promise: deferred.promise}
-
-      expectedEvent = angular.extend {}, recommendedEvent
-      delete expectedEvent.id
-      expectedEvent.recommendedEvent = recommendedEvent.id
-
-      spyOn $mixpanel, 'track'
-
-      ctrl.saveRecommendedEvent recommendedEvent
-
-    it 'should create an event from the recommended event', ->
-      expect(Event.save).toHaveBeenCalledWith expectedEvent
-
-    it 'should set a was saved flag', ->
-      expect(recommendedEvent.wasSaved).toBe true
-
-    describe 'on success', ->
-
-      beforeEach ->
-        deferred.resolve()
-        scope.$apply()
-
-      it 'should track Create Event in mixpanel', ->
-        expect($mixpanel.track).toHaveBeenCalledWith 'Create Event',
-          'from recommended': true
-          'has place': true
-          'has time': true
-
-    describe 'on error', ->
-
-      beforeEach ->
-        spyOn ngToast, 'create'
-
-        deferred.reject()
-        scope.$apply()
-
-      it 'should remove the was saved flag', ->
-        expect(recommendedEvent.wasSaved).toBe undefined
-
-      it 'should show an error', ->
-        expect(ngToast.create).toHaveBeenCalled()
-
-
   ##viewEvent
   describe 'viewing an event', ->
+    item = null
     savedEvent = null
     commentsCount = null
 
@@ -479,16 +431,18 @@ describe 'events controller', ->
         id: 1
         eventId: 2
       commentsCount = 16
-      ctrl.commentsCount = {}
-      ctrl.commentsCount[savedEvent.eventId] = commentsCount
-      spyOn $state, 'go'
-
-      ctrl.viewEvent savedEvent
-
-    it 'should go to the event view', ->
-      expect($state.go).toHaveBeenCalledWith 'event',
+      item =
         savedEvent: savedEvent
         commentsCount: commentsCount
+      spyOn $state, 'go'
+
+      ctrl.viewEvent item
+
+    it 'should go to the event view', ->
+      expect($state.go).toHaveBeenCalledWith 'home.event',
+        savedEvent: item.savedEvent
+        recommendedEvent: item.recommendedEvent
+        commentsCount: item.commentsCount
 
 
   ##optionallyShowWalkthrough
