@@ -27,8 +27,14 @@
                 }">
         <div ng-if="item.friend"
              ng-click="chats.viewChat(item)">
-          <img class="item-image" ng-src="{{item.friend.getImageUrl()}}">
-           <canvas class="chart chart-pie avatar-pie"
+          <img class="item-image" 
+               ng-src="{{item.friend.getImageUrl()}}"
+               ng-if="item.friend.imageUrl">
+          <span class="contact-image item-image"
+                ng-if="!item.friend.imageUrl">
+                {{item.friend.getInitials()}}
+          </span>
+          <canvas class="chart chart-pie avatar-pie"
                    data="[
                      (100 - item.chat.percentRemaining),
                      item.chat.percentRemaining
