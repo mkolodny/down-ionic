@@ -1,6 +1,8 @@
 class Event
-  @$inject: ['$ionicModal', '$stateParams', '$rootScope', '$scope', 'Auth', 'LocalDB']
-  constructor: (@$ionicModal, @$stateParams, @$rootScope, @$scope, @Auth, @LocalDB) ->
+  @$inject: ['$ionicModal', '$stateParams', '$rootScope', '$scope', \
+             'Auth', 'LocalDB', 'User']
+  constructor: (@$ionicModal, @$stateParams, @$rootScope, @$scope,
+                @Auth, @LocalDB, @User) ->
     # State params
     #   if not set, ui.router defaults to null
     #   default to undefined instead
@@ -18,7 +20,8 @@ class Event
       @LocalDB.get 'contacts'
         .then (contacts) =>
           if contacts isnt null
-            @contacts = contacts
+            for key, value of contacts
+              @contacts[key] = new @User value
           @items = @buildItems()
 
     @$scope.$on '$ionicView.beforeEnter', =>
