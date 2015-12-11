@@ -46,8 +46,7 @@ class Event
             <i class="fa fa-search"></i>
             <input id="enter-place"
                    ng-model="searchQuery"
-                   placeholder="Search"
-                   autofocus>
+                   placeholder="Search">
           </div>
           <div id="see-whos-down">
             <div id="section-header" ng-if="!searchQuery">

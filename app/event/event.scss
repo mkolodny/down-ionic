@@ -18,6 +18,9 @@
   input {
     padding-left: 23px;
   }
+  input:read-only {
+    background-color: rgb(255, 255, 255);
+  }
   .fa-search {
     padding-left: 0;
   }
