@@ -47,6 +47,10 @@ class Event
                    placeholder="Search"
                    autofocus>
           </div>
+          <ion-item>
+            <h2>Invite your favorite people</h2>
+            <p>We'll send them a text if they're not on Rallytap.</p>
+          </ion-item>
           <ion-item ng-repeat="item in event.items | filter:searchQuery | limitTo:10"
                 class="item-avatar item-icon-right"
                 item-height="79px"
