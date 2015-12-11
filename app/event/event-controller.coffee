@@ -33,7 +33,7 @@ class Event
       animation: 'slide-in-up'
       focusFirstInput: true
     modalTemplate = """
-      <ion-modal-view id="search">
+      <ion-modal-view id="invite-friends-modal">
         <ion-header-bar>
           <button class="button button-icon icon"
                   ng-click="event.hideSearchModal()">
@@ -48,7 +48,7 @@ class Event
                    ng-model="searchQuery"
                    placeholder="Search">
           </div>
-          <div id="see-whos-down">
+          <div id="invite-friends">
             <div id="section-header" ng-if="!searchQuery">
               <p>We'll send them a text with your message and a link to reply if they're not on Rallytap.</p>
             </div>
