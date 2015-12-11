@@ -48,13 +48,13 @@ class InviteButtonCtrl
           chatId: chatId
           type: 'invite_action'
           'meta.recommendedEvent.id': @recommendedEvent.id
-          'creator.id': 
+          'creator.id':
             $ne: "#{@Auth.user.id}"
         ,
           chatId: chatId
           type: 'invite_action'
           'meta.event.recommendedEvent': @recommendedEvent.id
-          'creator.id': 
+          'creator.id':
             $ne: "#{@Auth.user.id}"
         ]
 
@@ -99,8 +99,7 @@ class InviteButtonCtrl
   showSentInvitePopup: ->
     @$ionicPopup.show
       title: 'Send Message?'
-      subTitle: "Tapping \"Down?\" sends #{@user.name} a message
-        asking if they\'re down for \"#{@event.title}\""
+      subTitle: "Tapping \"Down?\" sends #{@user.firstName} the message \"Are you down for \"#{@event.title}\"?\""
       buttons: [
         text: 'Cancel'
       ,
