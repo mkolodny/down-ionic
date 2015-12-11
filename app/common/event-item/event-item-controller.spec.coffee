@@ -118,6 +118,7 @@ describe 'event item directive', ->
             interestedFriends: interestedFriends
 
           spyOn $mixpanel, 'track'
+          spyOn ctrl, 'optionallyShowWalkthrough'
 
           deferred.resolve newSavedEvent
           scope.$apply()
@@ -137,6 +138,9 @@ describe 'event item directive', ->
 
         it 'should clear a loading flag', ->
           expect(ctrl.savedEvent.isLoadingInterested).toBe false
+
+        it 'should optionally show the next step of the walkthrough', ->
+          expect(ctrl.optionallyShowWalkthrough).toHaveBeenCalled()
 
 
       describe 'on error', ->
@@ -177,7 +181,7 @@ describe 'event item directive', ->
 
 
   ##didUserSaveEvent
-  describe 'checking if the currrent user saved the event', ->
+  describe 'checking if the current user saved the event', ->
 
     describe 'when the user has saved the event', ->
 
@@ -245,3 +249,33 @@ describe 'event item directive', ->
           text: '<b>Interested</b>'
           onTap: jasmine.any Function
         ]
+
+
+  ##optionallyShowWalkthrough
+  describe 'optionally showing the next step of the walkthrough', ->
+
+    describe 'when the user hasn\'t learned the invite button yet', ->
+
+      beforeEach ->
+        delete Auth.flags.hasLearnedInvite
+
+        ctrl.optionallyShowWalkthrough()
+
+      it 'should show the learn invite popup', ->
+        expect(ctrl.showLearnInvitePopover).toBe true
+
+
+  ##setHasLearnedInvite
+  describe 'marking the user as having learned the invite button', ->
+
+    beforeEach ->
+      spyOn Auth, 'setFlag'
+      ctrl.showLearnInvitePopover = true
+
+      ctrl.setHasLearnedInvite()
+
+    it 'should set a flag', ->
+      expect(Auth.setFlag).toHaveBeenCalledWith 'hasLearnedInvite', true
+
+    it 'should hide the learn invite popup', ->
+      expect(ctrl.showLearnInvitePopover).toBe false

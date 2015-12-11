@@ -1,12 +1,16 @@
 class EventsCtrl
-  @$inject: ['$meteor', '$scope', '$state', 'Auth', 'Points', 'SavedEvent',
-             'RecommendedEvent', 'ngToast', 'User', 'Event', '$mixpanel']
-  constructor: (@$meteor, @$scope, @$state, @Auth, @Points,
+  @$inject: ['$meteor', '$rootScope', '$scope', '$state', 'Auth', 'Points',
+             'SavedEvent', 'RecommendedEvent', 'ngToast', 'User', 'Event',
+             '$mixpanel']
+  constructor: (@$meteor, @$rootScope, @$scope, @$state, @Auth, @Points,
                 @SavedEvent, @RecommendedEvent, @ngToast, @User,
                 @Event, @$mixpanel) ->
     @items = []
     @commentsCount = {}
     @currentUser = @Auth.user
+
+    # Set this function on the root scope so that it can be called from index.html.
+    @$rootScope.setHasLearnedSaveEvent = @setHasLearnedSaveEvent
 
     @$scope.$on '$ionicView.loaded', =>
       @isLoading = true
@@ -18,6 +22,7 @@ class EventsCtrl
       @items = @buildItems()
       @isLoading = false
       @$scope.$broadcast 'scroll.refreshComplete'
+      @optionallyShowWalkthrough()
 
   refresh: ->
     delete @savedEventsLoaded
@@ -99,14 +104,15 @@ class EventsCtrl
     event.recommendedEvent = recommendedEvent.id
     delete event.id
     recommendedEvent.wasSaved = true
-    @Event.save(event).$promise.then =>
-      @$mixpanel.track 'Create Event',
-        'from recommended': true
-        'has place': angular.isDefined recommendedEvent.place
-        'has time': angular.isDefined recommendedEvent.datetime
-    , =>
-      delete recommendedEvent.wasSaved
-      @ngToast.create 'Oops.. an error occurred..'
+    @Event.save event
+      .$promise.then =>
+        @$mixpanel.track 'Create Event',
+          'from recommended': true
+          'has place': angular.isDefined recommendedEvent.place
+          'has time': angular.isDefined recommendedEvent.datetime
+      , =>
+        delete recommendedEvent.wasSaved
+        @ngToast.create 'Oops.. an error occurred..'
 
   getItemHeight: (item) ->
     if item.isDivider
@@ -120,5 +126,22 @@ class EventsCtrl
     @$state.go 'event',
       savedEvent: savedEvent
       commentsCount: @commentsCount[savedEvent.eventId]
+
+  optionallyShowWalkthrough: ->
+    if not @Auth.flags.hasLearnedSaveEvent
+      @$rootScope.showLearnSaveEventPopover = true
+    else if not @Auth.flags.hasLearnedFeed and @savedEvents.length > 0
+      @showLearnFeedPopover = true
+
+  setHasLearnedFeed: ->
+    @Auth.setFlag 'hasLearnedFeed', true
+    @showLearnFeedPopover = false
+
+  # We need the => to call functions from this controller's scope because this
+  # function is called from the root scope.
+  setHasLearnedSaveEvent: =>
+    @Auth.setFlag 'hasLearnedSaveEvent', true
+    @$rootScope.showLearnSaveEventPopover = false
+    @optionallyShowWalkthrough()
 
 module.exports = EventsCtrl

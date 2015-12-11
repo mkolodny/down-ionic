@@ -120,4 +120,14 @@
       margin-top: 2px;
     }
   }
+  #learn-down {
+    top: 43px;
+    font-size: 17px;
+
+    .popover-arrow {
+      transform: rotate(180deg);
+      right: 44px;
+      top: 76px;
+    }
+  }
 }

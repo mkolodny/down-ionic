@@ -62,6 +62,20 @@
         'other': 'friends are interested'
       }" />
     </div>
+    <div id="learn-down" class="popover" ng-if="eventItem.showLearnInvitePopover">
+      <div>
+        Your friends are interested, too!
+      </div>
+      <div>
+        Tap to ask if they're down.
+        <button class="button button-clear"
+                ng-click="eventItem.setHasLearnedInvite(); $event.stopPropagation()"
+                ontouchstart>
+          Got it.
+        </button>
+      </div>
+      <div class="popover-arrow"></div>
+    </div>
     <div class="item item-avatar item-button-right interested-friend"
          ng-class="{first: $first}"
          ng-repeat="friend in eventItem.savedEvent.interestedFriends">

@@ -8,6 +8,7 @@ require '../common/points/points-module'
 EventsCtrl = require './events-controller'
 
 describe 'events controller', ->
+  $rootScope = null
   $q = null
   $state = null
   $meteor = null
@@ -36,6 +37,7 @@ describe 'events controller', ->
 
   beforeEach inject(($injector) ->
     $controller = $injector.get '$controller'
+    $rootScope = $injector.get '$rootScope'
     $q = $injector.get '$q'
     $state = $injector.get '$state'
     $meteor = $injector.get '$meteor'
@@ -60,6 +62,9 @@ describe 'events controller', ->
 
   it 'should set the points service on the controller', ->
     expect(ctrl.Points).toBe Points
+
+  it 'should set the walkthrough function on the root scope', ->
+    expect($rootScope.setHasLearnedSaveEvent).toBe ctrl.setHasLearnedSaveEvent
 
   ##$ionicView.loaded
   describe 'the first time that the view is loaded', ->
@@ -93,6 +98,7 @@ describe 'events controller', ->
         ctrl.savedEventsLoaded = true
         ctrl.recommendedEventsLoaded = true
         ctrl.commentsCountLoaded = true
+        spyOn ctrl, 'optionallyShowWalkthrough'
 
         ctrl.handleLoadedData()
 
@@ -107,6 +113,9 @@ describe 'events controller', ->
 
       it 'should set the items on the controller', ->
         expect(ctrl.items).toBe items
+
+      it 'should optionally show a walkthrough popover', ->
+        expect(ctrl.optionallyShowWalkthrough).toHaveBeenCalled()
 
 
   ##refresh
@@ -480,3 +489,80 @@ describe 'events controller', ->
       expect($state.go).toHaveBeenCalledWith 'event',
         savedEvent: savedEvent
         commentsCount: commentsCount
+
+
+  ##optionallyShowWalkthrough
+  describe 'optionally showing the walkthrough', ->
+
+    beforeEach ->
+      ctrl.savedEvents = []
+
+    describe 'when the user hasn\'t seen a save event button yet', ->
+
+      beforeEach ->
+        delete Auth.flags.hasLearnedSaveEvent
+
+        ctrl.optionallyShowWalkthrough()
+
+      it 'should show the learn save event popover', ->
+        expect($rootScope.showLearnSaveEventPopover).toBe true
+
+
+    describe 'when the user has done the save event walkthrough', ->
+
+      beforeEach ->
+        Auth.flags.hasLearnedSaveEvent = true
+
+      describe 'but not the learn feed walkthrough', ->
+
+        beforeEach ->
+          delete Auth.flags.hasLearnedFeed
+
+        describe 'and the user has saved events', ->
+
+          beforeEach ->
+            ctrl.savedEvents = [
+              id: 1
+            ]
+
+            ctrl.optionallyShowWalkthrough()
+
+          it 'should show the learn feed popover', ->
+            expect(ctrl.showLearnFeedPopover).toBe true
+
+
+  ##setHasLearnedFeed
+  describe 'marking that the user has learned how the feed works', ->
+
+    beforeEach ->
+      delete Auth.flags.hasLearnedFeed
+      spyOn Auth, 'setFlag'
+      @showLearnFeedPopover = true
+
+      ctrl.setHasLearnedFeed()
+
+    it 'should set a flag', ->
+      expect(Auth.setFlag).toHaveBeenCalledWith 'hasLearnedFeed', true
+
+    it 'should hide the feed', ->
+      expect(ctrl.showLearnFeedPopover).toBe false
+
+
+  describe 'marking that the user has learned the interested button', ->
+
+    beforeEach ->
+      delete Auth.flags.hasLearnedSaveEvent
+      spyOn Auth, 'setFlag'
+      $rootScope.showLearnSaveEventPopover = true
+      spyOn ctrl, 'optionallyShowWalkthrough'
+
+      ctrl.setHasLearnedSaveEvent()
+
+    it 'should set a flag', ->
+      expect(Auth.setFlag).toHaveBeenCalledWith 'hasLearnedSaveEvent', true
+
+    it 'should hide the feed', ->
+      expect($rootScope.showLearnSaveEventPopover).toBe false
+
+    it 'should optionally show the next step of the walkthrough', ->
+      expect(ctrl.optionallyShowWalkthrough).toHaveBeenCalled()

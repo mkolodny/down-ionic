@@ -6,8 +6,8 @@ class EventItemCtrl
 
   saveEvent: ->
     if not @Auth.flags.hasSavedEvent
-      @Auth.setFlag 'hasSavedEvent', true
       @showSavedEventPopup()
+      @Auth.setFlag 'hasSavedEvent', true
       return
 
     # For latency compensation
@@ -28,6 +28,7 @@ class EventItemCtrl
           'time since posted': @$filter('timeAgo') @savedEvent.createdAt.getTime()
           'has time': angular.isDefined @savedEvent.event.datetime
           'has place': angular.isDefined @savedEvent.event.place
+        @optionallyShowWalkthrough()
       , =>
         # Revert latency compensation
         delete @savedEvent.interestedFriends
@@ -52,6 +53,14 @@ class EventItemCtrl
 
   didUserSaveEvent: ->
     angular.isArray @savedEvent.interestedFriends
+
+  optionallyShowWalkthrough: ->
+    if not @Auth.flags.hasLearnedInvite
+      @showLearnInvitePopover = true
+
+  setHasLearnedInvite: ->
+    @Auth.setFlag 'hasLearnedInvite', true
+    @showLearnInvitePopover = false
 
   viewComments: ->
     @$state.go 'comments',
