@@ -88,33 +88,47 @@ describe 'event controller', ->
       expect(LocalDB.get).toHaveBeenCalledWith 'contacts'
 
     describe 'when the contacts are returned successfully', ->
-      contacts = null
 
-      beforeEach ->
-        contacts = {}
-        deferred.resolve contacts
-        scope.$apply()
+      describe 'when the user has contacts in local db', ->
+        contacts = null
+        items = null
 
-      it 'should set the contacts on the controller', ->
-        expect(ctrl.contacts).toEqual contacts
+        beforeEach ->
+          contacts = {}
+          items = []
+          spyOn(ctrl, 'buildItems').and.returnValue items
+          deferred.resolve contacts
+          scope.$apply()
+
+        it 'should set the contacts on the controller', ->
+          expect(ctrl.contacts).toEqual contacts
+
+        it 'should set the items on the controller', ->
+          expect(ctrl.items).toBe items
+
+      describe 'when the user does not have contacts in local db', ->
+        contacts = null
+        items = null
+
+        beforeEach ->
+          items = []
+          spyOn(ctrl, 'buildItems').and.returnValue items
+          deferred.resolve null
+          scope.$apply()
+
+        it 'should set the items on the controller', ->
+          expect(ctrl.items).toBe items
 
 
   ##$ionicView.beforeEnter
   describe 'when the view enters', ->
-    items = null
 
     beforeEach ->
-      items = []
-      spyOn(ctrl, 'buildItems').and.returnValue items
-
       $rootScope.$broadcast '$ionicView.beforeEnter'
       $rootScope.$apply()
 
     it 'should hide the tab bar', ->
       expect($rootScope.hideTabBar).toBe true
-
-    it 'should set the items on the controller', ->
-      expect(ctrl.items).toBe items
 
 
   ##setupSearchModal

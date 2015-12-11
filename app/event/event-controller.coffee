@@ -1,6 +1,8 @@
 class Event
-  @$inject: ['$ionicModal', '$stateParams', '$rootScope', '$scope', 'Auth', 'LocalDB']
-  constructor: (@$ionicModal, @$stateParams, @$rootScope, @$scope, @Auth, @LocalDB) ->
+  @$inject: ['$ionicModal', '$stateParams', '$rootScope', '$scope', \
+             'Auth', 'LocalDB', 'User']
+  constructor: (@$ionicModal, @$stateParams, @$rootScope, @$scope,
+                @Auth, @LocalDB, @User) ->
     # State params
     #   if not set, ui.router defaults to null
     #   default to undefined instead
@@ -17,12 +19,13 @@ class Event
       # Set contacts on controller
       @LocalDB.get 'contacts'
         .then (contacts) =>
-          @contacts = contacts
-
+          if contacts isnt null
+            for key, value of contacts
+              @contacts[key] = new @User value
+          @items = @buildItems()
 
     @$scope.$on '$ionicView.beforeEnter', =>
       @$rootScope.hideTabBar = true
-      @items = @buildItems()
 
   setupSearchModal: =>
     # Init search modal
