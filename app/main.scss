@@ -36,6 +36,12 @@ $font-family-sans-serif: 'Open Sans', 'Helvetica Neue', 'Roboto', 'Segoe UI', sa
 // Font awesone path
 $fa-font-path: '../fonts';
 
+// Popover
+$popover-border-radius: 0;
+$popover-border-radius-ios: 0;
+$popover-bg-color: #000;
+$popover-backdrop-bg-active: rgba(0,0,0,0.3);
+
 // The path for our ionicons font files, relative to the built CSS in www/css
 //$ionicons-font-path: "../lib/ionic/fonts" !default;
 
@@ -639,6 +645,7 @@ ion-nav-back-button {
   left: 0;
   margin-left: 0;
   padding: 15px;
+  padding-right: 25px;
   font-size: 18px;
   height: initial;
   border-radius: 0;
@@ -671,7 +678,15 @@ ion-nav-back-button {
     height: 20px;
     top: 12px;
     left: 5px;
-    border-radius: 2px;
+    border-radius: 2px !important;
+  }
+}
+.platform-ios {
+  .popover-arrow {
+    top: -19px;
+  }
+  #learn-save-event {
+    top: 196px;
   }
 }
 #learn-save-event {
