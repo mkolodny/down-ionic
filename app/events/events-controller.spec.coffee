@@ -411,66 +411,6 @@ describe 'events controller', ->
       expect($state.go).toHaveBeenCalledWith 'createEvent'
 
 
-  ##saveRecommendedEvent
-  describe 'saving a recommended event', ->
-    recommendedEvent = null
-    deferred = null
-    expectedEvent = null
-
-    beforeEach ->
-      recommendedEvent =
-        id: 1
-        title: 'Going up on a Tuesday'
-        datetime: new Date()
-        place:
-          name: 'Bar bar'
-          lat: 40.6785872
-          long: -74.0419964
-
-      deferred = $q.defer()
-      spyOn(Event, 'save').and.returnValue {$promise: deferred.promise}
-
-      expectedEvent = angular.extend {}, recommendedEvent
-      delete expectedEvent.id
-      expectedEvent.recommendedEvent = recommendedEvent.id
-
-      spyOn $mixpanel, 'track'
-
-      ctrl.saveRecommendedEvent recommendedEvent
-
-    it 'should create an event from the recommended event', ->
-      expect(Event.save).toHaveBeenCalledWith expectedEvent
-
-    it 'should set a was saved flag', ->
-      expect(recommendedEvent.wasSaved).toBe true
-
-    describe 'on success', ->
-
-      beforeEach ->
-        deferred.resolve()
-        scope.$apply()
-
-      it 'should track Create Event in mixpanel', ->
-        expect($mixpanel.track).toHaveBeenCalledWith 'Create Event',
-          'from recommended': true
-          'has place': true
-          'has time': true
-
-    describe 'on error', ->
-
-      beforeEach ->
-        spyOn ngToast, 'create'
-
-        deferred.reject()
-        scope.$apply()
-
-      it 'should remove the was saved flag', ->
-        expect(recommendedEvent.wasSaved).toBe undefined
-
-      it 'should show an error', ->
-        expect(ngToast.create).toHaveBeenCalled()
-
-
   ##viewEvent
   describe 'viewing an event', ->
     savedEvent = null

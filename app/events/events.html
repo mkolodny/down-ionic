@@ -43,33 +43,12 @@
           <div class="divider-line"></div>
         </div>
 
-        <!-- Event -->
-        <event-item ng-if="item.savedEvent"
+        <!-- Event or Recommended Event -->
+        <event-item ng-if="item.savedEvent || item.recommendedEvent"
+                    recommended-event="item.recommendedEvent"
                     saved-event="item.savedEvent"
                     comments-count="item.commentsCount"></event-item>
 
-        <!-- Recommended Event -->
-        <div class="saved-event" ng-if="item.recommendedEvent">
-          <div class="event item-button-left">
-            <button class="button mark-interested"
-                    ng-disabled="item.recommendedEvent.wasSaved"
-                    ng-click="events.saveRecommendedEvent(item.recommendedEvent)"
-                    on-tap>
-              <i class="icon"
-                 ng-class="{
-                   'calendar-star-selected': item.recommendedEvent.wasSaved,
-                   'calendar-star-default': !item.recommendedEvent.wasSaved
-                 }"></i>
-            </button>
-            <h2>
-               {{item.recommendedEvent.title}}<span
-               ng-if="item.recommendedEvent.place"
-               > at {{item.recommendedEvent.place.name}}</span><span
-               ng-if="item.recommendedEvent.datetime"
-               > &mdash; {{item.recommendedEvent.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
-            </h2>
-          </div>
-        </div>
       </ion-item>
     </ion-list>
   </ion-content>

@@ -97,20 +97,6 @@ class EventsCtrl
   createEvent: ->
     @$state.go 'createEvent'
 
-  saveRecommendedEvent: (recommendedEvent) ->
-    event = angular.copy recommendedEvent
-    event.recommendedEvent = recommendedEvent.id
-    delete event.id
-    recommendedEvent.wasSaved = true
-    @Event.save(event).$promise.then =>
-      @$mixpanel.track 'Create Event',
-        'from recommended': true
-        'has place': angular.isDefined recommendedEvent.place
-        'has time': angular.isDefined recommendedEvent.datetime
-    , =>
-      delete recommendedEvent.wasSaved
-      @ngToast.create 'Oops.. an error occurred..'
-
   getItemHeight: (item) ->
     if item.isDivider
       26

@@ -77,70 +77,187 @@ describe 'invite button directive', ->
       title: 'Hoe down'
     ctrl = $controller InviteButtonCtrl
     ctrl.user = user
-    ctrl.event = event
   )
 
   ##hasSentInvite
   describe 'checking is a user has sent an invite', ->
     selector = null
+    chatId = null
+    response = null
 
     beforeEach ->
+      ctrl.Messages =
+        findOne: jasmine.createSpy 'Messages.findOne'
       chatId = Friendship.getChatId user.id
-      selector =
-        chatId: chatId
-        type: 'invite_action'
-        'creator.id': "#{Auth.user.id}"
-        'meta.event.id': event.id
 
-    describe 'when a user has sent an invite', ->
+    describe 'when there is an event', ->
 
       beforeEach ->
-        ctrl.Messages =
-          findOne: jasmine.createSpy('Messages.findOne').and.returnValue {}
+        ctrl.event = event
+        selector =
+          chatId: chatId
+          type: 'invite_action'
+          'creator.id': "#{Auth.user.id}"
+          'meta.event.id': event.id
 
-      it 'should return true', ->
-        expect(ctrl.hasSentInvite()).toBe true
+      describe 'when a user has sent an invite', ->
 
-    describe 'when a user has not sent an invite', ->
+        beforeEach ->
+          ctrl.Messages.findOne.and.returnValue {}
+          response = ctrl.hasSentInvite()
+
+        it 'should return true', ->
+          expect(response).toBe true
+
+        it 'should query for invite action messages', ->
+          expect(ctrl.Messages.findOne).toHaveBeenCalledWith selector
+
+
+      describe 'when a user has not sent an invite', ->
+
+        beforeEach ->
+          ctrl.Messages.findOne.and.returnValue undefined
+          response = ctrl.hasSentInvite()
+
+        it 'should return false', ->
+          expect(response).toBe false
+
+        it 'should query for invite action messages', ->
+          expect(ctrl.Messages.findOne).toHaveBeenCalledWith selector
+
+
+    describe 'when there is a recommended event', ->
 
       beforeEach ->
-        ctrl.Messages =
-          findOne: jasmine.createSpy('Messages.findOne').and.returnValue undefined
+        ctrl.recommendedEvent = event
+        selector = 
+          $or: [
+            chatId: chatId
+            type: 'invite_action'
+            'creator.id': "#{Auth.user.id}"
+            'meta.recommendedEvent.id': event.id
+          ,
+            chatId: chatId
+            type: 'invite_action'
+            'creator.id': "#{Auth.user.id}"
+            'meta.event.recommendedEvent': event.id
+          ]
 
-      it 'should return false', ->
-        expect(ctrl.hasSentInvite()).toBe false
+      describe 'when a user has sent an invite', ->
+
+        beforeEach ->
+          ctrl.Messages.findOne.and.returnValue {}
+          response = ctrl.hasSentInvite()
+
+        it 'should return true', ->
+          expect(response).toBe true
+
+        it 'should query for invite action messages', ->
+          expect(ctrl.Messages.findOne).toHaveBeenCalledWith selector
+
+
+      describe 'when a user has not sent an invite', ->
+
+        beforeEach ->
+          ctrl.Messages.findOne.and.returnValue undefined
+          response = ctrl.hasSentInvite()
+
+        it 'should return false', ->
+          expect(response).toBe false
+
+        it 'should query for invite action messages', ->
+          expect(ctrl.Messages.findOne).toHaveBeenCalledWith selector
 
 
   ##hasBeenInvited
   describe 'checking is a user has been invited', ->
     selector = null
+    chatId = null
+    response = null
 
     beforeEach ->
+      ctrl.Messages =
+        findOne: jasmine.createSpy 'Messages.findOne'
       chatId = Friendship.getChatId user.id
-      selector =
-        chatId: chatId
-        type: 'invite_action'
-        'meta.event.id': event.id
-        'creator.id':
-          $ne: "#{Auth.user.id}"
 
-    describe 'when a user has been invited', ->
+
+    describe 'when there is an event', ->
 
       beforeEach ->
-        ctrl.Messages =
-          findOne: jasmine.createSpy('Messages.findOne').and.returnValue {}
+        ctrl.event = event
+        selector =
+          chatId: chatId
+          type: 'invite_action'
+          'meta.event.id': event.id
+          'creator.id':
+            $ne: "#{Auth.user.id}"
 
-      it 'should return true', ->
-        expect(ctrl.hasSentInvite()).toBe true
+      describe 'when a user has been invited', ->
 
-    describe 'when a user has not been invited', ->
+        beforeEach ->
+          ctrl.Messages.findOne.and.returnValue {}
+          response = ctrl.hasBeenInvited()
+
+        it 'should return true', ->
+          expect(response).toBe true
+
+        it 'should query for invite action messages', ->
+          expect(ctrl.Messages.findOne).toHaveBeenCalledWith selector
+
+      describe 'when a user has not been invited', ->
+
+        beforeEach ->
+          ctrl.Messages.findOne.and.returnValue undefined
+          response = ctrl.hasBeenInvited()
+
+        it 'should return false', ->
+          expect(response).toBe false
+
+        it 'should query for invite action messages', ->
+          expect(ctrl.Messages.findOne).toHaveBeenCalledWith selector
+
+    describe 'when there is a recommended event', ->
 
       beforeEach ->
-        ctrl.Messages =
-          findOne: jasmine.createSpy('Messages.findOne').and.returnValue undefined
+        ctrl.recommendedEvent = event
+        selector =
+          $or: [
+            chatId: chatId
+            type: 'invite_action'
+            'meta.recommendedEvent.id': event.id
+            'creator.id': 
+              $ne: "#{Auth.user.id}"
+          ,
+            chatId: chatId
+            type: 'invite_action'
+            'meta.event.recommendedEvent': event.id
+            'creator.id': 
+              $ne: "#{Auth.user.id}"
+          ]
 
-      it 'should return false', ->
-        expect(ctrl.hasSentInvite()).toBe false
+      describe 'when a user has been invited', ->
+
+        beforeEach ->
+          ctrl.Messages.findOne.and.returnValue {}
+          response = ctrl.hasBeenInvited()
+
+        it 'should return true', ->
+          expect(response).toBe true
+
+        it 'should query for invite action messages', ->
+          expect(ctrl.Messages.findOne).toHaveBeenCalledWith selector
+
+      describe 'when a user has not been invited', ->
+
+        beforeEach ->
+          ctrl.Messages.findOne.and.returnValue undefined
+          response = ctrl.hasBeenInvited()
+
+        it 'should return false', ->
+          expect(response).toBe false
+
+        it 'should query for invite action messages', ->
+          expect(ctrl.Messages.findOne).toHaveBeenCalledWith selector      
 
 
   ##inviteUser
@@ -149,6 +266,7 @@ describe 'invite button directive', ->
     describe 'when this is the user\'s first time', ->
 
       beforeEach ->
+        ctrl.event = event
         Auth.flags =
           hasSentInvite: false
         Auth.setFlag = jasmine.createSpy 'Auth.setFlag'
@@ -165,6 +283,7 @@ describe 'invite button directive', ->
 
     describe 'when this isn\'t the user\'s first rodeo', ->
       deferred = null
+      creator = null
 
       beforeEach ->
         Auth.flags =
@@ -172,55 +291,104 @@ describe 'invite button directive', ->
         deferred = $q.defer()
         $meteor.call.and.returnValue deferred.promise
 
-        ctrl.inviteUser()
-
-      it 'should set the loading flag', ->
-        expect(ctrl.isLoading).toBe true
-
-      it 'should call the send invite meteor method', ->
         creator =
           id: "#{Auth.user.id}"
           name: Auth.user.name
           firstName: Auth.user.firstName
           lastName: Auth.user.lastName
           imageUrl: Auth.user.imageUrl
-        expect($meteor.call).toHaveBeenCalledWith('sendEventInvite', creator,
-            "#{user.id}", event)
 
-      describe 'when successful', ->
+      describe 'when there is an event', ->
 
         beforeEach ->
-          spyOn ctrl, 'trackInvite'
+          ctrl.event = event
+          ctrl.inviteUser()
 
-          deferred.resolve()
-          scope.$apply()
+        it 'should call the send invite meteor method', ->
+          expect($meteor.call).toHaveBeenCalledWith('sendEventInvite', creator,
+              "#{user.id}", event)
 
-        it 'should track the invite', ->
-          expect(ctrl.trackInvite).toHaveBeenCalled()
+        it 'should set the loading flag', ->
+          expect(ctrl.isLoading).toBe true
 
-        it 'should stop the loading spinner', ->
-          expect(ctrl.isLoading).toBe false
+        describe 'when successful', ->
+
+          beforeEach ->
+            spyOn ctrl, 'trackInvite'
+
+            deferred.resolve()
+            scope.$apply()
+
+          it 'should track the invite', ->
+            expect(ctrl.trackInvite).toHaveBeenCalled()
+
+          it 'should stop the loading spinner', ->
+            expect(ctrl.isLoading).toBe false
 
 
-      describe 'on error', ->
+        describe 'on error', ->
 
+          beforeEach ->
+            spyOn ngToast, 'create'
+
+            deferred.reject()
+            scope.$apply()
+
+          it 'should throw an error', ->
+            expect(ngToast.create).toHaveBeenCalled()
+
+          it 'should stop the loading spinner', ->
+            expect(ctrl.isLoading).toBe false
+
+
+      describe 'when there is a recommended event', ->
+        
         beforeEach ->
-          spyOn ngToast, 'create'
+          ctrl.recommendedEvent = event
+          ctrl.inviteUser()
 
-          deferred.reject()
-          scope.$apply()
+        it 'should call the send recommended event invite meteor method', ->
+          expect($meteor.call).toHaveBeenCalledWith('sendRecommendedEventInvite', creator,
+              "#{user.id}", event)
 
-        it 'should throw an error', ->
-          expect(ngToast.create).toHaveBeenCalled()
+        it 'should set the loading flag', ->
+          expect(ctrl.isLoading).toBe true
 
-        it 'should stop the loading spinner', ->
-          expect(ctrl.isLoading).toBe false
+        describe 'when successful', ->
+
+          beforeEach ->
+            spyOn ctrl, 'trackInvite'
+
+            deferred.resolve()
+            scope.$apply()
+
+          it 'should track the invite', ->
+            expect(ctrl.trackInvite).toHaveBeenCalled()
+
+          it 'should stop the loading spinner', ->
+            expect(ctrl.isLoading).toBe false
+
+
+        describe 'on error', ->
+
+          beforeEach ->
+            spyOn ngToast, 'create'
+
+            deferred.reject()
+            scope.$apply()
+
+          it 'should throw an error', ->
+            expect(ngToast.create).toHaveBeenCalled()
+
+          it 'should stop the loading spinner', ->
+            expect(ctrl.isLoading).toBe false
 
 
   ##trackInvite
   describe 'tracking invites in mixpanel', ->
 
     beforeEach ->
+      ctrl.event = event
       spyOn $mixpanel, 'track'
       Auth.isFriend.and.returnValue true
 
@@ -230,6 +398,7 @@ describe 'invite button directive', ->
       expect($mixpanel.track).toHaveBeenCalledWith 'Send Invite',
         'is friend': true
         'from screen': $state.current.name
+        'from recommended': angular.isDefined ctrl.recommendedEvent
 
 
   ##showSentInvitePopup
@@ -237,6 +406,7 @@ describe 'invite button directive', ->
     popupOptions = null
 
     beforeEach ->
+      ctrl.event = event
       spyOn($ionicPopup, 'show').and.callFake (options) ->
         popupOptions = options
 

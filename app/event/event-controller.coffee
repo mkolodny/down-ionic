@@ -45,7 +45,7 @@ class Event
                    placeholder="Search"
                    autofocus>
           </div>
-          <ion-item ng-repeat="item in event.items | filter:searchQuery"
+          <ion-item ng-repeat="item in event.items | filter:searchQuery | limitTo:10"
                 class="item-avatar item-icon-right"
                 item-height="79px"
                 item-width="100%">

@@ -6,25 +6,58 @@ class InviteButtonCtrl
     # Bound to controller via directive
     #  @user
     #  @event
+    #  @recommendedEvent
     @Messages = @$meteor.getCollectionByName 'messages'
 
   hasSentInvite: ->
     chatId = @Friendship.getChatId @user.id
-    selector =
-      chatId: chatId
-      type: 'invite_action'
-      'creator.id': "#{@Auth.user.id}"
-      'meta.event.id': @event.id
+    if angular.isDefined @event
+      selector =
+        chatId: chatId
+        type: 'invite_action'
+        'creator.id': "#{@Auth.user.id}"
+        'meta.event.id': @event.id
+    else
+      selector =
+        $or: [
+          chatId: chatId
+          type: 'invite_action'
+          'creator.id': "#{@Auth.user.id}"
+          'meta.recommendedEvent.id': @recommendedEvent.id
+        ,
+          chatId: chatId
+          type: 'invite_action'
+          'creator.id': "#{@Auth.user.id}"
+          'meta.event.recommendedEvent': @recommendedEvent.id
+        ]
+
     angular.isDefined @Messages.findOne(selector)
 
   hasBeenInvited: ->
     chatId = @Friendship.getChatId @user.id
-    selector =
-      chatId: chatId
-      type: 'invite_action'
-      'meta.event.id': @event.id
-      'creator.id':
-        $ne: "#{@Auth.user.id}"
+    if angular.isDefined @event
+      selector =
+        chatId: chatId
+        type: 'invite_action'
+        'meta.event.id': @event.id
+        'creator.id':
+          $ne: "#{@Auth.user.id}"
+    else
+      selector =
+        $or: [
+          chatId: chatId
+          type: 'invite_action'
+          'meta.recommendedEvent.id': @recommendedEvent.id
+          'creator.id': 
+            $ne: "#{@Auth.user.id}"
+        ,
+          chatId: chatId
+          type: 'invite_action'
+          'meta.event.recommendedEvent': @recommendedEvent.id
+          'creator.id': 
+            $ne: "#{@Auth.user.id}"
+        ]
+
     angular.isDefined @Messages.findOne(selector)
 
   inviteUser: =>
@@ -41,9 +74,17 @@ class InviteButtonCtrl
       firstName: @Auth.user.firstName
       lastName: @Auth.user.lastName
       imageUrl: @Auth.user.imageUrl
-    @$meteor.call 'sendEventInvite', creator, "#{@user.id}", @event
+
+    if angular.isDefined @event
+      methodName = 'sendEventInvite'
+      methodData = @event
+    else
+      methodName = 'sendRecommendedEventInvite'
+      methodData = @recommendedEvent
+
+    @$meteor.call methodName, creator, "#{@user.id}", methodData
       .then =>
-        @trackInvite @user
+        @trackInvite()
       , =>
         @ngToast.create 'Oops, an error occurred.'
       .finally =>
@@ -53,6 +94,7 @@ class InviteButtonCtrl
     @$mixpanel.track 'Send Invite',
       'is friend': @Auth.isFriend @user.id
       'from screen': @$state.current.name
+      'from recommended': angular.isDefined @recommendedEvent
 
   showSentInvitePopup: ->
     @$ionicPopup.show

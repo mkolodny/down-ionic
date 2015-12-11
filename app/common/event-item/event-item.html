@@ -2,7 +2,7 @@
   <div class="event item-button-left">
     <button class="button mark-interested"
             ng-disabled="eventItem.didUserSaveEvent()"
-            ng-click="eventItem.saveEvent(); $event.stopPropagation()"
+            ng-click="eventItem.save(); $event.stopPropagation()"
             on-tap>
       <i class="icon"
          ng-class="{
@@ -11,24 +11,26 @@
          }"></i>
     </button>
     <div class="total-num-interested"
+         ng-if="!eventItem.recommendedEvent && eventItem.savedEvent"
          ng-class="{selected: eventItem.didUserSaveEvent()}">
       {{eventItem.savedEvent.totalNumInterested}}
     </div>
     <h2>
-       {{eventItem.savedEvent.event.title}}<span
-       ng-if="eventItem.savedEvent.event.place"
+       {{eventItem.getEvent().title}}<span
+       ng-if="eventItem.getEvent().place"
        view-place
-       place="eventItem.savedEvent.event.place"
+       place="eventItem.getEvent().place"
        > at <span
-       class="place">{{eventItem.savedEvent.event.place.name}}</span></span><span
-       ng-if="eventItem.savedEvent.event.datetime"
-       > &mdash; {{eventItem.savedEvent.event.datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
+       class="place">{{eventItem.getEvent().place.name}}</span></span><span
+       ng-if="eventItem.getEvent().datetime"
+       > &mdash; {{eventItem.getEvent().datetime | date:"EEE, MMM d 'at' h:mm a"}}</span>
     </h2>
-    <div class="date-posted">
+    <div ng-if="!eventItem.recommendedEvent && eventItem.savedEvent"
+         class="date-posted">
        posted {{eventItem.savedEvent.createdAt.getTime() | timeAgo}}
     </div>
     <div class="extra-details"
-         ng-if="eventItem.didUserSaveEvent()">
+         ng-if="eventItem.savedEvent && eventItem.didUserSaveEvent()">
       <div class="event-link">
         <span ng-click="eventItem.viewInterested(eventItem.savedEvent.event); $event.stopPropagation();"
               >{{eventItem.savedEvent.totalNumInterested}} interested</span>
@@ -45,6 +47,7 @@
       </div>
     </div>
   </div>
+  <!-- Interested Friends -->
   <div class="loading interested-friends"
        ng-if="eventItem.savedEvent.isLoadingInterested">
     <div class="num-interested-friends">
