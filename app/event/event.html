@@ -4,9 +4,14 @@
   </ion-nav-title>
   <ion-content>
     <!-- Event item -->
-    <event-item saved-event="event.savedEvent"
-                recommended-event="event.recommendedEvent"
+    <event-item ng-if="event.savedEvent && !event.recommendedEvent"
+                saved-event="event.savedEvent"
                 comments-count="event.commentsCount"></event-item>
+
+    <!-- Recommended Event item -->
+    <event-item ng-if="event.recommendedEvent && !event.savedEvent"
+                recommended-event="event.recommendedEvent"></event-item>
+
     <!-- Invite friends -->
     <ion-list class="list-avatar">
       <!-- Section Heading -->
@@ -28,10 +33,15 @@
           </span>
           <h2>{{item.user.name}}</h2>
           <p>{{item.user.username}}</p>
-          <invite-button ng-if="item.user.id"
+          <!-- Event -->
+          <invite-button ng-if="item.user.id && event.savedEvent && !event.recommendedEvent"
                          user="item.user"
-                         recommended-event="event.recommendedEvent"
                          event="event.savedEvent.event">
+
+          <!-- Recommended Event -->
+          <invite-button ng-if="item.user.id && event.recommendedEvent && !event.savedEvent"
+                         user="item.user"
+                         recommended-event="event.recommendedEvent">
         </div>
       </ion-item>
     </ion-list>

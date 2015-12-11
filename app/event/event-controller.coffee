@@ -4,9 +4,9 @@ class Event
     # State params
     #   if not set, ui.router defaults to null
     #   default to undefined instead
-    @savedEvent = @$stateParams.savedEvent or undefined
-    @commentsCount = @$stateParams.commentsCount or undefined
-    @recommendedEvent = @$stateParams.recommendedEvent or undefined
+    @savedEvent = @$stateParams.savedEvent
+    @commentsCount = @$stateParams.commentsCount
+    @recommendedEvent = @$stateParams.recommendedEvent
 
     # Init variables
     @contacts = {}
