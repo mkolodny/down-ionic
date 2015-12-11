@@ -7,6 +7,9 @@ class EventItemCtrl
     #  @savedEvent
     #  @recommendedEvent
     #  @commentsCount
+
+  # Don't bind normalized event data to
+  #   controller for collection-repeat
   getEvent: ->
     if angular.isDefined @savedEvent
       @savedEvent.event

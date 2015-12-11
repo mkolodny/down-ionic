@@ -44,11 +44,14 @@
           <div class="divider-line"></div>
         </div>
 
-        <!-- Event or Recommended Event -->
-        <event-item ng-if="item.savedEvent || item.recommendedEvent"
-                    recommended-event="item.recommendedEvent"
+        <!-- Event -->
+        <event-item ng-if="item.savedEvent"
                     saved-event="item.savedEvent"
                     comments-count="item.commentsCount"></event-item>
+                    
+        <!-- Recommended Event -->
+        <event-item ng-if="item.recommendedEvent"
+                    recommended-event="item.recommendedEvent"></event-item>
 
       </ion-item>
     </ion-list>
