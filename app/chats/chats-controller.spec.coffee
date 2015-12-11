@@ -196,9 +196,9 @@ describe 'chats controller', ->
         '3': user3
         '4': user4
       newerMessage =
-        createdAt: earlier
-      olderMessage =
         createdAt: later
+      olderMessage =
+        createdAt: earlier
       spyOn(ctrl, 'getNewestMessage').and.callFake (chatId) ->
         if chatId is '2,3' then return newerMessage
         if chatId is '2,4' then return olderMessage
