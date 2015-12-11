@@ -761,8 +761,8 @@ a {
   text-decoration: none;
 }
 
-// See who's down
-#see-whos-down {
+// Invite friends
+#invite-friends {
   margin-top: 10px;
   padding-left: 10px;
 
@@ -809,5 +809,23 @@ a {
   }
   .invite {
     margin-top: 2px;
+  }
+}
+#invite-friends-modal {
+  #invite-friends {
+    padding-left: 0;
+  }
+  #section-header {
+    border-bottom-color: #eee;    
+  }
+  p {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .friend {
+    padding-left: 56px;
+  }
+  .item-image {
+    left: 15px;
   }
 }
