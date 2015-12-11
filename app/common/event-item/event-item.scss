@@ -15,16 +15,17 @@
   .mark-interested {
     background: none;
     border: none;
-    padding: 8px;
+    padding: 7px 9px;
     position: absolute;
-    top: 12px;
+    top: 14px;
     left: 12px;
     color: #999;
+    border: 1px solid #eee;
 
     &[disabled],
     &.disabled {
       opacity: 1;
-      color: $brand-color;
+      border-color: $brand-color;
     }
     &.activated {
       box-shadow: none;
@@ -32,12 +33,12 @@
   }
   .calendar-star-selected,
   .calendar-star-default {
-    padding-top: 23px;
-    width: 23px;
+    padding-top: 18px;
+    width: 18px;
   }
   .total-num-interested {
     position: absolute;
-    top: 46px;
+    top: 49px;
     left: 18px;
     font-size: 18px;
     font-weight: 700;
