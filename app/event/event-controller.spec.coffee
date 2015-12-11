@@ -18,6 +18,7 @@ describe 'event controller', ->
   savedEvent = null
   scope = null
   recommendedEvent = null
+  User = null
 
   beforeEach angular.mock.module('ui.router')
 
@@ -39,6 +40,7 @@ describe 'event controller', ->
     Friendship = $injector.get 'Friendship'
     LocalDB = $injector.get 'LocalDB'
     scope = $rootScope
+    User = $injector.get 'User'
 
     savedEvent =
       id: 1
@@ -263,7 +265,7 @@ describe 'event controller', ->
       ,
         user: Auth.user.facebookFriends[6]
       ,
-        user: ctrl.contacts[7]
+        user: new User ctrl.contacts[7]
       ]
       expect(items).toEqual expectedItems
 

@@ -20,8 +20,7 @@ class Event
       @LocalDB.get 'contacts'
         .then (contacts) =>
           if contacts isnt null
-            for key, value of contacts
-              @contacts[key] = new @User value
+            @contacts = contacts
           @items = @buildItems()
 
     @$scope.$on '$ionicView.beforeEnter', =>
@@ -54,7 +53,7 @@ class Event
             <div id="section-header" ng-if="!searchQuery">
               <p>We'll send them a text with your message and a link to reply if they're not on Rallytap.</p>
             </div>
-            <ion-item ng-repeat="item in event.items | filter:searchQuery"
+            <ion-item ng-repeat="item in event.items | filter:searchQuery | limitTo:20"
                   class="item-avatar item-icon-right friend"
                   item-height="52px"
                   item-width="100%">
@@ -91,23 +90,25 @@ class Event
     items = []
     usersMap = {} # to remove duplicates
 
-    pushItem = (user) =>
+    # Friends
+    for userId, user of @Auth.user.friends
+      items.push
+        user: user
+      usersMap[user.id] = true
+
+    # Facebook friends
+    for userId, user of @Auth.user.facebookFriends
       if usersMap[user.id] is undefined
         items.push
           user: user
         usersMap[user.id] = true
 
-    # Friends
-    for userId, user of @Auth.user.friends
-      pushItem user
-
-    # Facebook friends
-    for userId, user of @Auth.user.facebookFriends
-      pushItem user
-
     # Contacts
     for userId, user of @contacts
-      pushItem user
+      if usersMap[user.id] is undefined
+        items.push
+          user: new @User user
+        usersMap[user.id] = true
 
     items
 
