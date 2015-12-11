@@ -17,12 +17,12 @@ class Event
       # Set contacts on controller
       @LocalDB.get 'contacts'
         .then (contacts) =>
-          @contacts = contacts
-
+          if contacts isnt null
+            @contacts = contacts
+          @items = @buildItems()
 
     @$scope.$on '$ionicView.beforeEnter', =>
       @$rootScope.hideTabBar = true
-      @items = @buildItems()
 
   setupSearchModal: =>
     # Init search modal
