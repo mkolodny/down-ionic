@@ -196,6 +196,7 @@ class Contacts
     filteredUserPhones
 
   saveContacts: (contacts) ->
+    @Auth.contacts = contacts
     @LocalDB.set 'contacts', contacts
 
 module.exports = Contacts

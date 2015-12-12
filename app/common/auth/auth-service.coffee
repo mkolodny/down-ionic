@@ -7,8 +7,8 @@ class Auth
                 @$cordovaGeolocation, @$state, @LocalDB, @SavedEvent) ->
 
   user: {}
-
   flags: {}
+  contacts: {}
 
   resumeSession: ->
     deferred = @$q.defer()
@@ -18,8 +18,8 @@ class Auth
         if not session
           deferred.resolve()
 
-        @phone = session.phone
-        @flags = session.flags or {}
+        @phone = session?.phone
+        @flags = session?.flags or {}
         @user = new @User session.user
 
         # Set friends as instances of User resource
@@ -35,7 +35,12 @@ class Auth
           @$meteor.loginWithPassword "#{@user.id}", @user.authtoken
 
         @mixpanelIdentify()
-
+        @LocalDB.get 'contacts'
+      .then (contacts) =>
+        if contacts isnt null
+          # Set contacts on Auth
+          for key, value of contacts
+            @contacts[key] = new @User value
         deferred.resolve()
       , (error) ->
         deferred.reject()

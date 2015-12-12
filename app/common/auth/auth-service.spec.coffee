@@ -99,10 +99,15 @@ describe 'Auth service', ->
     deferred = null
     resolved = null
     rejected = null
+    contactsDeferred = null
 
     beforeEach ->
       deferred = $q.defer()
-      LocalDB.get.and.returnValue deferred.promise
+      contactsDeferred = $q.defer()
+      LocalDB.get.and.callFake (key) ->
+        if key is 'session' then return deferred.promise
+        if key is 'contacts' then return contactsDeferred.promise
+
       Auth.resumeSession()
         .then ->
           resolved = true
@@ -174,8 +179,27 @@ describe 'Auth service', ->
         it 'should set the facebookFriends on the user', ->
           expect(Auth.user.facebookFriends).toAngularEqual facebookFriends
 
-      it 'should resolve the promise', ->
-        expect(resolved).toBe true
+      it 'should get the contacts', ->
+        expect(LocalDB.get).toHaveBeenCalledWith 'contacts'
+
+
+      describe 'when the contacts are returned', ->
+        contacts = null
+
+        beforeEach ->
+          contacts =           
+            9:
+              id: 9
+              name: 'Other Other Friend'
+          contactsDeferred.resolve contacts
+          scope.$apply()
+
+        it 'should set the contacts on Auth', ->
+          expect(Auth.contacts).toAngularEqual 
+            9: new User contacts[9]
+
+        it 'should resolve the promise', ->
+          expect(resolved).toBe true
 
 
     describe 'when there is a LocalDB error', ->

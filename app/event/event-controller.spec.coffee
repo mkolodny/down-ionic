@@ -71,55 +71,23 @@ describe 'event controller', ->
   it 'shoud init the contacts object on the controller', ->
     expect(ctrl.contacts).toEqual {}
 
-  ##$ionicView.load
+  ##$ionicView.enter
   describe 'the first time the view loads', ->
-    deferred = null
+    items = null
 
     beforeEach ->
-      deferred = $q.defer()
-      spyOn(LocalDB, 'get').and.returnValue deferred.promise
       spyOn ctrl, 'setupSearchModal'
+      items = []
+      spyOn(ctrl, 'buildItems').and.returnValue items
 
-      scope.$broadcast '$ionicView.loaded'
+      scope.$broadcast '$ionicView.enter'
       scope.$apply()
 
     it 'should setup the search modal', ->
       expect(ctrl.setupSearchModal).toHaveBeenCalled()
 
-    it 'should get the contacts', ->
-      expect(LocalDB.get).toHaveBeenCalledWith 'contacts'
-
-    describe 'when the contacts are returned successfully', ->
-
-      describe 'when the user has contacts in local db', ->
-        contacts = null
-        items = null
-
-        beforeEach ->
-          contacts = {}
-          items = []
-          spyOn(ctrl, 'buildItems').and.returnValue items
-          deferred.resolve contacts
-          scope.$apply()
-
-        it 'should set the contacts on the controller', ->
-          expect(ctrl.contacts).toEqual contacts
-
-        it 'should set the items on the controller', ->
-          expect(ctrl.items).toBe items
-
-      describe 'when the user does not have contacts in local db', ->
-        contacts = null
-        items = null
-
-        beforeEach ->
-          items = []
-          spyOn(ctrl, 'buildItems').and.returnValue items
-          deferred.resolve null
-          scope.$apply()
-
-        it 'should set the items on the controller', ->
-          expect(ctrl.items).toBe items
+    it 'should set the items on the controller', ->
+      expect(ctrl.items).toBe items
 
 
   ##$ionicView.beforeEnter
@@ -235,7 +203,7 @@ describe 'event controller', ->
           location:
             lat: 40.79893 # just over 5 mi away
             long: -73.9821535
-      ctrl.contacts =
+      Auth.contacts =
         4: Auth.user.friends[4]
         7:
           id: 7
@@ -265,7 +233,7 @@ describe 'event controller', ->
       ,
         user: Auth.user.facebookFriends[6]
       ,
-        user: new User ctrl.contacts[7]
+        user: Auth.contacts[7]
       ]
       expect(items).toEqual expectedItems
 
