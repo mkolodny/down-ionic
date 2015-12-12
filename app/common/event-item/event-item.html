@@ -3,7 +3,7 @@
     <button class="button mark-interested"
             ng-disabled="eventItem.didUserSaveEvent()"
             ng-click="eventItem.save(); $event.stopPropagation()"
-            on-tap>
+            ontouchstart>
       <i class="icon"
          ng-class="{
            'calendar-star-selected': eventItem.didUserSaveEvent(),
