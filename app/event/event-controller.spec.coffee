@@ -90,17 +90,6 @@ describe 'event controller', ->
       expect(ctrl.items).toBe items
 
 
-  ##$ionicView.beforeEnter
-  describe 'when the view enters', ->
-
-    beforeEach ->
-      $rootScope.$broadcast '$ionicView.beforeEnter'
-      $rootScope.$apply()
-
-    it 'should hide the tab bar', ->
-      expect($rootScope.hideTabBar).toBe true
-
-
   ##setupSearchModal
   describe 'setting up the search modal', ->
     modal = null
@@ -110,13 +99,13 @@ describe 'event controller', ->
       spyOn($ionicModal, 'fromTemplate').and.returnValue modal
 
       ctrl.setupSearchModal()
-    
+
     it 'should init the search modal', ->
       expect($ionicModal.fromTemplate).toHaveBeenCalledWith jasmine.any(String),
         scope: scope
         animation: 'slide-in-up'
         focusFirstInput: true
-    
+
     it 'should set the modal on the controller', ->
       expect(ctrl.searchModal).toBe modal
 
