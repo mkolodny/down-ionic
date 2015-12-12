@@ -638,7 +638,8 @@ ion-nav-back-button {
 
 // Popover
 .popover {
-  background-color: #000;
+  background-color: #000 !important;
+  margin-top: 12px !important;
   color: #fff;
   opacity: .86;
   width: 100%;
