@@ -23,9 +23,6 @@ class Event
             @contacts = contacts
           @items = @buildItems()
 
-    @$scope.$on '$ionicView.beforeEnter', =>
-      @$rootScope.hideTabBar = true
-
   setupSearchModal: =>
     # Init search modal
     modalOptions =
