@@ -608,6 +608,7 @@ describe 'Contacts service', ->
         expect(filteredUserPhones).toEqual [userPhone1]
 
 
+  ##saveContacts
   describe 'saving contacts', ->
     contactsObject = null
     result = null
@@ -624,6 +625,11 @@ describe 'Contacts service', ->
       promise = 'promise'
       LocalDB.set.and.returnValue promise
       result = Contacts.saveContacts contactsObject
+
+    # Could not test this with issues when setting values
+    #   on services from services...
+    # it 'should set the contacts on Auth', ->
+    #   expect(Auth.contacts).toBe contactsObject
 
     it 'should save the contacts to the localDB', ->
       expect(LocalDB.set).toHaveBeenCalledWith 'contacts', contactsObject
