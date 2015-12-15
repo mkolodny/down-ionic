@@ -1,4 +1,3 @@
-require 'ng-cordova'
 RequestContactsCtrl = require './request-contacts-controller'
 
 angular.module 'rallytap.requestContacts', [

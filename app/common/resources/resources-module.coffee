@@ -1,6 +1,5 @@
 require 'angular-local-storage'
 require 'angular-resource'
-require 'angular-ui-router'
 require 'angular-elastic'
 require 'ng-toast'
 require '../env/env-module'
