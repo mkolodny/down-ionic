@@ -55,7 +55,7 @@ window.Ionic.io().onReady ->
       'https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.13/angular-ui-router.min.js'
       'https://d3r38ef3fjjz7g.cloudfront.net/vendor/ionic-angular.min.js'
       'https://d3r38ef3fjjz7g.cloudfront.net/vendor/Chart.min.js'
-      'https://d3r38ef3fjjz7g.cloudfront.net/vendor/angular-chart.min.js'
+      'https://d3r38ef3fjjz7g.cloudfront.net/vendor/angularChart.min.js'
       'https://d3r38ef3fjjz7g.cloudfront.net/vendor/ng-cordova.min.js'
     ]
     injectScripts scripts
