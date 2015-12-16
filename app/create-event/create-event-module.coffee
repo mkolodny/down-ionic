@@ -1,4 +1,3 @@
-require 'ng-cordova'
 require 'ng-toast'
 require '../common/resources/resources-module'
 require '../common/mixpanel/mixpanel-module'

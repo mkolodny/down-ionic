@@ -1,4 +1,3 @@
-require 'ng-cordova'
 require '../common/auth/auth-module'
 RequestLocationCtrl = require './request-location-controller'
 

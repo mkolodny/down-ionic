@@ -1,4 +1,3 @@
-require 'ng-cordova'
 require 'ng-toast'
 require '../auth/auth-module'
 require '../resources/resources-module'

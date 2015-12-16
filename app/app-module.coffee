@@ -1,9 +1,8 @@
+require './ionic/ionic.io.angular.js'
 require 'angular-local-storage'
 require 'ng-toast'
-require 'ng-cordova'
 # Lib
 require './ionic/angular-ios9-uiwebview.patch.js'
-require './ionic/ionic.io.min.js'
 require './vendor/mixpanel/mixpanel-jslib-snippet'
 # Common
 require './common/local-db/local-db-module'
@@ -125,9 +124,6 @@ angular.module 'rallytap', [
         $rootScope, $state, $timeout, $window, Auth, branchKey,
         localStorageService, LocalDB, ionicDeployChannel, PushNotifications,
         skipIonicDeploy, User, Messages) ->
-    ###
-    Put anything that touches Cordova in here!
-    ###
     bootstrap = ->
       # Hide the accessory bar by default (remove this to show the accessory bar
       # above the keyboard for form inputs)
@@ -193,59 +189,60 @@ angular.module 'rallytap', [
       $rootScope.finishedBootstrap = true
       Auth.redirectForAuthState()
 
-    $ionicPlatform.ready ->
-      # Init the localDB
-      LocalDB.init().then ->
-        # Resume session from local storage
-        Auth.resumeSession()
-      .then ->
-        # Skip Downloading Updates During Development
-        if skipIonicDeploy
-          console.log 'Skipping Ionic Deploy'
-          bootstrap()
-          return
+    # Note : checking ionic.onReady in bootstrap.coffee
+    # Init the localDB
+    LocalDB.init().then ->
+      # Resume session from local storage
+      Auth.resumeSession()
+    .then ->    
+      # Skip Downloading Updates During Development
+      if skipIonicDeploy
+        console.log 'Skipping Ionic Deploy'
+        bootstrap()
+        return
 
-        # Check For Updates
-        $ionicDeploy.setChannel ionicDeployChannel
-        if Auth.flags.hasCompletedFirstUpdate
-          # Download in the background
-          bootstrap()
-          $ionicDeploy.check()
-            .then (hasUpdate) ->
-              # No updates
-              if not hasUpdate then return
+      # Check For Updates
+      $ionicDeploy.setChannel ionicDeployChannel
+      if Auth.flags.hasCompletedFirstUpdate
+        # Download in the background
+        bootstrap()
+        $ionicDeploy.check()
+          .then (hasUpdate) ->
+            # No updates
+            if not hasUpdate then return
 
-              # Download in background and extract so that the
-              #  update will be applied on next app launch
-              $ionicDeploy.download()
-                .then ->
-                  $ionicDeploy.extract()
-        else
-          # Update before bootstrapping
-          $ionicDeploy.check()
-            .then (hasUpdate) ->
-              if not hasUpdate
-                # No update
-                Auth.setFlag 'hasCompletedFirstUpdate', true
-                bootstrap()
-                return
-
-              $ionicLoading.show
-                template: '''
-                  <div class="loading-text">Loading...</div>
-                  <ion-spinner icon="bubbles"></ion-spinner>
-                  '''
-
-              # Download update
-              $ionicDeploy.update()
-                .then ->
-                  Auth.setFlag 'hasCompletedFirstUpdate', true
-                .finally ->
-                  $ionicLoading.hide()
-                  bootstrap()
-            , ->
-              # Error checking for update
+            # Download in background and extract so that the
+            #  update will be applied on next app launch
+            $ionicDeploy.download()
+              .then ->
+                $ionicDeploy.extract()
+      else
+        # Update before bootstrapping
+        $ionicDeploy.check()
+          .then (hasUpdate) ->
+            if not hasUpdate
+              # No update
+              Auth.setFlag 'hasCompletedFirstUpdate', true
               bootstrap()
+              return
+
+            $ionicLoading.show
+              template: '''
+                <div class="loading-text">Loading...</div>
+                <ion-spinner icon="bubbles"></ion-spinner>
+                '''
+
+            # Download update
+            $ionicDeploy.update()
+              .then ->
+                Auth.setFlag 'hasCompletedFirstUpdate', true
+              .finally ->
+                $ionicLoading.hide()
+                bootstrap()
+          , ->
+            # Error checking for update
+            bootstrap()
+
 
   .constant '$ionicLoadingConfig',
     template: '''

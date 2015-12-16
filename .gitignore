@@ -9,7 +9,7 @@ plugins/
 *.sw[op]
 
 # build directory
-www/
+/www/
 
 # test directory
 tests/
