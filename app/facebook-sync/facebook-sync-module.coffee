@@ -1,4 +1,3 @@
-require 'ng-cordova'
 FacebookSyncCtrl = require './facebook-sync-controller'
 
 angular.module 'rallytap.facebookSync', [

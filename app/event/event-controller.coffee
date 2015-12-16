@@ -105,6 +105,12 @@ class Event
   showSearchModal: ->
     @searchModal.show()
 
+  didUserSaveEvent: ->
+    if @savedEvent
+      angular.isArray @savedEvent.interestedFriends
+    else
+      angular.isDefined @recommendedEvent.wasSaved
+
 
 
 

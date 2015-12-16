@@ -116,6 +116,9 @@ gulp.task 'resources-scripts', ->
     'meteor.js'
     'ionic.js'
     'ionic-angular.js'
+    'angular-chart.js'
+    'intlTelInput.js'
+    'jQuery-1.11.3.js'
   ]
   for fileName in files
     gulp.src "#{resourcesScriptsDir}/#{fileName}"
