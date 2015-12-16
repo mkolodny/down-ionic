@@ -322,16 +322,22 @@ describe 'events controller', ->
 
     describe 'when successful', ->
       response = null
+      recommendedEvents = null
 
       beforeEach ->
         response = []
         spyOn ctrl, 'handleLoadedData'
+        recommendedEvents = []
+        spyOn(ctrl, 'shuffle').and.returnValue recommendedEvents
 
         deferred.resolve response
         scope.$apply()
 
+      it 'should shuffle the recommended events', ->
+        expect(ctrl.shuffle).toHaveBeenCalledWith response
+
       it 'should set the recommended events on the controller', ->
-        expect(ctrl.recommendedEvents).toBe response
+        expect(ctrl.recommendedEvents).toBe recommendedEvents
 
       it 'should set the recommended events loaded flag', ->
         expect(ctrl.recommendedEventsLoaded).toBe true

@@ -82,7 +82,7 @@ class EventsCtrl
   getRecommendedEvents: ->
     @RecommendedEvent.query()
       .$promise.then (recommendedEvents) =>
-        @recommendedEvents = recommendedEvents
+        @recommendedEvents = @shuffle recommendedEvents
         @recommendedEventsLoaded = true
         @handleLoadedData()
       , =>
@@ -132,5 +132,24 @@ class EventsCtrl
     @Auth.setFlag 'hasLearnedSaveEvent', true
     @$rootScope.showLearnSaveEventPopover = false
     @optionallyShowWalkthrough()
+
+  # From http://stackoverflow.com/a/6274398/1658458
+  shuffle: (array) ->
+    counter = array.length
+
+    # While there are elements in the array
+    while counter > 0
+      # Pick a random index
+      index = Math.floor Math.random()*counter
+
+      # Decrease counter by 1
+      counter -= 1
+
+      # And swap the last element with it
+      temp = array[counter]
+      array[counter] = array[index]
+      array[index] = temp
+
+    array
 
 module.exports = EventsCtrl
